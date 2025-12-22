@@ -1,0 +1,16 @@
+Requirements resolution
+
+Targets -> required contracts mapping:
+  contracts/target_requirements.json
+
+Resolve requirements:
+  python3 tools/resolve_requirements.py --targets wasm,c --out receipts/requirements.json
+
+Probe required deps:
+  STUNIR_OUTPUT_TARGETS=wasm,c scripts/ensure_deps.sh
+
+Verify requirements satisfied:
+  scripts/verify_deps.sh
+
+Attestations:
+  python3 tools/inspect_attestation.py <files...> --out receipts/attestations.json
