@@ -1,16 +1,22 @@
 Requirements resolution
-
 Targets -> required contracts mapping:
-  contracts/target_requirements.json
+contracts/target_requirements.json
 
 Resolve requirements:
-  python3 tools/resolve_requirements.py --targets wasm,c --out receipts/requirements.json
+python3 tools/resolve_requirements.py --targets wasm,c --out receipts/requirements.json
 
-Probe required deps:
-  STUNIR_OUTPUT_TARGETS=wasm,c scripts/ensure_deps.sh
+Probe required deps (capability-based acceptance):
+STUNIR_OUTPUT_TARGETS=wasm,c STUNIR_PROBE_DEPS=1 scripts/build.sh
+# or run directly:
+# STUNIR_OUTPUT_TARGETS=wasm,c scripts/ensure_deps.sh
 
 Verify requirements satisfied:
-  scripts/verify_deps.sh
+scripts/verify_deps.sh
+
+Receipt storage:
+- Default: receipts are build artifacts and are not committed.
+- Optional: snapshot receipts into fixtures for audit/review:
+  scripts/snapshot_receipts.sh
 
 Attestations:
-  python3 tools/inspect_attestation.py <files...> --out receipts/attestations.json
+python3 tools/inspect_attestation.py  --out receipts/attestations.json

@@ -3,13 +3,18 @@ Dependency contracts and probing
 This repo assumes users provide toolchain dependencies.
 
 Capability-based acceptance:
-  - A tool is accepted if it satisfies a contract and provides deterministic evidence on fixed test vectors.
-  - No hard pinned manifest is required.
-  - Optional attestation documents can be recorded alongside the tool.
+- A tool is accepted if it satisfies a contract and provides deterministic evidence on fixed test vectors.
+- No hard pinned manifest is required.
+- Optional attestation documents can be recorded alongside the tool.
 
 Contracts: contracts/
 Test vectors: test_vectors/
 
 Example:
-  python3 tools/probe_dependency.py --contract contracts/c_compiler.json --out receipts/deps/c_compiler.json
-  python3 tools/probe_dependency.py --contract contracts/wasm_wat_to_wasm.json --out receipts/deps/wasm_wat_to_wasm.json
+python3 tools/probe_dependency.py --contract contracts/c_compiler.json --out receipts/deps/c_compiler.json
+python3 tools/probe_dependency.py --contract contracts/wasm_wat_to_wasm.json --out receipts/deps/wasm_wat_to_wasm.json
+
+Receipt storage:
+- Receipts are build artifacts by default (not committed).
+- If you need a preserved copy for audit/diff/regression, snapshot to fixtures:
+  scripts/snapshot_receipts.sh
