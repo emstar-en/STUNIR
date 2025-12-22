@@ -1,0 +1,10 @@
+[package]
+name = "hello_rust"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+debug = 0
+codegen-units = 1
+lto = false
+panic = "abort"
