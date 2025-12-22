@@ -1,5 +1,10 @@
 # STUNIR
 
+> **Status: PRE-ALPHA (experimental).**
+>
+> Expect breaking changes: directory layout, IR shape/canonicalization rules, and receipt schemas may change without notice.
+> Do not assume compatibility across commits yet.
+
 STUNIR is a **deterministic, receipt-emitting generation harness** for building programs from a **JSON specification pack** via a canonical **Intermediate Representation (IR)**.
 
 It is designed for workflows where you want to *generate*, *re-generate*, and *verify* artifacts (IR, assembly/binary outputs, manifests) with **machine-checkable provenance**—so you can answer:
@@ -26,7 +31,7 @@ In short: **STUNIR turns “generation” into a reproducible build** with a pap
 ### STUNIR is *not*
 
 - A monolithic compiler for a specific language.
-- A full assembler or C toolchain (you can *optionally* require one, but STUNIR itself is the harness around tools).
+- A full assembler or C toolchain (STUNIR is the harness around tools; backends are pluggable).
 - A magical “LLM writes code” system—STUNIR assumes the planner can be untrusted; **the deterministic toolchain and receipts are the source of truth**.
 
 ## Why this exists
@@ -59,6 +64,51 @@ You’ll typically see directories like:
 The exact contents will evolve, but the invariant is:
 
 > **Specs and tools in → canonical IR + artifacts + receipts out**
+
+## Dependencies (high level)
+
+STUNIR intentionally avoids pinning your entire world to a single build system. Instead, it provides a deterministic harness and asks you to supply **the backend toolchain(s)** for the output(s) you want.
+
+### Core (always)
+
+- A POSIX-like shell environment (`bash` recommended)
+- `python3` (for the `tools/` scripts)
+- Standard CLI utilities typically present on Linux/macOS (`find`, `sort`, `env`, `sha256sum`/`shasum`, etc.)
+
+Recommended (but not always required):
+
+- `git` (for provenance / commit-epoch derivation when enabled)
+
+### Language outputs (pluggable backends)
+
+For any given language target, you generally need **that ecosystem’s compiler/interpreter/runtime**.
+STUNIR will record what was used in receipts; the list below is intentionally **examples, not a hard contract**.
+
+- **C / C++ (standards like C11/C17/C23, C++17/20/23):** a C/C++ toolchain (`clang`/`gcc`, linker)
+- **Rust:** `rustc` + `cargo`
+- **Go:** `go`
+- **JVM languages (Java/Kotlin/Scala/Clojure):** a JDK (and build tooling if you use it)
+- **.NET languages (C#/F#):** .NET SDK
+- **JavaScript/TypeScript:** Node.js (and a package manager if needed)
+- **Python/Ruby/PHP:** the corresponding interpreter/runtime
+- **Lisp family:** depends on dialect (examples: SBCL for Common Lisp, Racket, JVM-based Clojure)
+- **Prolog (5GL):** a Prolog system (example: SWI-Prolog)
+- **WebAssembly:** a WASM toolchain/runtime as appropriate (compiler + runner)
+
+### Direct-to-environment binaries (native / embedded)
+
+If you want **direct binaries** (e.g., ELF/PE/Mach-O, firmware images), you need a target-appropriate toolchain:
+
+- An **assembler + linker** (native or cross)
+- A target-appropriate **CRT/libc/SDK** (depends on OS/ABI)
+- For cross-targets: a **cross-compiler toolchain** for the target architecture
+
+Recommended for verification/testing:
+
+- An emulator/simulator for the target (e.g., QEMU-class tooling)
+- A debugger (e.g., GDB/LLDB-class tooling)
+
+> The important design point: STUNIR’s receipts should make “what produced this binary?” *obvious and checkable*, even when the backend is external.
 
 ## Quickstart
 
@@ -145,49 +195,37 @@ Even without those, you can still get value today by tightening:
 
 If a step can’t “show its work” (produce a checkable receipt/certificate), it shouldn’t be allowed to affect the final output.
 
-## Appendix: previous README (kept for reference)
-
-The content below is preserved from the prior `README.md` found in the pack, in case there are notes you still want to keep.
-
-# STUNIR Pack (alpha, reproducible timestamp ready)
+## Pack notes (legacy / alpha)
 
 This pack bakes in reproducible build timestamp handling. Build scripts prefer the
 following environment variables when determining the canonical build epoch:
 
-1. STUNIR_BUILD_EPOCH (seconds since Unix epoch)
-2. SOURCE_DATE_EPOCH (seconds since Unix epoch; standard for reproducible builds)
-3. GIT_COMMIT_EPOCH (last commit time if `git` is available in the repo that invokes the build)
+1. `STUNIR_BUILD_EPOCH` (seconds since Unix epoch)
+2. `SOURCE_DATE_EPOCH` (seconds since Unix epoch; standard for reproducible builds)
+3. `GIT_COMMIT_EPOCH` (last commit time if `git` is available in the repo that invokes the build)
 4. Fallback to current UTC time (preserves baseline behavior if you do nothing)
 
 Nothing in this pack requires Docker/Nix; those remain optional. When you do use them,
 this same epoch preference applies inside the container or Nix shell.
 
-Quick start
-- Local: `scripts/build.sh`
-- Override time: `STUNIR_BUILD_EPOCH=1730000000 scripts/build.sh`
-- Standard reproducible: `export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct || echo 0); scripts/build.sh`
+### Outputs
 
-Outputs
-- receipts/ contain JSON receipts with `status`, `sha256`, and `build_epoch`.
-- build/provenance.h and build/provenance.json are generated in a deterministic way from the epoch and inputs.
+- `receipts/` contain JSON receipts with `status`, `sha256`, and `build_epoch`.
+- `build/provenance.h` and `build/provenance.json` are generated in a deterministic way from the epoch and inputs.
 - If a C compiler is available, `bin/prov_emit` is built to print embedded provenance at runtime.
 
+### Transparency & exceptions
 
-
-## Transparency & exceptions
 - All receipts include an `epoch` block with `selected_epoch`, `source`, and raw inputs.
 - Set `STUNIR_EPOCH_EXCEPTION_REASON` when a platform forces non-unified epoch behavior; this is recorded in the receipt.
 - The selected epoch is propagated to provenance artifacts and compiled targets where feasible.
 
+### IR generation
 
-## IR generation
-- The build generates a deterministic IR summary at asm/spec_ir.txt from the contents of spec/ using tools/spec_to_ir.py.
-- A receipt (receipts/spec_ir.json) records its sha256 and the exact epoch manifest.
+- The build generates a deterministic IR summary at `asm/spec_ir.txt` from the contents of `spec/` using `tools/spec_to_ir.py`.
+- A receipt (`receipts/spec_ir.json`) records its sha256 and the exact epoch manifest.
 
-## Enforcing toolchains
-- Set `STUNIR_REQUIRE_C_TOOLCHAIN=1` to make the build fail if the C compiler is unavailable (receipt status TOOLCHAIN_REQUIRED_MISSING).
-- Otherwise, the build records SKIPPED_TOOLCHAIN and continues.
+### Enforcing toolchains
 
-## Docker toolchain
-- If you lack a native compiler, run: `scripts/build_docker.sh`
-- This compiles bin/prov_emit inside the gcc:13 container and records receipts on the host.
+- Set `STUNIR_REQUIRE_C_TOOLCHAIN=1` to make the build fail if the C compiler is unavailable (receipt status `TOOLCHAIN_REQUIRED_MISSING`).
+- Otherwise, the build records `SKIPPED_TOOLCHAIN` and continues.
