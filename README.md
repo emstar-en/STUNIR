@@ -41,3 +41,15 @@ Outputs
 ## Docker toolchain
 - If you lack a native compiler, run: `scripts/build_docker.sh`
 - This compiles bin/prov_emit inside the gcc:13 container and records receipts on the host.
+Verification
+
+* After building, run: `scripts/verify.sh`
+* Strict mode defaults to on (`STUNIR_STRICT=1`) and will:
+  - require a deterministic epoch (no CURRENT_TIME)
+  - disable noisy platform fields in receipts by default (`STUNIR_INCLUDE_PLATFORM=0`)
+  - run verification automatically (`STUNIR_VERIFY_AFTER_BUILD=1`)
+
+Opt out for legacy behavior:
+
+* `STUNIR_STRICT=0 scripts/build.sh`
+

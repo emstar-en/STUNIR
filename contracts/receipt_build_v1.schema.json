@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "STUNIR Build Receipt v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "target",
+    "status",
+    "build_epoch",
+    "epoch",
+    "receipt_core_id_sha256"
+  ],
+  "properties": {
+    "schema": {
+      "const": "stunir.receipt.build.v1"
+    },
+    "target": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "build_epoch": {
+      "type": "integer"
+    },
+    "sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "epoch": {
+      "type": "object",
+      "required": [
+        "selected_epoch",
+        "source",
+        "inputs"
+      ],
+      "properties": {
+        "selected_epoch": {
+          "type": "integer"
+        },
+        "source": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "kind",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "dir"
+            ]
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "tool": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "argv": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "receipt_core_id_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "epoch_exception": {
+      "type": "boolean"
+    },
+    "exception_reason": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}
