@@ -16,6 +16,7 @@ fi
 
 # Policy knobs
 export STUNIR_STRICT=${STUNIR_STRICT:-1}
+export STUNIR_CBOR_FLOAT_POLICY=${STUNIR_CBOR_FLOAT_POLICY:-float64_fixed}
 if [[ "$STUNIR_STRICT" == "1" ]]; then
   export STUNIR_REQUIRE_DETERMINISTIC_EPOCH=${STUNIR_REQUIRE_DETERMINISTIC_EPOCH:-1}
   export STUNIR_VERIFY_AFTER_BUILD=${STUNIR_VERIFY_AFTER_BUILD:-1}
@@ -60,7 +61,7 @@ fi
 python3 tools/spec_to_ir.py --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"
 
 # IR files now emitted as deterministic dCBOR bytes (*.dcbor) plus a simple offset bundle.
-python3 tools/spec_to_ir_files.py       --spec-root spec       --out-root asm/ir       --epoch-json "$EPOCH_JSON"       --manifest-out receipts/ir_manifest.json       --bundle-out asm/ir_bundle.bin       --bundle-manifest-out receipts/ir_bundle_manifest.json
+python3 tools/spec_to_ir_files.py       --spec-root spec       --out-root asm/ir       --epoch-json "$EPOCH_JSON"       --manifest-out receipts/ir_manifest.json       --float-policy "$STUNIR_CBOR_FLOAT_POLICY"       --bundle-out asm/ir_bundle.bin       --bundle-manifest-out receipts/ir_bundle_manifest.json
 
 # Generate provenance *after* IR emission so asm_digest commits to final asm/ state
 python3 tools/gen_provenance.py       --epoch "$STUNIR_BUILD_EPOCH"       --spec-root spec       --asm-root asm       --out-header build/provenance.h       --out-json build/provenance.json       --epoch-source "$STUNIR_EPOCH_SOURCE"

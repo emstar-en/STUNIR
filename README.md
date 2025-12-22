@@ -132,10 +132,29 @@ This repo currently emits IR in two complementary forms:
 1. **IR summary**: `asm/spec_ir.txt` via `tools/spec_to_ir.py`
    - a deterministic manifest-style summary of spec JSON files (file + sha256 + optional id/name)
 
-2. **Normalized IR files**: `asm/ir/**/*.json` via `tools/spec_to_ir_files.py`
-   - each `spec/**/*.json` is normalized to a canonical JSON byte form (when parseable)
-   - a manifest `receipts/ir_manifest.json` is written containing sha256 for each normalized IR file (and epoch metadata when available)
+2. **Normalized IR files**: `asm/ir/**/*.dcbor` via `tools/spec_to_ir_files.py`
+   - each `spec/**/*.json` is normalized into deterministic CBOR bytes (dCBOR-style map ordering)
+   - the encoder uses canonical map key ordering and a configurable float policy
+   - a manifest `receipts/ir_manifest.json` is written containing sha256 for each IR file (and epoch metadata when available)
+   - optional bundle output: `asm/ir_bundle.bin` with `receipts/ir_bundle_manifest.json`
 
+
+#### dCBOR float policy
+
+`tools/dcbor.py` supports an explicit float encoding policy enum. This matters because floats can have multiple valid CBOR encodings.
+
+Policies:
+
+- `forbid_floats` — reject any float values.
+- `float64_fixed` — encode floats always as IEEE-754 float64 (deterministic, not "shortest form").
+- `dcbor_shortest` — dCBOR-style numeric reduction and shortest-width float encoding.
+
+Configuration:
+
+- Environment: `STUNIR_CBOR_FLOAT_POLICY` (default: `float64_fixed`)
+- CLI: `tools/spec_to_ir_files.py --float-policy <policy>` (overrides env)
+
+Note: In `dcbor_shortest`, numeric reduction means values like `1.0` encode as the integer `1`, and both `0.0` and `-0.0` encode as integer `0` (consistent with the dCBOR draft rules for negative zero and integer reduction).
 ### Provenance commitment
 
 After IR emission, `tools/gen_provenance.py` computes deterministic digests of directories:
@@ -175,7 +194,7 @@ If the toolchain is missing, a receipt still records the skip/requirement status
 - `build/provenance.json` matches recomputed digests of `spec/` and `asm/`
 - `build/provenance.h` is reproducible
 - `receipts/spec_ir.json` sha256 matches `asm/spec_ir.txt`
-- `receipts/ir_manifest.json` matches the `asm/ir/**/*.json` set and sha256s (exact set in `--strict` mode)
+- `receipts/ir_manifest.json` matches the `asm/ir/**/*.dcbor` set and sha256s (exact set in `--strict` mode)
 - `receipts/prov_emit.json` sha256 matches `bin/prov_emit` when status is `BINARY_EMITTED`
 - receipt epochs match `build/epoch.json`
 
