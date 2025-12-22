@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """STUNIR dependency probe.
-
 Accept a user-provided dependency (tool and/or attestations), evaluate it
 against a capability contract, and emit a checkable acceptance receipt.
-
 No downloads/installs. No hard pinned manifest.
+
+Bundle C extension:
+- tests can treat stdout/stderr as output artifacts by listing '@stdout' and/or '@stderr' in a test's outputs.
+- invariants can include: stdout_nonempty, stdout_empty, stderr_nonempty, stderr_empty.
 """
 
 import argparse
@@ -53,6 +55,8 @@ def run_cmd(argv, cwd=None, env=None, timeout=60):
         'exit_code': p.returncode,
         'stdout_sha256': sha256_bytes(p.stdout),
         'stderr_sha256': sha256_bytes(p.stderr),
+        'stdout_len': len(p.stdout),
+        'stderr_len': len(p.stderr),
     }
 
 
@@ -68,6 +72,8 @@ def resolve_tool(locator, explicit_tool=None):
             found = shutil.which(cand)
             if found:
                 return found
+        return None
+
     return None
 
 
@@ -80,22 +86,46 @@ def apply_placeholders(argv, mapping):
     return out
 
 
-def eval_invariants(invariants, mapping):
+def eval_invariants(invariants, mapping, run_record=None):
     results = []
     ok = True
+
     for inv in invariants or []:
         inv_type = inv.get('type')
+
+        if inv_type in ('stdout_nonempty', 'stdout_empty', 'stderr_nonempty', 'stderr_empty'):
+            if run_record is None:
+                passed = False
+            else:
+                if inv_type == 'stdout_nonempty':
+                    passed = int(run_record.get('stdout_len') or 0) > 0
+                elif inv_type == 'stdout_empty':
+                    passed = int(run_record.get('stdout_len') or 0) == 0
+                elif inv_type == 'stderr_nonempty':
+                    passed = int(run_record.get('stderr_len') or 0) > 0
+                elif inv_type == 'stderr_empty':
+                    passed = int(run_record.get('stderr_len') or 0) == 0
+                else:
+                    passed = False
+            results.append({'type': inv_type, 'passed': passed})
+            ok = ok and passed
+            continue
+
+        # Default: file/path invariants
         path = inv.get('path', '')
         for k, v in mapping.items():
             path = path.replace('{' + k + '}', v)
+
         if inv_type == 'file_exists':
             passed = os.path.exists(path)
         elif inv_type == 'file_nonempty':
             passed = os.path.exists(path) and os.path.getsize(path) > 0
         else:
             passed = False
+
         results.append({'type': inv_type, 'path': path, 'passed': passed})
         ok = ok and passed
+
     return ok, results
 
 
@@ -109,11 +139,12 @@ def main():
     args = ap.parse_args()
 
     repo = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
     contract_path = args.contract
     if not os.path.isabs(contract_path):
         contract_path = os.path.join(repo, contract_path)
-
     contract = load_json(contract_path)
+
     tool = resolve_tool(contract.get('tool_locator', {}), explicit_tool=args.tool)
 
     receipt = {
@@ -179,11 +210,12 @@ def main():
         try:
             r = run_cmd(argv, cwd=repo)
         except Exception:
-            r = {'argv': argv, 'exit_code': None, 'stdout_sha256': None, 'stderr_sha256': None}
+            r = {'argv': argv, 'exit_code': None, 'stdout_sha256': None, 'stderr_sha256': None, 'stdout_len': None, 'stderr_len': None}
         r['accepted_exit_code'] = (r['exit_code'] in accept_codes) if r['exit_code'] is not None else False
         receipt['identity']['commands'].append(r)
 
     all_tests_ok = True
+
     with tempfile.TemporaryDirectory(prefix='stunir_dep_') as td:
         for test in contract.get('tests', []):
             tname = test.get('name')
@@ -199,8 +231,11 @@ def main():
                 cwd = cwd.replace('{' + k + '}', v)
 
             runs = []
-            for i in range(trepeat):
+            for _i in range(trepeat):
+                # Clear file outputs from prior run (stdout/stderr pseudo outputs ignored)
                 for op in touts:
+                    if op in ('@stdout', '@stderr'):
+                        continue
                     op2 = op
                     for k, v in t_mapping.items():
                         op2 = op2.replace('{' + k + '}', v)
@@ -215,6 +250,13 @@ def main():
 
                 outs_digest_map = {}
                 for op in touts:
+                    if op == '@stdout':
+                        outs_digest_map[op] = r.get('stdout_sha256')
+                        continue
+                    if op == '@stderr':
+                        outs_digest_map[op] = r.get('stderr_sha256')
+                        continue
+
                     op2 = op
                     for k, v in t_mapping.items():
                         op2 = op2.replace('{' + k + '}', v)
@@ -223,16 +265,16 @@ def main():
                     else:
                         outs_digest_map[op] = None
 
-                inv_ok, inv_results = eval_invariants(invs, t_mapping)
+                inv_ok, inv_results = eval_invariants(invs, t_mapping, run_record=r)
                 r.update({'outputs_sha256': outs_digest_map, 'invariants_ok': inv_ok, 'invariants': inv_results})
                 runs.append(r)
 
             det_ok = True
             first = runs[0]['outputs_sha256'] if runs else {}
-            for r in runs:
-                det_ok = det_ok and r.get('invariants_ok', False)
-                det_ok = det_ok and (r.get('outputs_sha256') == first)
-                det_ok = det_ok and (r.get('exit_code') == 0)
+            for rr in runs:
+                det_ok = det_ok and rr.get('invariants_ok', False)
+                det_ok = det_ok and (rr.get('outputs_sha256') == first)
+                det_ok = det_ok and (rr.get('exit_code') == 0)
 
             receipt['tests'].append({
                 'name': tname,
