@@ -1,0 +1,9 @@
+// Soufflé Datalog: emits Out.csv deterministically.
+.decl Edge(x:number, y:number)
+.decl Out(x:number, y:number)
+.output Out
+
+Edge(1,2).
+Edge(2,3).
+
+Out(x,y) :- Edge(x,y).
