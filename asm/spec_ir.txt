@@ -1,0 +1,15 @@
+; STUNIR IR SUMMARY v1
+; epoch.selected=1730000000 source=STUNIR_BUILD_EPOCH
+FILE comprehensive-consolidation.rfc6902.json SHA256 2d0273f6796c255b91fe22c5cf6b229788290b7f22d1043000ed150257cff191 ID - NAME -
+FILE core-simple-m_of_n.rfc6902.json SHA256 ef138010e059cbb0ffa647e7533f58f99b95d4bf81d191839f2f91f53e54561e ID - NAME -
+FILE entity-autonomy-ecc-delta.rfc6902.json SHA256 b75c30b7ace5ba96cfd4043381dbce0c431f4db7232290744382898ec415b093 ID - NAME -
+FILE generalized-provenance-accounting.rfc6902.json SHA256 90137e0af4a3a2b00eb3d9d53996c0df27caef0ac19e4789097f06fb322b81f4 ID - NAME -
+FILE hypersync_complete_mathematical_specification_v3.json SHA256 c9a052e93c7c5d9e5befecfa32998bc8703bac6a43da1458599a5bbfd9222c34 ID - NAME -
+FILE io-discrete.rfc6902.json SHA256 d55bc191cf5ebb5cb92491298591671baf11bab78f4310d0901359213c8f61ab ID - NAME -
+FILE ld-namespacing.comprehensive.rfc6902.json SHA256 a89b7047270ca77b46ac6145cd0aa226c118a790827d4c7d9b84394759c267b6 ID - NAME -
+FILE pipeline-to-nld.rfc6902.json SHA256 1902c39712824cdedc7153f70d01d93353058a40211e40e8482cc2c8476cbed6 ID - NAME -
+FILE privacy-balls.comprehensive.rfc6902.json SHA256 ef1fc832b84a8dad6f481c2a4bce0e9ed7dc43361a5d724aa17cb40ffc4c6be8 ID - NAME -
+FILE privacy-presence.rfc6902.json SHA256 edca3dac0dc7790f2a028921c834b2c9f83cefdea8427449b44417be89883436 ID - NAME -
+FILE quorum-arming.rfc6902.json SHA256 69a801b7095fc7bbf0e342faea27592ab31b97406d91dc015d1220b998387fc9 ID - NAME -
+FILE robot-safety-stub.rfc6902.json SHA256 8c5db56756b554795de9299ab1ef9d5614f59b5d2574b0b60a0a28f3178708da ID - NAME -
+FILE schema_fix_catalog.json SHA256 2c692ab2dbdf08df2b7ff3c8fba88be1718e505e9ea7ef5f1f45f634f351c7a8 ID - NAME -

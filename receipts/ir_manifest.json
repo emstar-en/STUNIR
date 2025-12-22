@@ -1,0 +1,53 @@
+{
+  "epoch": {
+    "inputs": {
+      "GIT_COMMIT_EPOCH": null,
+      "SOURCE_DATE_EPOCH": null,
+      "STUNIR_BUILD_EPOCH": 1730000000
+    },
+    "selected_epoch": 1730000000,
+    "source": "STUNIR_BUILD_EPOCH"
+  },
+  "files": [
+    {
+      "file": "comprehensive-consolidation.rfc6902.json",
+      "sha256": "06dcd7e24e1a1d856ca8ef59a28f8bbbe6ae90a4dbbe48956e40705281e79967"
+    },
+    {
+      "file": "core-simple-m_of_n.rfc6902.json",
+      "sha256": "c39f78e23ffe8ff4046a5cb9c835fd84a4e8d9cf431df29a445a44565709ee58"
+    },
+    {
+      "file": "entity-autonomy-ecc-delta.rfc6902.json",
+      "sha256": "12c1499af26064c9f1c3587e8f53e6a050868b6992fdd4f96def5166d6d7e073"
+    },
+    {
+      "file": "generalized-provenance-accounting.rfc6902.json",
+      "sha256": "b86ab881b5d1437395d1132721a2e8f32d17003279b3175cc537a89594f2eb6f"
+    },
+    {
+      "file": "io-discrete.rfc6902.json",
+      "sha256": "ad739da82fe18c83ac668c46b9a8a65f59d3018f6b626b2dca0fb0470e5f717e"
+    },
+    {
+      "file": "ld-namespacing.comprehensive.rfc6902.json",
+      "sha256": "036db26a5c344f2b198b5739a5ba1776b92453d78348353ab6c007c41b6bdd16"
+    },
+    {
+      "file": "pipeline-to-nld.rfc6902.json",
+      "sha256": "fa91ce0b4d9336941cdee5f6782ab1ac6649e33d1cc1750c106b173fdc33479c"
+    },
+    {
+      "file": "quorum-arming.rfc6902.json",
+      "sha256": "9e335431fae414d9cab994b953fe724be6cb0613c229ba9041cf905ee4551d1d"
+    },
+    {
+      "file": "robot-safety-stub.rfc6902.json",
+      "sha256": "295f164ec5d5fa29d6c86abc021ae557003846dcc9071515925f395271b3c0e5"
+    },
+    {
+      "file": "schema_fix_catalog.json",
+      "sha256": "f6f8fbba7c29f54369c432a03a7c5964ce4e007083591e25c721f181aa5b4b1a"
+    }
+  ]
+}
