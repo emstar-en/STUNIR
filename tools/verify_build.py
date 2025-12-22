@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Verify STUNIR build artifacts and receipts.
 
-This is intended to be a *small checker*.
+Intended to be a small checker.
 
 Verifies (when present):
-  - build/provenance.json matches recomputed digests of spec/ and asm/
-  - build/provenance.h matches recomputed provenance
-  - receipts/spec_ir.json sha256 matches asm/spec_ir.txt
-  - receipts/ir_manifest.json matches asm/ir/* file sha256s (exact file set in --strict mode)
-  - receipts/prov_emit.json sha256 matches bin/prov_emit when status=BINARY_EMITTED
-  - each receipt epoch.selected_epoch matches build/epoch.json selected_epoch
+- build/provenance.json matches recomputed digests of spec/ and asm/
+- build/provenance.h matches recomputed provenance
+- receipts/spec_ir.json sha256 matches asm/spec_ir.txt
+- receipts/ir_manifest.json matches asm/ir/* file sha256s (exact file set in --strict mode)
+- receipts/ir_bundle_manifest.json matches asm/ir_bundle.bin offsets+sha (when present)
+- receipts/prov_emit.json sha256 matches bin/prov_emit when status=BINARY_EMITTED
+- each receipt epoch.selected_epoch matches build/epoch.json selected_epoch
 
 Exit codes:
   0 OK
@@ -59,6 +60,16 @@ def run_py(repo: Path, tool_rel: str, argv: list[str]) -> subprocess.CompletedPr
     return subprocess.run(cmd, cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
 
 
+def _infer_ir_glob_from_manifest(man: dict) -> str:
+    # Back-compat: if manifest lists *.dcbor files, verify those; else verify *.json.
+    files = man.get('files') or []
+    for f in files:
+        name = (f.get('file') or '')
+        if name.endswith('.dcbor'):
+            return '*.dcbor'
+    return '*.json'
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--repo', default='.')
@@ -80,13 +91,11 @@ def main():
     selected_epoch = epoch.get('selected_epoch')
 
     prov = load_json(prov_json)
-
     if selected_epoch is not None and prov.get('build_epoch') is not None and int(prov.get('build_epoch')) != int(selected_epoch):
         fail('build/provenance.json build_epoch does not match build/epoch.json selected_epoch')
 
     spec_digest = sha256_of_dir(repo / 'spec')
     asm_digest = sha256_of_dir(repo / 'asm')
-
     if prov.get('spec_digest') != spec_digest:
         fail(f"spec_digest mismatch: expected {prov.get('spec_digest')} got {spec_digest}")
     if prov.get('asm_digest') != asm_digest:
@@ -108,9 +117,9 @@ def main():
         except Exception:
             pass
     tmp.mkdir(parents=True, exist_ok=True)
+
     tmp_h = tmp / 'provenance.h'
     tmp_j = tmp / 'provenance.json'
-
     r = run_py(repo, 'tools/gen_provenance.py', [
         '--epoch', str(prov.get('build_epoch', 0)),
         '--spec-root', 'spec',
@@ -145,10 +154,13 @@ def main():
     ir_root = repo / 'asm' / 'ir'
     if man_path.exists():
         man = load_json(man_path)
-        listed = {f['file']: f['sha256'] for f in (man.get('files') or [])}
+        glob_pat = _infer_ir_glob_from_manifest(man)
+
+        listed = {f['file']: f['sha256'] for f in (man.get('files') or []) if f.get('file')}
         actual_files = []
+
         if ir_root.exists():
-            for p in sorted(ir_root.rglob('*.json')):
+            for p in sorted(ir_root.rglob(glob_pat)):
                 if p.is_file():
                     rel = p.relative_to(ir_root).as_posix()
                     actual_files.append(rel)
@@ -156,12 +168,39 @@ def main():
                     exp = listed.get(rel)
                     if exp != got:
                         fail(f"IR file sha256 mismatch for {rel}: expected {exp} got {got}")
+
         if args.strict:
             if set(actual_files) != set(listed.keys()):
                 fail('IR manifest file set does not match asm/ir contents')
+
         e = (man.get('epoch') or {}).get('selected_epoch')
         if selected_epoch is not None and e is not None and int(e) != int(selected_epoch):
             fail('ir_manifest epoch.selected_epoch does not match build/epoch.json')
+
+    # Verify IR bundle offsets (optional)
+    bm_path = repo / 'receipts' / 'ir_bundle_manifest.json'
+    if bm_path.exists():
+        bm = load_json(bm_path)
+        bundle_path = repo / (bm.get('bundle') or 'asm/ir_bundle.bin')
+        if not bundle_path.exists():
+            fail('ir_bundle_manifest.json present but bundle file is missing')
+        bundle = bundle_path.read_bytes()
+        got_bundle_sha = hashlib.sha256(bundle).hexdigest()
+        if bm.get('bundle_sha256') and bm.get('bundle_sha256') != got_bundle_sha:
+            fail('IR bundle sha256 does not match ir_bundle_manifest.json')
+        for ent in (bm.get('entries') or []):
+            off = int(ent.get('offset', -1))
+            ln = int(ent.get('length', -1))
+            if off < 0 or ln < 0 or off + ln > len(bundle):
+                fail(f"IR bundle entry out of bounds for {ent.get('file')}")
+            seg = bundle[off:off+ln]
+            seg_sha = hashlib.sha256(seg).hexdigest()
+            if ent.get('sha256') and ent.get('sha256') != seg_sha:
+                fail(f"IR bundle segment sha256 mismatch for {ent.get('file')}")
+
+        e = (bm.get('epoch') or {}).get('selected_epoch')
+        if selected_epoch is not None and e is not None and int(e) != int(selected_epoch):
+            fail('ir_bundle_manifest epoch.selected_epoch does not match build/epoch.json')
 
     # Verify prov_emit receipt
     prov_emit_receipt = repo / 'receipts' / 'prov_emit.json'
@@ -175,9 +214,9 @@ def main():
             got = sha256_file(prov_emit_bin)
             if rr.get('sha256') != got:
                 fail('prov_emit receipt sha256 does not match bin/prov_emit')
-        e = (rr.get('epoch') or {}).get('selected_epoch')
-        if selected_epoch is not None and e is not None and int(e) != int(selected_epoch):
-            fail('prov_emit receipt epoch.selected_epoch does not match build/epoch.json')
+            e = (rr.get('epoch') or {}).get('selected_epoch')
+            if selected_epoch is not None and e is not None and int(e) != int(selected_epoch):
+                fail('prov_emit receipt epoch.selected_epoch does not match build/epoch.json')
 
     print('OK')
 

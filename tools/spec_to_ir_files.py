@@ -1,51 +1,147 @@
-#!/usr/bin/env python3
-import argparse, hashlib, json, os
-from pathlib import Path
+    #!/usr/bin/env python3
+    import argparse
+    import hashlib
+    import json
+    import os
+    from pathlib import Path
 
-def normalize_json_bytes(b):
-    try:
-        obj = json.loads(b.decode('utf-8'))
-        return json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False).encode('utf-8') + b"\n"
-    except Exception:
-        return b
+    # When run as: python3 tools/spec_to_ir_files.py
+    # sys.path[0] == 'tools', so sibling import works.
+    import dcbor
 
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument('--spec-root', default='spec')
-    p.add_argument('--out-root', default='asm/ir')
-    p.add_argument('--epoch-json', default=None)
-    p.add_argument('--manifest-out', default='receipts/ir_manifest.json')
-    args = p.parse_args()
 
-    spec_root = Path(args.spec_root)
-    out_root = Path(args.out_root)
-    out_root.mkdir(parents=True, exist_ok=True)
+    def _load_epoch(epoch_json_path: str | None):
+        if not epoch_json_path:
+            return None
+        if epoch_json_path == '-':
+            return None
+        if os.path.isfile(epoch_json_path):
+            try:
+                with open(epoch_json_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                return None
+        return None
 
-    files = sorted([p for p in spec_root.rglob('*.json') if p.is_file()])
-    manifest = { 'files': [], 'epoch': None }
-    if args.epoch_json and os.path.isfile(args.epoch_json):
+
+    def _encode_spec_bytes_to_dcbor(b: bytes) -> tuple[bytes, bool]:
+        """Return (dcbor_bytes, parsed_json_ok).
+
+        If the input is not valid JSON, we still produce dCBOR bytes by
+        encoding the raw bytes as a CBOR byte-string.
+        """
         try:
-            with open(args.epoch_json, 'r', encoding='utf-8') as f:
-                manifest['epoch'] = json.load(f)
+            obj = json.loads(b.decode('utf-8'))
+            return (dcbor.dumps(obj), True)
         except Exception:
-            manifest['epoch'] = None
+            return (dcbor.dumps(b), False)
 
-    for src in files:
-        rel = src.relative_to(spec_root)
-        dst = out_root / rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        data = src.read_bytes()
-        norm = normalize_json_bytes(data)
-        dst.write_bytes(norm)
-        sha = hashlib.sha256(norm).hexdigest()
-        manifest['files'].append({'file': rel.as_posix(), 'sha256': sha})
 
-    manifest['files'].sort(key=lambda x: x['file'])
-    man_path = Path(args.manifest_out)
-    man_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(man_path, 'w', encoding='utf-8') as f:
-        json.dump(manifest, f, sort_keys=True, separators=(',',':'), ensure_ascii=False)
-    print(f"Wrote IR files to {out_root} and manifest {man_path}")
+    def main():
+        p = argparse.ArgumentParser()
+        p.add_argument('--spec-root', default='spec')
+        p.add_argument('--out-root', default='asm/ir')
+        p.add_argument('--epoch-json', default=None)
+        p.add_argument('--manifest-out', default='receipts/ir_manifest.json')
+        # Optional: emit a single bundle file + offset index for simplicity.
+        p.add_argument('--bundle-out', default=None)
+        p.add_argument('--bundle-manifest-out', default=None)
+        args = p.parse_args()
 
-if __name__ == '__main__':
-    main()
+        spec_root = Path(args.spec_root)
+        out_root = Path(args.out_root)
+        out_root.mkdir(parents=True, exist_ok=True)
+
+        epoch = _load_epoch(args.epoch_json)
+
+        src_files = sorted([pp for pp in spec_root.rglob('*.json') if pp.is_file()])
+
+        manifest = {
+            'schema': 'stunir.ir_manifest.v2',
+            'ir_format': 'dcbor',
+            'files': [],
+            'epoch': epoch,
+        }
+
+        # Bundle support
+        bundle_entries = []
+        bundle_bytes_parts: list[bytes] = []
+        bundle_offset = 0
+
+        for src in src_files:
+            rel_src = src.relative_to(spec_root)
+            # Output path: replace .json -> .dcbor for clarity.
+            rel_out = rel_src.with_suffix('.dcbor')
+            dst = out_root / rel_out
+            dst.parent.mkdir(parents=True, exist_ok=True)
+
+            raw = src.read_bytes()
+            ir_bytes, parsed_ok = _encode_spec_bytes_to_dcbor(raw)
+            dst.write_bytes(ir_bytes)
+
+            sha = hashlib.sha256(ir_bytes).hexdigest()
+            rec = {
+                'file': rel_out.as_posix(),
+                'source_file': rel_src.as_posix(),
+                'sha256': sha,
+                'json_parse': bool(parsed_ok),
+                'bytes_len': len(ir_bytes),
+            }
+            manifest['files'].append(rec)
+
+            if args.bundle_out:
+                bundle_entries.append({
+                    'file': rel_out.as_posix(),
+                    'source_file': rel_src.as_posix(),
+                    'offset': bundle_offset,
+                    'length': len(ir_bytes),
+                    'sha256': sha,
+                    'json_parse': bool(parsed_ok),
+                })
+                bundle_bytes_parts.append(ir_bytes)
+                bundle_offset += len(ir_bytes)
+
+        manifest['files'].sort(key=lambda x: x['file'])
+
+        man_path = Path(args.manifest_out)
+        man_path.parent.mkdir(parents=True, exist_ok=True)
+        man_path.write_text(
+            json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '
+',
+            encoding='utf-8',
+        )
+
+        if args.bundle_out:
+            if not args.bundle_manifest_out:
+                raise SystemExit('--bundle-out requires --bundle-manifest-out')
+
+            bundle_path = Path(args.bundle_out)
+            bundle_path.parent.mkdir(parents=True, exist_ok=True)
+            bundle_data = b''.join(bundle_bytes_parts)
+            bundle_path.write_bytes(bundle_data)
+            bundle_sha = hashlib.sha256(bundle_data).hexdigest()
+
+            bundle_manifest = {
+                'schema': 'stunir.ir_bundle_manifest.v1',
+                'bundle': str(bundle_path.as_posix()),
+                'bundle_format': 'concat_raw',
+                'bundle_sha256': bundle_sha,
+                'epoch': epoch,
+                'entries': sorted(bundle_entries, key=lambda x: x['file']),
+            }
+
+            bm_path = Path(args.bundle_manifest_out)
+            bm_path.parent.mkdir(parents=True, exist_ok=True)
+            bm_path.write_text(
+                json.dumps(bundle_manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '
+',
+                encoding='utf-8',
+            )
+
+        print(f"Wrote IR files to {out_root} and manifest {man_path}")
+        if args.bundle_out:
+            print(f"Wrote IR bundle {args.bundle_out} and bundle manifest {args.bundle_manifest_out}")
+
+
+    if __name__ == '__main__':
+        main()

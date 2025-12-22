@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 # Determinism defaults (can be overridden by environment)
 export LC_ALL=${LC_ALL:-C}
 export LANG=${LANG:-C}
@@ -28,6 +29,7 @@ fi
 # Epoch resolution (preserve or generate once) - reproducible and transparent
 EPOCH_JSON=build/epoch.json
 mkdir -p build receipts bin
+
 if [[ "${STUNIR_PRESERVE_EPOCH:-0}" == "1" ]] && [[ -s "$EPOCH_JSON" ]]; then
   CANONICAL_EPOCH="$(python3 -c 'import json; print(json.load(open("build/epoch.json"))["selected_epoch"])')"
   STUNIR_EPOCH_SOURCE="$(python3 -c 'import json; print(json.load(open("build/epoch.json"))["source"])')"
@@ -36,6 +38,7 @@ else
   CANONICAL_EPOCH="$(cat build/.epoch_val)"
   STUNIR_EPOCH_SOURCE="$(python3 -c 'import json; print(json.load(open("build/epoch.json"))["source"])')"
 fi
+
 export STUNIR_BUILD_EPOCH="$CANONICAL_EPOCH"
 export STUNIR_EPOCH_SOURCE
 
@@ -46,9 +49,6 @@ if [[ "${STUNIR_REQUIRE_DETERMINISTIC_EPOCH:-0}" == "1" ]] && [[ "$STUNIR_EPOCH_
 fi
 
 # Optional: dependency probing / capability acceptance
-# Gate is explicit to avoid surprising users.
-# - Set STUNIR_PROBE_DEPS=1 to probe required contracts for STUNIR_OUTPUT_TARGETS.
-# - Set STUNIR_REQUIRE_DEPS=1 to fail the build if requirements are not satisfied.
 if [[ "${STUNIR_PROBE_DEPS:-0}" == "1" ]] || [[ -n "${STUNIR_OUTPUT_TARGETS:-}" ]]; then
   bash scripts/ensure_deps.sh
   if [[ "${STUNIR_REQUIRE_DEPS:-0}" == "1" ]]; then
@@ -58,13 +58,15 @@ fi
 
 # Generate deterministic IR from spec/
 python3 tools/spec_to_ir.py --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"
-python3 tools/spec_to_ir_files.py --spec-root spec --out-root asm/ir --epoch-json "$EPOCH_JSON" --manifest-out receipts/ir_manifest.json
+
+# IR files now emitted as deterministic dCBOR bytes (*.dcbor) plus a simple offset bundle.
+python3 tools/spec_to_ir_files.py       --spec-root spec       --out-root asm/ir       --epoch-json "$EPOCH_JSON"       --manifest-out receipts/ir_manifest.json       --bundle-out asm/ir_bundle.bin       --bundle-manifest-out receipts/ir_bundle_manifest.json
 
 # Generate provenance *after* IR emission so asm_digest commits to final asm/ state
-python3 tools/gen_provenance.py   --epoch "$STUNIR_BUILD_EPOCH"   --spec-root spec   --asm-root asm   --out-header build/provenance.h   --out-json build/provenance.json   --epoch-source "$STUNIR_EPOCH_SOURCE"
+python3 tools/gen_provenance.py       --epoch "$STUNIR_BUILD_EPOCH"       --spec-root spec       --asm-root asm       --out-header build/provenance.h       --out-json build/provenance.json       --epoch-source "$STUNIR_EPOCH_SOURCE"
 
 # Record IR receipt (bind tool + argv; include generator sources as inputs)
-python3 tools/record_receipt.py   --target asm/spec_ir.txt   --receipt receipts/spec_ir.json   --status GENERATED_IR   --build-epoch "$STUNIR_BUILD_EPOCH"   --epoch-json "$EPOCH_JSON"   --inputs build/provenance.json receipts/ir_manifest.json tools/spec_to_ir.py tools/spec_to_ir_files.py tools/gen_provenance.py tools/record_receipt.py   --input-dirs spec asm   --tool "$PY_BIN"   --argv "$PY_BIN" tools/spec_to_ir.py --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"   --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+python3 tools/record_receipt.py       --target asm/spec_ir.txt       --receipt receipts/spec_ir.json       --status GENERATED_IR       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json               tools/spec_to_ir.py tools/spec_to_ir_files.py tools/dcbor.py tools/gen_provenance.py tools/record_receipt.py       --input-dirs spec asm       --tool "$PY_BIN"       --argv "$PY_BIN" tools/spec_to_ir.py --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
 
 # Try compiling the provenance emitter for the host, if a C compiler exists
 CC_BIN="${CC:-}"
@@ -85,17 +87,18 @@ fi
 
 if [[ -n "$CC_BIN" ]]; then
   echo "Compiling prov_emit with $CC_BIN (epoch=$STUNIR_BUILD_EPOCH)"
-  $CC_BIN -std=c11 -O2 -Wno-builtin-macro-redefined     -D_FORTIFY_SOURCE=2     -D_STUNIR_BUILD_EPOCH="$STUNIR_BUILD_EPOCH"     -Ibuild -o bin/prov_emit tools/prov_emit.c
+  $CC_BIN -std=c11 -O2 -Wno-builtin-macro-redefined -D_FORTIFY_SOURCE=2         -D_STUNIR_BUILD_EPOCH="$STUNIR_BUILD_EPOCH" -Ibuild -o bin/prov_emit tools/prov_emit.c
 
-  python3 tools/record_receipt.py     --target bin/prov_emit     --receipt receipts/prov_emit.json     --status BINARY_EMITTED     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json receipts/ir_manifest.json tools/prov_emit.c tools/record_receipt.py     --input-dirs spec asm     --tool "$CC_PATH"     --argv "$CC_PATH" -std=c11 -O2 -Wno-builtin-macro-redefined -D_FORTIFY_SOURCE=2 -D_STUNIR_BUILD_EPOCH="$STUNIR_BUILD_EPOCH" -Ibuild -o bin/prov_emit tools/prov_emit.c     --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+  python3 tools/record_receipt.py         --target bin/prov_emit         --receipt receipts/prov_emit.json         --status BINARY_EMITTED         --build-epoch "$STUNIR_BUILD_EPOCH"         --epoch-json "$EPOCH_JSON"         --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json tools/prov_emit.c tools/record_receipt.py         --input-dirs spec asm         --tool "$CC_PATH"         --argv "$CC_PATH" -std=c11 -O2 -Wno-builtin-macro-redefined -D_FORTIFY_SOURCE=2               -D_STUNIR_BUILD_EPOCH="$STUNIR_BUILD_EPOCH" -Ibuild -o bin/prov_emit tools/prov_emit.c         --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
 else
   if [[ "${STUNIR_REQUIRE_C_TOOLCHAIN:-0}" == "1" ]]; then
     echo "No C compiler found and STUNIR_REQUIRE_C_TOOLCHAIN=1; failing."
-    python3 tools/record_receipt.py       --target bin/prov_emit       --receipt receipts/prov_emit.json       --status TOOLCHAIN_REQUIRED_MISSING       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json tools/prov_emit.c tools/record_receipt.py       --input-dirs spec asm       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    python3 tools/record_receipt.py           --target bin/prov_emit           --receipt receipts/prov_emit.json           --status TOOLCHAIN_REQUIRED_MISSING           --build-epoch "$STUNIR_BUILD_EPOCH"           --epoch-json "$EPOCH_JSON"           --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json tools/prov_emit.c tools/record_receipt.py           --input-dirs spec asm           --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
     exit 2
   else
     echo "No C compiler found; skipping prov_emit build"
-    python3 tools/record_receipt.py       --target bin/prov_emit       --receipt receipts/prov_emit.json       --status SKIPPED_TOOLCHAIN       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json tools/prov_emit.c tools/record_receipt.py       --input-dirs spec asm       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    python3 tools/record_receipt.py           --target bin/prov_emit           --receipt receipts/prov_emit.json           --status SKIPPED_TOOLCHAIN           --build-epoch "$STUNIR_BUILD_EPOCH"           --epoch-json "$EPOCH_JSON"           --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json tools/prov_emit.c tools/record_receipt.py           --input-dirs spec asm           --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
   fi
 fi
 
