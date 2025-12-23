@@ -1,0 +1,3 @@
+./scripts/verify.sh receipt.dsse.json \
+  --trust-key <KEYID>=keys/pubkey.pem \
+  --required-algs sha256,sha512
