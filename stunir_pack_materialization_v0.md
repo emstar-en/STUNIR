@@ -4,24 +4,21 @@
 This document clarifies how STUNIR can “go all the way to runtime” while keeping the **pack** deterministic.
 
 Key principle:
-
 - **Digests define identity. Paths are UX.**
 
 #### 1. Definitions
-- **Included blob:** present under `objects/sha256/<hex>` and referenced by the manifest.
+- **Included blob:** present under `objects/sha256/` and referenced by the root attestation.
 - **Materialized file:** written into some workspace path chosen by the user/model.
 
 #### 2. Typical STUNIR usage
 STUNIR commonly:
-
-- commits to **inputs + IR + receipts** (portable audit evidence), and
+- commits to **inputs + IR + attestation artifacts** (portable audit evidence), and
 - materializes downstream outputs to user-chosen paths.
 
-In many workflows, users keep receipts as the audit record; auditors who care about inputs (e.g., the spec) will naturally examine upstream artifacts.
+In many workflows, users keep step receipts as the audit record; auditors who care about inputs (e.g., the spec) will naturally examine upstream artifacts.
 
 #### 3. Materialization as a pure operation
 Given a mapping `(digest -> destination_path)`, materialization is:
-
 1. locate blob bytes by `digest` in the object store,
 2. write exact bytes to `destination_path`.
 
@@ -31,7 +28,6 @@ This is a pure copy. Any permissions/exec bits are a policy decision and should 
 Paths are often absolute, host-specific, user-specific, or ephemeral.
 
 If you need auditability, emit a **materialization receipt**:
-
 - It SHOULD record the list of `(digest, destination_path, mode)`.
 - Its **core identifier** SHOULD be computed from digest lists and normalized policy fields, excluding absolute paths.
 - The full receipt MAY include paths in a non-core section.
