@@ -6,16 +6,21 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      STUNIR_STRICT: "1"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Make scripts executable
-        run: |
-          chmod +x scripts/*.sh || true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Build (includes verification)
         shell: bash
         run: |
-          ./scripts/build.sh
+          bash scripts/build.sh
