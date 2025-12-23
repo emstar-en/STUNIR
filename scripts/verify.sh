@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export LC_ALL=${LC_ALL:-C}
-export LANG=${LANG:-C}
-export TZ=${TZ:-UTC}
-export PYTHONHASHSEED=${PYTHONHASHSEED:-0}
+ENVELOPE=${1:-receipt.dsse.json}
+shift || true
 
-python3 -B tools/verify_build.py --repo . --strict
+python3 tools/verify_build.py   --envelope "${ENVELOPE}"   --repo .   --tmp-dir _verify_build   "$@"
