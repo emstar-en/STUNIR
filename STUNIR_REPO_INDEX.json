@@ -1,0 +1,1824 @@
+{
+  "repo": "emstar-en/STUNIR",
+  "branch": "main",
+  "generated_utc": "2025-12-24T04:38:03Z",
+  "notes": {
+    "git_sha": "This is the git blob SHA (sha1) from the repository tree.",
+    "sha256": "Chunk sha256 values are computed over UTF-8 text chunks in STUNIR_CHUNK_INDEX.jsonl.",
+    "test_vectors": "Included in REPO index with metadata; excluded from chunking by default to avoid noise."
+  },
+  "files": [
+    {
+      "path": ".github/workflows/verify.yml",
+      "size": 457,
+      "git_sha": "04d3bf66c81e43f74304f3b6f8e08883981e4f8a",
+      "ext": ".yml",
+      "category": "data",
+      "is_test_vector": false
+    },
+    {
+      "path": "AI_START_HERE.md",
+      "size": 1612,
+      "git_sha": "b4f21e376d648f57934124cdb9a5365b3dc4f450",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "AI_START_HERE"
+        },
+        {
+          "level": 2,
+          "text": "Canonical reading order"
+        },
+        {
+          "level": 2,
+          "text": "Repo map (what lives where)"
+        },
+        {
+          "level": 2,
+          "text": "Anti-loop rules"
+        },
+        {
+          "level": 2,
+          "text": "Link conventions"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "ENTRYPOINT.md",
+      "size": 3436,
+      "git_sha": "b8b22f21e633e2c684befca656090519e36ac5d7",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack Entry Point (v0)"
+        },
+        {
+          "level": 4,
+          "text": "1) What to look for"
+        },
+        {
+          "level": 4,
+          "text": "2) Authority rule (integrity boundary)"
+        },
+        {
+          "level": 4,
+          "text": "3) What STUNIR is trying to achieve"
+        },
+        {
+          "level": 4,
+          "text": "4) Inclusion vs materialization"
+        },
+        {
+          "level": 4,
+          "text": "5) Minimal verification checklist"
+        },
+        {
+          "level": 4,
+          "text": "6) Where the detailed rules live"
+        },
+        {
+          "level": 4,
+          "text": "7) Model/agent operating guidance (non-normative)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "LICENSE",
+      "size": 11357,
+      "git_sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "ext": "",
+      "category": "other",
+      "is_test_vector": false
+    },
+    {
+      "path": "README.md",
+      "size": 17775,
+      "git_sha": "4ae88f72e112b6cd9c42660cecfbf0beb94ce779",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "STUNIR"
+        },
+        {
+          "level": 2,
+          "text": "Where to start"
+        },
+        {
+          "level": 2,
+          "text": "Why the name matters (ST / UN / IR)"
+        },
+        {
+          "level": 3,
+          "text": "ST \u2014 Standardization Theorem (operational meaning in STUNIR)"
+        },
+        {
+          "level": 3,
+          "text": "UN \u2014 Unique Normals (what we use today)"
+        },
+        {
+          "level": 3,
+          "text": "IR \u2014 Intermediate Reference"
+        },
+        {
+          "level": 2,
+          "text": "Origin / motivation (why this exists)"
+        },
+        {
+          "level": 2,
+          "text": "What STUNIR is (and is not)"
+        },
+        {
+          "level": 3,
+          "text": "STUNIR is"
+        },
+        {
+          "level": 3,
+          "text": "STUNIR is not"
+        },
+        {
+          "level": 2,
+          "text": "Core idea: shackle models to a deterministic toolchain"
+        },
+        {
+          "level": 2,
+          "text": "Packs and attestation artifacts (distribution vs workspace)"
+        },
+        {
+          "level": 3,
+          "text": "Pack bootstrap: root attestation"
+        },
+        {
+          "level": 3,
+          "text": "Inclusion vs materialization"
+        },
+        {
+          "level": 2,
+          "text": "Verification (small checkers, multiple toolchain levels)"
+        },
+        {
+          "level": 3,
+          "text": "Profile 1: Full verification (Python)"
+        },
+        {
+          "level": 3,
+          "text": "Profile 2: Portable verifier binary (no Python)"
+        },
+        {
+          "level": 3,
+          "text": "Profile 3: Minimal verification (no Python, no custom binaries)"
+        },
+        {
+          "level": 2,
+          "text": "Mechanics (how this repo works)"
+        },
+        {
+          "level": 3,
+          "text": "Determinism baseline"
+        },
+        {
+          "level": 3,
+          "text": "Epoch selection"
+        },
+        {
+          "level": 3,
+          "text": "IR emission (current)"
+        },
+        {
+          "level": 4,
+          "text": "dCBOR float policy"
+        },
+        {
+          "level": 3,
+          "text": "Provenance commitment"
+        },
+        {
+          "level": 3,
+          "text": "Receipt emission"
+        },
+        {
+          "level": 3,
+          "text": "Optional native tool build"
+        },
+        {
+          "level": 3,
+          "text": "Verification (small checker)"
+        },
+        {
+          "level": 2,
+          "text": "Pipeline (conceptual)"
+        },
+        {
+          "level": 2,
+          "text": "Output taxonomy (stable even as language support grows)"
+        },
+        {
+          "level": 3,
+          "text": "Execution modes"
+        },
+        {
+          "level": 4,
+          "text": "1) Hosted runtimes (mass-market)"
+        },
+        {
+          "level": 4,
+          "text": "2) Compiled runtimes (direct-to-environment)"
+        },
+        {
+          "level": 4,
+          "text": "3) Raw outputs (language artifacts)"
+        },
+        {
+          "level": 3,
+          "text": "Roles (how a target is used)"
+        },
+        {
+          "level": 2,
+          "text": "Promotion workflow (staging \u2192 compiled distribution)"
+        },
+        {
+          "level": 3,
+          "text": "Live modification policy (important)"
+        },
+        {
+          "level": 2,
+          "text": "Receipts: what they are supposed to prove"
+        },
+        {
+          "level": 2,
+          "text": "Integration contract (for orchestrators)"
+        },
+        {
+          "level": 2,
+          "text": "Repository conventions"
+        },
+        {
+          "level": 2,
+          "text": "Design principles"
+        },
+        {
+          "level": 2,
+          "text": "Target descriptor (optional)"
+        },
+        {
+          "level": 2,
+          "text": "Editing policy (do not delete meaning)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "STUNIR_REFERENCE_AUDIT.json",
+      "size": 1148,
+      "git_sha": "e9eb5c40af5c1dd452a94d136672b37f99ea3132",
+      "ext": ".json",
+      "category": "data",
+      "is_test_vector": false
+    },
+    {
+      "path": "STUNIR_REFERENCE_AUDIT.md",
+      "size": 761,
+      "git_sha": "99644462d5743f3725dbe778e682fca91cb0c238",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "STUNIR_REFERENCE_AUDIT"
+        },
+        {
+          "level": 2,
+          "text": "Summary"
+        },
+        {
+          "level": 2,
+          "text": "Placeholder-ish targets"
+        },
+        {
+          "level": 2,
+          "text": "Broken repo-relative links"
+        },
+        {
+          "level": 2,
+          "text": "Suspicious links"
+        },
+        {
+          "level": 2,
+          "text": "Recommended actions"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "STUNIR_REFERENCE_RULES.md",
+      "size": 812,
+      "git_sha": "f83de3d321124c4baa7b86c65d813ec69a64d4ff",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "STUNIR_REFERENCE_RULES"
+        },
+        {
+          "level": 2,
+          "text": "Rules"
+        },
+        {
+          "level": 2,
+          "text": "Recommended minimum cross-links"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "asm/README.txt",
+      "size": 51,
+      "git_sha": "c2624cc83ba2de344a18aa680ee7f6f2faa770a7",
+      "ext": ".txt",
+      "category": "asm",
+      "is_test_vector": false,
+      "headings": [],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "asm/ir/comprehensive-consolidation.rfc6902.json",
+      "size": 23069,
+      "git_sha": "a0f3581d2488edd52fe5cff60f00e53c367f5587",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/core-simple-m_of_n.rfc6902.json",
+      "size": 792,
+      "git_sha": "f4a1498410031b79b018ba6ce07c2d71c78bcda7",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/entity-autonomy-ecc-delta.rfc6902.json",
+      "size": 795,
+      "git_sha": "bece94dda12c1d7f8c2d91ef9716f78d7b18116b",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/generalized-provenance-accounting.rfc6902.json",
+      "size": 1279,
+      "git_sha": "27e78e054f71c084a98b7169106f5b81c67554d3",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/io-discrete.rfc6902.json",
+      "size": 555,
+      "git_sha": "b4d5a8fc766ada734c2b391b90d607af6a472508",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/ld-namespacing.comprehensive.rfc6902.json",
+      "size": 633,
+      "git_sha": "a77d64e7af94c90c0f2bb6070e2db8e6b0967c73",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/pipeline-to-nld.rfc6902.json",
+      "size": 623,
+      "git_sha": "84a8d1dfd33299549787c61233dfcb5876602599",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/quorum-arming.rfc6902.json",
+      "size": 546,
+      "git_sha": "a54bfd7d938e1bcd2f1aedd11283da717f86799f",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/robot-safety-stub.rfc6902.json",
+      "size": 507,
+      "git_sha": "5df89dda9b6bb4be712dcc56eee34bf343387f2e",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/ir/schema_fix_catalog.json",
+      "size": 32693,
+      "git_sha": "aef86cccc4e5a6ce47d73a262556202316aaaaff",
+      "ext": ".json",
+      "category": "asm",
+      "is_test_vector": false
+    },
+    {
+      "path": "asm/spec_ir.txt",
+      "size": 1696,
+      "git_sha": "030197fc8c15a9b52afe49a8f5cc5b643d553b79",
+      "ext": ".txt",
+      "category": "asm",
+      "is_test_vector": false,
+      "headings": [],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "build/README.md",
+      "size": 318,
+      "git_sha": "e8c9f0ac867e569e07a53679cc828ef710545db8",
+      "ext": ".md",
+      "category": "build_output",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "build/"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "contracts/c_compiler.json",
+      "size": 654,
+      "git_sha": "6671333a908dd85a491a70068bbb0ebca13c8852",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/cargo.json",
+      "size": 764,
+      "git_sha": "6c2bc53b12a6ce38d1b9bce7052c2e8500dc6b5a",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/clingo.json",
+      "size": 544,
+      "git_sha": "1c4b10410e72a77188ac87be625b8efb6b1e1c4a",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/dotnet_sdk.json",
+      "size": 341,
+      "git_sha": "39f96e9bf8d233147098bcd5003451e804c0648c",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/go_toolchain.json",
+      "size": 648,
+      "git_sha": "b79971d8f7be6802f75df33e2ae2156ef94be974",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/javac.json",
+      "size": 635,
+      "git_sha": "e21cbb8567b1c222fae786375bfbed6191eeed55",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/julia_runtime.json",
+      "size": 649,
+      "git_sha": "42ad9ee464ad123d1c944cc2f705bee59c49a232",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/lua_runtime.json",
+      "size": 638,
+      "git_sha": "bdb6cbfa568be2a07cd97cb1023de965c5b19851",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/minizinc.json",
+      "size": 649,
+      "git_sha": "544ff5da35a37d18b1c3f3d2a2a41b965af48b0a",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/node_runtime.json",
+      "size": 642,
+      "git_sha": "63a2757d08b3b134fb3e2dae48dc9259074cbfb4",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/php_runtime.json",
+      "size": 634,
+      "git_sha": "2a079ace9ec68d0edb271f7f71bbbd2b4ca75688",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/python_runtime.json",
+      "size": 677,
+      "git_sha": "5e2e2b76349c006a255f26e5b242823c56386fa9",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/r_runtime.json",
+      "size": 588,
+      "git_sha": "cc1d4c7fe96878962dc8c77e65a10d93dac46cf8",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/receipt_build_v1.schema.json",
+      "size": 2321,
+      "git_sha": "75aa78977f7f3f46387d6aadfdaad6e28a13d3c9",
+      "ext": ".schema.json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/ruby_runtime.json",
+      "size": 604,
+      "git_sha": "1db4d8ecb3f413fe756b81cf58118fa887e27aec",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/runghc.json",
+      "size": 576,
+      "git_sha": "b15dab2b65b37ecb309e505943d734414c3400ca",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/sbcl.json",
+      "size": 613,
+      "git_sha": "6b914acf602a4021ff71b86fa25ed0225570e10b",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/souffle.json",
+      "size": 594,
+      "git_sha": "e8fa6f21a0184819d54cc6b3affdb25c1cbffafa",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/swi_prolog.json",
+      "size": 599,
+      "git_sha": "95cf308882a8c01db82bb18cd3ebaa91055580bc",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/target_requirements.json",
+      "size": 5740,
+      "git_sha": "9fa724e36323f7bd3fc32439fe98df9f0db4dc57",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/wasm_wat_to_wasm.json",
+      "size": 680,
+      "git_sha": "538e7097492bf0a5a32f895290d87e576ca12b89",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "contracts/z3_solver.json",
+      "size": 525,
+      "git_sha": "6d6f1f56bc0ea13e93eb480c0fef7c6448f9a274",
+      "ext": ".json",
+      "category": "contract",
+      "is_test_vector": false
+    },
+    {
+      "path": "docs/bundle_A_notes.md",
+      "size": 543,
+      "git_sha": "54a9b529b5c81b0fe1609aab05adf249eab956b7",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Bundle A: Go / Rust / Java compiled-target contracts"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/bundle_B_notes.md",
+      "size": 597,
+      "git_sha": "7d1e37801d34a9eaa5001cda6b4bef2fff631431",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Bundle B: Hosted runtime breadth (Lua/Ruby/PHP/R/Julia)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/bundle_C_notes.md",
+      "size": 797,
+      "git_sha": "df58a8a072d333eb5f72bd2b538ebbdb11b56c7f",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Bundle C: Solver/5GL targets + stdout/stderr output artifacts"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/dependencies.txt",
+      "size": 810,
+      "git_sha": "a132bdbd2d0cbf8e06a6e62005febe0a1e3397dc",
+      "ext": ".txt",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/examples/dead_end_decision_example_v1.json",
+      "size": 1192,
+      "git_sha": "3f04b7da2978921c133d0e6cd6ba30728e8cb52e",
+      "ext": ".json",
+      "category": "doc",
+      "is_test_vector": false
+    },
+    {
+      "path": "docs/policy/dead_end_handling_contract.md",
+      "size": 5812,
+      "git_sha": "5c8a31fa83f8bb1fb160baf4b855cca58663e383",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "STUNIR Dead-End Handling Contract (DEHC) v1"
+        },
+        {
+          "level": 2,
+          "text": "Core rule"
+        },
+        {
+          "level": 2,
+          "text": "Definitions"
+        },
+        {
+          "level": 2,
+          "text": "Resolution ladder (preferred order)"
+        },
+        {
+          "level": 3,
+          "text": "R1 \u2014 Same meaning, different representation (preferred)"
+        },
+        {
+          "level": 3,
+          "text": "R2 \u2014 Deterministic auto-selection (tool-driven)"
+        },
+        {
+          "level": 3,
+          "text": "R3 \u2014 Explicit semantic downgrade (allowed, but must be labeled)"
+        },
+        {
+          "level": 3,
+          "text": "R4 \u2014 Refuse (hard fail)"
+        },
+        {
+          "level": 2,
+          "text": "What must be attested"
+        },
+        {
+          "level": 2,
+          "text": "Stable reason codes"
+        },
+        {
+          "level": 2,
+          "text": "Verifier expectations"
+        },
+        {
+          "level": 2,
+          "text": "Guidance for tool authors"
+        },
+        {
+          "level": 3,
+          "text": "Strict-by-default with explicit escape hatches"
+        },
+        {
+          "level": 3,
+          "text": "Example: IR emission for JSON specs"
+        },
+        {
+          "level": 3,
+          "text": "Example: float policy in deterministic CBOR"
+        },
+        {
+          "level": 2,
+          "text": "Orchestrator guidance (models as planners)"
+        },
+        {
+          "level": 2,
+          "text": "Relationship to packs"
+        },
+        {
+          "level": 2,
+          "text": "Compatibility and evolution"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/receipt_policy_blurb.txt",
+      "size": 506,
+      "git_sha": "9bc67d3dde49431a2d6a7f0015d2606fa51242e5",
+      "ext": ".txt",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/receipt_storage_policy.md",
+      "size": 1535,
+      "git_sha": "b01e6b277bc12b22e04db89b3fc8a239734a2ad1",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Receipt storage policy (STUNIR)"
+        },
+        {
+          "level": 2,
+          "text": "Verifying a snapshot later"
+        },
+        {
+          "level": 1,
+          "text": "1) Checkout the commit that produced the snapshot."
+        },
+        {
+          "level": 1,
+          "text": "2) Restore the snapshot epoch"
+        },
+        {
+          "level": 1,
+          "text": "3) Rebuild outputs using that epoch (but don't auto-verify using current receipts/)"
+        },
+        {
+          "level": 1,
+          "text": "4) Verify the snapshot receipts against the rebuilt outputs"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/relayout_report.md",
+      "size": 1021,
+      "git_sha": "f4a12f1add88b36a75b190c456935cd39092cbc7",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Repo relayout report (generated)"
+        },
+        {
+          "level": 2,
+          "text": "Moves performed"
+        },
+        {
+          "level": 2,
+          "text": "Added files"
+        },
+        {
+          "level": 2,
+          "text": "References updated (best-effort)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/requirements.txt",
+      "size": 715,
+      "git_sha": "43fa05dafdc7dc780f1c1ca5f7f9175a93b4899d",
+      "ext": ".txt",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/ENTRYPOINT.md",
+      "size": 3436,
+      "git_sha": "b8b22f21e633e2c684befca656090519e36ac5d7",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack Entry Point (v0)"
+        },
+        {
+          "level": 4,
+          "text": "1) What to look for"
+        },
+        {
+          "level": 4,
+          "text": "2) Authority rule (integrity boundary)"
+        },
+        {
+          "level": 4,
+          "text": "3) What STUNIR is trying to achieve"
+        },
+        {
+          "level": 4,
+          "text": "4) Inclusion vs materialization"
+        },
+        {
+          "level": 4,
+          "text": "5) Minimal verification checklist"
+        },
+        {
+          "level": 4,
+          "text": "6) Where the detailed rules live"
+        },
+        {
+          "level": 4,
+          "text": "7) Model/agent operating guidance (non-normative)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_archiving_v0.md",
+      "size": 1723,
+      "git_sha": "8bd86fdd11c00668e4ca12627a93ece13c2eaf05",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack v0 \u2014 Deterministic Archiving Guidance"
+        },
+        {
+          "level": 4,
+          "text": "1. General requirements"
+        },
+        {
+          "level": 4,
+          "text": "2. Zip guidance"
+        },
+        {
+          "level": 4,
+          "text": "3. Tar guidance (often easier)"
+        },
+        {
+          "level": 4,
+          "text": "4. Canonical archive recommendation"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_manifest_v0.md",
+      "size": 519,
+      "git_sha": "4084167d0d4689c2049152af46c72c48beaa64d2",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack Manifest v0 \u0014 (Deprecated)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_materialization_v0.md",
+      "size": 1881,
+      "git_sha": "8aa8ed7134587475fb003b1dc0be3db9409167a9",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack v0 \u2014 Materialization (Writing Outputs to User-Chosen Paths)"
+        },
+        {
+          "level": 4,
+          "text": "0. Purpose"
+        },
+        {
+          "level": 4,
+          "text": "1. Definitions"
+        },
+        {
+          "level": 4,
+          "text": "2. Typical STUNIR usage"
+        },
+        {
+          "level": 4,
+          "text": "3. Materialization as a pure operation"
+        },
+        {
+          "level": 4,
+          "text": "4. Recording materialization without contaminating core IDs"
+        },
+        {
+          "level": 4,
+          "text": "5. Recommended constraints"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_root_attestation_text_v0.md",
+      "size": 2526,
+      "git_sha": "c93325fa585f8187e70559665dce55c0f35f1db3",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack Root Attestation Text v0 \u0014 Schema (`root_attestation.txt`)"
+        },
+        {
+          "level": 4,
+          "text": "0. Purpose"
+        },
+        {
+          "level": 4,
+          "text": "1. File location and encoding"
+        },
+        {
+          "level": 4,
+          "text": "2. Version line (required)"
+        },
+        {
+          "level": 4,
+          "text": "3. Comments and whitespace"
+        },
+        {
+          "level": 4,
+          "text": "4. Record lines"
+        },
+        {
+          "level": 5,
+          "text": "4.1 `epoch` record"
+        },
+        {
+          "level": 5,
+          "text": "4.2 `ir` record (exactly one required)"
+        },
+        {
+          "level": 5,
+          "text": "4.3 `input` record (optional)"
+        },
+        {
+          "level": 5,
+          "text": "4.4 `receipt` record (0+)"
+        },
+        {
+          "level": 5,
+          "text": "4.5 `artifact` record (0+)"
+        },
+        {
+          "level": 4,
+          "text": "5. Digest format"
+        },
+        {
+          "level": 4,
+          "text": "6. Object store mapping"
+        },
+        {
+          "level": 4,
+          "text": "7. Optional signature"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_root_attestation_v0.md",
+      "size": 1673,
+      "git_sha": "9251e3b949a8afcc539d70a39390b1b67babfb27",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack Root Attestation v0 \u0014 Schema (dCBOR)"
+        },
+        {
+          "level": 4,
+          "text": "0. Encoding"
+        },
+        {
+          "level": 4,
+          "text": "1. Top-level object"
+        },
+        {
+          "level": 4,
+          "text": "2. Digest string format"
+        },
+        {
+          "level": 4,
+          "text": "3. IR descriptor"
+        },
+        {
+          "level": 4,
+          "text": "4. Input descriptor"
+        },
+        {
+          "level": 4,
+          "text": "5. Receipt descriptor"
+        },
+        {
+          "level": 4,
+          "text": "6. Artifact descriptor"
+        },
+        {
+          "level": 4,
+          "text": "7. Object store mapping rule"
+        },
+        {
+          "level": 4,
+          "text": "8. Canonical pack identifier (recommended)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_security_v0.md",
+      "size": 2283,
+      "git_sha": "f86b558dbf593341f3feefccfdb59986ff32cc02",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack v0 \u0014 Security Considerations"
+        },
+        {
+          "level": 4,
+          "text": "1. Threats addressed by the pack format"
+        },
+        {
+          "level": 4,
+          "text": "2. Mandatory verifier behaviors"
+        },
+        {
+          "level": 4,
+          "text": "3. Root attestation encodings"
+        },
+        {
+          "level": 4,
+          "text": "4. Receipts and signatures"
+        },
+        {
+          "level": 4,
+          "text": "5. Rollback / freeze / update security"
+        },
+        {
+          "level": 4,
+          "text": "6. Privacy"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/root/stunir_pack_spec_v0.md",
+      "size": 4023,
+      "git_sha": "e9dd93fbcd500642cb6d7b94a75e7a1576c7f11a",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Pack v0 (Directory or Archive) \u0014 Specification"
+        },
+        {
+          "level": 4,
+          "text": "0. Status and scope"
+        },
+        {
+          "level": 4,
+          "text": "1. Terminology"
+        },
+        {
+          "level": 4,
+          "text": "2. High-level invariants"
+        },
+        {
+          "level": 4,
+          "text": "3. Directory layout"
+        },
+        {
+          "level": 4,
+          "text": "4. Object store"
+        },
+        {
+          "level": 4,
+          "text": "5. Root attestation encodings"
+        },
+        {
+          "level": 5,
+          "text": "5.1 Canonical encoding: dCBOR"
+        },
+        {
+          "level": 5,
+          "text": "5.2 Minimal-toolchain encoding: text"
+        },
+        {
+          "level": 5,
+          "text": "5.3 Equivalence rule"
+        },
+        {
+          "level": 4,
+          "text": "6. Verification requirements"
+        },
+        {
+          "level": 4,
+          "text": "7. Archive representation"
+        },
+        {
+          "level": 4,
+          "text": "8. Security boundary notes"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/toolchain_contracts.md",
+      "size": 911,
+      "git_sha": "5914c76cbd049667f7d2188b35d4bb0890361540",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Toolchain contracts (lifted toolchains)"
+        },
+        {
+          "level": 2,
+          "text": "The pattern"
+        },
+        {
+          "level": 2,
+          "text": "Notes"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/verification.md",
+      "size": 1571,
+      "git_sha": "b4f38565b8bcef3687e0dbe2108b19e2ef9f66b4",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "STUNIR Verification Contract"
+        },
+        {
+          "level": 2,
+          "text": "Profile 1: Local verification (Python)"
+        },
+        {
+          "level": 3,
+          "text": "Run"
+        },
+        {
+          "level": 2,
+          "text": "Profile 2: Portable verifier binary (no Python)"
+        },
+        {
+          "level": 2,
+          "text": "Profile 3: Minimal verification (no Python, no custom binaries)"
+        },
+        {
+          "level": 3,
+          "text": "POSIX-like"
+        },
+        {
+          "level": 3,
+          "text": "Windows PowerShell"
+        },
+        {
+          "level": 3,
+          "text": "Windows cmd"
+        },
+        {
+          "level": 2,
+          "text": "Canonical JSON: `stunir-json-c14n-v1`"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "docs/verification_profiles.md",
+      "size": 2056,
+      "git_sha": "a1a43b45c25e37c75272a3e7665cede0858bcd63",
+      "ext": ".md",
+      "category": "doc",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 3,
+          "text": "STUNIR Verification Profiles (Toolchain Levels)"
+        },
+        {
+          "level": 4,
+          "text": "Profile 1: Full verification (Python)"
+        },
+        {
+          "level": 4,
+          "text": "Profile 2: Portable verifier binary (no Python)"
+        },
+        {
+          "level": 4,
+          "text": "Profile 3: Minimal verification (no Python, no custom binaries)"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "receipts/README.md",
+      "size": 390,
+      "git_sha": "9848b32b72ba3a9e99b7863f06a11ae505083419",
+      "ext": ".md",
+      "category": "receipts",
+      "is_test_vector": false,
+      "headings": [
+        {
+          "level": 1,
+          "text": "receipts/"
+        }
+      ],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "schemas/stunir_dead_end_decision_v1.schema.json",
+      "size": 5024,
+      "git_sha": "0f7277f72407c5ead2499ad0a2475ddc7ee78028",
+      "ext": ".schema.json",
+      "category": "schema",
+      "is_test_vector": false
+    },
+    {
+      "path": "schemas/stunir_receipt_predicate_v1.schema.json",
+      "size": 2849,
+      "git_sha": "f15204b7f2d2b5af02f866a9fd0ab6b8db73f3c0",
+      "ext": ".schema.json",
+      "category": "schema",
+      "is_test_vector": false
+    },
+    {
+      "path": "schemas/stunir_statement_wrapper_v1.schema.json",
+      "size": 549,
+      "git_sha": "cce3b765a5b32227a0af784cfbca54e3fc189a0d",
+      "ext": ".schema.json",
+      "category": "schema",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/build.sh",
+      "size": 6652,
+      "git_sha": "2782af776785dbe06e4dcf0e2612ffe57d1340e9",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/build_docker.sh",
+      "size": 2983,
+      "git_sha": "97e33d3ee0fb9e50f8cf687522ebbe82d691da43",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/ensure_deps.sh",
+      "size": 1343,
+      "git_sha": "3e561eaacd2c607c37c717a54cc80d460d43eaa4",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/probe_deps.sh",
+      "size": 355,
+      "git_sha": "f21f8e67982292b7b08b18055af72340d5a13cda",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/snapshot_receipts.sh",
+      "size": 1414,
+      "git_sha": "c574d42bf2643b3d651b8ffd72d39b5802d83942",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/verify.sh",
+      "size": 4152,
+      "git_sha": "1431ade502d3139f8d40cc138e2350d86b36f54b",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/verify_deps.sh",
+      "size": 131,
+      "git_sha": "051bbe1fbff9fdcd86798383f153e9e5e9502958",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/verify_minimal.cmd",
+      "size": 2032,
+      "git_sha": "56998ef3b3f2e6b90af364858523f870ad37f021",
+      "ext": ".cmd",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/verify_minimal.ps1",
+      "size": 2416,
+      "git_sha": "190e227a7a79d5edca6964614dba388e87633e25",
+      "ext": ".ps1",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "scripts/verify_minimal.sh",
+      "size": 3126,
+      "git_sha": "7ddfc9931c9fd588a14766169566bfa13a8d4d14",
+      "ext": ".sh",
+      "category": "script",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/README.txt",
+      "size": 50,
+      "git_sha": "f2cdef9b7e840a5af9f7885b3eddba934d973a52",
+      "ext": ".txt",
+      "category": "spec",
+      "is_test_vector": false,
+      "headings": [],
+      "outbound_repo_links": []
+    },
+    {
+      "path": "spec/comprehensive-consolidation.rfc6902.json",
+      "size": 28133,
+      "git_sha": "9f4b37b13ceb5fb2ed9ebb89afbb0db944b9a8ab",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/core-simple-m_of_n.rfc6902.json",
+      "size": 1008,
+      "git_sha": "5bcf20e555889cab499807499f4abda9a09052d7",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/entity-autonomy-ecc-delta.rfc6902.json",
+      "size": 1011,
+      "git_sha": "c475614118d0c42091ff3ffc1dccf7c9ab73b278",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/generalized-provenance-accounting.rfc6902.json",
+      "size": 1591,
+      "git_sha": "183529d6867832e444415599e0aa3568b8ac07a6",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/io-discrete.rfc6902.json",
+      "size": 723,
+      "git_sha": "552ab0708cc97ab1c6fa9a65d521a111a8e78d67",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/ld-namespacing.comprehensive.rfc6902.json",
+      "size": 801,
+      "git_sha": "8f712dc57ac252507e5926032dfb9e951b112938",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/pipeline-to-nld.rfc6902.json",
+      "size": 767,
+      "git_sha": "fdbca064e09433828f14cdb0d624b25611e34c99",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/quorum-arming.rfc6902.json",
+      "size": 690,
+      "git_sha": "9f76a1d18b3f0eb2a9082dd0bbd8525eb5cc720a",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/robot-safety-stub.rfc6902.json",
+      "size": 651,
+      "git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/schema_fix_catalog.json",
+      "size": 37525,
+      "git_sha": "5452bd9d9bfa56ef48d9f723f98bddb5ca497e50",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "spec/stunir_machine_plan.json",
+      "size": 2920,
+      "git_sha": "b4d86f50b1fe39f62a8c36ac51ec8319674e056b",
+      "ext": ".json",
+      "category": "spec",
+      "is_test_vector": false
+    },
+    {
+      "path": "test_vectors/asp/hello.lp",
+      "size": 71,
+      "git_sha": "908dcb82bf760be46f57883bb3db298d88c7cff0",
+      "ext": ".lp",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/c/hello.c",
+      "size": 131,
+      "git_sha": "d6d887c755a25fd1ceeee42b08dfb5d7682746c2",
+      "ext": ".c",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/datalog/hello.dl",
+      "size": 174,
+      "git_sha": "ab9d6a85b2a089ac606b46a8f8fb912ecbdc0c4a",
+      "ext": ".dl",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/dotnet/Hello/Hello.csproj",
+      "size": 375,
+      "git_sha": "3c02c6affe9053f63549247020e5f6427c968826",
+      "ext": ".csproj",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/dotnet/Hello/Program.cs",
+      "size": 186,
+      "git_sha": "5d2705e87639140b22be5b2c6afdcc84b0743505",
+      "ext": ".cs",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/go/hello/go.mod",
+      "size": 34,
+      "git_sha": "655f224f7e869e2b7cfd29a0e19ba3891fe31d00",
+      "ext": ".mod",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/go/hello/main.go",
+      "size": 106,
+      "git_sha": "843697af67fe77d6c55249af740f71747535c352",
+      "ext": ".go",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/haskell/Hello.hs",
+      "size": 69,
+      "git_sha": "da7ea759c16c087619d9c10fba1b508dec7f5735",
+      "ext": ".hs",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/java/Hello.java",
+      "size": 169,
+      "git_sha": "28580dee5c2a25c772a254ce4ab12345ccb3d4c2",
+      "ext": ".java",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/julia/write_out.jl",
+      "size": 163,
+      "git_sha": "29485103a384333f8cf2eaa0aa252e062a607f40",
+      "ext": ".jl",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/lisp/hello_sbcl.lisp",
+      "size": 305,
+      "git_sha": "841a198430a88a591edb4e4859afd0679e5aa5df",
+      "ext": ".lisp",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/lua/write_out.lua",
+      "size": 166,
+      "git_sha": "b84660185a058913889b297f1f62d5f717af239d",
+      "ext": ".lua",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/minizinc/hello.mzn",
+      "size": 206,
+      "git_sha": "e22b3528be5af872250ada8aac699358a3ab4f93",
+      "ext": ".mzn",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/node/write_out.js",
+      "size": 143,
+      "git_sha": "abae8fff01eee88f62c76aa420fe17ea117a3615",
+      "ext": ".js",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/php/write_out.php",
+      "size": 143,
+      "git_sha": "4245f3121051e1c3942b251210e75e39c5130cf6",
+      "ext": ".php",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/prolog/hello.pl",
+      "size": 116,
+      "git_sha": "c9f349da09b06f56f6c0ff0c36ce07c030d7f5ad",
+      "ext": ".pl",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/python/write_out.py",
+      "size": 231,
+      "git_sha": "2c342a5fe7e46f5a670f91b346c6191e96f722ee",
+      "ext": ".py",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/r/write_out.R",
+      "size": 188,
+      "git_sha": "3ada265175b74304f473adc62f6018724b59cda5",
+      "ext": ".r",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/ruby/write_out.rb",
+      "size": 142,
+      "git_sha": "5361d5e13b380714ab1e85d82562fe8293eebdb6",
+      "ext": ".rb",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/rust/hello_rust/Cargo.lock",
+      "size": 142,
+      "git_sha": "06ffb19304ef37fe50cddcda57c08af95560d64d",
+      "ext": ".lock",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/rust/hello_rust/Cargo.toml",
+      "size": 140,
+      "git_sha": "3149457bd4e1d27a33b6df118f4f7c0c61b80b3c",
+      "ext": ".toml",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/rust/hello_rust/src/main.rs",
+      "size": 93,
+      "git_sha": "4199d54d89d20c6fe8691e2070d8844947c64b93",
+      "ext": ".rs",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/smt/hello.smt2",
+      "size": 143,
+      "git_sha": "68a7a27b8322a092db5ca0592f028c71e16b22a7",
+      "ext": ".smt2",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "test_vectors/wasm/hello.wat",
+      "size": 125,
+      "git_sha": "a6a153b2dfad42b6b7703c475508ba315b9343ea",
+      "ext": ".wat",
+      "category": "test_vector",
+      "is_test_vector": true
+    },
+    {
+      "path": "tools/dcbor.py",
+      "size": 6824,
+      "git_sha": "ed711fee3228a59dce52d8817549189bdba97e62",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/epoch.py",
+      "size": 1581,
+      "git_sha": "dca97f878f733593a7fad98828cbefde4572e962",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/gen_provenance.py",
+      "size": 1482,
+      "git_sha": "1ef2045a630bf9aaaf03358bf008581b14826989",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/inspect_attestation.py",
+      "size": 2240,
+      "git_sha": "42bfe67082b63a5b61c156c3f341095611f44d0b",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/probe_dependency.py",
+      "size": 10646,
+      "git_sha": "3e7d0cbeacd1485fb3c5c187ee775c536ed7d53d",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/prov_emit.c",
+      "size": 414,
+      "git_sha": "a0132c25f60411badd243d2367a524b9137923a5",
+      "ext": ".c",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/record_receipt.py",
+      "size": 6822,
+      "git_sha": "12d362a99799d28a69b27e918ecd462291947795",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/resolve_requirements.py",
+      "size": 2960,
+      "git_sha": "38deb53ad1976045d3322339061ea62d6e8b3927",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/spec_to_ir.py",
+      "size": 1934,
+      "git_sha": "0652771d6c07584eaf10b7f3d93e2b63adc8a087",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/spec_to_ir_files.py",
+      "size": 5479,
+      "git_sha": "fec0cdf307bb3c40109919c4ab8722318da06433",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/verify_build.py",
+      "size": 37498,
+      "git_sha": "db9321265073b692fa2f91a5037843f51f1300d2",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/verify_dependency_receipt.py",
+      "size": 3487,
+      "git_sha": "aed5c047f8875808e320b78c581cf48bf9a7bb70",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    },
+    {
+      "path": "tools/verify_requirements.py",
+      "size": 2665,
+      "git_sha": "a3e69509e6fe298fd0de2dd5bc05ab235bbee54f",
+      "ext": ".py",
+      "category": "tool",
+      "is_test_vector": false
+    }
+  ]
+}
