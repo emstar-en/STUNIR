@@ -1,0 +1,46 @@
+{
+  "constraints": {
+    "selected_epoch": 1700000000,
+    "verification_profile": "full"
+  },
+  "inputs": {
+    "inputs_digest": {
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "inputs_uri": "spec/20_floats_and_negzero.json"
+  },
+  "reason_code": "ENCODING_RANGE_LIMIT",
+  "reason_detail": "Numeric reduction would require an integer outside CBOR uint64/int64 range; encoded value as float instead.",
+  "rejections": [
+    {
+      "error_kind": "ValueError",
+      "error_message": "dCBOR policy cannot encode integers outside CBOR 64-bit range",
+      "mode": "dcbor",
+      "policy": "dcbor_shortest"
+    }
+  ],
+  "requested": {
+    "mode": "dcbor",
+    "policy": "dcbor_shortest"
+  },
+  "resolution_class": "R1",
+  "schema": "stunir.dead_end_decision.v1",
+  "selected": {
+    "mode": "dcbor",
+    "policy": "float64_fixed"
+  },
+  "step": "ir.emit.dcbor",
+  "tool": {
+    "argv": [
+      "python3",
+      "-B",
+      "tools/spec_to_ir_files.py",
+      "--float-policy",
+      "dcbor_shortest"
+    ],
+    "digest": {
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "path": "tools/dcbor.py"
+  }
+}
