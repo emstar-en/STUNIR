@@ -1,0 +1,47 @@
+[
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/core/EntityCapabilityContract@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/core/ResourceDelta@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/core/GrantReceipt@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/core/DeltaRevocation@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/policies/-",
+    "value": "spec-pack/policies/core/ecc-enforcement@v1.json"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/ecc_tools.py"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/delta_tools.py"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/grant_tools.py"
+  },
+  {
+    "op": "add",
+    "path": "/configs/-",
+    "value": "spec-pack/conformance/vectors/ecc/ecc-delta.v1.json"
+  }
+]
