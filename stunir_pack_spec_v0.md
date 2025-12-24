@@ -1,4 +1,4 @@
-### STUNIR Pack v0 (Directory or Archive) — Specification
+### STUNIR Pack v0 (Directory or Archive)  Specification
 
 #### 0. Status and scope
 This document defines the **STUNIR Pack v0** interchange format.
@@ -8,18 +8,11 @@ A **STUNIR pack** is the unit a model (or other consumer) ingests as a **determi
 - an **attestation bundle** binding pipeline steps to digests,
 - (optionally) the relevant **inputs** (e.g., the spec) needed to audit upstream.
 
-A pack MAY also include other blobs, but **v0 does not assume that downstream runtime outputs are baked into the pack**. A normal STUNIR conversational UX can materialize code/binaries/outputs wherever the user asks; attestation artifacts are the primary audit object.
+A pack MAY also include other blobs, but **v0 does not assume that downstream runtime outputs are baked into the pack**.
 
 A pack may be represented as:
-- a **directory tree** (e.g., in a repo checkout), or
+- a **directory tree**, or
 - an **archive** of that tree (e.g., a `.zip`).
-
-This spec defines:
-- a canonical on-disk directory layout,
-- a canonical content-addressed object store,
-- a canonical **root attestation** (bootstrap + inventory),
-- verification requirements,
-- deterministic archive recommendations.
 
 #### 1. Terminology
 - **Blob**: a byte string.
@@ -29,7 +22,6 @@ This spec defines:
 - **Root attestation**: the canonical bootstrap artifact that inventories pack contents by digest.
 - **Attestation artifact**: any emitted evidence object (e.g., step receipts, root attestation, provenance/SBOM objects, DSSE envelopes).
 - **Receipt**: a step-scoped evidence object emitted by the STUNIR harness.
-- **Materialize**: write/copy bytes to user-chosen filesystem locations.
 
 Normative keywords: **MUST**, **SHOULD**, **MAY**.
 
@@ -38,95 +30,64 @@ A conforming STUNIR pack:
 1. **MUST be self-describing** via its root attestation.
 2. **MUST be locally verifiable** without network access.
 3. **MUST bind all included integrity-boundary content** by digest in the root attestation.
-4. **MUST be deterministic as an artifact**: given identical root attestation bytes and identical referenced objects, the directory representation and any canonical archive representation MUST have stable bytes.
 
-Notes:
-- This spec is about the **pack** as a deterministic container/commitment.
-- It does **not** prescribe conversational behavior or where outputs are written.
-
-#### 3. Inclusion vs materialization (important distinction)
-STUNIR can “take someone all the way to runtime” by **materializing outputs wherever the user instructs the model to put them**.
-
-This implies two different notions:
-- **Inclusion (pack content):** A blob is *included* if its bytes live under `objects/sha256/` and the root attestation references its digest.
-  - Included blobs are inside the pack integrity boundary.
-  - Included blobs are portable and can be verified offline.
-- **Materialization (workspace output):** A blob is *materialized* if it is written to some path in a working directory (e.g., `./out/app.py`, `/tmp/run/out.txt`).
-  - Materialized paths are **not** part of the pack integrity boundary.
-  - Materialized paths are user/environment-specific.
-
-A typical workflow is:
-- include **inputs + IR + attestation artifacts** in the pack, and
-- materialize downstream outputs on demand.
-
-#### 4. Included content classes (v0 emphasis)
-v0 draws a strong distinction:
-- **Attestation artifacts are primary** for audit.
-- **Inputs and IR are what auditors will pull upstream** to validate provenance.
-- Baked downstream outputs (code/binaries/runtime outputs) are OPTIONAL and should not be assumed.
-
-If downstream outputs are included, they MUST be treated as ordinary included blobs referenced by digest; see the optional `artifacts` section in the root attestation schema.
-
-#### 5. Directory layout
+#### 3. Directory layout
 A STUNIR pack directory MUST have:
-- `root_attestation.dcbor` (REQUIRED)
 - `objects/sha256/` (REQUIRED)
+- one of:
+  - `root_attestation.dcbor` (REQUIRED for the canonical encoding), or
+  - `root_attestation.txt` (REQUIRED for minimal-toolchain environments)
 
-Optionally, it MAY have:
-- `index/` (OPTIONAL; pointers/aliases for humans)
-- `meta/` (OPTIONAL; non-authoritative convenience docs)
+A pack SHOULD include `root_attestation.dcbor`.
+A pack MAY include both encodings.
 
-Unknown extra paths MUST be ignored by verifiers unless the root attestation explicitly declares them as included objects.
+Back-compat note:
+- `pack_manifest.dcbor` MAY be present as a legacy alias.
 
-##### 5.1 Object store
+#### 4. Object store
 All included integrity-boundary content MUST be stored as digest-addressed blobs:
 - Path form: `objects/sha256/<hex>`
 - File bytes MUST be exactly the blob bytes.
 
 The root attestation MUST reference blobs by digest (not by path). Paths are not part of the security boundary.
 
-#### 6. Root attestation: authority and commitment
-The **root attestation** is the authority for what the pack includes.
-- The root attestation MUST be encoded as **canonical dCBOR** (per STUNIR canonicalization rules).
-- The root attestation bytes are the primary **commitment root**.
+#### 5. Root attestation encodings
+v0 supports two equivalent encodings of the root attestation:
 
-This spec defines the v0 root attestation schema in `stunir_pack_root_attestation_v0.md`.
+##### 5.1 Canonical encoding: dCBOR
+- File: `root_attestation.dcbor`
+- Spec: `stunir_pack_root_attestation_v0.md`
 
-Back-compat note:
-- `pack_manifest.dcbor` MAY be present as a legacy alias.
-- If present, it MUST NOT contradict the root attestation.
+This is the preferred encoding for strict determinism and compactness.
 
-#### 7. Verification requirements
-A verifier MUST implement the following checks:
-1. **Root attestation decoding**: decode `root_attestation.dcbor` using canonical rules.
-2. **Schema check**: validate required keys, types, and version.
-3. **Object integrity**: for every digest referenced by the root attestation, recompute SHA-256 over the corresponding object store file and compare.
-4. **IR presence**: the root attestation MUST reference exactly one canonical IR blob via `ir.digest`.
-5. **Receipt presence**: each receipt digest listed MUST be present as a blob.
-6. **Input integrity (if present)**: each input digest listed MUST be present as a blob.
+##### 5.2 Minimal-toolchain encoding: text
+- File: `root_attestation.txt`
+- Spec: `stunir_pack_root_attestation_text_v0.md`
 
-A verifier MAY provide a “strong mode” that re-runs the harness and confirms it reproduces the same digests; this is outside pack-format conformance.
+This encoding exists to support environments that cannot run Python and cannot install custom binaries. It is intentionally parseable with:
+- POSIX shell + awk/sed + `sha256sum`/`shasum`/`openssl`, and
+- Windows PowerShell (`Get-FileHash`) or cmd (`certutil`).
 
-#### 8. Materialization guidance (non-normative)
-Materialization is the act of writing included blobs (or newly produced results) to user-chosen paths.
+##### 5.3 Equivalence rule
+If both `root_attestation.dcbor` and `root_attestation.txt` are present:
+- They MUST describe the same inventory and the same `ir.digest`.
+- Consumers SHOULD treat `root_attestation.dcbor` as authoritative.
 
-Recommended practice:
-- materialization should be a *pure copy* of bytes from digest-addressed blobs,
-- any path mapping should be treated as user data (not part of the core commitment),
-- if you need an auditable record of where things were written, emit a **materialization receipt** whose core identifier excludes absolute paths.
+#### 6. Verification requirements
+A verifier MUST implement:
+1. Decode an available root attestation encoding.
+2. Validate required fields for that encoding.
+3. For every referenced digest, recompute SHA-256 over `objects/sha256/<hex>` and compare.
+4. Confirm there is exactly one canonical IR referenced.
 
-See `stunir_pack_materialization_v0.md`.
+A verifier MAY provide a stronger mode that re-runs the harness and confirms it reproduces the same digests.
 
-#### 9. Archive representation (zip, tar)
+#### 7. Archive representation
 A pack MAY be distributed as an archive of the directory tree.
-- The archive MUST contain the same paths as the directory representation.
-- The archive MUST preserve file bytes exactly.
-
 Deterministic archiving guidance is defined in `stunir_pack_archiving_v0.md`.
 
-#### 10. Security boundary notes
+#### 8. Security boundary notes
 - Only blobs referenced by digest in the root attestation are authoritative.
 - Any file not referenced by digest MUST be ignored for integrity purposes.
-- Consumers MUST defend against archive path traversal (“zip slip”).
 
 Security considerations are expanded in `stunir_pack_security_v0.md`.
