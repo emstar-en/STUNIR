@@ -103,6 +103,216 @@ else
   fi
 fi
 
+
+
+# Optional: emit requested output targets (raw code + optional runtime outputs)
+if [[ -n "${STUNIR_OUTPUT_TARGETS:-}" ]]; then
+  # Prefer normalized targets from receipts/requirements.json (aliases resolved)
+  NORMALIZED_TARGETS="${STUNIR_OUTPUT_TARGETS}"
+  if [[ -f receipts/requirements.json ]]; then
+    NORMALIZED_TARGETS="$(python3 - <<'PY'
+import json
+r=json.load(open('receipts/requirements.json','r',encoding='utf-8'))
+print(','.join([str(x) for x in (r.get('normalized_targets') or [])]))
+PY
+)"
+  fi
+  echo "Emitting output targets (normalized): ${NORMALIZED_TARGETS}"
+
+  has_target() {
+    local needle="$1"
+    local csv="$2"
+    local IFS=','
+    read -ra parts <<<"$csv"
+    for t in "${parts[@]}"; do
+      t="${t//[[:space:]]/}"
+      if [[ "$t" == "$needle" ]]; then
+        return 0
+      fi
+    done
+    return 1
+  }
+
+  # ---------- Python (portable emission baseline) ----------
+  if has_target "python" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting python (portable)"
+    python3 tools/ir_to_python.py \
+      --variant portable \
+      --ir-manifest receipts/ir_manifest.json \
+      --out-root asm/python/portable
+
+    python3 tools/emit_output_manifest.py \
+      --root asm/python/portable \
+      --manifest-out receipts/python_portable_manifest.json
+
+    python3 tools/record_receipt.py \
+      --target receipts/python_portable_manifest.json \
+      --receipt receipts/python_portable.json \
+      --status CODEGEN_EMITTED_PYTHON_PORTABLE \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json \
+              tools/ir_to_python.py tools/emit_output_manifest.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --tool "$PY_BIN" \
+      --argv "$PY_BIN" tools/ir_to_python.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/python/portable \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+  fi
+
+  # ---------- Python (CPython-backed variant) ----------
+  if has_target "python_cpython" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting python_cpython (requires python_runtime acceptance)"
+    PY_RUNTIME_BIN=""
+    if [[ -f receipts/deps/python_runtime.json ]]; then
+      PY_RUNTIME_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/python_runtime.json --require-accepted --print-path || true)"
+    fi
+
+    if [[ -z "$PY_RUNTIME_BIN" ]]; then
+      echo "python_runtime not accepted or not present; skipping python_cpython"
+      python3 tools/record_receipt.py \
+        --target receipts/python_cpython_manifest.json \
+        --receipt receipts/python_cpython.json \
+        --status TOOLCHAIN_REQUIRED_MISSING \
+        --build-epoch "$STUNIR_BUILD_EPOCH" \
+        --epoch-json "$EPOCH_JSON" \
+        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/python_runtime.json \
+                tools/ir_to_python.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+        --input-dirs spec asm \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+      if [[ "${STUNIR_REQUIRE_DEPS:-0}" == "1" ]]; then
+        exit 3
+      fi
+    else
+      python3 tools/ir_to_python.py \
+        --variant cpython \
+        --ir-manifest receipts/ir_manifest.json \
+        --out-root asm/python/cpython
+
+      python3 tools/emit_output_manifest.py \
+        --root asm/python/cpython \
+        --manifest-out receipts/python_cpython_manifest.json
+
+      python3 tools/record_receipt.py \
+        --target receipts/python_cpython_manifest.json \
+        --receipt receipts/python_cpython.json \
+        --status CODEGEN_EMITTED_PYTHON_CPYTHON \
+        --build-epoch "$STUNIR_BUILD_EPOCH" \
+        --epoch-json "$EPOCH_JSON" \
+        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/python_runtime.json \
+                tools/ir_to_python.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+        --input-dirs spec asm \
+        --tool "$PY_BIN" \
+        --argv "$PY_BIN" tools/ir_to_python.py --variant cpython --ir-manifest receipts/ir_manifest.json --out-root asm/python/cpython \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+      # Runtime run (bind stdout as an artifact)
+      "$PY_RUNTIME_BIN" asm/python/cpython/program.py > asm/python/cpython/run_stdout.json
+
+      python3 tools/record_receipt.py \
+        --target asm/python/cpython/run_stdout.json \
+        --receipt receipts/python_cpython_run.json \
+        --status RUNTIME_STDOUT_EMITTED_PYTHON_CPYTHON \
+        --build-epoch "$STUNIR_BUILD_EPOCH" \
+        --epoch-json "$EPOCH_JSON" \
+        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/python_cpython_manifest.json receipts/deps/python_runtime.json \
+                asm/python/cpython/program.py asm/python/cpython/runtime.py tools/dep_receipt_tool.py tools/record_receipt.py \
+        --input-dirs spec asm \
+        --tool "$PY_RUNTIME_BIN" \
+        --argv "$PY_RUNTIME_BIN" asm/python/cpython/program.py \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    fi
+  fi
+
+  # ---------- SMT2 (portable emission baseline) ----------
+  if has_target "smt" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting smt (portable SMT2)"
+    python3 tools/ir_to_smt2.py \
+      --variant portable \
+      --ir-manifest receipts/ir_manifest.json \
+      --out-root asm/smt/portable
+
+    python3 tools/emit_output_manifest.py \
+      --root asm/smt/portable \
+      --manifest-out receipts/smt_portable_manifest.json
+
+    python3 tools/record_receipt.py \
+      --target receipts/smt_portable_manifest.json \
+      --receipt receipts/smt_portable.json \
+      --status CODEGEN_EMITTED_SMT2_PORTABLE \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json \
+              tools/ir_to_smt2.py tools/emit_output_manifest.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --tool "$PY_BIN" \
+      --argv "$PY_BIN" tools/ir_to_smt2.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/smt/portable \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+  fi
+
+  # ---------- SMT2 (Z3-backed variant) ----------
+  if has_target "smt_z3" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting smt_z3 (requires z3_solver acceptance)"
+    Z3_BIN=""
+    if [[ -f receipts/deps/z3_solver.json ]]; then
+      Z3_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/z3_solver.json --require-accepted --print-path || true)"
+    fi
+
+    if [[ -z "$Z3_BIN" ]]; then
+      echo "z3_solver not accepted or not present; skipping smt_z3"
+      python3 tools/record_receipt.py \
+        --target receipts/smt_z3_manifest.json \
+        --receipt receipts/smt_z3.json \
+        --status TOOLCHAIN_REQUIRED_MISSING \
+        --build-epoch "$STUNIR_BUILD_EPOCH" \
+        --epoch-json "$EPOCH_JSON" \
+        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/z3_solver.json \
+                tools/ir_to_smt2.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+        --input-dirs spec asm \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+      if [[ "${STUNIR_REQUIRE_DEPS:-0}" == "1" ]]; then
+        exit 3
+      fi
+    else
+      python3 tools/ir_to_smt2.py \
+        --variant z3 \
+        --ir-manifest receipts/ir_manifest.json \
+        --out-root asm/smt/z3
+
+      python3 tools/emit_output_manifest.py \
+        --root asm/smt/z3 \
+        --manifest-out receipts/smt_z3_manifest.json
+
+      python3 tools/record_receipt.py \
+        --target receipts/smt_z3_manifest.json \
+        --receipt receipts/smt_z3.json \
+        --status CODEGEN_EMITTED_SMT2_Z3 \
+        --build-epoch "$STUNIR_BUILD_EPOCH" \
+        --epoch-json "$EPOCH_JSON" \
+        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/z3_solver.json \
+                tools/ir_to_smt2.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+        --input-dirs spec asm \
+        --tool "$PY_BIN" \
+        --argv "$PY_BIN" tools/ir_to_smt2.py --variant z3 --ir-manifest receipts/ir_manifest.json --out-root asm/smt/z3 \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+      "$Z3_BIN" -smt2 asm/smt/z3/problem.smt2 > asm/smt/z3/solver_stdout.txt
+
+      python3 tools/record_receipt.py \
+        --target asm/smt/z3/solver_stdout.txt \
+        --receipt receipts/smt_z3_run.json \
+        --status RUNTIME_STDOUT_EMITTED_SMT2_Z3 \
+        --build-epoch "$STUNIR_BUILD_EPOCH" \
+        --epoch-json "$EPOCH_JSON" \
+        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/smt_z3_manifest.json receipts/deps/z3_solver.json \
+                asm/smt/z3/problem.smt2 tools/dep_receipt_tool.py tools/record_receipt.py \
+        --input-dirs spec asm \
+        --tool "$Z3_BIN" \
+        --argv "$Z3_BIN" -smt2 asm/smt/z3/problem.smt2 \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    fi
+  fi
+fi
+
 if [[ "${STUNIR_VERIFY_AFTER_BUILD:-0}" == "1" ]]; then
   echo "Verifying build artifacts..."
   bash scripts/verify.sh

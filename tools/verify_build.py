@@ -770,6 +770,51 @@ def verify_ir_bundle_manifest(bundle_manifest_path: Path, repo: Path, *, asm_dir
                 die(f"bundle bytes differ from file bytes for {rel}")
 
 
+
+def verify_output_manifest(manifest_path: Path, repo: Path, *, strict: bool) -> None:
+    """Verify a generic output manifest emitted by tools/emit_output_manifest.py."""
+    if not manifest_path.exists():
+        die(f"missing output manifest: {manifest_path}")
+    file_is_canonical_json(manifest_path)
+    man = parse_json_bytes(read_bytes(manifest_path), where=str(manifest_path))
+    if not isinstance(man, dict):
+        die("output manifest must be object")
+    if man.get("schema") != "stunir.output_manifest.v1":
+        die(f"unexpected output manifest schema: {man.get('schema')!r}")
+    root_rel = man.get("root")
+    if not isinstance(root_rel, str) or not root_rel:
+        die("output manifest root must be non-empty string")
+    root_path = (repo / safe_relpath(root_rel)).resolve()
+    if not root_path.exists() or not root_path.is_dir():
+        die(f"output manifest root missing or not a dir: {root_rel} (resolved {root_path})")
+    files = man.get("files")
+    if not isinstance(files, list):
+        die("output manifest files must be list")
+    seen: set[str] = set()
+    for rec in files:
+        if not isinstance(rec, dict):
+            die("output manifest entry must be object")
+        rel = rec.get("file")
+        sha = rec.get("sha256")
+        if not isinstance(rel, str) or not isinstance(sha, str):
+            die("output manifest entry must contain file(str) and sha256(str)")
+        if rel in seen:
+            die(f"duplicate output manifest entry: {rel}")
+        seen.add(rel)
+        p = (root_path / safe_relpath(rel)).resolve()
+        if not p.exists() or not p.is_file():
+            die(f"missing output file listed in manifest: {root_rel}/{rel} (resolved {p})")
+        got = sha256_file(p)
+        if got != sha.lower():
+            die(f"output file sha256 mismatch for {root_rel}/{rel}: expected {sha.lower()}, got {got}")
+    if strict:
+        actual = [p for p in root_path.rglob('*') if p.is_file()]
+        actual_set = {p.relative_to(root_path).as_posix() for p in actual}
+        if actual_set != seen:
+            missing = sorted(actual_set - seen)
+            extra = sorted(seen - actual_set)
+            die(f"output manifest set mismatch (strict) for {root_rel}: missing={missing} extra={extra}")
+
 def verify_provenance(build_dir: Path, repo: Path, *, spec_dir: Path, asm_dir: Path, tmp_dir: Path, strict: bool) -> None:
     prov_json = build_dir / "provenance.json"
     prov_h = build_dir / "provenance.h"
@@ -906,6 +951,39 @@ def verify_local(
 
     if ir_bundle_manifest.exists():
         verify_ir_bundle_manifest(ir_bundle_manifest, repo, asm_dir=asm_dir)
+
+
+    # Optional: verify additional backend output manifests and receipts if present
+    optional_output_manifests = [
+        receipts_dir / "python_portable_manifest.json",
+        receipts_dir / "python_cpython_manifest.json",
+        receipts_dir / "smt_portable_manifest.json",
+        receipts_dir / "smt_z3_manifest.json",
+    ]
+    for mp in optional_output_manifests:
+        if mp.exists():
+            verify_output_manifest(mp, repo, strict=strict)
+
+    optional_receipts = [
+        receipts_dir / "python_portable.json",
+        receipts_dir / "python_cpython.json",
+        receipts_dir / "python_cpython_run.json",
+        receipts_dir / "smt_portable.json",
+        receipts_dir / "smt_z3.json",
+        receipts_dir / "smt_z3_run.json",
+    ]
+    for rp in optional_receipts:
+        if rp.exists():
+            verify_build_receipt(
+                rp,
+                repo,
+                receipts_dir=receipts_dir,
+                build_dir=build_dir,
+                asm_dir=asm_dir,
+                bin_dir=bin_dir,
+                epoch_json=epoch_json,
+                strict=strict,
+            )
 
     print(
         "OK: local verification passed (canonical JSON; epochs consistent; receipts + manifests match files)"
