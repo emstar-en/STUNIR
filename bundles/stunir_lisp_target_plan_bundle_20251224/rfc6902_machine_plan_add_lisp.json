@@ -1,1 +1,0 @@
-[{"op":"add","path":"/language_output_priority/tier_b/0","value":{"name":"Common Lisp (portable) + SBCL variant","rationale":"Useful hosted-runtime family with a concrete deterministic implementation (SBCL) already under contract; portable source target fits STUNIR’s receipt-first model."}}]
