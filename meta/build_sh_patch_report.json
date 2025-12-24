@@ -1,0 +1,9 @@
+{
+  "changes": [
+    "Close CC toolchain if immediately after prov_emit else branch",
+    "Move Lisp emission blocks inside STUNIR_OUTPUT_TARGETS block after NORMALIZED_TARGETS and has_target are defined",
+    "Keep --exception-reason before --argv and ensure --argv is last arg (no trailing \\)"
+  ],
+  "overlay_base": "stunir_overlay_buildsh_tools_20251224_v4.zip",
+  "overlay_v5": "stunir_overlay_buildsh_tools_20251224_v5.zip"
+}

@@ -25,8 +25,7 @@ def sha256_file(path: Path) -> str:
 def write_canon_json(path: Path, obj) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '
-',
+        json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n',
         encoding='utf-8',
     )
 

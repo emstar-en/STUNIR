@@ -1,0 +1,31 @@
+{
+  "base_repo_zip": "stunir_repo_main.zip",
+  "env": {
+    "PYTHONUTF8": "1",
+    "STUNIR_OUTPUT_TARGETS": "lisp,python,smt",
+    "STUNIR_REQUIRE_C_TOOLCHAIN": "0",
+    "STUNIR_REQUIRE_DEPS": "0",
+    "STUNIR_VERIFY_AFTER_BUILD": "0"
+  },
+  "generated_at_utc": "2025-12-24T18:46:55Z",
+  "inputs_source_zip": "stunir_sample_runs_bundle_20251224_codegenfix10.zip",
+  "overlay_zip": "stunir_overlay_buildsh_tools_20251224_v5.zip",
+  "samples": [
+    {
+      "exit_code": 0,
+      "sample_id": "minimal"
+    },
+    {
+      "exit_code": 0,
+      "sample_id": "multifile"
+    },
+    {
+      "exit_code": 0,
+      "sample_id": "patch_like"
+    },
+    {
+      "exit_code": 0,
+      "sample_id": "unicode"
+    }
+  ]
+}

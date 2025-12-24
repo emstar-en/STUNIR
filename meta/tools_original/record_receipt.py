@@ -116,7 +116,7 @@ def parse_args(argv: list[str]):
     ap.add_argument('--inputs', nargs='*', default=[])
     ap.add_argument('--input-dirs', nargs='*', default=[])
     ap.add_argument('--tool', default=None)
-    ap.add_argument('--argv', nargs=argparse.REMAINDER, default=None)
+    ap.add_argument('--argv', nargs='*', default=None)
     ap.add_argument('--include-platform', type=int, choices=[0, 1], default=None)
     ns = ap.parse_args(argv[1:])
     return {
