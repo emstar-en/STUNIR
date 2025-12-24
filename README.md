@@ -164,10 +164,13 @@ This section is intentionally concrete. If you want to understand “how STUNIR 
 `tools/epoch.py` chooses a single `selected_epoch` in priority order:
 1. `STUNIR_BUILD_EPOCH`
 2. `SOURCE_DATE_EPOCH`
-3. `GIT_COMMIT_EPOCH` (derived from `git log -1 --format=%ct` when available)
-4. else `CURRENT_TIME`
+3. `DERIVED_SPEC_DIGEST_V1` (deterministic; derived from the `spec/` tree digest)
+4. `GIT_COMMIT_EPOCH` (derived from `git log -1 --format=%ct` when available)
+5. else `ZERO` (0), unless `tools/epoch.py --allow-current-time` is used
 
-The choice is written to `build/epoch.json`. In strict mode, `scripts/build.sh` can forbid `CURRENT_TIME` (see `STUNIR_REQUIRE_DETERMINISTIC_EPOCH`).
+The choice is written to `build/epoch.json`.
+
+In strict mode, `scripts/build.sh` can forbid non-deterministic epochs; by default the pipeline should not require the user to manually provide an epoch.
 
 ### IR emission (current)
 This repo currently emits IR in two complementary forms:

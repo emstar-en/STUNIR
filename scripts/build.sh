@@ -27,7 +27,7 @@ else
   export STUNIR_INCLUDE_PLATFORM=${STUNIR_INCLUDE_PLATFORM:-1}
 fi
 
-# Epoch resolution (preserve or generate once) - reproducible and transparent
+# Epoch resolution (preserve or generate once) - reproducible and transparent (defaults to derived-from-spec)
 EPOCH_JSON=build/epoch.json
 mkdir -p build receipts bin
 
@@ -45,7 +45,7 @@ export STUNIR_EPOCH_SOURCE
 
 # Guard: require deterministic epoch if requested
 if [[ "${STUNIR_REQUIRE_DETERMINISTIC_EPOCH:-0}" == "1" ]] && [[ "$STUNIR_EPOCH_SOURCE" == "CURRENT_TIME" ]]; then
-  echo "Deterministic epoch required but CURRENT_TIME was selected. Set STUNIR_BUILD_EPOCH or SOURCE_DATE_EPOCH." 1>&2
+  echo "Deterministic epoch required but CURRENT_TIME was selected. Set STUNIR_BUILD_EPOCH or SOURCE_DATE_EPOCH, or rely on the default derived-from-spec epoch." 1>&2
   exit 3
 fi
 
