@@ -101,6 +101,90 @@ else
     echo "No C compiler found; skipping prov_emit build"
     python3 tools/record_receipt.py           --target bin/prov_emit           --receipt receipts/prov_emit.json           --status SKIPPED_TOOLCHAIN           --build-epoch "$STUNIR_BUILD_EPOCH"           --epoch-json "$EPOCH_JSON"           --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json tools/prov_emit.c tools/record_receipt.py           --input-dirs spec asm           --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
   fi
+
+# ---------- Lisp (portable emission baseline) ----------
+if has_target "lisp" "${NORMALIZED_TARGETS}"; then
+  echo "Emitting lisp (portable Common Lisp)"
+  python3 tools/ir_to_lisp.py \
+    --variant portable \
+    --ir-manifest receipts/ir_manifest.json \
+    --out-root asm/lisp/portable
+  python3 tools/emit_output_manifest.py \
+    --root asm/lisp/portable \
+    --manifest-out receipts/lisp_portable_manifest.json
+  python3 tools/record_receipt.py \
+    --target receipts/lisp_portable_manifest.json \
+    --receipt receipts/lisp_portable.json \
+    --status CODEGEN_EMITTED_LISP_PORTABLE \
+    --build-epoch "$STUNIR_BUILD_EPOCH" \
+    --epoch-json "$EPOCH_JSON" \
+    --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json \
+      tools/ir_to_lisp.py tools/emit_output_manifest.py tools/record_receipt.py \
+    --input-dirs spec asm \
+    --tool "$PY_BIN" \
+    --argv "$PY_BIN" tools/ir_to_lisp.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/lisp/portable \
+    --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+fi
+
+# ---------- Lisp (SBCL-backed variant) ----------
+if has_target "lisp_sbcl" "${NORMALIZED_TARGETS}"; then
+  echo "Emitting lisp_sbcl (requires sbcl acceptance)"
+  SBCL_BIN=""
+  if [[ -f receipts/deps/sbcl.json ]]; then
+    SBCL_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/sbcl.json --require-accepted --print-path || true)"
+  fi
+  if [[ -z "$SBCL_BIN" ]]; then
+    echo "sbcl not accepted or not present; skipping lisp_sbcl"
+    python3 tools/record_receipt.py \
+      --target receipts/lisp_sbcl_manifest.json \
+      --receipt receipts/lisp_sbcl.json \
+      --status TOOLCHAIN_REQUIRED_MISSING \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/sbcl.json \
+        tools/ir_to_lisp.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    if [[ "${STUNIR_REQUIRE_DEPS:-0}" == "1" ]]; then
+      exit 3
+    fi
+  else
+    python3 tools/ir_to_lisp.py \
+      --variant sbcl \
+      --ir-manifest receipts/ir_manifest.json \
+      --out-root asm/lisp/sbcl
+    python3 tools/emit_output_manifest.py \
+      --root asm/lisp/sbcl \
+      --manifest-out receipts/lisp_sbcl_manifest.json
+    python3 tools/record_receipt.py \
+      --target receipts/lisp_sbcl_manifest.json \
+      --receipt receipts/lisp_sbcl.json \
+      --status CODEGEN_EMITTED_LISP_SBCL \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/sbcl.json \
+        tools/ir_to_lisp.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --tool "$PY_BIN" \
+      --argv "$PY_BIN" tools/ir_to_lisp.py --variant sbcl --ir-manifest receipts/ir_manifest.json --out-root asm/lisp/sbcl \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+    # Runtime run (bind stdout as an artifact)
+    "$SBCL_BIN" --noinform --non-interactive --disable-debugger --script asm/lisp/sbcl/program.lisp > asm/lisp/sbcl/run_stdout.json
+    python3 tools/record_receipt.py \
+      --target asm/lisp/sbcl/run_stdout.json \
+      --receipt receipts/lisp_sbcl_run.json \
+      --status RUNTIME_STDOUT_EMITTED_LISP_SBCL \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/lisp_sbcl_manifest.json receipts/deps/sbcl.json \
+        asm/lisp/sbcl/program.lisp asm/lisp/sbcl/runtime.lisp asm/lisp/sbcl/package.lisp tools/dep_receipt_tool.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --tool "$SBCL_BIN" \
+      --argv "$SBCL_BIN" --noinform --non-interactive --disable-debugger --script asm/lisp/sbcl/program.lisp \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+  fi
+fi
 fi
 
 

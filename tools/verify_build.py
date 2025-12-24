@@ -955,6 +955,8 @@ def verify_local(
 
     # Optional: verify additional backend output manifests and receipts if present
     optional_output_manifests = [
+        receipts_dir / "lisp_portable_manifest.json",
+        receipts_dir / "lisp_sbcl_manifest.json",
         receipts_dir / "python_portable_manifest.json",
         receipts_dir / "python_cpython_manifest.json",
         receipts_dir / "smt_portable_manifest.json",
@@ -965,6 +967,9 @@ def verify_local(
             verify_output_manifest(mp, repo, strict=strict)
 
     optional_receipts = [
+        receipts_dir / "lisp_portable.json",
+        receipts_dir / "lisp_sbcl.json",
+        receipts_dir / "lisp_sbcl_run.json",
         receipts_dir / "python_portable.json",
         receipts_dir / "python_cpython.json",
         receipts_dir / "python_cpython_run.json",
