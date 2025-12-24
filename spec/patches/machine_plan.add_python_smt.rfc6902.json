@@ -1,0 +1,18 @@
+[
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Python",
+      "rationale": "Fast hosted runtime for reference emission + sample-input execution; helps bootstrap STUNIR semantics quickly."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "SMT-LIB (SMT2)",
+      "rationale": "Logic/constraint target; solver-backed sample checks and equivalence testing help validate IR lowering."
+    }
+  }
+]
