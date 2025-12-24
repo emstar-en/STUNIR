@@ -1,0 +1,38 @@
+{
+  "repo": "emstar-en/STUNIR",
+  "branch": "main",
+  "generated_utc": "2025-12-24T04:30:25Z",
+  "counts": {
+    "repo_files_indexed": 123,
+    "markdown_files_scanned": 19,
+    "broken_links": 0,
+    "suspicious_links": 0
+  },
+  "placeholder_targets": [
+    "asm/README.txt",
+    "spec/README.txt"
+  ],
+  "broken": [],
+  "suspicious": [],
+  "link_graph": {
+    "ENTRYPOINT.md": [],
+    "README.md": [],
+    "docs/bundle_A_notes.md": [],
+    "docs/bundle_B_notes.md": [],
+    "docs/bundle_C_notes.md": [],
+    "docs/policy/dead_end_handling_contract.md": [],
+    "docs/receipt_storage_policy.md": [],
+    "docs/relayout_report.md": [],
+    "docs/root/ENTRYPOINT.md": [],
+    "docs/root/stunir_pack_archiving_v0.md": [],
+    "docs/root/stunir_pack_manifest_v0.md": [],
+    "docs/root/stunir_pack_materialization_v0.md": [],
+    "docs/root/stunir_pack_root_attestation_text_v0.md": [],
+    "docs/root/stunir_pack_root_attestation_v0.md": [],
+    "docs/root/stunir_pack_security_v0.md": [],
+    "docs/root/stunir_pack_spec_v0.md": [],
+    "docs/toolchain_contracts.md": [],
+    "docs/verification.md": [],
+    "docs/verification_profiles.md": []
+  }
+}
