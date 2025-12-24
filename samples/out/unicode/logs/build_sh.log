@@ -1,0 +1,15 @@
+OK: dependency probing attempted. See receipts/requirements.json and receipts/deps/*.json
+Wrote IR asm/spec_ir.txt with 20 entries
+Wrote IR files to asm/ir and manifest receipts/ir_manifest.json
+Wrote IR bundle asm/ir_bundle.bin and bundle manifest receipts/ir_bundle_manifest.json
+Wrote receipts/spec_ir.json
+No C compiler found; skipping prov_emit build
+Wrote receipts/prov_emit.json
+Emitting output targets (normalized): lisp,python,smt
+Emitting lisp (portable Common Lisp)
+Wrote receipts/lisp_portable.json
+Emitting python (portable)
+Wrote receipts/python_portable.json
+Emitting smt (portable SMT2)
+Wrote receipts/smt_portable.json
+Build complete. Receipts in receipts/

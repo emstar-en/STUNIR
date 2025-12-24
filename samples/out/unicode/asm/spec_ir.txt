@@ -1,0 +1,22 @@
+; STUNIR IR SUMMARY v1
+; epoch.selected=3545526663 source=DERIVED_SPEC_DIGEST_V1
+FILE comprehensive-consolidation.rfc6902.json SHA256 2d0273f6796c255b91fe22c5cf6b229788290b7f22d1043000ed150257cff191 ID - NAME -
+FILE core-simple-m_of_n.rfc6902.json SHA256 ef138010e059cbb0ffa647e7533f58f99b95d4bf81d191839f2f91f53e54561e ID - NAME -
+FILE entity-autonomy-ecc-delta.rfc6902.json SHA256 b75c30b7ace5ba96cfd4043381dbce0c431f4db7232290744382898ec415b093 ID - NAME -
+FILE generalized-provenance-accounting.rfc6902.json SHA256 90137e0af4a3a2b00eb3d9d53996c0df27caef0ac19e4789097f06fb322b81f4 ID - NAME -
+FILE io-discrete.rfc6902.json SHA256 d55bc191cf5ebb5cb92491298591671baf11bab78f4310d0901359213c8f61ab ID - NAME -
+FILE ld-namespacing.comprehensive.rfc6902.json SHA256 a89b7047270ca77b46ac6145cd0aa226c118a790827d4c7d9b84394759c267b6 ID - NAME -
+FILE patches/machine_plan.add_lisp.rfc6902.json SHA256 9227306d54ac41f29733d7d9f5dfb50c457eaa83b99ce74698ce18d425915a0b ID - NAME -
+FILE patches/machine_plan.add_python_smt.rfc6902.json SHA256 a26e06800e8175142c2876bb94c76dde5431c805581bdc97458f89cdf2367070 ID - NAME -
+FILE patches/target_requirements.lisp_split.rfc6902.json SHA256 718a10353fbac21c06a15d31b55fc8e4d510172d393e21739c81d16b5208e08f ID - NAME -
+FILE patches/target_requirements.python_split.rfc6902.json SHA256 dc142520dad9914196c94b2a8a4151f779c3d36e72b58d25ee69d99e2dfa1cd0 ID - NAME -
+FILE patches/target_requirements.smt_split.rfc6902.json SHA256 470856cd512bb51728f346950e911c5019f44526c1de0b0a143d6e46989202c4 ID - NAME -
+FILE pipeline-to-nld.rfc6902.json SHA256 1902c39712824cdedc7153f70d01d93353058a40211e40e8482cc2c8476cbed6 ID - NAME -
+FILE quorum-arming.rfc6902.json SHA256 69a801b7095fc7bbf0e342faea27592ab31b97406d91dc015d1220b998387fc9 ID - NAME -
+FILE robot-safety-stub.rfc6902.json SHA256 8c5db56756b554795de9299ab1ef9d5614f59b5d2574b0b60a0a28f3178708da ID - NAME -
+FILE schema_fix_catalog.json SHA256 2c692ab2dbdf08df2b7ff3c8fba88be1718e505e9ea7ef5f1f45f634f351c7a8 ID - NAME -
+FILE stunir_machine_plan.json SHA256 45039c744a503266bc9733848a816966aef401917fb79b7a7f4e940f163c311b ID - NAME -
+FILE targets/lisp/lisp_targets_matrix.json SHA256 87f2ea8822939a82a6cbdf016ffa9a52c3bedfef3a1b129a0a1559e429c90580 ID - NAME -
+FILE targets/output_language_plans_manifest.json SHA256 1b60517f6905837cd23e211105865f9bcb6d39bb92b6f997319b6bca54a46b53 ID - NAME -
+FILE targets/python/python_targets_matrix.json SHA256 68a11e73c1c03905a617e78d95e0a4d115d72e82055c0eb887bbf9c85dbaf5f7 ID - NAME -
+FILE targets/smt/smt_targets_matrix.json SHA256 69bd8076dd0800a46e1f47e9bceb2a0210bc9ab27b053b425cc9ba8e93ac0247 ID - NAME -
