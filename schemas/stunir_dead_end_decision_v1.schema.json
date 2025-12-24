@@ -1,0 +1,231 @@
+{
+  "$id": "urn:stunir:schema:dead-end-decision:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "constraints": {
+      "additionalProperties": true,
+      "properties": {
+        "selected_epoch": {
+          "type": "integer"
+        },
+        "verification_profile": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "decision_rule": {
+      "additionalProperties": false,
+      "properties": {
+        "rule_digest": {
+          "additionalProperties": false,
+          "minProperties": 1,
+          "patternProperties": {
+            "^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$": {
+              "pattern": "^[0-9a-f]{16,256}$",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "rule_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "rule_version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_id"
+      ],
+      "type": "object"
+    },
+    "inputs": {
+      "additionalProperties": false,
+      "properties": {
+        "inputs_digest": {
+          "additionalProperties": false,
+          "minProperties": 1,
+          "patternProperties": {
+            "^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$": {
+              "pattern": "^[0-9a-f]{16,256}$",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "inputs_uri": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "inputs_digest"
+      ],
+      "type": "object"
+    },
+    "reason_code": {
+      "enum": [
+        "POLICY_FORBIDS_FEATURE",
+        "ENCODING_RANGE_LIMIT",
+        "TOOLCHAIN_MISSING",
+        "TOOLCHAIN_NONDETERMINISTIC",
+        "PROFILE_CONSTRAINT",
+        "INPUT_PARSE_FAILED",
+        "EQUIVALENCE_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "reason_detail": {
+      "type": "string"
+    },
+    "rejections": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "error_kind": {
+            "type": "string"
+          },
+          "error_message": {
+            "type": "string"
+          },
+          "error_message_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "policy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "policy",
+          "error_kind"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "requested": {
+      "additionalProperties": true,
+      "properties": {
+        "mode": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "policy": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "policy"
+      ],
+      "type": "object"
+    },
+    "resolution_class": {
+      "enum": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "type": "string"
+    },
+    "schema": {
+      "const": "stunir.dead_end_decision.v1",
+      "type": "string"
+    },
+    "selected": {
+      "additionalProperties": true,
+      "properties": {
+        "mode": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "policy": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "policy"
+      ],
+      "type": "object"
+    },
+    "step": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "tool": {
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "digest": {
+          "additionalProperties": false,
+          "minProperties": 1,
+          "patternProperties": {
+            "^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$": {
+              "pattern": "^[0-9a-f]{16,256}$",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "identity_probe": {
+          "additionalProperties": true,
+          "properties": {
+            "command": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "exit_code": {
+              "type": "integer"
+            },
+            "stderr": {
+              "type": "string"
+            },
+            "stdout": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "digest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "step",
+    "requested",
+    "selected",
+    "resolution_class",
+    "reason_code",
+    "inputs",
+    "tool"
+  ],
+  "title": "STUNIR Dead-End Decision Record v1",
+  "type": "object"
+}
