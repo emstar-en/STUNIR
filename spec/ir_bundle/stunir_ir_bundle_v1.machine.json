@@ -1,1 +1,113 @@
-{"schema":"stunir.machine_spec.v1","id":"stunir.ir_bundle.v1","title":"STUNIR IR bundle v1 (byte_exact for IR bundle bytes; layout-independent)","scope":{"byte_exact_applies_to":["ir_bundle_bytes"],"explicitly_not_byte_exact":["receipts","emitted_outputs","logs","package_zip"]},"modes":{"default":"semantic","semantic":{"guarantee":"semantic_equivalence","anchor":"cir_sha256","notes":"Emitters may vary by platform/toolchain; receipts must bind outputs to CIR."},"byte_exact":{"guarantee":"ir_bundle_bytes_are_a_pure_function_of_canonical_ir_content","definition":{"bundle_value":{"type":"cbor_array","len":2,"items":[{"type":"text","const":"stunir.ir_bundle.v1"},{"type":"canonical_ir_object_model"}]},"bundle_bytes":"dcbor_canonical_encode(bundle_value)"},"engine_priority":["native_bin","python_fallback"],"missing_engine_policy":"hard_fail"}},"canonical_ir_content":{"type":"canonical_ir_object_model","layout_independent":true,"forbid_environment_dependent_fields":true,"string_normalization":{"unicode":"NFC","encoding":"utf-8"},"float_policy":{"byte_exact":"forbid_floats","rationale":"Avoid cross-encoder divergence from alternative float encodings."}},"encoding":{"family":"dcbor","canonical":true,"definite_lengths_only":true,"indefinite_lengths":"forbidden","map_key_order":"canonical","integer_encoding":"shortest","byte_string_encoding":"canonical","text_string_encoding":"utf-8"},"hashes":{"cir_sha256":"sha256(dcbor_canonical_encode(canonical_ir_object_model))","ir_bundle_sha256":"sha256(ir_bundle_bytes)"},"receipts":{"required_fields":["ir_bundle.mode","ir_bundle.id","ir_bundle.format_version","ir_bundle.sha256","ir_bundle.cir_sha256","ir_bundle.engine.type","ir_bundle.engine.version_or_build","ir_bundle.encoding.family","ir_bundle.float_policy","ir_bundle.unicode_normalization"],"explain_differences":{"primary_anchor":"cir_sha256","rule":"If cir_sha256 matches, semantic outputs may differ; receipts must record emitter identity/config."}},"conformance_tests":{"cross_matrix":{"precondition":"Two implementations produce identical canonical IR content (same cir_sha256).","assertions":["In byte_exact mode, ir_bundle_sha256 must match across implementations/platforms.","In semantic mode, emitted outputs may differ; receipts must bind them to the same cir_sha256."]}},"versioning":{"format_version":1,"backwards_compat_policy":"Newer readers may support older formats; older readers may reject newer.","evolution":"Bump id/version only when canonical encoding rules or CIR model changes in a way that affects bytes."}}
+{
+  "authoritative_definition": {
+    "cir_value": {
+      "constraints": [
+        "Top-level CIR is a JSON array.",
+        "Each unit is a JSON object.",
+        "All JSON strings (keys and values) are Unicode NFC normalized.",
+        "Floats are forbidden everywhere (JSON numbers must be integers).",
+        "Duplicate keys are forbidden, including duplicates introduced by NFC normalization."
+      ],
+      "items": {
+        "description": "canonical IR unit as a normalized JSON object",
+        "type": "object"
+      },
+      "name": "cir_units",
+      "type": "array"
+    },
+    "ir_bundle_bytes": "dcbor_canonical_encode(ir_bundle_value)",
+    "ir_bundle_value": {
+      "items": [
+        {
+          "const": "stunir.ir_bundle.v1",
+          "type": "text"
+        },
+        {
+          "type": "cir_units"
+        }
+      ],
+      "len": 2,
+      "type": "cbor_array"
+    }
+  },
+  "conformance_tests": {
+    "cross_matrix": {
+      "assertions": [
+        "In byte_exact mode, ir_bundle_sha256 must match across implementations/platforms.",
+        "In semantic mode, emitted outputs may differ; receipts must bind them to the same cir_sha256."
+      ],
+      "precondition": "Two implementations produce identical cir_sha256 for the same cir_units."
+    }
+  },
+  "encoding": {
+    "canonical": true,
+    "definite_lengths_only": true,
+    "family": "dcbor",
+    "indefinite_lengths": "forbidden",
+    "integer_encoding": "shortest",
+    "map_key_order": "RFC8949_canonical (length then lexicographic by encoded key bytes)",
+    "text_string_encoding": "utf-8"
+  },
+  "hashes": {
+    "cir_sha256": "sha256(dcbor_canonical_encode(cir_units))",
+    "ir_bundle_sha256": "sha256(ir_bundle_bytes)"
+  },
+  "id": "stunir.ir_bundle.v1",
+  "modes": {
+    "byte_exact": {
+      "engine_priority": [
+        "native_bin",
+        "python_fallback"
+      ],
+      "guarantee": "ir_bundle_bytes_are_a_pure_function_of_cir_units",
+      "missing_engine_policy": "hard_fail",
+      "policies": {
+        "encoding": "dcbor (RFC 8949 canonical form; definite lengths only)",
+        "float_policy": "forbid_floats",
+        "unicode_normalization": "NFC"
+      }
+    },
+    "default": "semantic",
+    "semantic": {
+      "anchor": "cir_sha256",
+      "guarantee": "semantic_equivalence",
+      "notes": "Emitters may vary by platform/toolchain; receipts must bind outputs to CIR."
+    }
+  },
+  "receipts": {
+    "explain_differences": {
+      "primary_anchor": "cir_sha256",
+      "rule": "If cir_sha256 matches, semantic outputs may differ; receipts must record emitter identity/config."
+    },
+    "required_fields": [
+      "ir_bundle.mode",
+      "ir_bundle.id",
+      "ir_bundle.format_version",
+      "ir_bundle.sha256",
+      "ir_bundle.cir_sha256",
+      "ir_bundle.engine.type",
+      "ir_bundle.engine.version_or_build",
+      "ir_bundle.encoding.family",
+      "ir_bundle.float_policy",
+      "ir_bundle.unicode_normalization"
+    ]
+  },
+  "schema": "stunir.machine_spec.v1",
+  "scope": {
+    "byte_exact_applies_to": [
+      "ir_bundle_bytes"
+    ],
+    "explicitly_not_byte_exact": [
+      "receipts",
+      "emitted_outputs",
+      "logs",
+      "package_zip"
+    ]
+  },
+  "title": "STUNIR IR bundle v1 (authoritative; CIR is a JSON-unit list; byte_exact only for IR bundle bytes)",
+  "versioning": {
+    "backwards_compat_policy": "Newer readers may support older formats; older readers may reject newer.",
+    "evolution": "Bump id/version only when CIR model or canonical encoding rules change in a way that affects bytes.",
+    "format_version": 1
+  }
+}
