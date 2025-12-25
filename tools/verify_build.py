@@ -900,6 +900,15 @@ def verify_local(
     if not isinstance(epoch_json, dict):
         die("epoch.json must be object")
 
+    # Optional: Tier A ingest (IR-in-source) metadata
+
+    ir_in_source_ingest = build_dir / "ir_in_source_ingest.json"
+
+    if ir_in_source_ingest.exists():
+
+        file_is_canonical_json(ir_in_source_ingest)
+
+
     # Provenance
     spec_dir = repo / "spec"
     verify_provenance(build_dir, repo, spec_dir=spec_dir, asm_dir=asm_dir, tmp_dir=tmp_dir, strict=strict)
@@ -967,7 +976,8 @@ def verify_local(
             verify_output_manifest(mp, repo, strict=strict)
 
     optional_receipts = [
-        receipts_dir / "lisp_portable.json",
+        receipts_dir / "ir_in_source_ingest.json",
+receipts_dir / "lisp_portable.json",
         receipts_dir / "lisp_sbcl.json",
         receipts_dir / "lisp_sbcl_run.json",
         receipts_dir / "python_portable.json",

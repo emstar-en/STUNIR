@@ -57,6 +57,54 @@ if [[ "${STUNIR_PROBE_DEPS:-0}" == "1" ]] || [[ -n "${STUNIR_OUTPUT_TARGETS:-}" 
   fi
 fi
 
+# Optional: Tier A ingest (IR-in-source)
+# If STUNIR_INPUT_SOURCES is set, extract/verify an IR bundle reference/embedded payload from source files.
+# This emits:
+#   - build/ir_in_source_ingest.json (metadata)
+#   - build/ingested_ir_bundle.machine.json (the canonical IR bundle bytes)
+#   - receipts/ir_in_source_ingest.json (receipt binding the ingest step)
+if [[ -n "${STUNIR_INPUT_SOURCES:-}" ]] || [[ -n "${STUNIR_INPUT_IR_BUNDLE:-}" ]]; then
+  IR_IN_SOURCE_MATRIX="${STUNIR_IR_IN_SOURCE_MARKERS_MATRIX:-spec/ingest/ir_in_source/ir_in_source_markers_matrix_v0.json}"
+  IR_IN_SOURCE_OUT_JSON="${STUNIR_IR_IN_SOURCE_OUT_JSON:-build/ir_in_source_ingest.json}"
+  IR_IN_SOURCE_OUT_BUNDLE="${STUNIR_IR_IN_SOURCE_OUT_BUNDLE:-build/ingested_ir_bundle.machine.json}"
+
+  # Expand CSV source list (if provided) into individual args for receipts
+  IR_IN_SOURCE_INPUTS=("$IR_IN_SOURCE_MATRIX" "$IR_IN_SOURCE_OUT_BUNDLE")
+  if [[ -n "${STUNIR_INPUT_IR_BUNDLE:-}" ]]; then
+    IR_IN_SOURCE_INPUTS+=("${STUNIR_INPUT_IR_BUNDLE}")
+  fi
+  if [[ -n "${STUNIR_INPUT_SOURCES:-}" ]]; then
+    IFS=',' read -ra _SRC_PARTS <<< "${STUNIR_INPUT_SOURCES}"
+    for s in "${_SRC_PARTS[@]}"; do
+      s="${s//[[:space:]]/}"
+      if [[ -n "$s" ]]; then
+        IR_IN_SOURCE_INPUTS+=("$s")
+      fi
+    done
+  fi
+
+  python3 tools/ir_in_source_ingest.py \
+    --repo-root . \
+    --markers-matrix "$IR_IN_SOURCE_MATRIX" \
+    ${STUNIR_INPUT_SOURCES:+--sources "$STUNIR_INPUT_SOURCES"} \
+    ${STUNIR_INPUT_IR_BUNDLE:+--ir-bundle "$STUNIR_INPUT_IR_BUNDLE"} \
+    ${STUNIR_INPUT_IR_BUNDLE_SHA256:+--ir-bundle-sha256 "$STUNIR_INPUT_IR_BUNDLE_SHA256"} \
+    --out-json "$IR_IN_SOURCE_OUT_JSON" \
+    --out-bundle "$IR_IN_SOURCE_OUT_BUNDLE"
+
+  python3 tools/record_receipt.py \
+    --target "$IR_IN_SOURCE_OUT_JSON" \
+    --receipt receipts/ir_in_source_ingest.json \
+    --status INGESTED_IR_IN_SOURCE_TIER_A \
+    --build-epoch "$STUNIR_BUILD_EPOCH" \
+    --epoch-json "$EPOCH_JSON" \
+    --inputs "${IR_IN_SOURCE_INPUTS[@]}" \
+    --input-dirs spec \
+    --tool "$PY_BIN" \
+    --argv "$PY_BIN" tools/ir_in_source_ingest.py --repo-root . --markers-matrix "$IR_IN_SOURCE_MATRIX" \
+    --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+fi
+
 # Generate deterministic IR from spec/
 python3 tools/spec_to_ir.py --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"
 
