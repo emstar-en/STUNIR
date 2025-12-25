@@ -102,7 +102,12 @@ else
     python3 tools/record_receipt.py           --target bin/prov_emit           --receipt receipts/prov_emit.json           --status SKIPPED_TOOLCHAIN           --build-epoch "$STUNIR_BUILD_EPOCH"           --epoch-json "$EPOCH_JSON"           --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json tools/prov_emit.c tools/record_receipt.py           --input-dirs spec asm           --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
   fi
 
+  fi
 fi
+fi
+
+
+
 # Optional: emit requested output targets (raw code + optional runtime outputs)
 if [[ -n "${STUNIR_OUTPUT_TARGETS:-}" ]]; then
   # Prefer normalized targets from receipts/requirements.json (aliases resolved)
@@ -130,91 +135,174 @@ PY
     done
     return 1
   }
-
-
   # ---------- Lisp (portable emission baseline) ----------
   if has_target "lisp" "${NORMALIZED_TARGETS}"; then
-    echo "Emitting lisp (portable Common Lisp)"
-    python3 tools/ir_to_lisp.py \
-      --variant portable \
-      --ir-manifest receipts/ir_manifest.json \
-      --out-root asm/lisp/portable
-    python3 tools/emit_output_manifest.py \
-      --root asm/lisp/portable \
-      --manifest-out receipts/lisp_portable_manifest.json
-    python3 tools/record_receipt.py \
-      --target receipts/lisp_portable_manifest.json \
-      --receipt receipts/lisp_portable.json \
-      --status CODEGEN_EMITTED_LISP_PORTABLE \
-      --build-epoch "$STUNIR_BUILD_EPOCH" \
-      --epoch-json "$EPOCH_JSON" \
-      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json \
-        tools/ir_to_lisp.py tools/emit_output_manifest.py tools/record_receipt.py \
-      --input-dirs spec asm \
-      --tool "$PY_BIN" \
-      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-      --argv "$PY_BIN" tools/ir_to_lisp.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/lisp/portable 
+  echo "Emitting lisp (portable Common Lisp)"
+  python3 tools/ir_to_lisp.py \
+    --variant portable \
+    --ir-manifest receipts/ir_manifest.json \
+    --out-root asm/lisp/portable
+  python3 tools/emit_output_manifest.py \
+    --root asm/lisp/portable \
+    --manifest-out receipts/lisp_portable_manifest.json
+  python3 tools/record_receipt.py \
+    --target receipts/lisp_portable_manifest.json \
+    --receipt receipts/lisp_portable.json \
+    --status CODEGEN_EMITTED_LISP_PORTABLE \
+    --build-epoch "$STUNIR_BUILD_EPOCH" \
+    --epoch-json "$EPOCH_JSON" \
+    --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json \
+      tools/ir_to_lisp.py tools/emit_output_manifest.py tools/record_receipt.py \
+    --input-dirs spec asm \
+    --tool "$PY_BIN" \
+    --argv "$PY_BIN" tools/ir_to_lisp.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/lisp/portable \
+    --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
   fi
 
   # ---------- Lisp (SBCL-backed variant) ----------
   if has_target "lisp_sbcl" "${NORMALIZED_TARGETS}"; then
-    echo "Emitting lisp_sbcl (requires sbcl acceptance)"
-    SBCL_BIN=""
-    if [[ -f receipts/deps/sbcl.json ]]; then
-      SBCL_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/sbcl.json --require-accepted --print-path || true)"
+  echo "Emitting lisp_sbcl (requires sbcl acceptance)"
+  SBCL_BIN=""
+  if [[ -f receipts/deps/sbcl.json ]]; then
+    SBCL_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/sbcl.json --require-accepted --print-path || true)"
+  fi
+  if [[ -z "$SBCL_BIN" ]]; then
+    echo "sbcl not accepted or not present; skipping lisp_sbcl"
+    python3 tools/record_receipt.py \
+      --target receipts/lisp_sbcl_manifest.json \
+      --receipt receipts/lisp_sbcl.json \
+      --status TOOLCHAIN_REQUIRED_MISSING \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/sbcl.json \
+        tools/ir_to_lisp.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    if [[ "${STUNIR_REQUIRE_DEPS:-0}" == "1" ]]; then
+      exit 3
     fi
-    if [[ -z "$SBCL_BIN" ]]; then
-      echo "sbcl not accepted or not present; skipping lisp_sbcl"
-      python3 tools/record_receipt.py \
-        --target receipts/lisp_sbcl_manifest.json \
-        --receipt receipts/lisp_sbcl.json \
-        --status TOOLCHAIN_REQUIRED_MISSING \
-        --build-epoch "$STUNIR_BUILD_EPOCH" \
-        --epoch-json "$EPOCH_JSON" \
-        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/sbcl.json \
-          tools/ir_to_lisp.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
-        --input-dirs spec asm \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
-      if [[ "${STUNIR_REQUIRE_DEPS:-0}" == "1" ]]; then
-        exit 3
-      fi
-    else
-      python3 tools/ir_to_lisp.py \
-        --variant sbcl \
-        --ir-manifest receipts/ir_manifest.json \
-        --out-root asm/lisp/sbcl
-      python3 tools/emit_output_manifest.py \
-        --root asm/lisp/sbcl \
-        --manifest-out receipts/lisp_sbcl_manifest.json
-      python3 tools/record_receipt.py \
-        --target receipts/lisp_sbcl_manifest.json \
-        --receipt receipts/lisp_sbcl.json \
-        --status CODEGEN_EMITTED_LISP_SBCL \
-        --build-epoch "$STUNIR_BUILD_EPOCH" \
-        --epoch-json "$EPOCH_JSON" \
-        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/sbcl.json \
-          tools/ir_to_lisp.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
-        --input-dirs spec asm \
-        --tool "$PY_BIN" \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-        --argv "$PY_BIN" tools/ir_to_lisp.py --variant sbcl --ir-manifest receipts/ir_manifest.json --out-root asm/lisp/sbcl 
+  else
+    python3 tools/ir_to_lisp.py \
+      --variant sbcl \
+      --ir-manifest receipts/ir_manifest.json \
+      --out-root asm/lisp/sbcl
+    python3 tools/emit_output_manifest.py \
+      --root asm/lisp/sbcl \
+      --manifest-out receipts/lisp_sbcl_manifest.json
+    python3 tools/record_receipt.py \
+      --target receipts/lisp_sbcl_manifest.json \
+      --receipt receipts/lisp_sbcl.json \
+      --status CODEGEN_EMITTED_LISP_SBCL \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json receipts/deps/sbcl.json \
+        tools/ir_to_lisp.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --tool "$PY_BIN" \
+      --argv "$PY_BIN" tools/ir_to_lisp.py --variant sbcl --ir-manifest receipts/ir_manifest.json --out-root asm/lisp/sbcl \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
 
-      # Runtime run (bind stdout as an artifact)
-      "$SBCL_BIN" --noinform --non-interactive --disable-debugger --script asm/lisp/sbcl/program.lisp > asm/lisp/sbcl/run_stdout.json
-      python3 tools/record_receipt.py \
-        --target asm/lisp/sbcl/run_stdout.json \
-        --receipt receipts/lisp_sbcl_run.json \
-        --status RUNTIME_STDOUT_EMITTED_LISP_SBCL \
-        --build-epoch "$STUNIR_BUILD_EPOCH" \
-        --epoch-json "$EPOCH_JSON" \
-        --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/lisp_sbcl_manifest.json receipts/deps/sbcl.json \
-          asm/lisp/sbcl/program.lisp asm/lisp/sbcl/runtime.lisp asm/lisp/sbcl/package.lisp tools/dep_receipt_tool.py tools/record_receipt.py \
-        --input-dirs spec asm \
-        --tool "$SBCL_BIN" \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-        --argv "$SBCL_BIN" --noinform --non-interactive --disable-debugger --script asm/lisp/sbcl/program.lisp 
+    # Runtime run (bind stdout as an artifact)
+    "$SBCL_BIN" --noinform --non-interactive --disable-debugger --script asm/lisp/sbcl/program.lisp > asm/lisp/sbcl/run_stdout.json
+    python3 tools/record_receipt.py \
+      --target asm/lisp/sbcl/run_stdout.json \
+      --receipt receipts/lisp_sbcl_run.json \
+      --status RUNTIME_STDOUT_EMITTED_LISP_SBCL \
+      --build-epoch "$STUNIR_BUILD_EPOCH" \
+      --epoch-json "$EPOCH_JSON" \
+      --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/lisp_sbcl_manifest.json receipts/deps/sbcl.json \
+        asm/lisp/sbcl/program.lisp asm/lisp/sbcl/runtime.lisp asm/lisp/sbcl/package.lisp tools/dep_receipt_tool.py tools/record_receipt.py \
+      --input-dirs spec asm \
+      --tool "$SBCL_BIN" \
+      --argv "$SBCL_BIN" --noinform --non-interactive --disable-debugger --script asm/lisp/sbcl/program.lisp \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+  # ---------- Node.js (hosted runtime) ----------
+  if has_target "node" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting node (Node.js hosted runtime)"
+    python3 tools/ir_to_node.py     --variant hosted     --ir-manifest receipts/ir_manifest.json     --out-root asm/node/app
+
+    python3 tools/emit_output_manifest.py     --root asm/node/app     --manifest-out receipts/node_manifest.json
+
+    python3 tools/record_receipt.py     --target receipts/node_manifest.json     --receipt receipts/node.json     --status CODEGEN_EMITTED_NODE     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json             tools/ir_to_node.py tools/emit_output_manifest.py tools/record_receipt.py     --input-dirs spec asm     --tool "$PY_BIN"     --argv "$PY_BIN" tools/ir_to_node.py --variant hosted --ir-manifest receipts/ir_manifest.json --out-root asm/node/app     --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+    NODE_BIN=""
+    if [[ -f receipts/deps/node_runtime.json ]]; then
+      NODE_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/node_runtime.json --require-accepted --print-path || true)"
+    fi
+
+    if [[ -n "$NODE_BIN" ]]; then
+      "$NODE_BIN" asm/node/app/index.js > asm/node/app/run_stdout.json
+      python3 tools/record_receipt.py       --target asm/node/app/run_stdout.json       --receipt receipts/node_run.json       --status RUNTIME_STDOUT_EMITTED_NODE       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/node_manifest.json receipts/deps/node_runtime.json               asm/node/app/index.js asm/node/app/package.json tools/dep_receipt_tool.py tools/record_receipt.py       --input-dirs spec asm       --tool "$NODE_BIN"       --argv "$NODE_BIN" asm/node/app/index.js       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    else
+      python3 tools/record_receipt.py       --target asm/node/app/run_stdout.json       --receipt receipts/node_run.json       --status SKIPPED_TOOLCHAIN       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/node_manifest.json receipts/deps/node_runtime.json               asm/node/app/index.js asm/node/app/package.json tools/dep_receipt_tool.py tools/record_receipt.py       --input-dirs spec asm       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
     fi
   fi
+
+  # ---------- JVM (hosted runtime) ----------
+  if has_target "java" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting java (JVM hosted runtime)"
+    python3 tools/ir_to_java.py     --variant hosted     --ir-manifest receipts/ir_manifest.json     --out-root asm/java/app
+
+    python3 tools/emit_output_manifest.py     --root asm/java/app     --manifest-out receipts/java_manifest.json
+
+    python3 tools/record_receipt.py     --target receipts/java_manifest.json     --receipt receipts/java.json     --status CODEGEN_EMITTED_JAVA     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json             tools/ir_to_java.py tools/emit_output_manifest.py tools/record_receipt.py     --input-dirs spec asm     --tool "$PY_BIN"     --argv "$PY_BIN" tools/ir_to_java.py --variant hosted --ir-manifest receipts/ir_manifest.json --out-root asm/java/app     --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+  fi
+
+  # ---------- .NET (hosted runtime) ----------
+  if has_target "dotnet" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting dotnet (.NET hosted runtime)"
+    python3 tools/ir_to_dotnet.py     --variant hosted     --ir-manifest receipts/ir_manifest.json     --out-root asm/dotnet/app
+
+    python3 tools/emit_output_manifest.py     --root asm/dotnet/app     --manifest-out receipts/dotnet_manifest.json
+
+    python3 tools/record_receipt.py     --target receipts/dotnet_manifest.json     --receipt receipts/dotnet.json     --status CODEGEN_EMITTED_DOTNET     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json             tools/ir_to_dotnet.py tools/emit_output_manifest.py tools/record_receipt.py     --input-dirs spec asm     --tool "$PY_BIN"     --argv "$PY_BIN" tools/ir_to_dotnet.py --variant hosted --ir-manifest receipts/ir_manifest.json --out-root asm/dotnet/app     --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+  fi
+
+  # ---------- Ruby (hosted runtime) ----------
+  if has_target "ruby" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting ruby (hosted runtime)"
+    python3 tools/ir_to_ruby.py     --variant hosted     --ir-manifest receipts/ir_manifest.json     --out-root asm/ruby/app
+
+    python3 tools/emit_output_manifest.py     --root asm/ruby/app     --manifest-out receipts/ruby_manifest.json
+
+    python3 tools/record_receipt.py     --target receipts/ruby_manifest.json     --receipt receipts/ruby.json     --status CODEGEN_EMITTED_RUBY     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json             tools/ir_to_ruby.py tools/emit_output_manifest.py tools/record_receipt.py     --input-dirs spec asm     --tool "$PY_BIN"     --argv "$PY_BIN" tools/ir_to_ruby.py --variant hosted --ir-manifest receipts/ir_manifest.json --out-root asm/ruby/app     --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+    RUBY_BIN=""
+    if [[ -f receipts/deps/ruby_runtime.json ]]; then
+      RUBY_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/ruby_runtime.json --require-accepted --print-path || true)"
+    fi
+
+    if [[ -n "$RUBY_BIN" ]]; then
+      "$RUBY_BIN" asm/ruby/app/main.rb > asm/ruby/app/run_stdout.json
+      python3 tools/record_receipt.py       --target asm/ruby/app/run_stdout.json       --receipt receipts/ruby_run.json       --status RUNTIME_STDOUT_EMITTED_RUBY       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/ruby_manifest.json receipts/deps/ruby_runtime.json               asm/ruby/app/main.rb tools/dep_receipt_tool.py tools/record_receipt.py       --input-dirs spec asm       --tool "$RUBY_BIN"       --argv "$RUBY_BIN" asm/ruby/app/main.rb       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    else
+      python3 tools/record_receipt.py       --target asm/ruby/app/run_stdout.json       --receipt receipts/ruby_run.json       --status SKIPPED_TOOLCHAIN       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/ruby_manifest.json receipts/deps/ruby_runtime.json               asm/ruby/app/main.rb tools/dep_receipt_tool.py tools/record_receipt.py       --input-dirs spec asm       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    fi
+  fi
+
+  # ---------- PHP (hosted runtime) ----------
+  if has_target "php" "${NORMALIZED_TARGETS}"; then
+    echo "Emitting php (hosted runtime)"
+    python3 tools/ir_to_php.py     --variant hosted     --ir-manifest receipts/ir_manifest.json     --out-root asm/php/app
+
+    python3 tools/emit_output_manifest.py     --root asm/php/app     --manifest-out receipts/php_manifest.json
+
+    python3 tools/record_receipt.py     --target receipts/php_manifest.json     --receipt receipts/php.json     --status CODEGEN_EMITTED_PHP     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/requirements.json             tools/ir_to_php.py tools/emit_output_manifest.py tools/record_receipt.py     --input-dirs spec asm     --tool "$PY_BIN"     --argv "$PY_BIN" tools/ir_to_php.py --variant hosted --ir-manifest receipts/ir_manifest.json --out-root asm/php/app     --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+
+    PHP_BIN=""
+    if [[ -f receipts/deps/php_runtime.json ]]; then
+      PHP_BIN="$(python3 tools/dep_receipt_tool.py --receipt receipts/deps/php_runtime.json --require-accepted --print-path || true)"
+    fi
+
+    if [[ -n "$PHP_BIN" ]]; then
+      "$PHP_BIN" asm/php/app/main.php > asm/php/app/run_stdout.json
+      python3 tools/record_receipt.py       --target asm/php/app/run_stdout.json       --receipt receipts/php_run.json       --status RUNTIME_STDOUT_EMITTED_PHP       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/php_manifest.json receipts/deps/php_runtime.json               asm/php/app/main.php tools/dep_receipt_tool.py tools/record_receipt.py       --input-dirs spec asm       --tool "$PHP_BIN"       --argv "$PHP_BIN" asm/php/app/main.php       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    else
+      python3 tools/record_receipt.py       --target asm/php/app/run_stdout.json       --receipt receipts/php_run.json       --status SKIPPED_TOOLCHAIN       --build-epoch "$STUNIR_BUILD_EPOCH"       --epoch-json "$EPOCH_JSON"       --inputs build/provenance.json receipts/ir_manifest.json receipts/ir_bundle_manifest.json receipts/php_manifest.json receipts/deps/php_runtime.json               asm/php/app/main.php tools/dep_receipt_tool.py tools/record_receipt.py       --input-dirs spec asm       --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
+    fi
+  fi
+
 
   # ---------- Python (portable emission baseline) ----------
   if has_target "python" "${NORMALIZED_TARGETS}"; then
@@ -238,8 +326,8 @@ PY
               tools/ir_to_python.py tools/emit_output_manifest.py tools/record_receipt.py \
       --input-dirs spec asm \
       --tool "$PY_BIN" \
-      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-      --argv "$PY_BIN" tools/ir_to_python.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/python/portable 
+      --argv "$PY_BIN" tools/ir_to_python.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/python/portable \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
   fi
 
   # ---------- Python (CPython-backed variant) ----------
@@ -285,8 +373,8 @@ PY
                 tools/ir_to_python.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
         --input-dirs spec asm \
         --tool "$PY_BIN" \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-        --argv "$PY_BIN" tools/ir_to_python.py --variant cpython --ir-manifest receipts/ir_manifest.json --out-root asm/python/cpython 
+        --argv "$PY_BIN" tools/ir_to_python.py --variant cpython --ir-manifest receipts/ir_manifest.json --out-root asm/python/cpython \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
 
       # Runtime run (bind stdout as an artifact)
       "$PY_RUNTIME_BIN" asm/python/cpython/program.py > asm/python/cpython/run_stdout.json
@@ -301,8 +389,8 @@ PY
                 asm/python/cpython/program.py asm/python/cpython/runtime.py tools/dep_receipt_tool.py tools/record_receipt.py \
         --input-dirs spec asm \
         --tool "$PY_RUNTIME_BIN" \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-        --argv "$PY_RUNTIME_BIN" asm/python/cpython/program.py 
+        --argv "$PY_RUNTIME_BIN" asm/python/cpython/program.py \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
     fi
   fi
 
@@ -328,8 +416,8 @@ PY
               tools/ir_to_smt2.py tools/emit_output_manifest.py tools/record_receipt.py \
       --input-dirs spec asm \
       --tool "$PY_BIN" \
-      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-      --argv "$PY_BIN" tools/ir_to_smt2.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/smt/portable 
+      --argv "$PY_BIN" tools/ir_to_smt2.py --variant portable --ir-manifest receipts/ir_manifest.json --out-root asm/smt/portable \
+      --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
   fi
 
   # ---------- SMT2 (Z3-backed variant) ----------
@@ -375,8 +463,8 @@ PY
                 tools/ir_to_smt2.py tools/emit_output_manifest.py tools/dep_receipt_tool.py tools/record_receipt.py \
         --input-dirs spec asm \
         --tool "$PY_BIN" \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-        --argv "$PY_BIN" tools/ir_to_smt2.py --variant z3 --ir-manifest receipts/ir_manifest.json --out-root asm/smt/z3 
+        --argv "$PY_BIN" tools/ir_to_smt2.py --variant z3 --ir-manifest receipts/ir_manifest.json --out-root asm/smt/z3 \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
 
       "$Z3_BIN" -smt2 asm/smt/z3/problem.smt2 > asm/smt/z3/solver_stdout.txt
 
@@ -390,8 +478,8 @@ PY
                 asm/smt/z3/problem.smt2 tools/dep_receipt_tool.py tools/record_receipt.py \
         --input-dirs spec asm \
         --tool "$Z3_BIN" \
-        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}" \
-        --argv "$Z3_BIN" -smt2 asm/smt/z3/problem.smt2 
+        --argv "$Z3_BIN" -smt2 asm/smt/z3/problem.smt2 \
+        --exception-reason "${STUNIR_EPOCH_EXCEPTION_REASON:-}"
     fi
   fi
 fi
