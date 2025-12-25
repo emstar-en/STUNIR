@@ -1,0 +1,7 @@
+{application, stunir_program,
+ [{description, "STUNIR Erlang skeleton"},
+  {vsn, "0.0.0"},
+  {modules, [stunir_runtime, stunir_program]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []}]}.

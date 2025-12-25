@@ -1,0 +1,251 @@
+{
+  "doc_type": "stunir.polyglot_target_matrix.v0",
+  "recommended_aggregate_manifest": "receipts/output_manifest.json",
+  "targets": {
+    "asp": {
+      "kind": "asp_clingo_flavor_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/asp/clingo/program.lp",
+          "asm/asp/clingo/README.md"
+        ],
+        "manifest": "receipts/asp_manifest.json",
+        "root": "asm/asp/clingo"
+      },
+      "receipt": "receipts/asp.json",
+      "receipt_status": "CODEGEN_EMITTED_ASP",
+      "receipt_target": "receipts/asp_manifest.json",
+      "required_contracts": []
+    },
+    "c11": {
+      "kind": "c11_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/c/c11/stunir_runtime.h",
+          "asm/c/c11/stunir_runtime.c",
+          "asm/c/c11/main.c",
+          "asm/c/c11/README.md"
+        ],
+        "manifest": "receipts/c11_manifest.json",
+        "root": "asm/c/c11"
+      },
+      "receipt": "receipts/c11.json",
+      "receipt_status": "CODEGEN_EMITTED_C11",
+      "receipt_target": "receipts/c11_manifest.json",
+      "required_contracts": []
+    },
+    "c17": {
+      "kind": "c17_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/c/c17/stunir_runtime.h",
+          "asm/c/c17/stunir_runtime.c",
+          "asm/c/c17/main.c",
+          "asm/c/c17/README.md"
+        ],
+        "manifest": "receipts/c17_manifest.json",
+        "root": "asm/c/c17"
+      },
+      "receipt": "receipts/c17.json",
+      "receipt_status": "CODEGEN_EMITTED_C17",
+      "receipt_target": "receipts/c17_manifest.json",
+      "required_contracts": []
+    },
+    "c23": {
+      "kind": "c23_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/c/c23/stunir_runtime.h",
+          "asm/c/c23/stunir_runtime.c",
+          "asm/c/c23/main.c",
+          "asm/c/c23/README.md"
+        ],
+        "manifest": "receipts/c23_manifest.json",
+        "root": "asm/c/c23"
+      },
+      "receipt": "receipts/c23.json",
+      "receipt_status": "CODEGEN_EMITTED_C23",
+      "receipt_target": "receipts/c23_manifest.json",
+      "required_contracts": []
+    },
+    "c89": {
+      "kind": "c89_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/c/c89/stunir_runtime.h",
+          "asm/c/c89/stunir_runtime.c",
+          "asm/c/c89/main.c",
+          "asm/c/c89/README.md"
+        ],
+        "manifest": "receipts/c89_manifest.json",
+        "root": "asm/c/c89"
+      },
+      "receipt": "receipts/c89.json",
+      "receipt_status": "CODEGEN_EMITTED_C89",
+      "receipt_target": "receipts/c89_manifest.json",
+      "required_contracts": []
+    },
+    "c99": {
+      "kind": "c99_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/c/c99/stunir_runtime.h",
+          "asm/c/c99/stunir_runtime.c",
+          "asm/c/c99/main.c",
+          "asm/c/c99/README.md"
+        ],
+        "manifest": "receipts/c99_manifest.json",
+        "root": "asm/c/c99"
+      },
+      "receipt": "receipts/c99.json",
+      "receipt_status": "CODEGEN_EMITTED_C99",
+      "receipt_target": "receipts/c99_manifest.json",
+      "required_contracts": []
+    },
+    "datalog": {
+      "kind": "datalog_souffle_flavor_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/datalog/souffle/program.dl",
+          "asm/datalog/souffle/README.md"
+        ],
+        "manifest": "receipts/datalog_manifest.json",
+        "root": "asm/datalog/souffle"
+      },
+      "receipt": "receipts/datalog.json",
+      "receipt_status": "CODEGEN_EMITTED_DATALOG",
+      "receipt_target": "receipts/datalog_manifest.json",
+      "required_contracts": []
+    },
+    "elixir": {
+      "kind": "beam_elixir_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/elixir/mix/mix.exs",
+          "asm/elixir/mix/lib/stunir_runtime.ex",
+          "asm/elixir/mix/lib/stunir_program.ex",
+          "asm/elixir/mix/README.md"
+        ],
+        "manifest": "receipts/elixir_manifest.json",
+        "root": "asm/elixir/mix"
+      },
+      "receipt": "receipts/elixir.json",
+      "receipt_status": "CODEGEN_EMITTED_ELIXIR",
+      "receipt_target": "receipts/elixir_manifest.json",
+      "required_contracts": []
+    },
+    "erlang": {
+      "kind": "beam_erlang_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/erlang/rebar3/rebar.config",
+          "asm/erlang/rebar3/src/stunir_runtime.erl",
+          "asm/erlang/rebar3/src/stunir_program.erl",
+          "asm/erlang/rebar3/README.md"
+        ],
+        "manifest": "receipts/erlang_manifest.json",
+        "root": "asm/erlang/rebar3"
+      },
+      "receipt": "receipts/erlang.json",
+      "receipt_status": "CODEGEN_EMITTED_ERLANG",
+      "receipt_target": "receipts/erlang_manifest.json",
+      "required_contracts": []
+    },
+    "go": {
+      "kind": "go_module_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/go/module/go.mod",
+          "asm/go/module/runtime.go",
+          "asm/go/module/main.go",
+          "asm/go/module/README.md"
+        ],
+        "manifest": "receipts/go_manifest.json",
+        "root": "asm/go/module"
+      },
+      "receipt": "receipts/go.json",
+      "receipt_status": "CODEGEN_EMITTED_GO",
+      "receipt_target": "receipts/go_manifest.json",
+      "required_contracts": []
+    },
+    "haskell": {
+      "kind": "haskell_cabal_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/haskell/cabal/stunir.cabal",
+          "asm/haskell/cabal/src/STUNIR/Runtime.hs",
+          "asm/haskell/cabal/app/Main.hs",
+          "asm/haskell/cabal/README.md"
+        ],
+        "manifest": "receipts/haskell_manifest.json",
+        "root": "asm/haskell/cabal"
+      },
+      "receipt": "receipts/haskell.json",
+      "receipt_status": "CODEGEN_EMITTED_HASKELL",
+      "receipt_target": "receipts/haskell_manifest.json",
+      "required_contracts": []
+    },
+    "minizinc": {
+      "kind": "minizinc_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/minizinc/model/program.mzn",
+          "asm/minizinc/model/README.md"
+        ],
+        "manifest": "receipts/minizinc_manifest.json",
+        "root": "asm/minizinc/model"
+      },
+      "receipt": "receipts/minizinc.json",
+      "receipt_status": "CODEGEN_EMITTED_MINIZINC",
+      "receipt_target": "receipts/minizinc_manifest.json",
+      "required_contracts": []
+    },
+    "prolog": {
+      "kind": "prolog_iso_leaning_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/prolog/iso/runtime.pl",
+          "asm/prolog/iso/program.pl",
+          "asm/prolog/iso/README.md"
+        ],
+        "manifest": "receipts/prolog_manifest.json",
+        "root": "asm/prolog/iso"
+      },
+      "receipt": "receipts/prolog.json",
+      "receipt_status": "CODEGEN_EMITTED_PROLOG",
+      "receipt_target": "receipts/prolog_manifest.json",
+      "required_contracts": []
+    },
+    "rust": {
+      "kind": "rust_edition2021_baseline",
+      "optional_contracts": [],
+      "outputs": {
+        "files": [
+          "asm/rust/edition2021/Cargo.toml",
+          "asm/rust/edition2021/src/runtime.rs",
+          "asm/rust/edition2021/src/main.rs",
+          "asm/rust/edition2021/README.md"
+        ],
+        "manifest": "receipts/rust_manifest.json",
+        "root": "asm/rust/edition2021"
+      },
+      "receipt": "receipts/rust.json",
+      "receipt_status": "CODEGEN_EMITTED_RUST",
+      "receipt_target": "receipts/rust_manifest.json",
+      "required_contracts": []
+    }
+  }
+}

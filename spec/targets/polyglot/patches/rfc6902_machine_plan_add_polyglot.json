@@ -1,0 +1,74 @@
+[
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "C (C11 default) + C89/C99/C17/C23 variants",
+      "rationale": "Low-dependency native source target family; good baseline for hosted + embedded environments."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Rust (edition 2021)",
+      "rationale": "Strong determinism story at the source level; good performance and safety; ecosystem-standard packaging."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Go",
+      "rationale": "Fast builds, simple deployment model; good for operational tooling and services."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Haskell",
+      "rationale": "Pure functional target family; useful for testing semantic lowering and normalization properties."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Erlang + Elixir (BEAM)",
+      "rationale": "Concurrency/message-passing semantics; useful for distributed/runtime-focused variants."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Prolog",
+      "rationale": "Logic programming target family; good for declarative semantics and search."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "Datalog",
+      "rationale": "Declarative fixed-point semantics; good for IR analyses and constraint-style derivations."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "ASP (clingo-flavored)",
+      "rationale": "Non-monotonic reasoning target family; good for policy/rules encodings."
+    }
+  },
+  {
+    "op": "add",
+    "path": "/language_output_priority/tier_b/-",
+    "value": {
+      "name": "MiniZinc",
+      "rationale": "Constraint modeling target; good for optimization/constraint backends."
+    }
+  }
+]

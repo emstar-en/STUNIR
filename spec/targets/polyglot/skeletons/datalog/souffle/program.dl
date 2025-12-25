@@ -1,0 +1,5 @@
+// STUB: codegen should replace this file with a STUNIR-derived program.
+.decl hello(msg:symbol)
+.output hello
+
+hello("STUNIR Datalog skeleton: program stub").
