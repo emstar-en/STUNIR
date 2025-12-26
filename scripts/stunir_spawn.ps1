@@ -1,8 +1,5 @@
 # STUNIR: CLI wrapper to run a command in a clean environment (PowerShell 5.1+ compatible)
-# Usage is intentionally declarative:
-#   - AllowlistJson defines which host vars may be inherited (e.g., SystemRoot).
-#   - StepEnvJson defines explicit vars for the step.
-#   - The launched process receives ONLY (inherited allowlist) + (explicit step vars).
+# The launched process receives ONLY (allowlisted inherited vars) + (explicit step vars).
 
 Set-StrictMode -Version 2
 
@@ -32,7 +29,6 @@ if ($AllowlistJson -and $AllowlistJson.Trim().Length -gt 0) {
 $stepEnv = @{}
 if ($StepEnvJson -and $StepEnvJson.Trim().Length -gt 0) {
     $envObj = Read-StunirJsonFile -Path $StepEnvJson
-    # Accept either {"KEY":"VAL"} or {"env":{...}}
     if ($envObj.env) { $envObj = $envObj.env }
     foreach ($p in $envObj.PSObject.Properties) {
         $stepEnv[$p.Name] = "$($p.Value)"
@@ -58,7 +54,6 @@ if ($ReceiptJson -and $ReceiptJson.Trim().Length -gt 0) {
 
 if ($result.ExitCode -ne 0) {
     if (-not $StderrFile) {
-        # Surface stderr for interactive use, but keep behavior consistent.
         if ($result.Stderr) { [Console]::Error.WriteLine($result.Stderr) }
     }
     exit $result.ExitCode
