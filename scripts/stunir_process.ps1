@@ -3,47 +3,11 @@
 
 Set-StrictMode -Version 2
 
-function Resolve-StunirPowerShellExe {
-    param(
-        [switch]$PreferCore
-    )
-
-    if ($env:STUNIR_POWERSHELL_EXE -and (Test-Path -LiteralPath $env:STUNIR_POWERSHELL_EXE)) {
-        return (Resolve-Path -LiteralPath $env:STUNIR_POWERSHELL_EXE).Path
-    }
-
-    try {
-        $candidate = Join-Path -Path $PSHOME -ChildPath 'pwsh.exe'
-        if ($PreferCore -and (Test-Path -LiteralPath $candidate)) { return (Resolve-Path -LiteralPath $candidate).Path }
-
-        $candidate = Join-Path -Path $PSHOME -ChildPath 'powershell.exe'
-        if (-not $PreferCore -and (Test-Path -LiteralPath $candidate)) { return (Resolve-Path -LiteralPath $candidate).Path }
-
-        $candidate = Join-Path -Path $PSHOME -ChildPath 'pwsh.exe'
-        if (Test-Path -LiteralPath $candidate) { return (Resolve-Path -LiteralPath $candidate).Path }
-
-        $candidate = Join-Path -Path $PSHOME -ChildPath 'powershell.exe'
-        if (Test-Path -LiteralPath $candidate) { return (Resolve-Path -LiteralPath $candidate).Path }
-    } catch {
-        # fall through
-    }
-
-    $cmd = Get-Command -Name 'pwsh' -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
-
-    $cmd = Get-Command -Name 'powershell' -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
-
-    throw "Unable to locate a PowerShell executable (pwsh or powershell)."
-}
-
 function Resolve-StunirCommand {
     param([Parameter(Mandatory=$true)][string]$Name)
 
     $cmd = Get-Command -Name $Name -ErrorAction SilentlyContinue
-    if (-not $cmd) {
-        throw "Command not found: $Name"
-    }
+    if (-not $cmd) { throw "Command not found: $Name" }
 
     if ($cmd.Source) { return $cmd.Source }
     if ($cmd.Path) { return $cmd.Path }
@@ -54,15 +18,9 @@ function Resolve-StunirCommand {
 function Read-StunirJsonFile {
     param([Parameter(Mandatory=$true)][string]$Path)
 
-    if (-not (Test-Path -LiteralPath $Path)) {
-        throw "JSON file not found: $Path"
-    }
-
+    if (-not (Test-Path -LiteralPath $Path)) { throw "JSON file not found: $Path" }
     $raw = Get-Content -LiteralPath $Path -Raw
-    if ($null -eq $raw -or $raw.Trim().Length -eq 0) {
-        throw "JSON file is empty: $Path"
-    }
-
+    if ($null -eq $raw -or $raw.Trim().Length -eq 0) { throw "JSON file is empty: $Path" }
     return ($raw | ConvertFrom-Json -Depth 100)
 }
 
@@ -121,12 +79,8 @@ function Join-StunirArguments {
     param([string[]]$Args)
 
     if ($null -eq $Args) { return '' }
-
     $parts = @()
-    foreach ($a in $Args) {
-        $parts += (Format-StunirArgument -Arg ("$a"))
-    }
-
+    foreach ($a in $Args) { $parts += (Format-StunirArgument -Arg ("$a")) }
     return ($parts -join ' ')
 }
 
@@ -138,8 +92,7 @@ function Invoke-StunirProcess {
         [string]$WorkingDirectory = $null,
         [int]$TimeoutSec = 0,
         [string]$StdoutFile = $null,
-        [string]$StderrFile = $null,
-        [switch]$ThrowOnNonZero
+        [string]$StderrFile = $null
     )
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -188,7 +141,7 @@ function Invoke-StunirProcess {
     if ($StdoutFile) { [System.IO.File]::WriteAllText($StdoutFile, $stdout, [System.Text.Encoding]::UTF8) }
     if ($StderrFile) { [System.IO.File]::WriteAllText($StderrFile, $stderr, [System.Text.Encoding]::UTF8) }
 
-    $result = [PSCustomObject]@{
+    return [PSCustomObject]@{
         ExitCode   = $p.ExitCode
         Stdout     = $stdout
         Stderr     = $stderr
@@ -196,14 +149,6 @@ function Invoke-StunirProcess {
         Exe        = $Exe
         Args       = $Args
     }
-
-    if ($ThrowOnNonZero -and $result.ExitCode -ne 0) {
-        $msg = "Process failed with exit code $($result.ExitCode): $Exe"
-        if ($stderr -and $stderr.Trim().Length -gt 0) { $msg = $msg + "`n" + $stderr }
-        throw $msg
-    }
-
-    return $result
 }
 
 function Write-StunirProcessReceipt {

@@ -1,0 +1,19 @@
+{
+  "schema": "stunir.env_allowlist.v1",
+  "id": "stunir.host_env.windows.runtime.v1",
+  "notes": "STRICT runtime allowlist for Hybrid Strict policy. PATH/user profiles removed. TEMP/TMP are set explicitly to build-local dir by the runner.",
+  "inherit": [
+    "SystemRoot",
+    "WINDIR",
+    "ComSpec",
+    "NUMBER_OF_PROCESSORS",
+    "PROCESSOR_ARCHITECTURE",
+    "SOURCE_DATE_EPOCH",
+    "STUNIR_STRICT",
+    "STUNIR_CBOR_FLOAT_POLICY",
+    "STUNIR_BUILD_EPOCH",
+    "STUNIR_ENGINE",
+    "STUNIR_POWERSHELL_EXE",
+    "STUNIR_BASH_EXE"
+  ]
+}
