@@ -51,11 +51,10 @@ is_sha256_digest() {
 
 first_seen=0
 ir_count=0
-seen_digests=""
 
-# Normalize CRLF by stripping trailing .
+# Parse root_attestation.txt (text v0). For parsing convenience, accept CRLF by stripping trailing \r.
 while IFS= read -r line || [ -n "$line" ]; do
-  line=$(printf "%s" "$line" | sed 's/$//')
+  line=$(printf "%s" "$line" | sed 's/\r$//')
   case "$line" in
     ""|"#"*) continue;;
   esac
@@ -69,44 +68,80 @@ while IFS= read -r line || [ -n "$line" ]; do
     continue
   fi
 
-  # Split into tokens.
+  # Tokenize by ASCII whitespace.
   set -- $line
   rtype="$1"
 
   case "$rtype" in
     epoch)
-      continue;;
-    ir|input|receipt|artifact)
+      # epoch <opaque>
+      continue
+      ;;
+
+    ir)
+      # ir <digest> [key=value ...]
+      if [ "$#" -lt 2 ]; then
+        echo "malformed line: $line" 1>&2
+        exit 1
+      fi
+      digest="$2"
+      ;;
+
+    receipt)
+      # receipt <digest> [purpose=...] [key=value ...]
+      if [ "$#" -lt 2 ]; then
+        echo "malformed line: $line" 1>&2
+        exit 1
+      fi
+      digest="$2"
+      ;;
+
+    input)
+      # input <digest> kind=... [key=value ...]
       if [ "$#" -lt 3 ]; then
         echo "malformed line: $line" 1>&2
         exit 1
       fi
       digest="$2"
-      if ! is_sha256_digest "$digest"; then
-        echo "bad digest: $digest" 1>&2
-        exit 1
-      fi
-      hex=${digest#sha256:}
-      obj="$OBJ_DIR/$hex"
-      if [ ! -f "$obj" ]; then
-        echo "missing object: $obj" 1>&2
-        exit 1
-      fi
-      actual=$(hash_file "$obj")
-      if [ "$actual" != "$hex" ]; then
-        echo "hash mismatch for $obj" 1>&2
-        echo "expected $hex" 1>&2
-        echo "actual   $actual" 1>&2
-        exit 1
-      fi
-      case "$rtype" in
-        ir) ir_count=$((ir_count+1));;
-      esac
       ;;
+
+    artifact)
+      # artifact <digest> kind=... [logical_path=...] [key=value ...]
+      if [ "$#" -lt 3 ]; then
+        echo "malformed line: $line" 1>&2
+        exit 1
+      fi
+      digest="$2"
+      ;;
+
     *)
       echo "unknown record type: $rtype" 1>&2
-      exit 1;;
+      exit 1
+      ;;
   esac
+
+  if ! is_sha256_digest "$digest"; then
+    echo "bad digest: $digest" 1>&2
+    exit 1
+  fi
+
+  hex=${digest#sha256:}
+  obj="$OBJ_DIR/$hex"
+  if [ ! -f "$obj" ]; then
+    echo "missing object: $obj" 1>&2
+    exit 1
+  fi
+  actual=$(hash_file "$obj")
+  if [ "$actual" != "$hex" ]; then
+    echo "hash mismatch for $obj" 1>&2
+    echo "expected $hex" 1>&2
+    echo "actual $actual" 1>&2
+    exit 1
+  fi
+
+  if [ "$rtype" = "ir" ]; then
+    ir_count=$((ir_count+1))
+  fi
 
 done < "$ATTEST_PATH"
 
@@ -114,7 +149,6 @@ if [ "$first_seen" -eq 0 ]; then
   echo "no version line found" 1>&2
   exit 1
 fi
-
 if [ "$ir_count" -ne 1 ]; then
   echo "expected exactly 1 ir record, got $ir_count" 1>&2
   exit 1

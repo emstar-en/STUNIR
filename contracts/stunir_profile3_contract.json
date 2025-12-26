@@ -1,0 +1,83 @@
+{
+  "constraints": {
+    "epoch_handling": "MUST be externally provided (pinned) OR read from root_attestation.txt. MUST NOT be derived from Spec in this profile.",
+    "json_parsing": "MUST NOT be required.",
+    "receipt_format_primary": "root_attestation.txt (stunir.pack.root_attestation_text.v0)",
+    "receipt_format_secondary": "flat_json_optional",
+    "required_primitives": [
+      "sha256",
+      "find",
+      "sort",
+      "awk",
+      "sed"
+    ],
+    "semantic_generation": "FORBIDDEN"
+  },
+  "core_functions": {
+    "stunir_sha256": "Polyglot wrapper around sha256sum (GNU) / shasum -a 256 (BSD/macOS) / openssl dgst -sha256, returning ONLY lowercase hex.",
+    "stunir_verify_manifest_v1": "If pack_manifest.tsv is present and bound, verify that each listed path exists and content hash matches; verify manifest ordering; enforce safe-path policy.",
+    "stunir_verify_root_attestation_text_v0": "Parse and validate root_attestation.txt record grammar; verify required invariants; verify object-store blobs exist and hash-match."
+  },
+  "failure_modes": {
+    "bad_digest_format": "FATAL",
+    "bad_version_line": "FATAL",
+    "crlf_detected_in_manifest": "FATAL",
+    "ir_count_not_one": "FATAL",
+    "manifest_line_malformed": "FATAL",
+    "manifest_target_hash_mismatch": "FATAL",
+    "manifest_target_missing": "FATAL",
+    "manifest_unsorted": "FATAL",
+    "missing_attestation": "FATAL",
+    "missing_hasher": "FATAL",
+    "missing_object_blob": "FATAL",
+    "missing_object_store": "FATAL",
+    "object_hash_mismatch": "FATAL",
+    "signature_verification_failed": "FATAL",
+    "unknown_record_type": "FATAL",
+    "unsafe_filename": "FATAL"
+  },
+  "non_goals": [
+    "Semantic generation (Spec -> IR) is forbidden in this profile.",
+    "Deep schema validation of receipts is not required.",
+    "Cryptographic authenticity is not guaranteed unless signature verification is enabled and a trusted public key is provided."
+  ],
+  "normative_references": {
+    "root_attestation_text_v0_doc": "docs/root/stunir_pack_root_attestation_text_v0.md",
+    "verification_profiles_doc": "docs/verification_profiles.md"
+  },
+  "objective": "Deterministic verification and packaging integrity checks in environments where Python and custom verifier binaries are unavailable.",
+  "outputs": {
+    "minimal_verdict": "OK (integrity) | FAIL",
+    "strict_verdict": "OK (integrity + manifest) | OK (integrity) | FAIL"
+  },
+  "pack_manifest_v1": {
+    "binding_to_root_attestation": "If included, pack_manifest.tsv SHOULD be referenced as an artifact record in root_attestation.txt: artifact sha256:<digest> kind=manifest logical_path=pack_manifest.tsv",
+    "encoding": "UTF-8",
+    "file_name": "pack_manifest.tsv",
+    "line_format": "<sha256_hex64>\\t<relative_posix_path>",
+    "newlines": "LF",
+    "ordering": "MUST be sorted lexicographically by <relative_posix_path> with LC_ALL=C semantics.",
+    "path_normalization_rules": [
+      "Paths are relative to pack root.",
+      "Use forward slashes.",
+      "No leading './'.",
+      "No leading '/'.",
+      "No '..' segments.",
+      "No empty path segments.",
+      "No whitespace characters.",
+      "No path segments beginning with '-'.",
+      "Allowed character class for path: [A-Za-z0-9._/-]"
+    ],
+    "scope_rule": "MUST enumerate regular files under pack root EXCLUDING objects/sha256/** and EXCLUDING the manifest itself.",
+    "status": "OPTIONAL_BUT_RECOMMENDED"
+  },
+  "profile_id": "stunir.profile3.shell_only_verifier.v1",
+  "profile_name": "Profile 3: Shell-Only Verifier (Strict Pack Integrity)",
+  "required_pack_layout": {
+    "object_store_dir": "objects/sha256/",
+    "object_store_mapping": "sha256:<hex64> -> objects/sha256/<hex64>",
+    "root_attestation_txt": "root_attestation.txt"
+  },
+  "requires_manifest_binding": true,
+  "status": "PROPOSED"
+}
