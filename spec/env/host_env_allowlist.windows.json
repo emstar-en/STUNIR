@@ -1,0 +1,13 @@
+{
+  "schema": "stunir.env_allowlist.v1",
+  "id": "stunir.host_env.windows.v1",
+  "notes": "Host env variables permitted to be inherited by STUNIR spawned processes. Keep this minimal and explicit.",
+  "inherit": [
+    "SystemRoot",
+    "WINDIR",
+    "ComSpec",
+    "TEMP",
+    "TMP",
+    "PATHEXT"
+  ]
+}
