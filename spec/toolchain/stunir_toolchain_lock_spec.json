@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "spec_name": "STUNIR Toolchain Lockfile Schema",
+    "version": "v1-draft",
+    "philosophy": "Two-Phase Build: (1) Discovery/Lock -> (2) Execution (Zero-Leak Env)"
+  },
+  "schema_definition": {
+    "tools": {
+      "type": "dictionary",
+      "key": "logical_name (e.g., 'python', 'bash', 'rustc')",
+      "value": {
+        "path": {
+          "type": "string",
+          "description": "Absolute path to the executable. MUST be normalized (forward slashes or escaped backslashes)."
+        },
+        "sha256": {
+          "type": "string",
+          "description": "SHA-256 content hash of the executable file."
+        },
+        "version_string": {
+          "type": "string",
+          "description": "Captured stdout/stderr from the tool's version command (e.g., --version). Used for diagnostics/receipts."
+        },
+        "verification_strategy": {
+          "type": "enum",
+          "values": [
+            "single_binary",
+            "directory_tree",
+            "explicit_manifest"
+          ],
+          "default": "single_binary"
+        },
+        "tree_digest": {
+          "type": "string",
+          "optional": true,
+          "description": "For directory-based toolchains (MSYS2, JDK). A Merkle root or recursive hash of the install directory. Expensive but strict."
+        },
+        "critical_dependencies": {
+          "type": "list",
+          "optional": true,
+          "description": "List of related binaries that must also match (e.g., for 'gcc', include 'ld', 'as')."
+        }
+      }
+    },
+    "environment_snapshot": {
+      "description": "Captures the state of the 'allowed' system variables at lock time.",
+      "variables": {
+        "SystemRoot": "...",
+        "ComSpec": "..."
+      }
+    }
+  },
+  "failure_modes": {
+    "STUNIR_STRICT_MODE": {
+      "tool_missing": "HARD_ERROR (Build fails immediately)",
+      "hash_mismatch": "HARD_ERROR (Security/Determinism violation)"
+    },
+    "SEMANTIC_MODE": {
+      "tool_missing": "DEGRADE (Skip targets requiring this tool; record 'SKIPPED' in receipt)",
+      "hash_mismatch": "WARN (Proceed but mark receipt as 'TAINTED')"
+    }
+  },
+  "implementation_plan": {
+    "phase_1_discovery": "Run 'tools/discover_toolchain.py'. Scans system, validates versions, computes hashes, writes 'build/local_toolchain.lock.json'.",
+    "phase_2_execution": "Run 'scripts/build.sh'. Reads lockfile. Injects paths into build steps. Clears PATH. Fails if lockfile is stale or missing."
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "stunir.env_allowlist.v1",
+  "id": "stunir.host_env.windows.discovery.v1",
+  "notes": "PERMISSIVE allowlist used ONLY for toolchain discovery. Allows PATH and system variables to locate tools.",
+  "inherit": [
+    "SystemRoot",
+    "WINDIR",
+    "ComSpec",
+    "PATH",
+    "PATHEXT",
+    "ProgramFiles",
+    "ProgramFiles(x86)",
+    "ProgramData",
+    "LOCALAPPDATA",
+    "APPDATA",
+    "USERPROFILE",
+    "HOME",
+    "NUMBER_OF_PROCESSORS",
+    "PROCESSOR_ARCHITECTURE",
+    "TEMP",
+    "TMP",
+    "STUNIR_*"
+  ]
+}
