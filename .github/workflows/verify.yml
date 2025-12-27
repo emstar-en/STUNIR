@@ -77,6 +77,14 @@ jobs:
           test -f receipts/README.md
           test -d asm || true
 
+      - name: spec_to_ir tool smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/build.sh
+          python3 -m py_compile tools/spec_to_ir.py
+          python3 tools/spec_to_ir.py --spec-root build --out /tmp/ir.from.tool.json
+
       - name: Build + strict verify (after clean)
         shell: bash
         run: |
