@@ -1,0 +1,8 @@
+cabal-version: 2.4
+name: stunir-native
+version: 0.1.0
+executable stunir-native
+  hs-source-dirs: app, src
+  main-is: Main.hs
+  default-language: Haskell2010
+  build-depends: base, aeson, bytestring, text, directory, filepath, optparse-applicative, cryptonite, memory

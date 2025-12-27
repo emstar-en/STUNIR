@@ -6,7 +6,11 @@ source scripts/lib/hash_strict.sh
 stunir_shell_receipt() {
     local in_bin=""
     local out_receipt=""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/rescue/main-pre-force
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --in-bin) in_bin="$2"; shift 2 ;;
@@ -16,10 +20,17 @@ stunir_shell_receipt() {
     done
 
     echo "Generating Receipt (Shell Mode) for $in_bin..."
+<<<<<<< HEAD
     
     # USE STRICT HASHING
     local target_hash=$(stunir_compute_strict_hash "$in_bin")
     
+=======
+
+    # USE STRICT HASHING
+    local target_hash=$(stunir_compute_strict_hash "$in_bin")
+
+>>>>>>> origin/rescue/main-pre-force
     # Create Receipt JSON
     cat <<JSON > "$out_receipt"
 {

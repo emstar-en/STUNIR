@@ -1,0 +1,1 @@
+pub fn canonicalize(_: &[u8]) -> Result<Vec<u8>, ()> { Ok(vec![]) }

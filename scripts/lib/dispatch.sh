@@ -11,7 +11,11 @@ done
 stunir_dispatch() {
     local cmd="$1"
     shift
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/rescue/main-pre-force
     # PRIORITY 1: Compiled Native Binary
     if [[ -x "build/stunir_native" ]]; then
         if [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+<<<<<<< HEAD
 
 stunir_shell_compile_provenance() {
     local in_prov=""
@@ -14,4 +15,11 @@ stunir_shell_compile_provenance() {
 
     echo "Compiling Provenance (Shell Mode: Copy)..."
     cp "$in_prov" "$out_bin"
+=======
+# scripts/lib/compile_provenance.sh
+
+stunir_shell_compile_provenance() {
+    # Just mock success or skip
+    echo "Shell Compile Provenance: SKIPPED (Shell Mode)"
+>>>>>>> origin/rescue/main-pre-force
 }

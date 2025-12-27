@@ -1,0 +1,1 @@
+pub fn check_relpath_safe(_: &str) -> Result<(), ()> { Ok(()) }
