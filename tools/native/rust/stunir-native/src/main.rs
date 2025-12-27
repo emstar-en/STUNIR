@@ -9,12 +9,14 @@ mod verify_pack;
 mod spec_to_ir;
 mod gen_provenance;
 mod check_toolchain;
+mod emit;
 
 use clap::{Parser, Subcommand};
 use std::process;
 use crate::spec_to_ir::run as run_spec_to_ir;
 use crate::gen_provenance::run as run_gen_provenance;
 use crate::check_toolchain::run as run_check_toolchain;
+use crate::emit::run as run_emit;
 
 #[derive(Parser)]
 #[command(name = "stunir_native")]
@@ -31,6 +33,11 @@ enum Commands {
     SpecToIr { #[arg(long)] in_json: String, #[arg(long)] out_ir: String },
     GenProvenance { #[arg(long)] in_ir: String, #[arg(long)] epoch_json: String, #[arg(long)] out_prov: String },
     CheckToolchain { #[arg(long)] lockfile: String },
+    Emit { 
+        #[arg(long)] in_ir: String, 
+        #[arg(long)] target: String, 
+        #[arg(long)] out_file: String 
+    },
 }
 
 fn main() {
@@ -41,6 +48,7 @@ fn main() {
         Commands::SpecToIr { in_json, out_ir } => run_spec_to_ir(in_json, out_ir),
         Commands::GenProvenance { in_ir, epoch_json, out_prov } => run_gen_provenance(in_ir, epoch_json, out_prov),
         Commands::CheckToolchain { lockfile } => run_check_toolchain(lockfile),
+        Commands::Emit { in_ir, target, out_file } => run_emit(in_ir, target, out_file),
     };
     if let Err(e) = result {
         eprintln!("Error: {:?}", e);
