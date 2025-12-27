@@ -16,54 +16,66 @@ fi
 
 # 2. Dispatch Function
 # Usage: stunir_dispatch <logical_operation> [args...]
-# Example: stunir_dispatch record_receipt --target foo.json ...
 stunir_dispatch() {
     local op="$1"
     shift
 
     # --- STRATEGY A: Native Binary ---
     if [[ "$HAS_NATIVE" == "1" ]]; then
-        # Convert snake_case op to kebab-case command (e.g., record_receipt -> record-receipt)
         local cmd="${op//_/-}"
-        # Execute and return
         "$STUNIR_BIN" "$cmd" "$@"
         return $?
     fi
 
     # --- STRATEGY B: Python Toolchain ---
     if [[ "$HAS_PYTHON" == "1" ]]; then
-        # Map logical op to python script path
         local script="tools/${op}.py"
-
         if [[ -f "$script" ]]; then
             "$STUNIR_TOOL_PYTHON" "$script" "$@"
             return $?
-        else
-            echo "WARNING: Python implementation for '$op' not found at '$script'" >&2
-            # Fall through to shell
         fi
     fi
 
     # --- STRATEGY C: Shell Native (Profile 3) ---
-    # Look for a shell library that might implement this
-    # Convention: scripts/lib/<op>.sh or scripts/lib/core.sh
+    # Map operations to shell functions
 
-    # Specific library check (e.g., scripts/lib/receipt.sh for record_receipt)
-    # We strip the prefix to find the category if needed, but for now let's try a direct map or common libs.
-
-    if [[ "$op" == "record_receipt" ]]; then
-        if [[ -f "scripts/lib/receipt.sh" ]]; then
-            source "scripts/lib/receipt.sh"
-            stunir_shell_record_receipt "$@"
-            return $?
-        fi
-    elif [[ "$op" == "epoch" ]]; then
-        if [[ -f "scripts/lib/epoch.sh" ]]; then
-            source "scripts/lib/epoch.sh"
-            stunir_shell_epoch "$@"
-            return $?
-        fi
-    fi
+    case "$op" in
+        epoch)
+            if [[ -f "scripts/lib/epoch.sh" ]]; then
+                source "scripts/lib/epoch.sh"
+                stunir_shell_epoch "$@"
+                return $?
+            fi
+            ;;
+        record_receipt)
+            if [[ -f "scripts/lib/receipt.sh" ]]; then
+                source "scripts/lib/receipt.sh"
+                stunir_shell_record_receipt "$@"
+                return $?
+            fi
+            ;;
+        spec_to_ir)
+            if [[ -f "scripts/lib/spec_to_ir.sh" ]]; then
+                source "scripts/lib/spec_to_ir.sh"
+                stunir_shell_spec_to_ir "$@"
+                return $?
+            fi
+            ;;
+        spec_to_ir_files)
+            if [[ -f "scripts/lib/spec_to_ir_files.sh" ]]; then
+                source "scripts/lib/spec_to_ir_files.sh"
+                stunir_shell_spec_to_ir_files "$@"
+                return $?
+            fi
+            ;;
+        gen_provenance)
+            if [[ -f "scripts/lib/gen_provenance.sh" ]]; then
+                source "scripts/lib/gen_provenance.sh"
+                stunir_shell_gen_provenance "$@"
+                return $?
+            fi
+            ;;
+    esac
 
     # --- FAILURE ---
     echo "CRITICAL ERROR: No implementation found for operation '$op'." >&2
@@ -72,6 +84,4 @@ stunir_dispatch() {
     echo "  Shell Lib: scripts/lib/${op}.sh (Not Found)" >&2
     exit 99
 }
-
-# Export for subshells
 export -f stunir_dispatch
