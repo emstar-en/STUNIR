@@ -3,3 +3,8 @@
 build/
 tools/native/rust/stunir-native/target/
 *.tar.gz
+# STUNIR generated artifacts
+_verify_build/
+tools/__pycache__/
+*.pyc
+receipts/*.json
