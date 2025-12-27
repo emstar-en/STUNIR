@@ -28,7 +28,7 @@ echo ">>> [3/6] Generating IR..."
 stunir_dispatch spec_to_ir --spec-root build --out build/ir.json
 
 echo ">>> [4/6] Generating Provenance..."
-stunir_dispatch gen_provenance --in-ir build/ir.json --out-prov build/provenance.json
+stunir_dispatch gen_provenance --epoch 0 --spec-root build --asm-root src --out-json build/provenance.json --out-header build/provenance.h
 
 echo ">>> [5/6] Compiling Provenance..."
 stunir_dispatch compile_provenance --in-prov build/provenance.json --out-bin build/provenance.bin
