@@ -25,7 +25,7 @@ else
 fi
 
 echo ">>> [3/6] Generating IR..."
-stunir_dispatch spec_to_ir --in-json build/spec.json --out-ir build/ir.json
+stunir_dispatch spec_to_ir --spec-root build --out build/ir.json
 
 echo ">>> [4/6] Generating Provenance..."
 stunir_dispatch gen_provenance --in-ir build/ir.json --out-prov build/provenance.json
