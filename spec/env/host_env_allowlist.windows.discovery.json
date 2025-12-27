@@ -1,24 +1,17 @@
 {
-  "schema": "stunir.env_allowlist.v1",
-  "id": "stunir.host_env.windows.discovery.v1",
-  "notes": "PERMISSIVE allowlist used ONLY for toolchain discovery. Allows PATH and system variables to locate tools.",
-  "inherit": [
-    "SystemRoot",
-    "WINDIR",
-    "ComSpec",
-    "PATH",
-    "PATHEXT",
-    "ProgramFiles",
-    "ProgramFiles(x86)",
-    "ProgramData",
-    "LOCALAPPDATA",
-    "APPDATA",
-    "USERPROFILE",
-    "HOME",
-    "NUMBER_OF_PROCESSORS",
-    "PROCESSOR_ARCHITECTURE",
-    "TEMP",
-    "TMP",
-    "STUNIR_*"
-  ]
+  "comment": "Permissive allowlist for toolchain discovery ONLY. Allows PATH.",
+  "env_vars": {
+    "PATH": { "policy": "allow" },
+    "SYSTEMROOT": { "policy": "allow" },
+    "TEMP": { "policy": "allow" },
+    "TMP": { "policy": "allow" },
+    "COMSPEC": { "policy": "allow" },
+    "PATHEXT": { "policy": "allow" },
+    "USERPROFILE": { "policy": "allow" },
+    "PROGRAMDATA": { "policy": "allow" },
+    "PROGRAMFILES": { "policy": "allow" },
+    "PROGRAMFILES(X86)": { "policy": "allow" },
+    "APPDATA": { "policy": "allow" },
+    "LOCALAPPDATA": { "policy": "allow" }
+  }
 }
