@@ -1,75 +1,61 @@
 #!/usr/bin/env python3
-import argparse, json, os, shutil
+# STUNIR: Import Code Tool
+# Scans inputs/ and creates spec/imported/ specs.
+from __future__ import annotations
+import argparse, json, os
 from pathlib import Path
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input-root', default='inputs')
-    parser.add_argument('--out-root', default='spec/imported')
-    args = parser.parse_args()
+def _w(p: Path, s: str) -> None:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(s, encoding="utf-8", newline="\n")
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--input-root", required=True)
+    ap.add_argument("--out-root", required=True)
+    args = ap.parse_args()
 
     in_root = Path(args.input_root)
     out_root = Path(args.out_root)
 
-    # 1. Clean Output Directory (Fixes Stale Artifact Hazard)
-    if out_root.exists():
-        print(f"Cleaning {out_root}...")
-        shutil.rmtree(out_root)
-
     if not in_root.exists():
-        # No inputs, nothing to do
-        return
+        print(f"Input root {in_root} does not exist. Skipping.")
+        return 0
 
-    # Ensure output directory exists
-    out_root.mkdir(parents=True, exist_ok=True)
+    print(f"Scanning {in_root}...")
 
-    print(f"Scanning {in_root} for source code...")
+    # Map extensions to languages
+    ext_map = {
+        ".py": "python", ".js": "javascript", ".ts": "typescript",
+        ".go": "go", ".rs": "rust", ".c": "c", ".cpp": "cpp",
+        ".java": "java", ".rb": "ruby", ".php": "php",
+        ".sh": "bash"
+    }
 
-    # Walk through inputs
     count = 0
-    # Sort for determinism
-    files = sorted([p for p in in_root.rglob('*') if p.is_file() and not p.name.startswith('.')])
+    for root, dirs, files in os.walk(in_root):
+        for f in files:
+            p = Path(root) / f
+            ext = p.suffix.lower()
+            if ext in ext_map:
+                lang = ext_map[ext]
+                rel_path = p.relative_to(in_root)
+                safe_name = str(rel_path).replace("/", "_").replace("\\", "_").replace(".", "_")
 
-    for p in files:
-        try:
-            # Try reading as text (UTF-8)
-            content = p.read_text(encoding='utf-8')
+                content = p.read_text(encoding="utf-8", errors="replace")
 
-            # Create STUNIR Blob Spec
-            # Fix: Hoist 'name' to root for IR Summary visibility
-            spec = {
-                "kind": "stunir.blob",
-                "name": p.name,  # Hoisted identity
-                "metadata": {
-                    "original_filename": p.name,
-                    "relative_path": p.relative_to(in_root).as_posix(),
-                    "extension": p.suffix,
-                    "ingest_strategy": "literal"
-                },
-                "content": content
-            }
+                spec = {
+                    "kind": "stunir.spec.v1",
+                    "meta": {"origin": str(rel_path), "lang": lang},
+                    "modules": [{"name": p.stem, "code": content, "lang": lang}]
+                }
 
-            # Generate output path: spec/imported/<rel_path>.json
-            rel_path = p.relative_to(in_root)
-            out_path = out_root / rel_path.parent / (p.name + ".json")
-            out_path.parent.mkdir(parents=True, exist_ok=True)
+                out_path = out_root / f"{safe_name}.json"
+                _w(out_path, json.dumps(spec, indent=2))
+                count += 1
 
-            with open(out_path, 'w', encoding='utf-8') as f:
-                json.dump(spec, f, indent=2, sort_keys=True)
-                f.write('\n')
+    print(f"Imported {count} files to {out_root}")
+    return 0
 
-            print(f"  [+] Ingested: {rel_path} -> {out_path}")
-            count += 1
-
-        except UnicodeDecodeError:
-            print(f"  [!] Skipping binary file: {p}")
-        except Exception as e:
-            print(f"  [!] Error processing {p}: {e}")
-
-    if count == 0:
-        print("No valid text files found in inputs/.")
-    else:
-        print(f"Ingestion complete. {count} files wrapped as specs.")
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    raise SystemExit(main())
