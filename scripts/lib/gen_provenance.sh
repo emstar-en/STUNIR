@@ -29,15 +29,10 @@ stunir_shell_gen_provenance() {
     mkdir -p "$(dirname "$out_header")"
 
     # Helper: Hash Directory
-    # Logic: sha256 over (relpath + bytes) in sorted traversal.
-    # Shell approx: sha256sum of all files, then sha256sum of that list.
-    # Note: This differs slightly from the Python logic (which hashes path string + content bytes).
-    # To be strictly compatible, we'd need a complex loop.
-    # For Profile 3 Shell, we accept a "Shell-Compatible Digest" which might differ from Python's.
-    # OR we try to match it. Matching it in shell is hard.
-    # Let's implement a robust shell directory hash:
-    # find . -type f | sort | xargs sha256sum | sha256sum
-
+    # We use a "Manifest Hash" strategy:
+    # 1. List all files (sorted)
+    # 2. Calculate hash of each file
+    # 3. Hash the list of "filename hash" lines
     calc_dir_hash() {
         local dir="$1"
         if [[ ! -d "$dir" ]]; then
@@ -45,20 +40,24 @@ stunir_shell_gen_provenance() {
             return
         fi
 
-        # We use a simplified digest for shell mode: Hash of the manifest of files+hashes.
         (
             cd "$dir"
             find . -type f | sort | while read -r f; do
-                # Print filename (stripped of ./)
-                echo -n "${f#./}"
-                # Print content hash
+                # Normalize path: ./foo -> foo
+                local clean_path="${f#./}"
+
+                # Calculate content hash
+                local fhash=""
                 if command -v sha256sum >/dev/null 2>&1; then
-                    sha256sum "$f" | awk '{print $1}'
+                    fhash=$(sha256sum "$f" | awk '{print $1}')
                 else
-                    shasum -a 256 "$f" | awk '{print $1}'
+                    fhash=$(shasum -a 256 "$f" | awk '{print $1}')
                 fi
+
+                # Output: "filename hash"
+                echo "$clean_path $fhash"
             done
-        ) |         if command -v sha256sum >/dev/null 2>&1; then
+        ) | if command -v sha256sum >/dev/null 2>&1; then
             sha256sum | awk '{print $1}'
         else
             shasum -a 256 | awk '{print $1}'
@@ -69,7 +68,6 @@ stunir_shell_gen_provenance() {
     local asm_digest=$(calc_dir_hash "$asm_root")
 
     # 1. JSON Output
-    # Minimal JSON construction
     echo "{" > "$out_json"
     echo "  "build_epoch": $epoch," >> "$out_json"
     echo "  "epoch_source": "SHELL_DERIVED"," >> "$out_json"
