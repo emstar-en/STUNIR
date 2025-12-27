@@ -1,7 +1,7 @@
 {
 "repo": "emstar-en/STUNIR",
 "branch": "main",
-"generated_utc": "2025-12-24T08:44:35Z",
+"generated_utc": "2025-12-27T02:54:47Z",
 "notes": {
 "git_sha": "This is the git blob SHA (sha1) from the repository tree.",
 "sha256": "Chunk sha256 values are computed over UTF-8 text chunks in STUNIR_CHUNK_INDEX.jsonl.",
@@ -104,8 +104,8 @@
 },
 {
 "path": "README.md",
-"size": 17957,
-"git_sha": "8a8ce0a196a29022931e8983f9750d3b3a55d9d5",
+"size": 21812,
+"git_sha": "b1024f11e117b0397b5d86b9d0076399e777ea39",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
@@ -113,6 +113,38 @@
 {
 "level": 1,
 "text": "STUNIR"
+},
+{
+"level": 2,
+"text": "🚀 Quick Start (For Humans Who Just Want This To Work)"
+},
+{
+"level": 3,
+"text": "**Step 1: Get STUNIR**"
+},
+{
+"level": 3,
+"text": "**Step 2: Give It To Your AI**"
+},
+{
+"level": 3,
+"text": "**What Can You Do With This?**"
+},
+{
+"level": 3,
+"text": "**What STUNIR Actually Does**"
+},
+{
+"level": 3,
+"text": "**Who Is This For?**"
+},
+{
+"level": 3,
+"text": "**TL;DR**"
+},
+{
+"level": 2,
+"text": "What is STUNIR?"
 },
 {
 "level": 2,
@@ -283,8 +315,8 @@
 },
 {
 "path": "STUNIR_CHUNK_INDEX.jsonl",
-"size": 111167,
-"git_sha": "5cd65fb60e4844c17612b4cdea07d2f7898c79bc",
+"size": 149087,
+"git_sha": "21e59a382cdc3c2a5a4fe04edbdd01fe96bacd34",
 "ext": ".jsonl",
 "category": "data",
 "is_test_vector": false
@@ -318,8 +350,8 @@
 },
 {
 "path": "STUNIR_INDEX_README.md",
-"size": 1099,
-"git_sha": "4597cd46da532278722e515cf1c6e7aa262cbd5a",
+"size": 1091,
+"git_sha": "b03b054c108bea5047bfcb79cc0b831818375b36",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
@@ -345,16 +377,16 @@
 },
 {
 "path": "STUNIR_REFERENCE_AUDIT.json",
-"size": 1148,
-"git_sha": "e9eb5c40af5c1dd452a94d136672b37f99ea3132",
+"size": 1455,
+"git_sha": "f476959e3575c0c82543010d3e412fe1fef255a2",
 "ext": ".json",
 "category": "data",
 "is_test_vector": false
 },
 {
 "path": "STUNIR_REFERENCE_AUDIT.md",
-"size": 761,
-"git_sha": "99644462d5743f3725dbe778e682fca91cb0c238",
+"size": 846,
+"git_sha": "741013c6aee8f350b5f466189bd0cdd72c6833c9",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
@@ -411,10 +443,18 @@
 },
 {
 "path": "STUNIR_REPO_INDEX.json",
-"size": 46892,
-"git_sha": "d484d24a745cd452cbdbd7de596a8fbfaff20994",
+"size": 45470,
+"git_sha": "f8fa6ecea5e8b7db926d53069ef9cfdc08b249ea",
 "ext": ".json",
 "category": "data",
+"is_test_vector": false
+},
+{
+"path": "analysis/stunir_shell_substitution_analysis_profile3_v3.machine.json",
+"size": 2380,
+"git_sha": "7caa80e855e286090ae02cc615cee7ecf52381b6",
+"ext": ".machine.json",
+"category": "other",
 "is_test_vector": false
 },
 {
@@ -431,7 +471,7 @@
 "path": "asm/ir/comprehensive-consolidation.rfc6902.json",
 "size": 23069,
 "git_sha": "a0f3581d2488edd52fe5cff60f00e53c367f5587",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -439,7 +479,7 @@
 "path": "asm/ir/core-simple-m_of_n.rfc6902.json",
 "size": 792,
 "git_sha": "f4a1498410031b79b018ba6ce07c2d71c78bcda7",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -447,7 +487,7 @@
 "path": "asm/ir/entity-autonomy-ecc-delta.rfc6902.json",
 "size": 795,
 "git_sha": "bece94dda12c1d7f8c2d91ef9716f78d7b18116b",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -455,7 +495,7 @@
 "path": "asm/ir/generalized-provenance-accounting.rfc6902.json",
 "size": 1279,
 "git_sha": "27e78e054f71c084a98b7169106f5b81c67554d3",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -463,7 +503,7 @@
 "path": "asm/ir/io-discrete.rfc6902.json",
 "size": 555,
 "git_sha": "b4d5a8fc766ada734c2b391b90d607af6a472508",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -471,7 +511,7 @@
 "path": "asm/ir/ld-namespacing.comprehensive.rfc6902.json",
 "size": 633,
 "git_sha": "a77d64e7af94c90c0f2bb6070e2db8e6b0967c73",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -479,7 +519,7 @@
 "path": "asm/ir/pipeline-to-nld.rfc6902.json",
 "size": 623,
 "git_sha": "84a8d1dfd33299549787c61233dfcb5876602599",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -487,7 +527,7 @@
 "path": "asm/ir/quorum-arming.rfc6902.json",
 "size": 546,
 "git_sha": "a54bfd7d938e1bcd2f1aedd11283da717f86799f",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -495,7 +535,7 @@
 "path": "asm/ir/robot-safety-stub.rfc6902.json",
 "size": 507,
 "git_sha": "5df89dda9b6bb4be712dcc56eee34bf343387f2e",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "asm",
 "is_test_vector": false
 },
@@ -621,6 +661,14 @@
 "is_test_vector": false
 },
 {
+"path": "contracts/profile3_shell_only_verifier_v1.json",
+"size": 1435,
+"git_sha": "0c7df3702971faaac7e23459d512aa4cb6650481",
+"ext": ".json",
+"category": "contract",
+"is_test_vector": false
+},
+{
 "path": "contracts/python_runtime.json",
 "size": 677,
 "git_sha": "5e2e2b76349c006a255f26e5b242823c56386fa9",
@@ -640,6 +688,14 @@
 "path": "contracts/receipt_build_v1.schema.json",
 "size": 2321,
 "git_sha": "75aa78977f7f3f46387d6aadfdaad6e28a13d3c9",
+"ext": ".schema.json",
+"category": "contract",
+"is_test_vector": false
+},
+{
+"path": "contracts/receipt_emit_v1.schema.json",
+"size": 2310,
+"git_sha": "d228e24f34b9de423fc572c7e50ad8c13e5aafb6",
 "ext": ".schema.json",
 "category": "contract",
 "is_test_vector": false
@@ -677,6 +733,14 @@
 "is_test_vector": false
 },
 {
+"path": "contracts/stunir_profile3_contract.json",
+"size": 4688,
+"git_sha": "74401ffd3c3fbc936c7b395d5ca34b844c960336",
+"ext": ".json",
+"category": "contract",
+"is_test_vector": false
+},
+{
 "path": "contracts/swi_prolog.json",
 "size": 599,
 "git_sha": "95cf308882a8c01db82bb18cd3ebaa91055580bc",
@@ -686,8 +750,8 @@
 },
 {
 "path": "contracts/target_requirements.json",
-"size": 6239,
-"git_sha": "22c29944be8dd169e4b804ce4d60ff60519ed10a",
+"size": 6252,
+"git_sha": "4ef6b14d2ceec6d4eceb3bdc45637795c4bf5ea9",
 "ext": ".json",
 "category": "contract",
 "is_test_vector": false
@@ -709,46 +773,40 @@
 "is_test_vector": false
 },
 {
-"path": "docs/bundle_A_notes.md",
-"size": 543,
-"git_sha": "54a9b529b5c81b0fe1609aab05adf249eab956b7",
+"path": "docs/code_emission.md",
+"size": 2368,
+"git_sha": "93e9292f369ca736a48cc8d08e76b91b164198f2",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
 "headings": [
 {
 "level": 1,
-"text": "Bundle A: Go / Rust / Java compiled-target contracts"
-}
-],
-"outbound_repo_links": []
+"text": "STUNIR Code Emission Contract (v0)"
 },
 {
-"path": "docs/bundle_B_notes.md",
-"size": 597,
-"git_sha": "7d1e37801d34a9eaa5001cda6b4bef2fff631431",
-"ext": ".md",
-"category": "doc",
-"is_test_vector": false,
-"headings": [
-{
-"level": 1,
-"text": "Bundle B: Hosted runtime breadth (Lua/Ruby/PHP/R/Julia)"
-}
-],
-"outbound_repo_links": []
+"level": 2,
+"text": "1) Determinism contract (normative)"
 },
 {
-"path": "docs/bundle_C_notes.md",
-"size": 797,
-"git_sha": "df58a8a072d333eb5f72bd2b538ebbdb11b56c7f",
-"ext": ".md",
-"category": "doc",
-"is_test_vector": false,
-"headings": [
+"level": 2,
+"text": "2) IR contract"
+},
 {
-"level": 1,
-"text": "Bundle C: Solver/5GL targets + stdout/stderr output artifacts"
+"level": 2,
+"text": "3) Template Pack contract"
+},
+{
+"level": 3,
+"text": "3.1 TEMPLATE_PACK.json"
+},
+{
+"level": 3,
+"text": "3.2 templates_manifest.tsv (normative)"
+},
+{
+"level": 2,
+"text": "4) Emit receipt"
 }
 ],
 "outbound_repo_links": []
@@ -770,6 +828,41 @@
 "ext": ".json",
 "category": "doc",
 "is_test_vector": false
+},
+{
+"path": "docs/ir_bundle_v1.md",
+"size": 1186,
+"git_sha": "eb4ac44535b326c04b52460a1b030ed161071123",
+"ext": ".md",
+"category": "doc",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR IR bundle v1 (authoritative)"
+},
+{
+"level": 2,
+"text": "What is byte-exact?"
+},
+{
+"level": 2,
+"text": "Canonical IR Content (CIR)"
+},
+{
+"level": 2,
+"text": "IR bundle bytes"
+},
+{
+"level": 2,
+"text": "Reference implementation"
+},
+{
+"level": 2,
+"text": "Test vectors"
+}
+],
+"outbound_repo_links": []
 },
 {
 "path": "docs/policy/dead_end_handling_contract.md",
@@ -1021,6 +1114,53 @@
 {
 "level": 3,
 "text": "STUNIR Pack Manifest v0 \u0014 (Deprecated)"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "docs/root/stunir_pack_manifest_v1.md",
+"size": 2535,
+"git_sha": "f3b00e7ca262f36c16182ee75c5b4bea1871aad3",
+"ext": ".md",
+"category": "doc",
+"is_test_vector": false,
+"headings": [
+{
+"level": 3,
+"text": "STUNIR Pack Manifest v1 — `pack_manifest.tsv`"
+},
+{
+"level": 4,
+"text": "0. Purpose"
+},
+{
+"level": 4,
+"text": "1. File location and encoding"
+},
+{
+"level": 4,
+"text": "2. Line format"
+},
+{
+"level": 4,
+"text": "3. Ordering"
+},
+{
+"level": 4,
+"text": "4. Scope"
+},
+{
+"level": 4,
+"text": "5. Path safety policy (mandatory)"
+},
+{
+"level": 4,
+"text": "6. Binding the manifest to `root_attestation.txt`"
+},
+{
+"level": 4,
+"text": "7. Verifier behavior (Profile 3 strict)"
 }
 ],
 "outbound_repo_links": []
@@ -1286,8 +1426,8 @@
 },
 {
 "path": "docs/targets/README.md",
-"size": 451,
-"git_sha": "5b9731f9200ee41a1404fcdf2f5e9480df1301e5",
+"size": 521,
+"git_sha": "dcaa12d77821a65089ead3078e439a328f631e93",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
@@ -1513,8 +1653,8 @@
 },
 {
 "path": "docs/verification.md",
-"size": 1571,
-"git_sha": "b4f38565b8bcef3687e0dbe2108b19e2ef9f66b4",
+"size": 2011,
+"git_sha": "473cc854998e21199466b3d6d0c287dd9b2a1ed9",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
@@ -1552,6 +1692,10 @@
 "text": "Windows cmd"
 },
 {
+"level": 3,
+"text": "Optional (POSIX-like): strict Profile 3 manifest verification"
+},
+{
 "level": 2,
 "text": "Canonical JSON: `stunir-json-c14n-v1`"
 }
@@ -1560,8 +1704,8 @@
 },
 {
 "path": "docs/verification_profiles.md",
-"size": 2056,
-"git_sha": "a1a43b45c25e37c75272a3e7665cede0858bcd63",
+"size": 3020,
+"git_sha": "d89bbaeca3f3edcd008eb12076b745692be54877",
 "ext": ".md",
 "category": "doc",
 "is_test_vector": false,
@@ -1581,9 +1725,149 @@
 {
 "level": 4,
 "text": "Profile 3: Minimal verification (no Python, no custom binaries)"
+},
+{
+"level": 5,
+"text": "Profile 3 (optional tightening): strict pack-manifest verification"
 }
 ],
 "outbound_repo_links": []
+},
+{
+"path": "meta/build_sh_original.sh",
+"size": 20533,
+"git_sha": "cf6a03da7ee86b2b7137cff700b2b1edbf52054a",
+"ext": ".sh",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/build_sh_patch_report.json",
+"size": 432,
+"git_sha": "921f1ed821d9a0dc88c37646e1a36c3da60657b8",
+"ext": ".json",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/build_sh_patched.sh",
+"size": 20703,
+"git_sha": "f969c9aeb92f4d42bc4dfb1af8db86854c5639c5",
+"ext": ".sh",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/run_index.json",
+"size": 709,
+"git_sha": "6269a7fbb52a830f13903618e35684adbec739d1",
+"ext": ".json",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/epoch.py",
+"size": 5085,
+"git_sha": "ff833c95ae6b64bf77469b96e181edc080e05fd7",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/gen_provenance.py",
+"size": 2681,
+"git_sha": "1c463fe2cd2d67fff85e307f2b14e07e9dad2025",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/ir_to_lisp.py",
+"size": 7737,
+"git_sha": "30e18ab291f7f74d38bee2e8f49a80b675fc2731",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/ir_to_python.py",
+"size": 3542,
+"git_sha": "c05c3af7a5d8ffac2c81fff4fdd423a177991505",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/ir_to_smt2.py",
+"size": 2112,
+"git_sha": "1a0fc2facf8077ebcf6f5f89cd9e8221a0a1cd4a",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/record_receipt.py",
+"size": 6822,
+"git_sha": "12d362a99799d28a69b27e918ecd462291947795",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_original/resolve_requirements.py",
+"size": 2960,
+"git_sha": "38deb53ad1976045d3322339061ea62d6e8b3927",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_used/epoch.py",
+"size": 5086,
+"git_sha": "eb2c60b2abefb1e41c7d324791d5210b48b8db48",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_used/gen_provenance.py",
+"size": 2690,
+"git_sha": "ec6b4cefa0f6f9c9f9f7cd79781cc2b323a88517",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_used/ir_to_lisp.py",
+"size": 2158,
+"git_sha": "4fcb500faead025c486fa1a5b1ace9935f772d32",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_used/ir_to_python.py",
+"size": 2452,
+"git_sha": "42640486aa9d96368b3a0aed36a20cb1f62fa769",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_used/ir_to_smt2.py",
+"size": 1345,
+"git_sha": "76c6e2acd1f47ad6100bc71fcb4c6ae61388fa52",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
+},
+{
+"path": "meta/tools_used/record_receipt.py",
+"size": 6837,
+"git_sha": "f5a6375fbe7a6bedeeb8f02acbefe186ce50c75b",
+"ext": ".py",
+"category": "meta",
+"is_test_vector": false
 },
 {
 "path": "receipts/README.md",
@@ -1601,9 +1885,2773 @@
 "outbound_repo_links": []
 },
 {
+"path": "samples/in/minimal/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/in/multifile/spec/robot-safety-stub.rfc6902.json",
+"size": 651,
+"git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/in/multifile/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/in/patch_like/spec/robot-safety-stub.rfc6902.json",
+"size": 651,
+"git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/in/unicode/spec/README_ünïçødé.txt",
+"size": 47,
+"git_sha": "24d2ccc088e90801335cbbc05ea04e8d35e009a3",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/in/unicode/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/README.txt",
+"size": 51,
+"git_sha": "c2624cc83ba2de344a18aa680ee7f6f2faa770a7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/asm/ir/comprehensive-consolidation.rfc6902.dcbor",
+"size": 20536,
+"git_sha": "78fc0992eab4c1220cabc164873985100b3a0188",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/comprehensive-consolidation.rfc6902.json",
+"size": 23069,
+"git_sha": "a0f3581d2488edd52fe5cff60f00e53c367f5587",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/core-simple-m_of_n.rfc6902.dcbor",
+"size": 683,
+"git_sha": "5defe93a805ca7e8ca800382662230830086123c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/core-simple-m_of_n.rfc6902.json",
+"size": 792,
+"git_sha": "f4a1498410031b79b018ba6ce07c2d71c78bcda7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/entity-autonomy-ecc-delta.rfc6902.dcbor",
+"size": 686,
+"git_sha": "61b39dfd2626c1b6f457cc956f8b230a5a1dbf44",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 795,
+"git_sha": "bece94dda12c1d7f8c2d91ef9716f78d7b18116b",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/generalized-provenance-accounting.rfc6902.dcbor",
+"size": 1122,
+"git_sha": "d779a369577bd00a8f3a3b4d401b275d81fcefa2",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/generalized-provenance-accounting.rfc6902.json",
+"size": 1279,
+"git_sha": "27e78e054f71c084a98b7169106f5b81c67554d3",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/io-discrete.rfc6902.dcbor",
+"size": 469,
+"git_sha": "61e7608eed60f02322c3e3c1719913dc2e8c69ef",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/io-discrete.rfc6902.json",
+"size": 555,
+"git_sha": "b4d5a8fc766ada734c2b391b90d607af6a472508",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/ld-namespacing.comprehensive.rfc6902.dcbor",
+"size": 548,
+"git_sha": "8fc70d6270a1a2838a5b64714723737349d6e157",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/ld-namespacing.comprehensive.rfc6902.json",
+"size": 633,
+"git_sha": "a77d64e7af94c90c0f2bb6070e2db8e6b0967c73",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/patches/machine_plan.add_lisp.rfc6902.dcbor",
+"size": 277,
+"git_sha": "abe4c1b66069fb54a39552e00ea0de4c4705847e",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/patches/machine_plan.add_python_smt.rfc6902.dcbor",
+"size": 382,
+"git_sha": "6ac6d7b19a4eac3f40b4d0704d5d3906c9778795",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/patches/target_requirements.lisp_split.rfc6902.dcbor",
+"size": 701,
+"git_sha": "a245b22b2fabe8ce1a4a9076d2558569a3676a59",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/patches/target_requirements.python_split.rfc6902.dcbor",
+"size": 505,
+"git_sha": "d015ac4ac945ff7e155064ae468b99d677ab77d4",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/patches/target_requirements.smt_split.rfc6902.dcbor",
+"size": 637,
+"git_sha": "f06027c0fdd495a962b35cd2201dce468e5282eb",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/pipeline-to-nld.rfc6902.dcbor",
+"size": 550,
+"git_sha": "2f8a1b11785a11ac15c13a9ede6e95e7326e24d9",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/pipeline-to-nld.rfc6902.json",
+"size": 623,
+"git_sha": "84a8d1dfd33299549787c61233dfcb5876602599",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/quorum-arming.rfc6902.dcbor",
+"size": 473,
+"git_sha": "dd399c5d8dfc4421cc0d7da36cc6641d9c7fdddf",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/quorum-arming.rfc6902.json",
+"size": 546,
+"git_sha": "a54bfd7d938e1bcd2f1aedd11283da717f86799f",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/robot-safety-stub.rfc6902.dcbor",
+"size": 434,
+"git_sha": "a05a221478a6426259c9f6f8cfc3fef2e2a3a65c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/robot-safety-stub.rfc6902.json",
+"size": 507,
+"git_sha": "5df89dda9b6bb4be712dcc56eee34bf343387f2e",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/schema_fix_catalog.dcbor",
+"size": 31141,
+"git_sha": "ae36f23c5520a5a39347ee850525121a9cceee81",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/schema_fix_catalog.json",
+"size": 32693,
+"git_sha": "aef86cccc4e5a6ce47d73a262556202316aaaaff",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/stunir_machine_plan.dcbor",
+"size": 3228,
+"git_sha": "c6191e8b675f91cb728f315050055e064631d785",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/targets/lisp/lisp_targets_matrix.dcbor",
+"size": 1043,
+"git_sha": "437d6a91ad6c616b8e4b9dc238d44f1544231899",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/targets/output_language_plans_manifest.dcbor",
+"size": 1742,
+"git_sha": "a9355260d96e8a396c4c1af180a200b7b0b90f0c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/targets/python/python_targets_matrix.dcbor",
+"size": 1014,
+"git_sha": "8cd65e0e76d3018191a74acddea4cc33efa7d6b3",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir/targets/smt/smt_targets_matrix.dcbor",
+"size": 854,
+"git_sha": "864a970766c92a842b2c3c0ab78bc0289ca1be6a",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/ir_bundle.bin",
+"size": 67025,
+"git_sha": "9e21ba30d84af43144038581e3fe0e33fb3f9eee",
+"ext": ".bin",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/lisp/portable/README.md",
+"size": 37,
+"git_sha": "02daaaa5bcd94db7172cbacc2109dd0a4ffb1df6",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/asm/lisp/portable/package.lisp",
+"size": 58,
+"git_sha": "fd929505e3d6bdaa7f7153f4d034dbd9266cef08",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/lisp/portable/payload.json",
+"size": 5139,
+"git_sha": "d59577809dc405a77487cbdf4613c1e62c32f133",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/lisp/portable/program.lisp",
+"size": 68,
+"git_sha": "93a5bd333057f70221ba62d5ed3173685b8f21fd",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/lisp/portable/runtime.lisp",
+"size": 434,
+"git_sha": "fb920917e0799286e84f03239b271d7c69fee5b8",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/python/portable/README.md",
+"size": 33,
+"git_sha": "a72a9bcb8ea63d1f6e3f648f65e08f60d0b06e71",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/asm/python/portable/program.py",
+"size": 1183,
+"git_sha": "c28e346b1d67d4aabc957c301faed92164c56c0c",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/python/portable/runtime.py",
+"size": 42,
+"git_sha": "012390aa68fad3cdcaed47cef4abda168a15e581",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/smt/portable/README.md",
+"size": 39,
+"git_sha": "362bca85740db1279ef7bb911aa44d16422559d7",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/asm/smt/portable/problem.smt2",
+"size": 199,
+"git_sha": "d77a4e3099040267c9ad953b3792a0360fef446a",
+"ext": ".smt2",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/asm/spec_ir.txt",
+"size": 2632,
+"git_sha": "d9e44b51c0166ec452c9dcda6efd20aa5e16e1e7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/build/README.md",
+"size": 318,
+"git_sha": "e8c9f0ac867e569e07a53679cc828ef710545db8",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "build/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/build/epoch.json",
+"size": 559,
+"git_sha": "877aecb8f2ab34d57a9c7c0e7e608f8875c3bc30",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/build/provenance.h",
+"size": 380,
+"git_sha": "ddb2046983c96617982edf5fe118c72f1329148d",
+"ext": ".h",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/build/provenance.json",
+"size": 251,
+"git_sha": "a873717dc3f90af2a7a11de956265429f085ccd5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/logs/build_sh.log",
+"size": 674,
+"git_sha": "2551f32c1f859e721e9dd77ededed5fa6f3fb67f",
+"ext": ".log",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/README.md",
+"size": 390,
+"git_sha": "9848b32b72ba3a9e99b7863f06a11ae505083419",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "receipts/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/receipts/ir_bundle_manifest.json",
+"size": 5350,
+"git_sha": "4c85fdd53906fe05661a8c21e1ce38905b94abea",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/ir_manifest.json",
+"size": 4984,
+"git_sha": "1250d5e39a98728cf8d327ae7adc64703576d5a2",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/lisp_portable.json",
+"size": 1981,
+"git_sha": "eea54fa948a2abff772f83b48fadf8f8470f2274",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/lisp_portable_manifest.json",
+"size": 651,
+"git_sha": "a085bc9a1a1cbc344b33be7c77a376211d0ed61a",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/prov_emit.json",
+"size": 1376,
+"git_sha": "cdb0dcd97b7463b6c67c3de306aac31abf9c3b2c",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/python_portable.json",
+"size": 1991,
+"git_sha": "dd8540c48ba598b90f0788fad36b2fb8f2320c4e",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/python_portable_manifest.json",
+"size": 418,
+"git_sha": "071924eb61823393b004997fd3228321ce5207e8",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/requirements.json",
+"size": 701,
+"git_sha": "1377534d1c6e062415292db107fade7dfc7eafb1",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/smt_portable.json",
+"size": 1979,
+"git_sha": "57e7d94e18fb56bf0c6e0e8e41194cfd011ff5c4",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/smt_portable_manifest.json",
+"size": 303,
+"git_sha": "ae5fcc72e94979b3454782bbafcefddf03b26d5c",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/receipts/spec_ir.json",
+"size": 2057,
+"git_sha": "bffcbd463209326cc2fb65a6ac040408cf54d9e9",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/README.txt",
+"size": 50,
+"git_sha": "f2cdef9b7e840a5af9f7885b3eddba934d973a52",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/minimal/spec/comprehensive-consolidation.rfc6902.json",
+"size": 28133,
+"git_sha": "9f4b37b13ceb5fb2ed9ebb89afbb0db944b9a8ab",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/core-simple-m_of_n.rfc6902.json",
+"size": 1008,
+"git_sha": "5bcf20e555889cab499807499f4abda9a09052d7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 1011,
+"git_sha": "c475614118d0c42091ff3ffc1dccf7c9ab73b278",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/generalized-provenance-accounting.rfc6902.json",
+"size": 1591,
+"git_sha": "183529d6867832e444415599e0aa3568b8ac07a6",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/io-discrete.rfc6902.json",
+"size": 723,
+"git_sha": "552ab0708cc97ab1c6fa9a65d521a111a8e78d67",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/ld-namespacing.comprehensive.rfc6902.json",
+"size": 801,
+"git_sha": "8f712dc57ac252507e5926032dfb9e951b112938",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/patches/machine_plan.add_lisp.rfc6902.json",
+"size": 295,
+"git_sha": "eec17a26f233d64561f302272139c0ecb42a2be8",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/patches/machine_plan.add_python_smt.rfc6902.json",
+"size": 509,
+"git_sha": "e0ce481733dbb6a7a21c32a780f2ab61f9014d0d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/patches/target_requirements.lisp_split.rfc6902.json",
+"size": 805,
+"git_sha": "7a5295d6defd5132a76ac7ee11428e7e6b33e01d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/patches/target_requirements.python_split.rfc6902.json",
+"size": 756,
+"git_sha": "29175b460136f76d52ca228d0a45e3a3e7dd0b62",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/patches/target_requirements.smt_split.rfc6902.json",
+"size": 999,
+"git_sha": "4209f278d24175c6aa6fcfb112886aa2e4a759d9",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/pipeline-to-nld.rfc6902.json",
+"size": 767,
+"git_sha": "fdbca064e09433828f14cdb0d624b25611e34c99",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/quorum-arming.rfc6902.json",
+"size": 690,
+"git_sha": "9f76a1d18b3f0eb2a9082dd0bbd8525eb5cc720a",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/robot-safety-stub.rfc6902.json",
+"size": 651,
+"git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/schema_fix_catalog.json",
+"size": 37525,
+"git_sha": "5452bd9d9bfa56ef48d9f723f98bddb5ca497e50",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/targets/lisp/lisp_targets_matrix.json",
+"size": 1142,
+"git_sha": "9d2f88d3f011d9696d832b79c9fd6b8bb673569f",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/targets/output_language_plans_manifest.json",
+"size": 1879,
+"git_sha": "1ddd33323e6d5c45d05d40fed6ebd32a263f15bc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/targets/python/python_targets_matrix.json",
+"size": 1105,
+"git_sha": "785360049d472da9fb6f63923eac8776925ae8f7",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/minimal/spec/targets/smt/smt_targets_matrix.json",
+"size": 946,
+"git_sha": "013cb5ea64cdcdd6b6bf9e17bfb34fa83c608bcc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/README.txt",
+"size": 51,
+"git_sha": "c2624cc83ba2de344a18aa680ee7f6f2faa770a7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/asm/ir/comprehensive-consolidation.rfc6902.dcbor",
+"size": 20536,
+"git_sha": "78fc0992eab4c1220cabc164873985100b3a0188",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/comprehensive-consolidation.rfc6902.json",
+"size": 23069,
+"git_sha": "a0f3581d2488edd52fe5cff60f00e53c367f5587",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/core-simple-m_of_n.rfc6902.dcbor",
+"size": 683,
+"git_sha": "5defe93a805ca7e8ca800382662230830086123c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/core-simple-m_of_n.rfc6902.json",
+"size": 792,
+"git_sha": "f4a1498410031b79b018ba6ce07c2d71c78bcda7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/entity-autonomy-ecc-delta.rfc6902.dcbor",
+"size": 686,
+"git_sha": "61b39dfd2626c1b6f457cc956f8b230a5a1dbf44",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 795,
+"git_sha": "bece94dda12c1d7f8c2d91ef9716f78d7b18116b",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/generalized-provenance-accounting.rfc6902.dcbor",
+"size": 1122,
+"git_sha": "d779a369577bd00a8f3a3b4d401b275d81fcefa2",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/generalized-provenance-accounting.rfc6902.json",
+"size": 1279,
+"git_sha": "27e78e054f71c084a98b7169106f5b81c67554d3",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/io-discrete.rfc6902.dcbor",
+"size": 469,
+"git_sha": "61e7608eed60f02322c3e3c1719913dc2e8c69ef",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/io-discrete.rfc6902.json",
+"size": 555,
+"git_sha": "b4d5a8fc766ada734c2b391b90d607af6a472508",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/ld-namespacing.comprehensive.rfc6902.dcbor",
+"size": 548,
+"git_sha": "8fc70d6270a1a2838a5b64714723737349d6e157",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/ld-namespacing.comprehensive.rfc6902.json",
+"size": 633,
+"git_sha": "a77d64e7af94c90c0f2bb6070e2db8e6b0967c73",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/patches/machine_plan.add_lisp.rfc6902.dcbor",
+"size": 277,
+"git_sha": "abe4c1b66069fb54a39552e00ea0de4c4705847e",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/patches/machine_plan.add_python_smt.rfc6902.dcbor",
+"size": 382,
+"git_sha": "6ac6d7b19a4eac3f40b4d0704d5d3906c9778795",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/patches/target_requirements.lisp_split.rfc6902.dcbor",
+"size": 701,
+"git_sha": "a245b22b2fabe8ce1a4a9076d2558569a3676a59",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/patches/target_requirements.python_split.rfc6902.dcbor",
+"size": 505,
+"git_sha": "d015ac4ac945ff7e155064ae468b99d677ab77d4",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/patches/target_requirements.smt_split.rfc6902.dcbor",
+"size": 637,
+"git_sha": "f06027c0fdd495a962b35cd2201dce468e5282eb",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/pipeline-to-nld.rfc6902.dcbor",
+"size": 550,
+"git_sha": "2f8a1b11785a11ac15c13a9ede6e95e7326e24d9",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/pipeline-to-nld.rfc6902.json",
+"size": 623,
+"git_sha": "84a8d1dfd33299549787c61233dfcb5876602599",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/quorum-arming.rfc6902.dcbor",
+"size": 473,
+"git_sha": "dd399c5d8dfc4421cc0d7da36cc6641d9c7fdddf",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/quorum-arming.rfc6902.json",
+"size": 546,
+"git_sha": "a54bfd7d938e1bcd2f1aedd11283da717f86799f",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/robot-safety-stub.rfc6902.dcbor",
+"size": 434,
+"git_sha": "a05a221478a6426259c9f6f8cfc3fef2e2a3a65c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/robot-safety-stub.rfc6902.json",
+"size": 507,
+"git_sha": "5df89dda9b6bb4be712dcc56eee34bf343387f2e",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/schema_fix_catalog.dcbor",
+"size": 31141,
+"git_sha": "ae36f23c5520a5a39347ee850525121a9cceee81",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/schema_fix_catalog.json",
+"size": 32693,
+"git_sha": "aef86cccc4e5a6ce47d73a262556202316aaaaff",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/stunir_machine_plan.dcbor",
+"size": 3228,
+"git_sha": "c6191e8b675f91cb728f315050055e064631d785",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/targets/lisp/lisp_targets_matrix.dcbor",
+"size": 1043,
+"git_sha": "437d6a91ad6c616b8e4b9dc238d44f1544231899",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/targets/output_language_plans_manifest.dcbor",
+"size": 1742,
+"git_sha": "a9355260d96e8a396c4c1af180a200b7b0b90f0c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/targets/python/python_targets_matrix.dcbor",
+"size": 1014,
+"git_sha": "8cd65e0e76d3018191a74acddea4cc33efa7d6b3",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir/targets/smt/smt_targets_matrix.dcbor",
+"size": 854,
+"git_sha": "864a970766c92a842b2c3c0ab78bc0289ca1be6a",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/ir_bundle.bin",
+"size": 67025,
+"git_sha": "9e21ba30d84af43144038581e3fe0e33fb3f9eee",
+"ext": ".bin",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/lisp/portable/README.md",
+"size": 37,
+"git_sha": "02daaaa5bcd94db7172cbacc2109dd0a4ffb1df6",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/asm/lisp/portable/package.lisp",
+"size": 58,
+"git_sha": "fd929505e3d6bdaa7f7153f4d034dbd9266cef08",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/lisp/portable/payload.json",
+"size": 5139,
+"git_sha": "d59577809dc405a77487cbdf4613c1e62c32f133",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/lisp/portable/program.lisp",
+"size": 68,
+"git_sha": "93a5bd333057f70221ba62d5ed3173685b8f21fd",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/lisp/portable/runtime.lisp",
+"size": 434,
+"git_sha": "fb920917e0799286e84f03239b271d7c69fee5b8",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/python/portable/README.md",
+"size": 33,
+"git_sha": "a72a9bcb8ea63d1f6e3f648f65e08f60d0b06e71",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/asm/python/portable/program.py",
+"size": 1183,
+"git_sha": "c28e346b1d67d4aabc957c301faed92164c56c0c",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/python/portable/runtime.py",
+"size": 42,
+"git_sha": "012390aa68fad3cdcaed47cef4abda168a15e581",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/smt/portable/README.md",
+"size": 39,
+"git_sha": "362bca85740db1279ef7bb911aa44d16422559d7",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/asm/smt/portable/problem.smt2",
+"size": 199,
+"git_sha": "d77a4e3099040267c9ad953b3792a0360fef446a",
+"ext": ".smt2",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/asm/spec_ir.txt",
+"size": 2632,
+"git_sha": "d9e44b51c0166ec452c9dcda6efd20aa5e16e1e7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/build/README.md",
+"size": 318,
+"git_sha": "e8c9f0ac867e569e07a53679cc828ef710545db8",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "build/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/build/epoch.json",
+"size": 559,
+"git_sha": "877aecb8f2ab34d57a9c7c0e7e608f8875c3bc30",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/build/provenance.h",
+"size": 380,
+"git_sha": "ddb2046983c96617982edf5fe118c72f1329148d",
+"ext": ".h",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/build/provenance.json",
+"size": 251,
+"git_sha": "a873717dc3f90af2a7a11de956265429f085ccd5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/logs/build_sh.log",
+"size": 674,
+"git_sha": "2551f32c1f859e721e9dd77ededed5fa6f3fb67f",
+"ext": ".log",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/README.md",
+"size": 390,
+"git_sha": "9848b32b72ba3a9e99b7863f06a11ae505083419",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "receipts/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/receipts/ir_bundle_manifest.json",
+"size": 5350,
+"git_sha": "4c85fdd53906fe05661a8c21e1ce38905b94abea",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/ir_manifest.json",
+"size": 4984,
+"git_sha": "1250d5e39a98728cf8d327ae7adc64703576d5a2",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/lisp_portable.json",
+"size": 1981,
+"git_sha": "eea54fa948a2abff772f83b48fadf8f8470f2274",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/lisp_portable_manifest.json",
+"size": 651,
+"git_sha": "a085bc9a1a1cbc344b33be7c77a376211d0ed61a",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/prov_emit.json",
+"size": 1376,
+"git_sha": "cdb0dcd97b7463b6c67c3de306aac31abf9c3b2c",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/python_portable.json",
+"size": 1991,
+"git_sha": "dd8540c48ba598b90f0788fad36b2fb8f2320c4e",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/python_portable_manifest.json",
+"size": 418,
+"git_sha": "071924eb61823393b004997fd3228321ce5207e8",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/requirements.json",
+"size": 701,
+"git_sha": "1377534d1c6e062415292db107fade7dfc7eafb1",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/smt_portable.json",
+"size": 1979,
+"git_sha": "57e7d94e18fb56bf0c6e0e8e41194cfd011ff5c4",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/smt_portable_manifest.json",
+"size": 303,
+"git_sha": "ae5fcc72e94979b3454782bbafcefddf03b26d5c",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/receipts/spec_ir.json",
+"size": 2057,
+"git_sha": "bffcbd463209326cc2fb65a6ac040408cf54d9e9",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/README.txt",
+"size": 50,
+"git_sha": "f2cdef9b7e840a5af9f7885b3eddba934d973a52",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/multifile/spec/comprehensive-consolidation.rfc6902.json",
+"size": 28133,
+"git_sha": "9f4b37b13ceb5fb2ed9ebb89afbb0db944b9a8ab",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/core-simple-m_of_n.rfc6902.json",
+"size": 1008,
+"git_sha": "5bcf20e555889cab499807499f4abda9a09052d7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 1011,
+"git_sha": "c475614118d0c42091ff3ffc1dccf7c9ab73b278",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/generalized-provenance-accounting.rfc6902.json",
+"size": 1591,
+"git_sha": "183529d6867832e444415599e0aa3568b8ac07a6",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/io-discrete.rfc6902.json",
+"size": 723,
+"git_sha": "552ab0708cc97ab1c6fa9a65d521a111a8e78d67",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/ld-namespacing.comprehensive.rfc6902.json",
+"size": 801,
+"git_sha": "8f712dc57ac252507e5926032dfb9e951b112938",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/patches/machine_plan.add_lisp.rfc6902.json",
+"size": 295,
+"git_sha": "eec17a26f233d64561f302272139c0ecb42a2be8",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/patches/machine_plan.add_python_smt.rfc6902.json",
+"size": 509,
+"git_sha": "e0ce481733dbb6a7a21c32a780f2ab61f9014d0d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/patches/target_requirements.lisp_split.rfc6902.json",
+"size": 805,
+"git_sha": "7a5295d6defd5132a76ac7ee11428e7e6b33e01d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/patches/target_requirements.python_split.rfc6902.json",
+"size": 756,
+"git_sha": "29175b460136f76d52ca228d0a45e3a3e7dd0b62",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/patches/target_requirements.smt_split.rfc6902.json",
+"size": 999,
+"git_sha": "4209f278d24175c6aa6fcfb112886aa2e4a759d9",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/pipeline-to-nld.rfc6902.json",
+"size": 767,
+"git_sha": "fdbca064e09433828f14cdb0d624b25611e34c99",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/quorum-arming.rfc6902.json",
+"size": 690,
+"git_sha": "9f76a1d18b3f0eb2a9082dd0bbd8525eb5cc720a",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/robot-safety-stub.rfc6902.json",
+"size": 651,
+"git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/schema_fix_catalog.json",
+"size": 37525,
+"git_sha": "5452bd9d9bfa56ef48d9f723f98bddb5ca497e50",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/targets/lisp/lisp_targets_matrix.json",
+"size": 1142,
+"git_sha": "9d2f88d3f011d9696d832b79c9fd6b8bb673569f",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/targets/output_language_plans_manifest.json",
+"size": 1879,
+"git_sha": "1ddd33323e6d5c45d05d40fed6ebd32a263f15bc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/targets/python/python_targets_matrix.json",
+"size": 1105,
+"git_sha": "785360049d472da9fb6f63923eac8776925ae8f7",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/multifile/spec/targets/smt/smt_targets_matrix.json",
+"size": 946,
+"git_sha": "013cb5ea64cdcdd6b6bf9e17bfb34fa83c608bcc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/README.txt",
+"size": 51,
+"git_sha": "c2624cc83ba2de344a18aa680ee7f6f2faa770a7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/asm/ir/comprehensive-consolidation.rfc6902.dcbor",
+"size": 20536,
+"git_sha": "78fc0992eab4c1220cabc164873985100b3a0188",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/comprehensive-consolidation.rfc6902.json",
+"size": 23069,
+"git_sha": "a0f3581d2488edd52fe5cff60f00e53c367f5587",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/core-simple-m_of_n.rfc6902.dcbor",
+"size": 683,
+"git_sha": "5defe93a805ca7e8ca800382662230830086123c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/core-simple-m_of_n.rfc6902.json",
+"size": 792,
+"git_sha": "f4a1498410031b79b018ba6ce07c2d71c78bcda7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/entity-autonomy-ecc-delta.rfc6902.dcbor",
+"size": 686,
+"git_sha": "61b39dfd2626c1b6f457cc956f8b230a5a1dbf44",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 795,
+"git_sha": "bece94dda12c1d7f8c2d91ef9716f78d7b18116b",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/generalized-provenance-accounting.rfc6902.dcbor",
+"size": 1122,
+"git_sha": "d779a369577bd00a8f3a3b4d401b275d81fcefa2",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/generalized-provenance-accounting.rfc6902.json",
+"size": 1279,
+"git_sha": "27e78e054f71c084a98b7169106f5b81c67554d3",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/io-discrete.rfc6902.dcbor",
+"size": 469,
+"git_sha": "61e7608eed60f02322c3e3c1719913dc2e8c69ef",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/io-discrete.rfc6902.json",
+"size": 555,
+"git_sha": "b4d5a8fc766ada734c2b391b90d607af6a472508",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/ld-namespacing.comprehensive.rfc6902.dcbor",
+"size": 548,
+"git_sha": "8fc70d6270a1a2838a5b64714723737349d6e157",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/ld-namespacing.comprehensive.rfc6902.json",
+"size": 633,
+"git_sha": "a77d64e7af94c90c0f2bb6070e2db8e6b0967c73",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/patches/machine_plan.add_lisp.rfc6902.dcbor",
+"size": 277,
+"git_sha": "abe4c1b66069fb54a39552e00ea0de4c4705847e",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/patches/machine_plan.add_python_smt.rfc6902.dcbor",
+"size": 382,
+"git_sha": "6ac6d7b19a4eac3f40b4d0704d5d3906c9778795",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/patches/target_requirements.lisp_split.rfc6902.dcbor",
+"size": 701,
+"git_sha": "a245b22b2fabe8ce1a4a9076d2558569a3676a59",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/patches/target_requirements.python_split.rfc6902.dcbor",
+"size": 505,
+"git_sha": "d015ac4ac945ff7e155064ae468b99d677ab77d4",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/patches/target_requirements.smt_split.rfc6902.dcbor",
+"size": 637,
+"git_sha": "f06027c0fdd495a962b35cd2201dce468e5282eb",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/pipeline-to-nld.rfc6902.dcbor",
+"size": 550,
+"git_sha": "2f8a1b11785a11ac15c13a9ede6e95e7326e24d9",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/pipeline-to-nld.rfc6902.json",
+"size": 623,
+"git_sha": "84a8d1dfd33299549787c61233dfcb5876602599",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/quorum-arming.rfc6902.dcbor",
+"size": 473,
+"git_sha": "dd399c5d8dfc4421cc0d7da36cc6641d9c7fdddf",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/quorum-arming.rfc6902.json",
+"size": 546,
+"git_sha": "a54bfd7d938e1bcd2f1aedd11283da717f86799f",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/robot-safety-stub.rfc6902.dcbor",
+"size": 434,
+"git_sha": "a05a221478a6426259c9f6f8cfc3fef2e2a3a65c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/robot-safety-stub.rfc6902.json",
+"size": 507,
+"git_sha": "5df89dda9b6bb4be712dcc56eee34bf343387f2e",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/schema_fix_catalog.dcbor",
+"size": 31141,
+"git_sha": "ae36f23c5520a5a39347ee850525121a9cceee81",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/schema_fix_catalog.json",
+"size": 32693,
+"git_sha": "aef86cccc4e5a6ce47d73a262556202316aaaaff",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/stunir_machine_plan.dcbor",
+"size": 3228,
+"git_sha": "c6191e8b675f91cb728f315050055e064631d785",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/targets/lisp/lisp_targets_matrix.dcbor",
+"size": 1043,
+"git_sha": "437d6a91ad6c616b8e4b9dc238d44f1544231899",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/targets/output_language_plans_manifest.dcbor",
+"size": 1742,
+"git_sha": "a9355260d96e8a396c4c1af180a200b7b0b90f0c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/targets/python/python_targets_matrix.dcbor",
+"size": 1014,
+"git_sha": "8cd65e0e76d3018191a74acddea4cc33efa7d6b3",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir/targets/smt/smt_targets_matrix.dcbor",
+"size": 854,
+"git_sha": "864a970766c92a842b2c3c0ab78bc0289ca1be6a",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/ir_bundle.bin",
+"size": 67025,
+"git_sha": "9e21ba30d84af43144038581e3fe0e33fb3f9eee",
+"ext": ".bin",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/lisp/portable/README.md",
+"size": 37,
+"git_sha": "02daaaa5bcd94db7172cbacc2109dd0a4ffb1df6",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/asm/lisp/portable/package.lisp",
+"size": 58,
+"git_sha": "fd929505e3d6bdaa7f7153f4d034dbd9266cef08",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/lisp/portable/payload.json",
+"size": 5139,
+"git_sha": "d59577809dc405a77487cbdf4613c1e62c32f133",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/lisp/portable/program.lisp",
+"size": 68,
+"git_sha": "93a5bd333057f70221ba62d5ed3173685b8f21fd",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/lisp/portable/runtime.lisp",
+"size": 434,
+"git_sha": "fb920917e0799286e84f03239b271d7c69fee5b8",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/python/portable/README.md",
+"size": 33,
+"git_sha": "a72a9bcb8ea63d1f6e3f648f65e08f60d0b06e71",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/asm/python/portable/program.py",
+"size": 1183,
+"git_sha": "c28e346b1d67d4aabc957c301faed92164c56c0c",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/python/portable/runtime.py",
+"size": 42,
+"git_sha": "012390aa68fad3cdcaed47cef4abda168a15e581",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/smt/portable/README.md",
+"size": 39,
+"git_sha": "362bca85740db1279ef7bb911aa44d16422559d7",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/asm/smt/portable/problem.smt2",
+"size": 199,
+"git_sha": "d77a4e3099040267c9ad953b3792a0360fef446a",
+"ext": ".smt2",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/asm/spec_ir.txt",
+"size": 2632,
+"git_sha": "d9e44b51c0166ec452c9dcda6efd20aa5e16e1e7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/build/README.md",
+"size": 318,
+"git_sha": "e8c9f0ac867e569e07a53679cc828ef710545db8",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "build/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/build/epoch.json",
+"size": 559,
+"git_sha": "877aecb8f2ab34d57a9c7c0e7e608f8875c3bc30",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/build/provenance.h",
+"size": 380,
+"git_sha": "ddb2046983c96617982edf5fe118c72f1329148d",
+"ext": ".h",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/build/provenance.json",
+"size": 251,
+"git_sha": "a873717dc3f90af2a7a11de956265429f085ccd5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/logs/build_sh.log",
+"size": 674,
+"git_sha": "2551f32c1f859e721e9dd77ededed5fa6f3fb67f",
+"ext": ".log",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/README.md",
+"size": 390,
+"git_sha": "9848b32b72ba3a9e99b7863f06a11ae505083419",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "receipts/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/receipts/ir_bundle_manifest.json",
+"size": 5350,
+"git_sha": "4c85fdd53906fe05661a8c21e1ce38905b94abea",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/ir_manifest.json",
+"size": 4984,
+"git_sha": "1250d5e39a98728cf8d327ae7adc64703576d5a2",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/lisp_portable.json",
+"size": 1981,
+"git_sha": "eea54fa948a2abff772f83b48fadf8f8470f2274",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/lisp_portable_manifest.json",
+"size": 651,
+"git_sha": "a085bc9a1a1cbc344b33be7c77a376211d0ed61a",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/prov_emit.json",
+"size": 1376,
+"git_sha": "cdb0dcd97b7463b6c67c3de306aac31abf9c3b2c",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/python_portable.json",
+"size": 1991,
+"git_sha": "dd8540c48ba598b90f0788fad36b2fb8f2320c4e",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/python_portable_manifest.json",
+"size": 418,
+"git_sha": "071924eb61823393b004997fd3228321ce5207e8",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/requirements.json",
+"size": 701,
+"git_sha": "1377534d1c6e062415292db107fade7dfc7eafb1",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/smt_portable.json",
+"size": 1979,
+"git_sha": "57e7d94e18fb56bf0c6e0e8e41194cfd011ff5c4",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/smt_portable_manifest.json",
+"size": 303,
+"git_sha": "ae5fcc72e94979b3454782bbafcefddf03b26d5c",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/receipts/spec_ir.json",
+"size": 2057,
+"git_sha": "bffcbd463209326cc2fb65a6ac040408cf54d9e9",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/README.txt",
+"size": 50,
+"git_sha": "f2cdef9b7e840a5af9f7885b3eddba934d973a52",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/patch_like/spec/comprehensive-consolidation.rfc6902.json",
+"size": 28133,
+"git_sha": "9f4b37b13ceb5fb2ed9ebb89afbb0db944b9a8ab",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/core-simple-m_of_n.rfc6902.json",
+"size": 1008,
+"git_sha": "5bcf20e555889cab499807499f4abda9a09052d7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 1011,
+"git_sha": "c475614118d0c42091ff3ffc1dccf7c9ab73b278",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/generalized-provenance-accounting.rfc6902.json",
+"size": 1591,
+"git_sha": "183529d6867832e444415599e0aa3568b8ac07a6",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/io-discrete.rfc6902.json",
+"size": 723,
+"git_sha": "552ab0708cc97ab1c6fa9a65d521a111a8e78d67",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/ld-namespacing.comprehensive.rfc6902.json",
+"size": 801,
+"git_sha": "8f712dc57ac252507e5926032dfb9e951b112938",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/patches/machine_plan.add_lisp.rfc6902.json",
+"size": 295,
+"git_sha": "eec17a26f233d64561f302272139c0ecb42a2be8",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/patches/machine_plan.add_python_smt.rfc6902.json",
+"size": 509,
+"git_sha": "e0ce481733dbb6a7a21c32a780f2ab61f9014d0d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/patches/target_requirements.lisp_split.rfc6902.json",
+"size": 805,
+"git_sha": "7a5295d6defd5132a76ac7ee11428e7e6b33e01d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/patches/target_requirements.python_split.rfc6902.json",
+"size": 756,
+"git_sha": "29175b460136f76d52ca228d0a45e3a3e7dd0b62",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/patches/target_requirements.smt_split.rfc6902.json",
+"size": 999,
+"git_sha": "4209f278d24175c6aa6fcfb112886aa2e4a759d9",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/pipeline-to-nld.rfc6902.json",
+"size": 767,
+"git_sha": "fdbca064e09433828f14cdb0d624b25611e34c99",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/quorum-arming.rfc6902.json",
+"size": 690,
+"git_sha": "9f76a1d18b3f0eb2a9082dd0bbd8525eb5cc720a",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/robot-safety-stub.rfc6902.json",
+"size": 651,
+"git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/schema_fix_catalog.json",
+"size": 37525,
+"git_sha": "5452bd9d9bfa56ef48d9f723f98bddb5ca497e50",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/targets/lisp/lisp_targets_matrix.json",
+"size": 1142,
+"git_sha": "9d2f88d3f011d9696d832b79c9fd6b8bb673569f",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/targets/output_language_plans_manifest.json",
+"size": 1879,
+"git_sha": "1ddd33323e6d5c45d05d40fed6ebd32a263f15bc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/targets/python/python_targets_matrix.json",
+"size": 1105,
+"git_sha": "785360049d472da9fb6f63923eac8776925ae8f7",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/patch_like/spec/targets/smt/smt_targets_matrix.json",
+"size": 946,
+"git_sha": "013cb5ea64cdcdd6b6bf9e17bfb34fa83c608bcc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/README.txt",
+"size": 51,
+"git_sha": "c2624cc83ba2de344a18aa680ee7f6f2faa770a7",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/asm/ir/comprehensive-consolidation.rfc6902.dcbor",
+"size": 20536,
+"git_sha": "78fc0992eab4c1220cabc164873985100b3a0188",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/comprehensive-consolidation.rfc6902.json",
+"size": 23069,
+"git_sha": "a0f3581d2488edd52fe5cff60f00e53c367f5587",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/core-simple-m_of_n.rfc6902.dcbor",
+"size": 683,
+"git_sha": "5defe93a805ca7e8ca800382662230830086123c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/core-simple-m_of_n.rfc6902.json",
+"size": 792,
+"git_sha": "f4a1498410031b79b018ba6ce07c2d71c78bcda7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/entity-autonomy-ecc-delta.rfc6902.dcbor",
+"size": 686,
+"git_sha": "61b39dfd2626c1b6f457cc956f8b230a5a1dbf44",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 795,
+"git_sha": "bece94dda12c1d7f8c2d91ef9716f78d7b18116b",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/generalized-provenance-accounting.rfc6902.dcbor",
+"size": 1122,
+"git_sha": "d779a369577bd00a8f3a3b4d401b275d81fcefa2",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/generalized-provenance-accounting.rfc6902.json",
+"size": 1279,
+"git_sha": "27e78e054f71c084a98b7169106f5b81c67554d3",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/io-discrete.rfc6902.dcbor",
+"size": 469,
+"git_sha": "61e7608eed60f02322c3e3c1719913dc2e8c69ef",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/io-discrete.rfc6902.json",
+"size": 555,
+"git_sha": "b4d5a8fc766ada734c2b391b90d607af6a472508",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/ld-namespacing.comprehensive.rfc6902.dcbor",
+"size": 548,
+"git_sha": "8fc70d6270a1a2838a5b64714723737349d6e157",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/ld-namespacing.comprehensive.rfc6902.json",
+"size": 633,
+"git_sha": "a77d64e7af94c90c0f2bb6070e2db8e6b0967c73",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/patches/machine_plan.add_lisp.rfc6902.dcbor",
+"size": 277,
+"git_sha": "abe4c1b66069fb54a39552e00ea0de4c4705847e",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/patches/machine_plan.add_python_smt.rfc6902.dcbor",
+"size": 382,
+"git_sha": "6ac6d7b19a4eac3f40b4d0704d5d3906c9778795",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/patches/target_requirements.lisp_split.rfc6902.dcbor",
+"size": 701,
+"git_sha": "a245b22b2fabe8ce1a4a9076d2558569a3676a59",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/patches/target_requirements.python_split.rfc6902.dcbor",
+"size": 505,
+"git_sha": "d015ac4ac945ff7e155064ae468b99d677ab77d4",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/patches/target_requirements.smt_split.rfc6902.dcbor",
+"size": 637,
+"git_sha": "f06027c0fdd495a962b35cd2201dce468e5282eb",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/pipeline-to-nld.rfc6902.dcbor",
+"size": 550,
+"git_sha": "2f8a1b11785a11ac15c13a9ede6e95e7326e24d9",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/pipeline-to-nld.rfc6902.json",
+"size": 623,
+"git_sha": "84a8d1dfd33299549787c61233dfcb5876602599",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/quorum-arming.rfc6902.dcbor",
+"size": 473,
+"git_sha": "dd399c5d8dfc4421cc0d7da36cc6641d9c7fdddf",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/quorum-arming.rfc6902.json",
+"size": 546,
+"git_sha": "a54bfd7d938e1bcd2f1aedd11283da717f86799f",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/robot-safety-stub.rfc6902.dcbor",
+"size": 434,
+"git_sha": "a05a221478a6426259c9f6f8cfc3fef2e2a3a65c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/robot-safety-stub.rfc6902.json",
+"size": 507,
+"git_sha": "5df89dda9b6bb4be712dcc56eee34bf343387f2e",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/schema_fix_catalog.dcbor",
+"size": 31141,
+"git_sha": "ae36f23c5520a5a39347ee850525121a9cceee81",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/schema_fix_catalog.json",
+"size": 32693,
+"git_sha": "aef86cccc4e5a6ce47d73a262556202316aaaaff",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/stunir_machine_plan.dcbor",
+"size": 3228,
+"git_sha": "c6191e8b675f91cb728f315050055e064631d785",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/targets/lisp/lisp_targets_matrix.dcbor",
+"size": 1043,
+"git_sha": "437d6a91ad6c616b8e4b9dc238d44f1544231899",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/targets/output_language_plans_manifest.dcbor",
+"size": 1742,
+"git_sha": "a9355260d96e8a396c4c1af180a200b7b0b90f0c",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/targets/python/python_targets_matrix.dcbor",
+"size": 1014,
+"git_sha": "8cd65e0e76d3018191a74acddea4cc33efa7d6b3",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir/targets/smt/smt_targets_matrix.dcbor",
+"size": 854,
+"git_sha": "864a970766c92a842b2c3c0ab78bc0289ca1be6a",
+"ext": ".dcbor",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/ir_bundle.bin",
+"size": 67025,
+"git_sha": "9e21ba30d84af43144038581e3fe0e33fb3f9eee",
+"ext": ".bin",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/lisp/portable/README.md",
+"size": 37,
+"git_sha": "02daaaa5bcd94db7172cbacc2109dd0a4ffb1df6",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/asm/lisp/portable/package.lisp",
+"size": 58,
+"git_sha": "fd929505e3d6bdaa7f7153f4d034dbd9266cef08",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/lisp/portable/payload.json",
+"size": 5139,
+"git_sha": "aedadfafac7242c29199512797f84cc08ea181f2",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/lisp/portable/program.lisp",
+"size": 68,
+"git_sha": "93a5bd333057f70221ba62d5ed3173685b8f21fd",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/lisp/portable/runtime.lisp",
+"size": 434,
+"git_sha": "fb920917e0799286e84f03239b271d7c69fee5b8",
+"ext": ".lisp",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/python/portable/README.md",
+"size": 33,
+"git_sha": "a72a9bcb8ea63d1f6e3f648f65e08f60d0b06e71",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/asm/python/portable/program.py",
+"size": 1183,
+"git_sha": "c28e346b1d67d4aabc957c301faed92164c56c0c",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/python/portable/runtime.py",
+"size": 42,
+"git_sha": "012390aa68fad3cdcaed47cef4abda168a15e581",
+"ext": ".py",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/smt/portable/README.md",
+"size": 39,
+"git_sha": "362bca85740db1279ef7bb911aa44d16422559d7",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/asm/smt/portable/problem.smt2",
+"size": 199,
+"git_sha": "19d33e645f8a6c7163597dab11ea438fd13192b6",
+"ext": ".smt2",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/asm/spec_ir.txt",
+"size": 2632,
+"git_sha": "fae885009a83c8f48c4446b3b3a4c9915c05f9a4",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/build/README.md",
+"size": 318,
+"git_sha": "e8c9f0ac867e569e07a53679cc828ef710545db8",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "build/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/build/epoch.json",
+"size": 559,
+"git_sha": "d2ee092beaba5c55d95500a14ef7cdcda92e595f",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/build/provenance.h",
+"size": 380,
+"git_sha": "9829db88e4998b8af0c8d6e037f9c1d19eb56885",
+"ext": ".h",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/build/provenance.json",
+"size": 251,
+"git_sha": "d94156bcc214dfc697070e84510f0f6753407c8d",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/logs/build_sh.log",
+"size": 674,
+"git_sha": "2551f32c1f859e721e9dd77ededed5fa6f3fb67f",
+"ext": ".log",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/README.md",
+"size": 390,
+"git_sha": "9848b32b72ba3a9e99b7863f06a11ae505083419",
+"ext": ".md",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [
+{
+"level": 1,
+"text": "receipts/"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/receipts/ir_bundle_manifest.json",
+"size": 5350,
+"git_sha": "40c8e1e7f5342162aa2c546d417c17dbe503b1a3",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/ir_manifest.json",
+"size": 4984,
+"git_sha": "36886a1bf41eb43dc2ce70560ca0977717f646e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/lisp_portable.json",
+"size": 1981,
+"git_sha": "8588711e098aff8693a5f2a8de502d03a5db010d",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/lisp_portable_manifest.json",
+"size": 651,
+"git_sha": "0b7f6d57e9a7332cd9b9d615e9040983555a90ff",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/prov_emit.json",
+"size": 1376,
+"git_sha": "98809b28fe13223580d6c179c6119ac4871614f9",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/python_portable.json",
+"size": 1991,
+"git_sha": "ef3f6d820c5f89f80f28983d9f23c02226b7cf39",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/python_portable_manifest.json",
+"size": 418,
+"git_sha": "071924eb61823393b004997fd3228321ce5207e8",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/requirements.json",
+"size": 701,
+"git_sha": "1377534d1c6e062415292db107fade7dfc7eafb1",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/smt_portable.json",
+"size": 1979,
+"git_sha": "22186669a0f2505e7336fb0acba3c1525e48bc87",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/smt_portable_manifest.json",
+"size": 303,
+"git_sha": "1875c71a27d1d9553b5ec432e8211bed2b03741d",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/receipts/spec_ir.json",
+"size": 2057,
+"git_sha": "8c39d5649f02dfbba9b17a308e2fbdaa35276df5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/README.txt",
+"size": 50,
+"git_sha": "f2cdef9b7e840a5af9f7885b3eddba934d973a52",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/spec/README_ünïçødé.txt",
+"size": 47,
+"git_sha": "24d2ccc088e90801335cbbc05ea04e8d35e009a3",
+"ext": ".txt",
+"category": "test_vector",
+"is_test_vector": true,
+"headings": [],
+"outbound_repo_links": []
+},
+{
+"path": "samples/out/unicode/spec/comprehensive-consolidation.rfc6902.json",
+"size": 28133,
+"git_sha": "9f4b37b13ceb5fb2ed9ebb89afbb0db944b9a8ab",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/core-simple-m_of_n.rfc6902.json",
+"size": 1008,
+"git_sha": "5bcf20e555889cab499807499f4abda9a09052d7",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/entity-autonomy-ecc-delta.rfc6902.json",
+"size": 1011,
+"git_sha": "c475614118d0c42091ff3ffc1dccf7c9ab73b278",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/generalized-provenance-accounting.rfc6902.json",
+"size": 1591,
+"git_sha": "183529d6867832e444415599e0aa3568b8ac07a6",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/io-discrete.rfc6902.json",
+"size": 723,
+"git_sha": "552ab0708cc97ab1c6fa9a65d521a111a8e78d67",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/ld-namespacing.comprehensive.rfc6902.json",
+"size": 801,
+"git_sha": "8f712dc57ac252507e5926032dfb9e951b112938",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/patches/machine_plan.add_lisp.rfc6902.json",
+"size": 295,
+"git_sha": "eec17a26f233d64561f302272139c0ecb42a2be8",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/patches/machine_plan.add_python_smt.rfc6902.json",
+"size": 509,
+"git_sha": "e0ce481733dbb6a7a21c32a780f2ab61f9014d0d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/patches/target_requirements.lisp_split.rfc6902.json",
+"size": 805,
+"git_sha": "7a5295d6defd5132a76ac7ee11428e7e6b33e01d",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/patches/target_requirements.python_split.rfc6902.json",
+"size": 756,
+"git_sha": "29175b460136f76d52ca228d0a45e3a3e7dd0b62",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/patches/target_requirements.smt_split.rfc6902.json",
+"size": 999,
+"git_sha": "4209f278d24175c6aa6fcfb112886aa2e4a759d9",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/pipeline-to-nld.rfc6902.json",
+"size": 767,
+"git_sha": "fdbca064e09433828f14cdb0d624b25611e34c99",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/quorum-arming.rfc6902.json",
+"size": 690,
+"git_sha": "9f76a1d18b3f0eb2a9082dd0bbd8525eb5cc720a",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/robot-safety-stub.rfc6902.json",
+"size": 651,
+"git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
+"ext": ".rfc6902.json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/schema_fix_catalog.json",
+"size": 37525,
+"git_sha": "5452bd9d9bfa56ef48d9f723f98bddb5ca497e50",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/stunir_machine_plan.json",
+"size": 3436,
+"git_sha": "d5504696011fc99ffd76ccca008f809d6fb0d7e5",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/targets/lisp/lisp_targets_matrix.json",
+"size": 1142,
+"git_sha": "9d2f88d3f011d9696d832b79c9fd6b8bb673569f",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/targets/output_language_plans_manifest.json",
+"size": 1879,
+"git_sha": "1ddd33323e6d5c45d05d40fed6ebd32a263f15bc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/targets/python/python_targets_matrix.json",
+"size": 1105,
+"git_sha": "785360049d472da9fb6f63923eac8776925ae8f7",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
+"path": "samples/out/unicode/spec/targets/smt/smt_targets_matrix.json",
+"size": 946,
+"git_sha": "013cb5ea64cdcdd6b6bf9e17bfb34fa83c608bcc",
+"ext": ".json",
+"category": "test_vector",
+"is_test_vector": true
+},
+{
 "path": "schemas/stunir_dead_end_decision_v1.schema.json",
 "size": 5024,
 "git_sha": "0f7277f72407c5ead2499ad0a2475ddc7ee78028",
+"ext": ".schema.json",
+"category": "schema",
+"is_test_vector": false
+},
+{
+"path": "schemas/stunir_ir_v1.schema.json",
+"size": 4384,
+"git_sha": "31b049205c8c305384b5102288515158214cf21b",
 "ext": ".schema.json",
 "category": "schema",
 "is_test_vector": false
@@ -1625,9 +4673,17 @@
 "is_test_vector": false
 },
 {
+"path": "schemas/stunir_template_pack_v1.schema.json",
+"size": 1958,
+"git_sha": "60a87412582951234b0a142b071e34a7158984d6",
+"ext": ".schema.json",
+"category": "schema",
+"is_test_vector": false
+},
+{
 "path": "scripts/build.sh",
-"size": 20533,
-"git_sha": "cf6a03da7ee86b2b7137cff700b2b1edbf52054a",
+"size": 34150,
+"git_sha": "99dbb32eba77ec97fc3b6b55d7acba9499d45809",
 "ext": ".sh",
 "category": "script",
 "is_test_vector": false
@@ -1637,6 +4693,22 @@
 "size": 2983,
 "git_sha": "97e33d3ee0fb9e50f8cf687522ebbe82d691da43",
 "ext": ".sh",
+"category": "script",
+"is_test_vector": false
+},
+{
+"path": "scripts/build_targets.ps1",
+"size": 6627,
+"git_sha": "33a4040094d32928feea4cca5b09e511536bd4bf",
+"ext": ".ps1",
+"category": "script",
+"is_test_vector": false
+},
+{
+"path": "scripts/discover_toolchain.ps1",
+"size": 6861,
+"git_sha": "cea13aed35b40c48a82dbba3cd3ea995d00e11ec",
+"ext": ".ps1",
 "category": "script",
 "is_test_vector": false
 },
@@ -1652,6 +4724,14 @@
 "path": "scripts/probe_deps.sh",
 "size": 355,
 "git_sha": "f21f8e67982292b7b08b18055af72340d5a13cda",
+"ext": ".sh",
+"category": "script",
+"is_test_vector": false
+},
+{
+"path": "scripts/profile3_lib.sh",
+"size": 2832,
+"git_sha": "3810e439d6e900ca304bb147f177908ae22d99db",
 "ext": ".sh",
 "category": "script",
 "is_test_vector": false
@@ -1840,6 +4920,22 @@
 "is_test_vector": false
 },
 {
+"path": "scripts/stunir_process.ps1",
+"size": 5302,
+"git_sha": "c1a536769bb12d6ec4607b12f04467662069f793",
+"ext": ".ps1",
+"category": "script",
+"is_test_vector": false
+},
+{
+"path": "scripts/stunir_spawn.ps1",
+"size": 2067,
+"git_sha": "bf0a7eec9650d9187b5cd460fb1e8d4a3ff467f6",
+"ext": ".ps1",
+"category": "script",
+"is_test_vector": false
+},
+{
 "path": "scripts/verify.sh",
 "size": 4152,
 "git_sha": "1431ade502d3139f8d40cc138e2350d86b36f54b",
@@ -1873,8 +4969,16 @@
 },
 {
 "path": "scripts/verify_minimal.sh",
-"size": 3126,
-"git_sha": "7ddfc9931c9fd588a14766169566bfa13a8d4d14",
+"size": 3538,
+"git_sha": "7fbaba3ff6db2f11767b48756e9178a5a3a59356",
+"ext": ".sh",
+"category": "script",
+"is_test_vector": false
+},
+{
+"path": "scripts/verify_profile3.sh",
+"size": 4641,
+"git_sha": "262542995f755ba164f4ff276436b5109dd8ebd1",
 "ext": ".sh",
 "category": "script",
 "is_test_vector": false
@@ -1893,7 +4997,7 @@
 "path": "spec/comprehensive-consolidation.rfc6902.json",
 "size": 28133,
 "git_sha": "9f4b37b13ceb5fb2ed9ebb89afbb0db944b9a8ab",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1901,7 +5005,7 @@
 "path": "spec/core-simple-m_of_n.rfc6902.json",
 "size": 1008,
 "git_sha": "5bcf20e555889cab499807499f4abda9a09052d7",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1909,14 +5013,176 @@
 "path": "spec/entity-autonomy-ecc-delta.rfc6902.json",
 "size": 1011,
 "git_sha": "c475614118d0c42091ff3ffc1dccf7c9ab73b278",
+"ext": ".rfc6902.json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/env/host_env_allowlist.windows.discovery.json",
+"size": 530,
+"git_sha": "47fa3717237ac5929fc939219503d47174780f86",
 "ext": ".json",
 "category": "spec",
 "is_test_vector": false
 },
 {
+"path": "spec/env/host_env_allowlist.windows.json",
+"size": 744,
+"git_sha": "bce15dfdc142dc8ef6c99ba63e5a9905bd89eecc",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/env/host_env_allowlist.windows.runtime.json",
+"size": 544,
+"git_sha": "29ae3399c1fc147f393813baa99798eb346e3e59",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/frontends/declarative/declarative_frontends_matrix_v0.json",
+"size": 964,
+"git_sha": "5875400b9c6f8ee973ada2df0804e91645ce94bb",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/frontends/declarative/declarative_frontends_plan_v0.md",
+"size": 2496,
+"git_sha": "12c2e9dcb29b8ac89317e7037019adc09b5be89e",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 3,
+"text": "Tier B (declarative) frontends plan (STUNIR)"
+},
+{
+"level": 4,
+"text": "0) Goal"
+},
+{
+"level": 4,
+"text": "1) Why declarative first"
+},
+{
+"level": 4,
+"text": "2) Compatibility policy"
+},
+{
+"level": 4,
+"text": "3) Output: canonical IR bundle"
+},
+{
+"level": 4,
+"text": "4) Proposed phased delivery"
+},
+{
+"level": 5,
+"text": "Phase B1: Surface syntax + canonical normalized AST (still meaningful)"
+},
+{
+"level": 5,
+"text": "Phase B2: Semantics-lift into STUNIR “meaning” IR"
+},
+{
+"level": 4,
+"text": "5) Receipts"
+},
+{
+"level": 4,
+"text": "6) Coexistence with Tier A"
+},
+{
+"level": 4,
+"text": "7) Non-goals"
+}
+],
+"outbound_repo_links": []
+},
+{
 "path": "spec/generalized-provenance-accounting.rfc6902.json",
 "size": 1591,
 "git_sha": "183529d6867832e444415599e0aa3568b8ac07a6",
+"ext": ".rfc6902.json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/ingest/ir_in_source/ir_in_source_ingest_plan_v0.md",
+"size": 3817,
+"git_sha": "dcce0057010821982f55c91ee09279eb8c7c1f05",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 3,
+"text": "Tier A ingest: IR-in-source / Source references IR (STUNIR)"
+},
+{
+"level": 4,
+"text": "0) Goal"
+},
+{
+"level": 4,
+"text": "1) Two ingest forms"
+},
+{
+"level": 5,
+"text": "1.1 Reference form (recommended)"
+},
+{
+"level": 5,
+"text": "1.2 Embedded form (optional)"
+},
+{
+"level": 4,
+"text": "2) Marker format"
+},
+{
+"level": 5,
+"text": "2.1 Reference record"
+},
+{
+"level": 5,
+"text": "2.2 Embedded record"
+},
+{
+"level": 4,
+"text": "3) Precedence and error rules"
+},
+{
+"level": 4,
+"text": "4) Language marker matrix"
+},
+{
+"level": 4,
+"text": "5) Receipt bindings (required)"
+},
+{
+"level": 4,
+"text": "6) Build-system integration (planning)"
+},
+{
+"level": 4,
+"text": "7) Security / supply-chain notes"
+},
+{
+"level": 4,
+"text": "8) Non-goals"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/ingest/ir_in_source/ir_in_source_markers_matrix_v0.json",
+"size": 1934,
+"git_sha": "b5ddbfdc025fa6078fe84dad586164be7a7ed45f",
 "ext": ".json",
 "category": "spec",
 "is_test_vector": false
@@ -1925,7 +5191,15 @@
 "path": "spec/io-discrete.rfc6902.json",
 "size": 723,
 "git_sha": "552ab0708cc97ab1c6fa9a65d521a111a8e78d67",
-"ext": ".json",
+"ext": ".rfc6902.json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/ir_bundle/stunir_ir_bundle_v1.machine.json",
+"size": 2546,
+"git_sha": "4947167521e2d627f3f5b3e998f410d55d8fa03d",
+"ext": ".machine.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1933,7 +5207,7 @@
 "path": "spec/ld-namespacing.comprehensive.rfc6902.json",
 "size": 801,
 "git_sha": "8f712dc57ac252507e5926032dfb9e951b112938",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1941,7 +5215,7 @@
 "path": "spec/patches/machine_plan.add_lisp.rfc6902.json",
 "size": 295,
 "git_sha": "eec17a26f233d64561f302272139c0ecb42a2be8",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1949,7 +5223,7 @@
 "path": "spec/patches/machine_plan.add_python_smt.rfc6902.json",
 "size": 509,
 "git_sha": "e0ce481733dbb6a7a21c32a780f2ab61f9014d0d",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1957,7 +5231,7 @@
 "path": "spec/patches/target_requirements.lisp_split.rfc6902.json",
 "size": 805,
 "git_sha": "7a5295d6defd5132a76ac7ee11428e7e6b33e01d",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1965,7 +5239,7 @@
 "path": "spec/patches/target_requirements.python_split.rfc6902.json",
 "size": 756,
 "git_sha": "29175b460136f76d52ca228d0a45e3a3e7dd0b62",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1973,7 +5247,7 @@
 "path": "spec/patches/target_requirements.smt_split.rfc6902.json",
 "size": 999,
 "git_sha": "4209f278d24175c6aa6fcfb112886aa2e4a759d9",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1981,7 +5255,7 @@
 "path": "spec/pipeline-to-nld.rfc6902.json",
 "size": 767,
 "git_sha": "fdbca064e09433828f14cdb0d624b25611e34c99",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1989,7 +5263,7 @@
 "path": "spec/quorum-arming.rfc6902.json",
 "size": 690,
 "git_sha": "9f76a1d18b3f0eb2a9082dd0bbd8525eb5cc720a",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -1997,7 +5271,7 @@
 "path": "spec/robot-safety-stub.rfc6902.json",
 "size": 651,
 "git_sha": "92d7e62a641cc3fbae7653de2faec8d8ccb51ff2",
-"ext": ".json",
+"ext": ".rfc6902.json",
 "category": "spec",
 "is_test_vector": false
 },
@@ -2034,6 +5308,829 @@
 "is_test_vector": false
 },
 {
+"path": "spec/targets/polyglot/ir_in_source_integration_notes_v0.md",
+"size": 796,
+"git_sha": "3bc734f36bd08196aa9f269fbe9d31d699ffe412",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 3,
+"text": "Tier A IR-in-source integration notes for polyglot targets"
+},
+{
+"level": 4,
+"text": "Principle"
+},
+{
+"level": 4,
+"text": "Suggested usage patterns"
+},
+{
+"level": 4,
+"text": "Determinism"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/patches/rfc6902_machine_plan_add_polyglot.json",
+"size": 2136,
+"git_sha": "d8c9414effb97bceb1fe354510878e752067f366",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/patches/rfc6902_target_requirements_polyglot_add.json",
+"size": 6973,
+"git_sha": "2291881512635c9a075ba6a904b5c15a1334132a",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/polyglot_target_implementation_plan_v0.md",
+"size": 3884,
+"git_sha": "94dfe9b19f5c6b797fe9aab463f7729c60dbc293",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 3,
+"text": "Polyglot target implementation plan (STUNIR)"
+},
+{
+"level": 4,
+"text": "0) Scope and non-goals"
+},
+{
+"level": 4,
+"text": "1) Target names (authoritative)"
+},
+{
+"level": 4,
+"text": "2) Artifact layout (exact paths)"
+},
+{
+"level": 4,
+"text": "3) Determinism policy"
+},
+{
+"level": 4,
+"text": "4) Contracts policy (v0)"
+},
+{
+"level": 4,
+"text": "5) Files in this bundle"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/polyglot_target_implementation_plan_v1.md",
+"size": 3393,
+"git_sha": "61f9fe8a63e81b39fe5f1ee0106c16984007eb3f",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 3,
+"text": "Polyglot target implementation plan (STUNIR) — v1 (with non-Python environment files)"
+},
+{
+"level": 4,
+"text": "0) Scope"
+},
+{
+"level": 4,
+"text": "1) Artifact layout (emitted outputs)"
+},
+{
+"level": 5,
+"text": "1.1 C variants"
+},
+{
+"level": 5,
+"text": "1.2 Rust (2021)"
+},
+{
+"level": 5,
+"text": "1.3 Go"
+},
+{
+"level": 5,
+"text": "1.4 Haskell"
+},
+{
+"level": 5,
+"text": "1.5 Erlang (rebar3)"
+},
+{
+"level": 5,
+"text": "1.6 Elixir (mix)"
+},
+{
+"level": 5,
+"text": "1.7 Prolog"
+},
+{
+"level": 5,
+"text": "1.8 Datalog (Soufflé-flavored baseline)"
+},
+{
+"level": 5,
+"text": "1.9 ASP (clingo-flavored baseline)"
+},
+{
+"level": 5,
+"text": "1.10 MiniZinc"
+},
+{
+"level": 4,
+"text": "2) Skeletons included in this bundle"
+},
+{
+"level": 4,
+"text": "3) Contracts policy (v0)"
+},
+{
+"level": 4,
+"text": "4) Files in this bundle"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/polyglot_targets_matrix.json",
+"size": 7789,
+"git_sha": "58d2d3e72e3727c1c139ad7a6d5018fe773d0a19",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/polyglot_targets_matrix_v1.json",
+"size": 8007,
+"git_sha": "cd45a5a3287b70989d4e4a5d770606b5047cfd2e",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/asp/clingo/README.md",
+"size": 232,
+"git_sha": "f90d1fd4c034f835639de9023c33682468200a8d",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR ASP skeleton (clingo-flavored)"
+},
+{
+"level": 2,
+"text": "Run (if clingo is installed)"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/asp/clingo/program.lp",
+"size": 137,
+"git_sha": "57d11687e60abb12203094adcdbf587c870d908d",
+"ext": ".lp",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c11/Makefile",
+"size": 203,
+"git_sha": "85bb6cadc9876a649c60fdcdf7560cb23f9fa82c",
+"ext": "",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c11/README.md",
+"size": 462,
+"git_sha": "d8912970eda0e32ec714d2111a1e929b755cce67",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR C C11 skeleton"
+},
+{
+"level": 2,
+"text": "Build"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c11/main.c",
+"size": 75,
+"git_sha": "0472f4e241fdb9aa6e58040ac45f1ec2bce3dc25",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c11/stunir_runtime.c",
+"size": 334,
+"git_sha": "2b2b447ca193a85c9c6f177679b49ff59be02cb5",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c11/stunir_runtime.h",
+"size": 250,
+"git_sha": "5f1f411055554f680ae232a6d1984e57e53421bc",
+"ext": ".h",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c17/Makefile",
+"size": 203,
+"git_sha": "85bb6cadc9876a649c60fdcdf7560cb23f9fa82c",
+"ext": "",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c17/README.md",
+"size": 462,
+"git_sha": "24a2f9ac2fb8df5263b4d61674c82ecc9ebf9265",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR C C17 skeleton"
+},
+{
+"level": 2,
+"text": "Build"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c17/main.c",
+"size": 75,
+"git_sha": "0472f4e241fdb9aa6e58040ac45f1ec2bce3dc25",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c17/stunir_runtime.c",
+"size": 334,
+"git_sha": "2b2b447ca193a85c9c6f177679b49ff59be02cb5",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c17/stunir_runtime.h",
+"size": 250,
+"git_sha": "5f1f411055554f680ae232a6d1984e57e53421bc",
+"ext": ".h",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c23/Makefile",
+"size": 203,
+"git_sha": "85bb6cadc9876a649c60fdcdf7560cb23f9fa82c",
+"ext": "",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c23/README.md",
+"size": 462,
+"git_sha": "a655e36e4a63be884f969dbdd248f1b16975f51b",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR C C23 skeleton"
+},
+{
+"level": 2,
+"text": "Build"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c23/main.c",
+"size": 75,
+"git_sha": "0472f4e241fdb9aa6e58040ac45f1ec2bce3dc25",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c23/stunir_runtime.c",
+"size": 334,
+"git_sha": "2b2b447ca193a85c9c6f177679b49ff59be02cb5",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c23/stunir_runtime.h",
+"size": 250,
+"git_sha": "5f1f411055554f680ae232a6d1984e57e53421bc",
+"ext": ".h",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c89/Makefile",
+"size": 203,
+"git_sha": "85bb6cadc9876a649c60fdcdf7560cb23f9fa82c",
+"ext": "",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c89/README.md",
+"size": 462,
+"git_sha": "af9b07fd9aed772ae8a02ae075ec65ba3a8a08c2",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR C C89 skeleton"
+},
+{
+"level": 2,
+"text": "Build"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c89/main.c",
+"size": 75,
+"git_sha": "0472f4e241fdb9aa6e58040ac45f1ec2bce3dc25",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c89/stunir_runtime.c",
+"size": 334,
+"git_sha": "2b2b447ca193a85c9c6f177679b49ff59be02cb5",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c89/stunir_runtime.h",
+"size": 250,
+"git_sha": "5f1f411055554f680ae232a6d1984e57e53421bc",
+"ext": ".h",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c99/Makefile",
+"size": 203,
+"git_sha": "85bb6cadc9876a649c60fdcdf7560cb23f9fa82c",
+"ext": "",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c99/README.md",
+"size": 462,
+"git_sha": "c1723f4cff9834e63bc9af4ab9899efaf447484c",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR C C99 skeleton"
+},
+{
+"level": 2,
+"text": "Build"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c99/main.c",
+"size": 75,
+"git_sha": "0472f4e241fdb9aa6e58040ac45f1ec2bce3dc25",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c99/stunir_runtime.c",
+"size": 334,
+"git_sha": "2b2b447ca193a85c9c6f177679b49ff59be02cb5",
+"ext": ".c",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/c/c99/stunir_runtime.h",
+"size": 250,
+"git_sha": "5f1f411055554f680ae232a6d1984e57e53421bc",
+"ext": ".h",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/datalog/souffle/README.md",
+"size": 280,
+"git_sha": "c63fd26ccabbeb1eefb0b3820b0967f2f02b0839",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Datalog skeleton (Soufflé-flavored)"
+},
+{
+"level": 2,
+"text": "Run (if Soufflé is installed)"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/datalog/souffle/program.dl",
+"size": 160,
+"git_sha": "1998f4f11fed41e77c9014b76aefa879055ee969",
+"ext": ".dl",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/elixir/mix/README.md",
+"size": 203,
+"git_sha": "3c34fbe02f0981f9a71268f0774917f060166ebb",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Elixir skeleton (Mix)"
+},
+{
+"level": 2,
+"text": "Run"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/elixir/mix/lib/stunir_program.ex",
+"size": 81,
+"git_sha": "6fe9ef130ce5cdc4ad8d34989b1ac11d6aaf6b32",
+"ext": ".ex",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/elixir/mix/lib/stunir_runtime.ex",
+"size": 201,
+"git_sha": "54c77644ea203f49b72b9b98d7bbfeef92a15fb3",
+"ext": ".ex",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/elixir/mix/mix.exs",
+"size": 295,
+"git_sha": "c50f26414bc1a29ca883704dca519262754d8f4e",
+"ext": ".exs",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/erlang/rebar3/README.md",
+"size": 259,
+"git_sha": "742042dac6b81adb2baad9fd9db7da7725f34530",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Erlang skeleton (rebar3)"
+},
+{
+"level": 2,
+"text": "Build/run"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/erlang/rebar3/rebar.config",
+"size": 39,
+"git_sha": "a20a1b98ea23ff4a316bac4864f2840794750f1c",
+"ext": ".config",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/erlang/rebar3/src/stunir_program.app.src",
+"size": 209,
+"git_sha": "a96da16407e482a78f5d48a8761754e10065641c",
+"ext": ".src",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/erlang/rebar3/src/stunir_program.erl",
+"size": 85,
+"git_sha": "88068472fad911a44724af0d60486c042139ec8d",
+"ext": ".erl",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/erlang/rebar3/src/stunir_runtime.erl",
+"size": 280,
+"git_sha": "452a250d4c69d3671f0390aaaab810876b6b76c4",
+"ext": ".erl",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/go/module/README.md",
+"size": 178,
+"git_sha": "6c4b6dc442319f1df6f4bb13d9a05712887d012a",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Go skeleton"
+},
+{
+"level": 2,
+"text": "Run"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/go/module/go.mod",
+"size": 44,
+"git_sha": "960263fc845d1505db5b8ba79bd30c4e4a572d86",
+"ext": ".mod",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/go/module/main.go",
+"size": 63,
+"git_sha": "00ca31092c3f1d4c609906355c25876d5c0ff2b0",
+"ext": ".go",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/go/module/runtime.go",
+"size": 154,
+"git_sha": "4cbd8ab19e876b0050a1b9762028bfa3f1816a41",
+"ext": ".go",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/haskell/cabal/README.md",
+"size": 186,
+"git_sha": "d0058a95544ab39296048694a1ee5f64aa1de91f",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Haskell skeleton (Cabal)"
+},
+{
+"level": 2,
+"text": "Build/run"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/haskell/cabal/app/Main.hs",
+"size": 212,
+"git_sha": "c8075674f49308d1bb9a5b4506e3fdff3765ac87",
+"ext": ".hs",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/haskell/cabal/src/STUNIR/Runtime.hs",
+"size": 175,
+"git_sha": "9cc3fbb27130d9593fcaf2b263c7a8b7060a0f54",
+"ext": ".hs",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/haskell/cabal/stunir.cabal",
+"size": 268,
+"git_sha": "524a83c5d503ab6c87086c720b0e69af5844151a",
+"ext": ".cabal",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/minizinc/model/README.md",
+"size": 243,
+"git_sha": "8ea6284119d6eeab57d1705ea323b96c8da00e21",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR MiniZinc skeleton"
+},
+{
+"level": 2,
+"text": "Run (if MiniZinc is installed)"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/minizinc/model/program.mzn",
+"size": 113,
+"git_sha": "463c4db68e8163bbcf4ef7f90d8dc426a765b387",
+"ext": ".mzn",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/prolog/iso/README.md",
+"size": 283,
+"git_sha": "756cbb8d7c9f236a053abe8af23192a065a84b06",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Prolog skeleton (ISO-leaning)"
+},
+{
+"level": 2,
+"text": "Run (dialect-dependent)"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/prolog/iso/program.pl",
+"size": 130,
+"git_sha": "68cbc34ab8a5f5261abbc8fcc03ae5cdb8ac54b5",
+"ext": ".pl",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/prolog/iso/runtime.pl",
+"size": 56,
+"git_sha": "962474d2bde05126c6fb73dfc11433a9fc6eccc4",
+"ext": ".pl",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/rust/edition2021/Cargo.toml",
+"size": 85,
+"git_sha": "3f066137eb331e999c0e05b07ed70b648edfb891",
+"ext": ".toml",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/rust/edition2021/README.md",
+"size": 213,
+"git_sha": "f03e01542742424d90ed6f6e8205caf41f148dc3",
+"ext": ".md",
+"category": "spec",
+"is_test_vector": false,
+"headings": [
+{
+"level": 1,
+"text": "STUNIR Rust (edition 2021) skeleton"
+},
+{
+"level": 2,
+"text": "Build/run"
+},
+{
+"level": 2,
+"text": "Notes"
+}
+],
+"outbound_repo_links": []
+},
+{
+"path": "spec/targets/polyglot/skeletons/rust/edition2021/src/main.rs",
+"size": 72,
+"git_sha": "58b09093c97af7e2709bf45eedc312701f2e2c3b",
+"ext": ".rs",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/targets/polyglot/skeletons/rust/edition2021/src/runtime.rs",
+"size": 192,
+"git_sha": "75303b3e6fb72681415b20a5a188dd8779aa7071",
+"ext": ".rs",
+"category": "spec",
+"is_test_vector": false
+},
+{
 "path": "spec/targets/python/python_targets_matrix.json",
 "size": 1105,
 "git_sha": "785360049d472da9fb6f63923eac8776925ae8f7",
@@ -2045,6 +6142,14 @@
 "path": "spec/targets/smt/smt_targets_matrix.json",
 "size": 946,
 "git_sha": "013cb5ea64cdcdd6b6bf9e17bfb34fa83c608bcc",
+"ext": ".json",
+"category": "spec",
+"is_test_vector": false
+},
+{
+"path": "spec/toolchain/stunir_toolchain_lock_spec.json",
+"size": 2492,
+"git_sha": "3a107adb84a70357c8c4032ad05ca283f2acb6ae",
 "ext": ".json",
 "category": "spec",
 "is_test_vector": false
@@ -2242,6 +6347,30 @@
 "is_test_vector": true
 },
 {
+"path": "tests/test_ir_bundle_v1.py",
+"size": 844,
+"git_sha": "9c945e836d88b6d698fefb20cab9a0d45c8eef99",
+"ext": ".py",
+"category": "other",
+"is_test_vector": false
+},
+{
+"path": "tests/test_ir_bundle_v1_vectors.json",
+"size": 1065,
+"git_sha": "c2d786016b7ec80dd112ad3ec2c46b9c486accc2",
+"ext": ".json",
+"category": "other",
+"is_test_vector": false
+},
+{
+"path": "tools/build_ir_bundle_v1.py",
+"size": 219,
+"git_sha": "c1137874566f65155838e34378348e582aa7bd32",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
 "path": "tools/dcbor.py",
 "size": 6824,
 "git_sha": "ed711fee3228a59dce52d8817549189bdba97e62",
@@ -2258,25 +6387,33 @@
 "is_test_vector": false
 },
 {
+"path": "tools/discover_toolchain.py",
+"size": 8912,
+"git_sha": "f7dad15fef8f3acc316bbb4daddc6953a1010786",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
 "path": "tools/emit_output_manifest.py",
-"size": 1649,
-"git_sha": "c4222bca56da343ad382671277ac9f932a1f166a",
+"size": 1650,
+"git_sha": "0b375b1335c8b2d583ef42ffd49c9e95c7da3c63",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
 },
 {
 "path": "tools/epoch.py",
-"size": 5085,
-"git_sha": "ff833c95ae6b64bf77469b96e181edc080e05fd7",
+"size": 5086,
+"git_sha": "eb2c60b2abefb1e41c7d324791d5210b48b8db48",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
 },
 {
 "path": "tools/gen_provenance.py",
-"size": 2681,
-"git_sha": "1c463fe2cd2d67fff85e307f2b14e07e9dad2025",
+"size": 2690,
+"git_sha": "ec6b4cefa0f6f9c9f9f7cd79781cc2b323a88517",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
@@ -2290,25 +6427,81 @@
 "is_test_vector": false
 },
 {
+"path": "tools/ir_bundle_v1.py",
+"size": 10119,
+"git_sha": "f989fd4447b2d791cbbf828b7dd68af6edf1ae10",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
+"path": "tools/ir_in_source_ingest.py",
+"size": 12431,
+"git_sha": "23bb7d0b42e1d55ba0b7fd72f2a929e182479b97",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
+"path": "tools/ir_to_dotnet.py",
+"size": 3163,
+"git_sha": "eb0f35ff58defb49debb30a8b864a430191b045d",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
+"path": "tools/ir_to_java.py",
+"size": 3074,
+"git_sha": "8c9df2168326cf4a1a04007edf7aa356927d831b",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
 "path": "tools/ir_to_lisp.py",
-"size": 7737,
-"git_sha": "30e18ab291f7f74d38bee2e8f49a80b675fc2731",
+"size": 2158,
+"git_sha": "4fcb500faead025c486fa1a5b1ace9935f772d32",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
+"path": "tools/ir_to_node.py",
+"size": 3339,
+"git_sha": "1c7f63c9aa45c1ac53946e6cfabdb3538cd1680f",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
+"path": "tools/ir_to_php.py",
+"size": 2926,
+"git_sha": "4787a19c0fad29f09d8c1a8c7c55aec114891b82",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
 },
 {
 "path": "tools/ir_to_python.py",
-"size": 3542,
-"git_sha": "c05c3af7a5d8ffac2c81fff4fdd423a177991505",
+"size": 2452,
+"git_sha": "42640486aa9d96368b3a0aed36a20cb1f62fa769",
+"ext": ".py",
+"category": "tool",
+"is_test_vector": false
+},
+{
+"path": "tools/ir_to_ruby.py",
+"size": 2487,
+"git_sha": "421e77a2d3b236bdd7ebfdb57927e7cefe152811",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
 },
 {
 "path": "tools/ir_to_smt2.py",
-"size": 2112,
-"git_sha": "1a0fc2facf8077ebcf6f5f89cd9e8221a0a1cd4a",
+"size": 1345,
+"git_sha": "76c6e2acd1f47ad6100bc71fcb4c6ae61388fa52",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
@@ -2331,8 +6524,8 @@
 },
 {
 "path": "tools/record_receipt.py",
-"size": 6822,
-"git_sha": "12d362a99799d28a69b27e918ecd462291947795",
+"size": 6837,
+"git_sha": "f5a6375fbe7a6bedeeb8f02acbefe186ce50c75b",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
@@ -2363,8 +6556,8 @@
 },
 {
 "path": "tools/verify_build.py",
-"size": 41121,
-"git_sha": "8b51f146f7a6335bfcc2cf6cfb16e8cfaea749f4",
+"size": 41377,
+"git_sha": "78828588c8526017d3f192e9ce35cfe1fd6144b1",
 "ext": ".py",
 "category": "tool",
 "is_test_vector": false
