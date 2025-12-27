@@ -21,6 +21,7 @@ def _read_epoch_from_epoch_json(spec_root: str | None) -> str | int | None:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--epoch", default=None)
+    ap.add_argument("--epoch-source", default=None)
     ap.add_argument("--spec-root", default=None)
     ap.add_argument("--asm-root", default=None)
     ap.add_argument("--out-header", default=None)
