@@ -22,6 +22,7 @@ def main():
         # Use canonical formatting (no spaces, sorted keys)
         with open(args.out_json, "w") as f:
             json.dump(data, f, separators=(',', ':'), sort_keys=True)
+            f.write('\n') # CRITICAL: Match shell 'echo' behavior
     
     if args.out_header:
         with open(args.out_header, "w") as f:
