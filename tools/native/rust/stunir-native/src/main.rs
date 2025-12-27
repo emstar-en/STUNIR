@@ -36,9 +36,9 @@ enum Commands {
         out: PathBuf,
     },
     GenProvenance {
-        #[arg(long)]
+        #[arg(long, default_value_t = 0)]
         epoch: u64,
-        #[arg(long)]
+        #[arg(long, default_value = "unknown")]
         epoch_source: String,
         #[arg(long)]
         out_json: PathBuf,
