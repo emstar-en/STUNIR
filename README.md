@@ -1,5 +1,5 @@
 # STUNIR - MADE BY AI FOR AI
-## 🚀 Quick Start (For Humans Who Just Want This To Work)
+##  Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
 ### **Step 2: Give It To Your AI**
@@ -15,22 +15,22 @@ Just tell the model what you want to do with it.
 It will lead to more questions you have to answer and you can ask questions about those questions.
 The AI can tell you if what you're asking for is possible or not and will find the clear path(s) to your goal.
 Can you understand code/mark-up?  If not, lean on the AI.
-### ⚠️This isn't magic, you still have to put effort into it.⚠️
+### ⚠️This isn't magic, you still have to put effort into it.
 You just don't need to know any specific programming languages.
-### ⚠️You DO have to be open to learning programming and systems archetecture, though.⚠️
+### ⚠️You DO have to be open to learning programming and systems archetecture, though.
 The AI can teach you there.  These wretched bundles of math are good for something healthy.
 ### **What Can You Do With This?**
 If you've ever:
-* ✅ **Asked AI to generate a program** and got something that _almost_ works
-* ✅ **Needed to translate code** between languages (Python → Rust, JavaScript → Go, etc.)
-* ✅ **Had working code in one language** and wanted it in another (just paste your code/snippets as input!)
-* ✅ **Knew exactly what implementation you wanted** but only knew how to write it in one language
-* ✅ **Wanted the same code in multiple languages** without copy-pasting and praying
-* ✅ **Crashed out debugging boilerplate** that should've been automated
-* ✅ **Needed verifiable, reproducible builds** (so you can prove your code does what it says)
-* ✅ **Wanted AI-generated code that doesn't randomly change** every time you regenerate it
-* ✅ **Needed to ship the same logic** as a web app, CLI tool, and WASM module
-* ✅ **Wanted receipts/proofs** that your build pipeline is legit
+*  **Asked AI to generate a program** and got something that _almost_ works
+*  **Needed to translate code** between languages (Python → Rust, JavaScript → Go, etc.)
+*  **Had working code in one language** and wanted it in another (just paste your code/snippets as input!)
+*  **Knew exactly what implementation you wanted** but only knew how to write it in one language
+*  **Wanted the same code in multiple languages** without copy-pasting and praying
+*  **Crashed out debugging boilerplate** that should've been automated
+*  **Needed verifiable, reproducible builds** (so you can prove your code does what it says)
+*  **Wanted AI-generated code that doesn't randomly change** every time you regenerate it
+*  **Needed to ship the same logic** as a web app, CLI tool, and WASM module
+*  **Wanted receipts/proofs** that your build pipeline is legit
 ...then STUNIR is for you.
 ### **What STUNIR Actually Does**
 Think of it as a **safety harness for AI code generation**:
