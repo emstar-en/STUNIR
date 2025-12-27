@@ -18,12 +18,17 @@ stunir_dispatch() {
 
     # PRIORITY 1: Compiled Native Binary
     if [[ -x "build/stunir_native" ]]; then
-        if [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
+        if [[ "$cmd" == "epoch" ]]; then
+             ./build/stunir_native epoch "$@"
+             return $?
+        elif [[ "$cmd" == "import_code" ]]; then
+             # Map arguments: --input-root X --out-spec Y -> import-code --input-root X --out-spec Y
+             # The flags match exactly, so we just pass "$@"
+             ./build/stunir_native import-code "$@"
+             return $?
+        elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
             ./build/stunir_native "$cmd" "$@"
             return $?
-        elif [[ "$cmd" == "epoch" ]]; then
-             stunir_shell_epoch "$@"
-             return $?
         fi
     fi
 
@@ -46,7 +51,7 @@ stunir_dispatch() {
                 esac
             done
             
-            echo "Importing Code from $input_root..."
+            echo "Importing Code from $input_root (Python Fallback)..."
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/import_spec.py --input-root "$input_root" --out-spec "$out_spec"
             else

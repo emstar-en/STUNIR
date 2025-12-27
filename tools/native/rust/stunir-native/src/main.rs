@@ -1,5 +1,7 @@
 use clap::{Parser, Subcommand};
 use serde::Serialize;
+use serde_json::Value;
+use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
@@ -21,8 +23,14 @@ enum Commands {
         #[arg(long)]
         print_epoch: bool,
     },
-    // Placeholders for future commands
-    ImportCode,
+    /// Import source code into a spec
+    ImportCode {
+        #[arg(long)]
+        input_root: PathBuf,
+        #[arg(long)]
+        out_spec: PathBuf,
+    },
+    // Placeholders
     SpecToIr,
     Receipt,
 }
@@ -38,7 +46,6 @@ fn main() -> anyhow::Result<()> {
 
     match cli.command {
         Commands::Epoch { out_json, print_epoch } => {
-            // Logic: Read SOURCE_DATE_EPOCH or default to 0
             let (epoch, source) = match std::env::var("SOURCE_DATE_EPOCH") {
                 Ok(val) => (val.parse::<u64>().unwrap_or(0), "env".to_string()),
                 Err(_) => (0, "default".to_string()),
@@ -53,13 +60,47 @@ fn main() -> anyhow::Result<()> {
                     selected_epoch: epoch,
                     source,
                 };
-                // Canonical JSON generation
-                let json_bytes = serde_json::to_vec_pretty(&output)?; // TODO: Make strict canonical later
+                // Canonical-ish JSON (Compact, Sorted Keys via Serde default)
+                let json_bytes = serde_json::to_vec(&output)?;
                 let mut file = File::create(path)?;
                 file.write_all(&json_bytes)?;
-                // Shell compatibility: Trailing newline
                 file.write_all(b"\n")?;
             }
+        }
+        Commands::ImportCode { input_root, out_spec } => {
+            let mut modules = Vec::new();
+            
+            // Deterministic walk (sorted by filename)
+            for entry in walkdir::WalkDir::new(&input_root).sort_by_file_name() {
+                let entry = entry?;
+                if entry.file_type().is_file() {
+                    let path = entry.path();
+                    // Normalize path separators to forward slash
+                    let rel_path = path.strip_prefix(&input_root)?.to_string_lossy().replace("\\", "/");
+                    
+                    // Hash content
+                    let mut file = File::open(path)?;
+                    let mut hasher = Sha256::new();
+                    std::io::copy(&mut file, &mut hasher)?;
+                    let hash = hex::encode(hasher.finalize());
+                    
+                    modules.push(serde_json::json!({
+                        "path": rel_path,
+                        "sha256": hash
+                    }));
+                }
+            }
+            
+            let spec = serde_json::json!({
+                "kind": "spec",
+                "modules": modules
+            });
+            
+            let mut file = File::create(out_spec)?;
+            // serde_json::to_vec produces compact JSON with sorted keys (BTreeMap default)
+            let json_bytes = serde_json::to_vec(&spec)?;
+            file.write_all(&json_bytes)?;
+            file.write_all(b"\n")?;
         }
         _ => {
             println!("Command not yet implemented in native binary.");
