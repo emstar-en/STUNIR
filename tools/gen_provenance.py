@@ -10,13 +10,14 @@ def main():
     ap.add_argument("--out-header")
     ap.add_argument("--out-json")
     args = ap.parse_args()
+    # normalize epoch to int (required by verify.sh)
+    try:
+        if getattr(args, 'epoch', None) is not None:
+            args.epoch = int(args.epoch)
+    except Exception:
+        pass
+    
 
-
-# normalize epoch to int (required by verify.sh)
-try:
-    args.epoch = int(args.epoch)
-except Exception:
-    pass
 
     if args.out_json:
         Path(args.out_json).parent.mkdir(parents=True, exist_ok=True)
