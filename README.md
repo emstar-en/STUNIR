@@ -11,7 +11,11 @@ You have two options:
 * Paste this into your chat: `https://github.com/emstar-en/STUNIR`
 * Most cloud AI models can read it directly
 ### **Step 3: Talk To Your AI**
-Just ask the model what you want to do with it.
+Just tell the model what you want to do with it.  It can tell you if it's possible or not.  Can you understand code/mark-up?  If not, lean on the AI.  
+*This isn't magic, you still have to put effort into it.
+You just don't need to know any specific programming languages.  
+*You do have to be open to learning program and systems archetecture, though.
+The AI can teach you there.  These wretched bundles of math are good for something healthy.
 ### **What Can You Do With This?**
 If you've ever:
 * ✅ **Asked AI to generate a program** and got something that _almost_ works
