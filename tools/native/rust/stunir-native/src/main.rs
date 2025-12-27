@@ -1,26 +1,12 @@
-mod errors;
-mod hash;
-mod ir_v1;
-mod jcs;
-mod path_policy;
-mod validate;
-mod verify_emit;
-mod verify_pack;
-mod spec_to_ir;
-mod gen_provenance;
-mod check_toolchain;
-mod emit;
-
 use clap::{Parser, Subcommand};
-use std::process;
-use crate::spec_to_ir::run as run_spec_to_ir;
-use crate::gen_provenance::run as run_gen_provenance;
-use crate::check_toolchain::run as run_check_toolchain;
-use crate::emit::run as run_emit;
+use serde::Serialize;
+use std::fs::File;
+use std::io::Write;
+use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(name = "stunir_native")]
-#[command(about = "STUNIR Native Core (Rust)", long_about = None)]
+#[command(name = "stunir-native")]
+#[command(about = "STUNIR Deterministic Core", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -28,30 +14,57 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    Validate { #[arg(long)] in_json: String },
-    Verify { #[arg(long)] receipt: String },
-    SpecToIr { #[arg(long)] in_json: String, #[arg(long)] out_ir: String },
-    GenProvenance { #[arg(long)] in_ir: String, #[arg(long)] epoch_json: String, #[arg(long)] out_prov: String },
-    CheckToolchain { #[arg(long)] lockfile: String },
-    Emit { 
-        #[arg(long)] in_ir: String, 
-        #[arg(long)] target: String, 
-        #[arg(long)] out_file: String 
+    /// Determine the build epoch
+    Epoch {
+        #[arg(long)]
+        out_json: Option<PathBuf>,
+        #[arg(long)]
+        print_epoch: bool,
     },
+    // Placeholders for future commands
+    ImportCode,
+    SpecToIr,
+    Receipt,
 }
 
-fn main() {
+#[derive(Serialize)]
+struct EpochOutput {
+    selected_epoch: u64,
+    source: String,
+}
+
+fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-    let result = match &cli.command {
-        Commands::Validate { in_json } => validate::run(in_json),
-        Commands::Verify { receipt } => verify_pack::run(receipt),
-        Commands::SpecToIr { in_json, out_ir } => run_spec_to_ir(in_json, out_ir),
-        Commands::GenProvenance { in_ir, epoch_json, out_prov } => run_gen_provenance(in_ir, epoch_json, out_prov),
-        Commands::CheckToolchain { lockfile } => run_check_toolchain(lockfile),
-        Commands::Emit { in_ir, target, out_file } => run_emit(in_ir, target, out_file),
-    };
-    if let Err(e) = result {
-        eprintln!("Error: {:?}", e);
-        process::exit(1);
+
+    match cli.command {
+        Commands::Epoch { out_json, print_epoch } => {
+            // Logic: Read SOURCE_DATE_EPOCH or default to 0
+            let (epoch, source) = match std::env::var("SOURCE_DATE_EPOCH") {
+                Ok(val) => (val.parse::<u64>().unwrap_or(0), "env".to_string()),
+                Err(_) => (0, "default".to_string()),
+            };
+
+            if print_epoch {
+                println!("{}", epoch);
+            }
+
+            if let Some(path) = out_json {
+                let output = EpochOutput {
+                    selected_epoch: epoch,
+                    source,
+                };
+                // Canonical JSON generation
+                let json_bytes = serde_json::to_vec_pretty(&output)?; // TODO: Make strict canonical later
+                let mut file = File::create(path)?;
+                file.write_all(&json_bytes)?;
+                // Shell compatibility: Trailing newline
+                file.write_all(b"\n")?;
+            }
+        }
+        _ => {
+            println!("Command not yet implemented in native binary.");
+        }
     }
+
+    Ok(())
 }
