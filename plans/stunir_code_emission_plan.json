@@ -1,0 +1,156 @@
+{
+  "plan_name": "STUNIR Code Emission Completion Strategy (Refined)",
+  "objective": "Solidify IR -> Code emission as a deterministic, hermetic, and verifiable stage.",
+  "current_status": {
+    "spec_to_ir": "Implemented (Python)",
+    "ir_to_code": "Missing / Placeholder",
+    "verification": "Implemented (Python + Shell)"
+  },
+  "determinism_contract": {
+    "encoding": "UTF-8",
+    "newlines": "LF",
+    "no_trailing_whitespace": true,
+    "no_timestamps": true,
+    "no_host_dependent_behavior": true,
+    "stable_ordering_required_in_ir": true
+  },
+  "inputs": {
+    "ir": {
+      "schema": "schemas/stunir_ir_v1.schema.json",
+      "file": "stunir_ir_bundle_v1.machine.json",
+      "requirements": [
+        "Validate against schema before emission.",
+        "Reject unknown IR fields (additionalProperties:false).",
+        "IR arrays that represent sets MUST already be in canonical order."
+      ]
+    },
+    "template_pack": {
+      "location": "templates/<lang>/",
+      "engine": "stunir_template_v1_minimal (no external deps)",
+      "required": [
+        "templates/<lang>/TEMPLATE_PACK.json",
+        "templates/<lang>/templates_manifest.tsv"
+      ],
+      "manifest_rules": {
+        "format": "SHA256_HEX<TAB>REL_PATH",
+        "sorted": true,
+        "lf_only": true,
+        "safe_relpaths_only": true,
+        "scope": "All files that influence emission output bytes",
+        "sorting": "lexicographically by REL_PATH (LC_ALL=C)"
+      },
+      "prohibitions": [
+        "No template includes/imports.",
+        "No arbitrary code execution.",
+        "No environment-variable reads used for rendering decisions."
+      ]
+    },
+    "emit_epoch": {
+      "description": "Explicit timestamp for file mtimes and receipt metadata. MUST NOT use current time.",
+      "source": "IR 'epoch' field OR explicit CLI arg."
+    }
+  },
+  "outputs": {
+    "root": "generated/<lang>/",
+    "path_policy": "safe_relpaths_only",
+    "receipt": {
+      "file": "generated/<lang>/stunir.emit.v1.json",
+      "binds": [
+        "ir_sha256",
+        "template_pack_sha256",
+        "emitter_id",
+        "emitter_version",
+        "render_options",
+        "emit_epoch",
+        "output_files (path + sha256)"
+      ]
+    }
+  },
+  "emitter_engine": {
+    "tool": "tools/ir_to_code.py",
+    "dependencies": "stdlib only",
+    "cli_contract": {
+      "required_flags": [
+        "--ir",
+        "--lang",
+        "--templates",
+        "--out",
+        "--emit-epoch"
+      ],
+      "optional_flags": [
+        "--clean",
+        "--emit-receipt"
+      ],
+      "exit_codes": {
+        "0": "success",
+        "2": "cli usage / unknown language",
+        "3": "template pack invalid",
+        "4": "ir validation failed",
+        "5": "write failure"
+      }
+    },
+    "render_rules": [
+      "All file bytes are UTF-8.",
+      "All newlines are LF.",
+      "No trailing whitespace.",
+      "All iteration order is defined by IR order (IR must already be canonical).",
+      "Emitters MUST NOT read current time; they must use the explicit emit_epoch input."
+    ],
+    "failure_semantics": {
+      "unknown_template_key": "hard_fail",
+      "missing_required_template": "hard_fail",
+      "unknown_ir_op": "hard_fail",
+      "unknown_ir_type_kind": "hard_fail"
+    }
+  },
+  "language_targets": [
+    {
+      "lang": "python",
+      "status": "first-class"
+    },
+    {
+      "lang": "rust",
+      "status": "planned"
+    },
+    {
+      "lang": "javascript",
+      "status": "planned"
+    }
+  ],
+  "verification_and_binding": {
+    "principle": "Emission must be checkable by digest binding, not by re-running the emitter.",
+    "recommended": [
+      "Record IR sha256 and template pack sha256 in stunir.emit.v1.json.",
+      "Record emit_epoch in stunir.emit.v1.json.",
+      "Record output file list (path + sha256) in stunir.emit.v1.json.",
+      "Optionally include stunir.emit.v1.json in higher-level receipts/attestations."
+    ]
+  },
+  "testing_and_validation": {
+    "strategy": "Golden File Testing",
+    "steps": [
+      "Create 'test_vectors/ir/sample_v1.json'.",
+      "Create 'test_vectors/golden/python/sample_v1.py'.",
+      "Run emitter on sample IR.",
+      "Compare output byte-for-byte with golden file."
+    ]
+  },
+  "profile_3_fallback": {
+    "strategy": "Integrity Verification Only",
+    "description": "Profile 3 (Shell-Only) CANNOT reliably perform semantic IR->Code emission. It is restricted to verifying the integrity of pre-generated artifacts.",
+    "actions": [
+      "Do NOT attempt to run 'ir_to_code.py' equivalents in shell.",
+      "Verify 'root_attestation.txt' against 'objects/sha256/'.",
+      "Ensure 'epoch' is present and matches the attestation."
+    ]
+  },
+  "next_steps": [
+    "Adopt the hardened schemas/stunir_ir_v1.schema.json as the IR contract.",
+    "Define TEMPLATE_PACK.json and templates_manifest.tsv format precisely.",
+    "Implement tools/ir_to_code.py with the CLI + render rules above.",
+    "Add a first working python template pack and a deterministic golden test."
+  ],
+  "known_spec_issues": [
+    "Resolved: docs/code_emission.md Section 3.2 sorting rule is REL_PATH (LC_ALL=C) to align with pack_manifest.tsv ordering in docs/root/stunir_pack_manifest_v1.md."
+  ]
+}
