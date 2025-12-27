@@ -10,6 +10,8 @@ You have two options:
 **Option B: Share the URL** (if your AI has internet access)
 * Paste this into your chat: `https://github.com/emstar-en/STUNIR`
 * Most cloud AI models can read it directly
+### **Step 3: Talk To Your AI**
+Just ask the model what you want to do with it.
 ### **What Can You Do With This?**
 If you've ever:
 * ✅ **Asked AI to generate a program** and got something that _almost_ works
