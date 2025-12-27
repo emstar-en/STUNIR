@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
-use crate::spec_to_ir::SpecModule; // Import from spec_to_ir or move definitions here. 
-// To avoid circular deps, let's redefine or move. 
-// For simplicity in this patch, I'll redefine the Metadata struct here or assume it's passed correctly.
-// Actually, let's keep it self-contained.
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SpecModule {
+    pub name: String,
+    pub code: String,
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IrInstruction {
@@ -19,7 +21,7 @@ pub struct IrFunction {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IrMetadata {
     pub kind: String,
-    pub modules: Vec<crate::spec_to_ir::SpecModule>,
+    pub modules: Vec<SpecModule>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

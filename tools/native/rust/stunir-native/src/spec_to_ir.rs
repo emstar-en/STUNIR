@@ -1,15 +1,9 @@
 use crate::errors::StunirError;
-use crate::ir_v1::{IrV1, IrMetadata, IrFunction, IrInstruction};
+use crate::ir_v1::{IrV1, IrMetadata, IrFunction, IrInstruction, SpecModule};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SpecModule {
-    pub name: String,
-    pub code: String,
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Spec {
@@ -23,8 +17,7 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
     let spec: Spec = serde_json::from_str(&content)
         .map_err(|e| StunirError::Json(format!("Invalid spec JSON: {}", e)))?;
 
-    // DEMO LOGIC: Inject a "main" function that prints "Hello from STUNIR"
-    // In a real implementation, this would parse spec.modules[].code
+    // DEMO LOGIC: Inject a "main" function
     let demo_func = IrFunction {
         name: "main".to_string(),
         body: vec![
