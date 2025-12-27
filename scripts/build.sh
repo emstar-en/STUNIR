@@ -34,6 +34,9 @@ echo ">>> [5/6] Compiling Provenance..."
 stunir_dispatch compile_provenance --in-prov build/provenance.json --out-bin build/provenance.bin
 
 echo ">>> [6/6] Generating Receipt..."
+if [ ! -f build/provenance.bin ] && [ -f build/provenance.json ]; then
+  cp build/provenance.json build/provenance.bin
+fi
 stunir_dispatch receipt --in-bin build/provenance.bin --out-receipt build/receipt.json
 
 echo ">>> Build Complete!"

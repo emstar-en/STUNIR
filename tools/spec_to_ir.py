@@ -11,7 +11,7 @@ def main():
 
     # Mock IR generation
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-    Path(args.out).write_text("IR_MANIFEST_MOCK", encoding="utf-8")
+    Path(args.out).write_text("{"functions":[],"ir_version":"v1","module_name":"Main","types":[]}", encoding="utf-8")
     print("Generated IR Summary")
 
 if __name__ == "__main__":
