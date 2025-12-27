@@ -1,0 +1,5 @@
+
+# STUNIR local build outputs
+build/
+tools/native/rust/stunir-native/target/
+*.tar.gz
