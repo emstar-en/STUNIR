@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::fs::File;
@@ -16,26 +16,41 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Determine the build epoch
     Epoch {
         #[arg(long)]
         out_json: Option<PathBuf>,
         #[arg(long)]
         print_epoch: bool,
     },
-    /// Import source code into a spec
     ImportCode {
         #[arg(long)]
         input_root: PathBuf,
         #[arg(long)]
         out_spec: PathBuf,
     },
-    /// Generate IR from Spec
     SpecToIr {
         #[arg(long)]
         spec_root: PathBuf,
         #[arg(long)]
         out: PathBuf,
+    },
+    /// Generate Provenance Metadata
+    GenProvenance {
+        #[arg(long)]
+        epoch: u64,
+        #[arg(long)]
+        epoch_source: String,
+        #[arg(long)]
+        out_json: PathBuf,
+        #[arg(long)]
+        out_header: PathBuf,
+    },
+    /// Compile Provenance into a Binary Artifact
+    CompileProvenance {
+        #[arg(long)]
+        prov_json: PathBuf,
+        #[arg(long)]
+        out_bin: PathBuf,
     },
     // Placeholders
     Receipt,
@@ -45,6 +60,12 @@ enum Commands {
 struct EpochOutput {
     selected_epoch: u64,
     source: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct ProvenanceData {
+    build_epoch: u64,
+    epoch_source: String,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -62,10 +83,7 @@ fn main() -> anyhow::Result<()> {
             }
 
             if let Some(path) = out_json {
-                let output = EpochOutput {
-                    selected_epoch: epoch,
-                    source,
-                };
+                let output = EpochOutput { selected_epoch: epoch, source };
                 let json_bytes = serde_json::to_vec(&output)?;
                 let mut file = File::create(path)?;
                 file.write_all(&json_bytes)?;
@@ -74,30 +92,19 @@ fn main() -> anyhow::Result<()> {
         }
         Commands::ImportCode { input_root, out_spec } => {
             let mut modules = Vec::new();
-            
             for entry in walkdir::WalkDir::new(&input_root).sort_by_file_name() {
                 let entry = entry?;
                 if entry.file_type().is_file() {
                     let path = entry.path();
                     let rel_path = path.strip_prefix(&input_root)?.to_string_lossy().replace("\\", "/");
-                    
                     let mut file = File::open(path)?;
                     let mut hasher = Sha256::new();
                     std::io::copy(&mut file, &mut hasher)?;
                     let hash = hex::encode(hasher.finalize());
-                    
-                    modules.push(serde_json::json!({
-                        "path": rel_path,
-                        "sha256": hash
-                    }));
+                    modules.push(serde_json::json!({ "path": rel_path, "sha256": hash }));
                 }
             }
-            
-            let spec = serde_json::json!({
-                "kind": "spec",
-                "modules": modules
-            });
-            
+            let spec = serde_json::json!({ "kind": "spec", "modules": modules });
             let mut file = File::create(out_spec)?;
             let json_bytes = serde_json::to_vec(&spec)?;
             file.write_all(&json_bytes)?;
@@ -113,31 +120,47 @@ fn main() -> anyhow::Result<()> {
             hasher.update(&content);
             let spec_hash = hex::encode(hasher.finalize());
 
-            // Validate JSON (optional but good)
-            let _spec_json: Value = serde_json::from_slice(&content)?;
-
-            // Construct IR with correct schema nesting
             let ir = serde_json::json!({
                 "ir_version": "v1",
                 "module_name": "stunir_bootstrap",
                 "docstring": "Bootstrap IR generated from source manifest.",
                 "types": [],
                 "functions": [],
-                "source": {
-                    "spec_sha256": spec_hash,
-                    "spec_logical_path": "spec.json"
-                },
-                "determinism": {
-                    "requires_utf8": true,
-                    "requires_lf_newlines": true,
-                    "requires_stable_ordering": true
-                }
+                "source": { "spec_sha256": spec_hash, "spec_logical_path": "spec.json" },
+                "determinism": { "requires_utf8": true, "requires_lf_newlines": true, "requires_stable_ordering": true }
             });
 
             let mut out_file = File::create(out)?;
             let json_bytes = serde_json::to_vec(&ir)?;
             out_file.write_all(&json_bytes)?;
             out_file.write_all(b"\n")?;
+        }
+        Commands::GenProvenance { epoch, epoch_source, out_json, out_header } => {
+            // 1. Write JSON
+            let prov = ProvenanceData { build_epoch: epoch, epoch_source };
+            let json_bytes = serde_json::to_vec(&prov)?;
+            let mut f_json = File::create(out_json)?;
+            f_json.write_all(&json_bytes)?;
+            f_json.write_all(b"\n")?;
+
+            // 2. Write C Header
+            let header_content = format!("#define STUNIR_EPOCH {}\n", epoch);
+            let mut f_header = File::create(out_header)?;
+            f_header.write_all(header_content.as_bytes())?;
+        }
+        Commands::CompileProvenance { prov_json, out_bin } => {
+            // Read Metadata
+            let f = File::open(prov_json)?;
+            let prov: ProvenanceData = serde_json::from_reader(f)?;
+
+            // Generate Deterministic Binary Artifact
+            // Format: [MAGIC: 8 bytes] [EPOCH: 8 bytes LE]
+            let magic = b"STUNIR\0\0"; // 8 bytes
+            let epoch_bytes = prov.build_epoch.to_le_bytes();
+
+            let mut f_bin = File::create(out_bin)?;
+            f_bin.write_all(magic)?;
+            f_bin.write_all(&epoch_bytes)?;
         }
         _ => {
             println!("Command not yet implemented in native binary.");

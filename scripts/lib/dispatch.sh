@@ -25,8 +25,15 @@ stunir_dispatch() {
              ./build/stunir_native import-code "$@"
              return $?
         elif [[ "$cmd" == "spec_to_ir" ]]; then
-             # Map arguments: --spec-root X --out Y -> spec-to-ir --spec-root X --out Y
              ./build/stunir_native spec-to-ir "$@"
+             return $?
+        elif [[ "$cmd" == "gen_provenance" ]]; then
+             # Map args: --epoch X --epoch-source Y --out-json Z --out-header W
+             ./build/stunir_native gen-provenance "$@"
+             return $?
+        elif [[ "$cmd" == "compile_provenance" ]]; then
+             # Map args: --prov-json X --out-bin Y
+             ./build/stunir_native compile-provenance "$@"
              return $?
         elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
             ./build/stunir_native "$cmd" "$@"
