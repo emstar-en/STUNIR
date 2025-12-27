@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Load Shell Libraries
-# We explicitly source json_canon.sh first to ensure helper is available
 if [[ -f "scripts/lib/json_canon.sh" ]]; then
     source scripts/lib/json_canon.sh
 fi
@@ -46,7 +45,6 @@ stunir_dispatch() {
             done
             echo "Importing Code from src (Shell Mode)..."
             if [[ -n "$out_spec" ]]; then
-                # Generate canonical empty spec
                 stunir_canon_echo '{"kind":"spec","modules":[]}' > "$out_spec"
             fi
             ;;
@@ -60,26 +58,33 @@ stunir_dispatch() {
             done
             echo "Generated IR Summary"
             if [[ -n "$out_ir" ]]; then
-                # Generate canonical empty IR
                 stunir_canon_echo '{}' > "$out_ir"
             fi
             ;;
         gen_provenance)
             local out_json=""
             local out_header=""
+            local epoch_val=0
+            local epoch_src="UNKNOWN"
+            
             while [[ $# -gt 0 ]]; do
                 case "$1" in
                     --out-json) out_json="$2"; shift 2 ;;
                     --out-header) out_header="$2"; shift 2 ;;
+                    --epoch) epoch_val="$2"; shift 2 ;;
+                    --epoch-source) epoch_src="$2"; shift 2 ;;
                     *) shift ;;
                 esac
             done
             echo "Generated Provenance"
             if [[ -n "$out_json" ]]; then
-                stunir_canon_echo '{}' > "$out_json"
+                # Construct JSON string manually to ensure structure, then canonicalize
+                # Note: epoch_val is int, epoch_src is string
+                local json_str="{\"build_epoch\": $epoch_val, \"epoch_source\": \"$epoch_src\"}"
+                stunir_canon_echo "$json_str" > "$out_json"
             fi
             if [[ -n "$out_header" ]]; then
-                touch "$out_header"
+                echo "#define STUNIR_EPOCH $epoch_val" > "$out_header"
             fi
             ;;
         compile_provenance)
