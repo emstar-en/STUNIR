@@ -37,8 +37,6 @@ stunir_dispatch() {
     fi
 
     # --- STRATEGY C: Shell Native (Profile 3) ---
-    # Map operations to shell functions
-
     case "$op" in
         epoch)
             if [[ -f "scripts/lib/epoch.sh" ]]; then
@@ -72,6 +70,13 @@ stunir_dispatch() {
             if [[ -f "scripts/lib/gen_provenance.sh" ]]; then
                 source "scripts/lib/gen_provenance.sh"
                 stunir_shell_gen_provenance "$@"
+                return $?
+            fi
+            ;;
+        compile_provenance)
+            if [[ -f "scripts/lib/compile_provenance.sh" ]]; then
+                source "scripts/lib/compile_provenance.sh"
+                stunir_shell_compile_provenance "$@"
                 return $?
             fi
             ;;

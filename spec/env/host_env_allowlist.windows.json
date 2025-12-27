@@ -1,31 +1,17 @@
 {
-  "schema": "stunir.env_allowlist.v1",
-  "id": "stunir.host_env.windows.v1",
-  "notes": "Host env vars permitted to be inherited by STUNIR spawned processes on Windows. Keep minimal & explicit; prefer passing step env via --step-env-json.",
-  "inherit": [
+  "comment": "Strict Runtime Allowlist for Windows. No PATH allowed.",
+  "inherit_env": [
+    "STUNIR_.*",
     "SystemRoot",
-    "WINDIR",
-    "ComSpec",
-    "TEMP",
-    "TMP",
-    "PATHEXT",
-    "PATH",
-    "HOME",
-    "USERPROFILE",
-    "LOCALAPPDATA",
-    "APPDATA",
-    "ProgramFiles",
-    "ProgramFiles(x86)",
-    "ProgramData",
-    "ProgramData",
-    "NUMBER_OF_PROCESSORS",
-    "PROCESSOR_ARCHITECTURE",
-    "SOURCE_DATE_EPOCH",
-    "STUNIR_STRICT",
-    "STUNIR_CBOR_FLOAT_POLICY",
-    "STUNIR_BUILD_EPOCH",
-    "STUNIR_ENGINE",
-    "STUNIR_POWERSHELL_EXE",
-    "STUNIR_BASH_EXE"
-  ]
+    "windir"
+  ],
+  "set_env": {
+    "LC_ALL": "C",
+    "LANG": "C"
+  },
+  "allow_env": {
+    "TEMP": "build/tmp",
+    "TMP": "build/tmp"
+  },
+  "deny_env": ["PATH"]
 }

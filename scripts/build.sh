@@ -21,41 +21,36 @@ umask 022
 # Policy
 export STUNIR_STRICT=${STUNIR_STRICT:-1}
 export STUNIR_BUILD_EPOCH="${STUNIR_BUILD_EPOCH:-}"
+# Default Targets (Fixes "no output" issue)
+export STUNIR_OUTPUT_TARGETS="${STUNIR_OUTPUT_TARGETS:-lisp}"
 
 # 3. Epoch Resolution
 EPOCH_JSON="build/epoch.json"
 mkdir -p build receipts bin asm
 
 if [[ -n "$STUNIR_BUILD_EPOCH" ]]; then
-    # Epoch provided by env, just generate the JSON wrapper
-    # We use the dispatch 'epoch' op with specific flags if needed, or just write it if we are in shell mode.
-    # For alignment, let's try to use the tool.
     stunir_dispatch epoch --out-json "$EPOCH_JSON" --set-epoch "$STUNIR_BUILD_EPOCH" >/dev/null
 else
-    # Generate/Derive Epoch
     stunir_dispatch epoch --out-json "$EPOCH_JSON" --print-epoch > build/.epoch_val
     STUNIR_BUILD_EPOCH="$(cat build/.epoch_val)"
     export STUNIR_BUILD_EPOCH
 fi
-
 echo "Build Epoch: $STUNIR_BUILD_EPOCH"
 
 # 4. Spec to IR
 echo "Generating IR..."
-stunir_dispatch spec_to_ir     --spec-root spec     --out asm/spec_ir.txt     --epoch-json "$EPOCH_JSON"
+stunir_dispatch spec_to_ir --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"
 
 # 5. IR Bundle & Manifest
-stunir_dispatch spec_to_ir_files     --spec-root spec     --out-root asm/ir     --epoch-json "$EPOCH_JSON"     --manifest-out receipts/ir_manifest.json     --bundle-out asm/ir_bundle.bin     --bundle-manifest-out receipts/ir_bundle_manifest.json
+stunir_dispatch spec_to_ir_files --spec-root spec --out-root asm/ir --epoch-json "$EPOCH_JSON" --manifest-out receipts/ir_manifest.json --bundle-out asm/ir_bundle.bin --bundle-manifest-out receipts/ir_bundle_manifest.json
 
 # 6. Provenance
-stunir_dispatch gen_provenance     --epoch "$STUNIR_BUILD_EPOCH"     --spec-root spec     --asm-root asm     --out-header build/provenance.h     --out-json build/provenance.json
+stunir_dispatch gen_provenance --epoch "$STUNIR_BUILD_EPOCH" --spec-root spec --asm-root asm --out-header build/provenance.h --out-json build/provenance.json
 
-# 7. Record Receipts (Example of binding the previous steps)
-# Note: In a pure shell mode, we might skip granular tool-hashing if the tools are shell functions.
-# The dispatcher handles the 'how', we just ask 'record this'.
-stunir_dispatch record_receipt     --target asm/spec_ir.txt     --receipt receipts/spec_ir.json     --status GENERATED_IR     --build-epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --inputs build/provenance.json     --input-dirs spec asm
+# 7. Compile Provenance Emitter (Refactored)
+stunir_dispatch compile_provenance     --epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --provenance-json build/provenance.json     --ir-manifest receipts/ir_manifest.json     --bundle-manifest receipts/ir_bundle_manifest.json
 
-# 8. Output Targets (Simplified Loop)
+# 8. Output Targets
 if [[ -n "${STUNIR_OUTPUT_TARGETS:-}" ]]; then
     IFS=',' read -ra TARGETS <<< "${STUNIR_OUTPUT_TARGETS}"
     for target in "${TARGETS[@]}"; do
@@ -63,11 +58,10 @@ if [[ -n "${STUNIR_OUTPUT_TARGETS:-}" ]]; then
         echo "Emitting target: $target"
 
         # Dispatch to specific codegen tools
-        # Convention: ir_to_<target>
-        stunir_dispatch "ir_to_${target}"             --variant portable             --ir-manifest receipts/ir_manifest.json             --out-root "asm/${target}/portable"
+        stunir_dispatch "ir_to_${target}" --variant portable --ir-manifest receipts/ir_manifest.json --out-root "asm/${target}/portable"
 
         # Record receipt for it
-        stunir_dispatch record_receipt             --target "asm/${target}/portable"             --receipt "receipts/${target}_portable.json"             --status "CODEGEN_EMITTED_${target^^}"             --build-epoch "$STUNIR_BUILD_EPOCH"             --epoch-json "$EPOCH_JSON"
+        stunir_dispatch record_receipt --target "asm/${target}/portable" --receipt "receipts/${target}_portable.json" --status "CODEGEN_EMITTED_${target^^}" --build-epoch "$STUNIR_BUILD_EPOCH" --epoch-json "$EPOCH_JSON"
     done
 fi
 
