@@ -17,13 +17,12 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
     let spec: Spec = serde_json::from_str(&content)
         .map_err(|e| StunirError::Json(format!("Invalid spec JSON: {}", e)))?;
 
-    // DEMO LOGIC: Inject a "main" function
     let demo_func = IrFunction {
         name: "main".to_string(),
         body: vec![
             IrInstruction {
                 op: "print".to_string(),
-                args: vec!["Hello from STUNIR Python Emitter!".to_string()],
+                args: vec!["Hello from STUNIR!".to_string()],
             }
         ],
     };
