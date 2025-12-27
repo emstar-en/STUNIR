@@ -6,6 +6,7 @@ source scripts/lib/hash_strict.sh
 stunir_shell_receipt() {
     local in_bin=""
     local out_receipt=""
+    local toolchain_lock=""
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -20,15 +21,30 @@ stunir_shell_receipt() {
 
     # USE STRICT HASHING
     local target_hash=$(stunir_compute_strict_hash "$in_bin")
+    
+    # Calculate Toolchain Hash if lockfile exists
+    local tc_entry=""
+    if [[ -n "${toolchain_lock:-}" && -f "$toolchain_lock" ]]; then
+        # Portable sha256sum
+        if command -v sha256sum >/dev/null 2>&1; then
+            tc_hash=$(sha256sum "$toolchain_lock" | awk '{print $1}')
+        else
+            tc_hash=$(shasum -a 256 "$toolchain_lock" | awk '{print $1}')
+        fi
+        tc_entry="  ,\"toolchain_sha256\": \"$tc_hash\""
+    fi
 
     # Create Receipt JSON
-    cat <<JSON > "$out_receipt"
-{
-  "kind": "receipt",
-  "generator": "shell_native",
-  "hashing": "strict_manifest_v1",
-  "target_hash": "$target_hash",
-  "status": "verified"
-}
-JSON
+    # We use manual echo to ensure we can inject the optional field easily
+    # and avoid heredoc indentation issues.
+    {
+        echo "{"
+        echo "  \"kind\": \"receipt\","
+        echo "  \"generator\": \"shell_native\","
+        echo "  \"hashing\": \"strict_manifest_v1\","
+        echo "  \"target_hash\": \"$target_hash\","
+        echo "  \"status\": \"verified\""
+        echo "$tc_entry"
+        echo "}"
+    } > "$out_receipt"
 }
