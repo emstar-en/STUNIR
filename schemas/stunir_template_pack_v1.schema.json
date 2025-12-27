@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:stunir:schema:template-pack:v1",
+  "title": "STUNIR Template Pack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "lang",
+    "engine",
+    "entrypoints",
+    "manifest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "stunir.template_pack.v1"
+    },
+    "lang": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,31}$"
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "entrypoints": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "module_template"
+      ],
+      "properties": {
+        "module_template": {
+          "type": "string",
+          "pattern": "^(?!/)(?!\\\\\\\\)(?!.*\\\\.\\\\.)(?!.*//)[A-Za-z0-9._/@+-][A-Za-z0-9._/@+\\-\\\\/]*$",
+          "description": "Primary template used to render the module/program."
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "templates_manifest_tsv"
+      ],
+      "properties": {
+        "templates_manifest_tsv": {
+          "type": "string",
+          "const": "templates_manifest.tsv"
+        },
+        "format": {
+          "type": "string",
+          "const": "<sha256hex><TAB><relpath>"
+        }
+      }
+    },
+    "output_policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "encoding": {
+          "type": "string",
+          "const": "utf-8"
+        },
+        "newlines": {
+          "type": "string",
+          "const": "LF"
+        },
+        "no_trailing_whitespace": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

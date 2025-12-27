@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:stunir:schema:ir:v1",
+  "title": "STUNIR Intermediate Reference (IR) v1",
+  "description": "Canonical representation of a program's structure and logic, ready for deterministic multi-language emission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ir_version",
+    "module_name",
+    "types",
+    "functions"
+  ],
+  "properties": {
+    "ir_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Version tag for this IR object model."
+    },
+    "module_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+      "description": "Logical name of the module/program."
+    },
+    "docstring": {
+      "type": "string",
+      "description": "High-level description of the module."
+    },
+    "types": {
+      "type": "array",
+      "description": "List of data models/structs defined in the program. Ordering is semantically significant and must already be canonical.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "fields"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "docstring": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "type"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Primitive type (string,int,float,bool) or a custom type name."
+                },
+                "optional": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "functions": {
+      "type": "array",
+      "description": "List of executable functions/endpoints. Ordering is semantically significant and must already be canonical.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "args",
+          "return_type"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "docstring": {
+            "type": "string"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "type"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "return_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "steps": {
+            "type": "array",
+            "description": "Simplified v1 operation list (mini-AST).",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op"
+              ],
+              "properties": {
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "return",
+                    "call",
+                    "assign",
+                    "error"
+                  ]
+                },
+                "target": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "object",
+                    "array",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
