@@ -4,10 +4,10 @@
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
 ### **Step 2: Give It To Your AI**
 You have two options:
-**Option A: Upload the ZIP**
+#### **Option A: Upload the ZIP**
 * Just drag and drop the ZIP file into your AI chat (ChatGPT, Claude, etc.)
 * Tell it: _"Use this STUNIR pack for my project"_
-**Option B: Share the URL** (if your AI has internet access)
+#### **Option B: Share the URL** (if your AI has internet access)
 * Paste this into your chat: `https://github.com/emstar-en/STUNIR`
 * Most cloud AI models can read it directly
 ### **Step 3: Talk To Your AI**
@@ -15,9 +15,9 @@ Just tell the model what you want to do with it.
 It will lead to more questions you have to answer and you can ask questions about those questions.
 The AI can tell you if what you're asking for is possible or not and will find the clear path(s) to your goal.
 Can you understand code/mark-up?  If not, lean on the AI.
-#This isn't magic, you still have to put effort into it.
-You just don't need to know any specific programming languages.  
-#You do have to be open to learning program and systems archetecture, though.
+#### This isn't magic, you still have to put effort into it.
+You just don't need to know any specific programming languages.
+#### You do have to be open to learning program and systems archetecture, though.
 The AI can teach you there.  These wretched bundles of math are good for something healthy.
 ### **What Can You Do With This?**
 If you've ever:
