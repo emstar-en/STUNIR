@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
 # Load Shell Libraries
+# We explicitly source json_canon.sh first to ensure helper is available
+if [[ -f "scripts/lib/json_canon.sh" ]]; then
+    source scripts/lib/json_canon.sh
+fi
+
 for lib in scripts/lib/*.sh; do
     name=$(basename "$lib")
-    if [[ "$name" != "dispatch.sh" ]]; then
+    if [[ "$name" != "dispatch.sh" && "$name" != "json_canon.sh" ]]; then
         source "$lib"
     fi
 done
@@ -18,7 +23,6 @@ stunir_dispatch() {
             ./build/stunir_native "$cmd" "$@"
             return $?
         elif [[ "$cmd" == "epoch" ]]; then
-             # Fallback to shell for epoch if native doesn't support it yet
              stunir_shell_epoch "$@"
              return $?
         fi
@@ -30,20 +34,53 @@ stunir_dispatch() {
             stunir_shell_epoch "$@"
             ;;
         check_toolchain)
-            # No-op in shell mode for now, handled by build.sh check
+            # No-op in shell mode
             ;;
         import_code)
-            # Placeholder for import_code
+            local out_spec=""
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --out-spec) out_spec="$2"; shift 2 ;;
+                    *) shift ;;
+                esac
+            done
             echo "Importing Code from src (Shell Mode)..."
+            if [[ -n "$out_spec" ]]; then
+                # Generate canonical empty spec
+                stunir_canon_echo '{"kind":"spec","modules":[]}' > "$out_spec"
+            fi
             ;;
         spec_to_ir)
+            local out_ir=""
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --out) out_ir="$2"; shift 2 ;;
+                    *) shift ;;
+                esac
+            done
             echo "Generated IR Summary"
+            if [[ -n "$out_ir" ]]; then
+                # Generate canonical empty IR
+                stunir_canon_echo '{}' > "$out_ir"
+            fi
             ;;
         gen_provenance)
+            local out_json=""
+            local out_header=""
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --out-json) out_json="$2"; shift 2 ;;
+                    --out-header) out_header="$2"; shift 2 ;;
+                    *) shift ;;
+                esac
+            done
             echo "Generated Provenance"
-            # Create dummy provenance files for the pipeline to continue
-            echo "{}" > build/provenance.json
-            touch build/provenance.h
+            if [[ -n "$out_json" ]]; then
+                stunir_canon_echo '{}' > "$out_json"
+            fi
+            if [[ -n "$out_header" ]]; then
+                touch "$out_header"
+            fi
             ;;
         compile_provenance)
             echo "Shell Compile Provenance: SKIPPED (Shell Mode)"

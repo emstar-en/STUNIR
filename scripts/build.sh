@@ -22,7 +22,7 @@ if [[ -d "src" ]]; then
     stunir_dispatch import_code --input-root src --out-spec build/spec.json
 else
     echo "No 'src' directory found, skipping."
-    echo '{ "kind": "spec", "modules": [] }' > build/spec.json
+    stunir_canon_echo '{"kind":"spec","modules":[]}' > build/spec.json
 fi
 
 echo ">>> [3/6] Generating IR..."
