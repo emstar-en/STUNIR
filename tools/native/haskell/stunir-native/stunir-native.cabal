@@ -1,24 +1,8 @@
-cabal-version:      2.4
-name:               stunir-native
-version:            0.1.0
-build-type:         Simple
-
+cabal-version: 2.4
+name: stunir-native
+version: 0.1.0
 executable stunir-native
-  hs-source-dirs:   app, src
-  main-is:          Main.hs
+  hs-source-dirs: app, src
+  main-is: Main.hs
   default-language: Haskell2010
-  ghc-options:      -Wall
-
-  build-depends:
-      base ^>=4.14 || ^>=4.15 || ^>=4.16 || ^>=4.17 || ^>=4.18
-    , aeson ^>=2.0 || ^>=2.1 || ^>=2.2
-    , base64-bytestring
-    , bytestring
-    , containers
-    , cryptonite
-    , directory
-    , filepath
-    , optparse-applicative
-    , scientific
-    , text
-    , vector
+  build-depends: base, aeson, bytestring, text, directory, filepath, optparse-applicative, cryptonite, memory

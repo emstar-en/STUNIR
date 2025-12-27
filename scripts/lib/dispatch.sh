@@ -1,42 +1,80 @@
 #!/usr/bin/env bash
-# scripts/lib/dispatch.sh
-# The core dispatcher for STUNIR's polyglot architecture.
-# It decides whether to call a Python tool or a Shell function.
 
-# Load all shell libraries if they exist
+# Load Shell Libraries
 for lib in scripts/lib/*.sh; do
-    if [[ "$lib" != "scripts/lib/dispatch.sh" && "$lib" != "scripts/lib/toolchain.sh" ]]; then
+    name=$(basename "$lib")
+    if [[ "$name" != "dispatch.sh" && "$name" != "toolchain.sh" ]]; then
         source "$lib"
     fi
 done
 
 stunir_dispatch() {
-    local command="$1"
+    local cmd="$1"
     shift
 
-    # 1. Try Python Tool first (Profile 1 & 2)
-    # We look for tools/{command}.py
-    local py_tool="tools/${command}.py"
+    # PRIORITY 1: Compiled Native Binary
+    if [[ -x "build/stunir_native" ]]; then
+        if [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
+            ./build/stunir_native "$cmd" "$@"
+            return $?
+        elif [[ "$cmd" == "spec_to_ir" ]]; then
+            # Adapter for spec-to-ir
+            local in_json=""
+            local out_ir=""
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --epoch-json|--in-json) in_json="$2"; shift 2 ;;
+                    --out|--out-ir) out_ir="$2"; shift 2 ;;
+                    *) shift ;;
+                esac
+            done
+            ./build/stunir_native spec-to-ir --in-json "$in_json" --out-ir "$out_ir"
+            return $?
+        elif [[ "$cmd" == "gen_provenance" ]]; then
+            # Adapter for gen-provenance
+            local in_ir=""
+            local out_prov=""
+            local epoch_json="build/epoch.json"
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --in-ir) in_ir="$2"; shift 2 ;;
+                    --out-prov|--out-json) out_prov="$2"; shift 2 ;;
+                    --epoch-json) epoch_json="$2"; shift 2 ;;
+                    *) shift ;;
+                esac
+            done
+            ./build/stunir_native gen-provenance --in-ir "$in_ir" --epoch-json "$epoch_json" --out-prov "$out_prov"
+            return $?
+        elif [[ "$cmd" == "check_toolchain" ]]; then
+            # Adapter for check-toolchain
+            local lockfile=""
+            while [[ $# -gt 0 ]]; do
+                case "$1" in
+                    --lockfile) lockfile="$2"; shift 2 ;;
+                    *) shift ;;
+                esac
+            done
+            ./build/stunir_native check-toolchain --lockfile "$lockfile"
+            return $?
+        fi
+    fi
 
-    if [[ -f "$py_tool" && -n "${STUNIR_TOOL_PYTHON:-}" ]]; then
-        # echo "Dispatching to Python: $py_tool $@" >&2
-        "$STUNIR_TOOL_PYTHON" "$py_tool" "$@"
+    # PRIORITY 2: Shell Function (Fallback)
+    if [[ "$cmd" == "import_code" || "$cmd" == "compile_provenance" || "$cmd" == "receipt" ]]; then
+        local sh_func="stunir_shell_${cmd}"
+        if type "$sh_func" &>/dev/null; then
+            "$sh_func" "$@"
+            return $?
+        fi
+    fi
+
+    # PRIORITY 3: Python Tool (Fallback)
+    local py_tool="tools/${cmd}.py"
+    if [[ -f "$py_tool" ]]; then
+        python3 "$py_tool" "$@"
         return $?
     fi
 
-    # 2. Try Shell Function fallback (Profile 3)
-    # We look for a function named stunir_shell_{command}
-    local sh_func="stunir_shell_${command}"
-
-    if type "$sh_func" &>/dev/null; then
-        # echo "Dispatching to Shell: $sh_func $@" >&2
-        "$sh_func" "$@"
-        return $?
-    fi
-
-    # 3. Failure
-    echo "ERROR: No handler found for command '$command'" >&2
-    echo "  Checked Python: $py_tool" >&2
-    echo "  Checked Shell:  $sh_func" >&2
+    echo "ERROR: No handler found for $cmd" >&2
     exit 127
 }
