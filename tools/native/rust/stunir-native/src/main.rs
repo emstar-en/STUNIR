@@ -3,7 +3,7 @@ use serde::Serialize;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -30,8 +30,14 @@ enum Commands {
         #[arg(long)]
         out_spec: PathBuf,
     },
+    /// Generate IR from Spec
+    SpecToIr {
+        #[arg(long)]
+        spec_root: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
     // Placeholders
-    SpecToIr,
     Receipt,
 }
 
@@ -60,7 +66,6 @@ fn main() -> anyhow::Result<()> {
                     selected_epoch: epoch,
                     source,
                 };
-                // Canonical-ish JSON (Compact, Sorted Keys via Serde default)
                 let json_bytes = serde_json::to_vec(&output)?;
                 let mut file = File::create(path)?;
                 file.write_all(&json_bytes)?;
@@ -70,15 +75,12 @@ fn main() -> anyhow::Result<()> {
         Commands::ImportCode { input_root, out_spec } => {
             let mut modules = Vec::new();
             
-            // Deterministic walk (sorted by filename)
             for entry in walkdir::WalkDir::new(&input_root).sort_by_file_name() {
                 let entry = entry?;
                 if entry.file_type().is_file() {
                     let path = entry.path();
-                    // Normalize path separators to forward slash
                     let rel_path = path.strip_prefix(&input_root)?.to_string_lossy().replace("\\", "/");
                     
-                    // Hash content
                     let mut file = File::open(path)?;
                     let mut hasher = Sha256::new();
                     std::io::copy(&mut file, &mut hasher)?;
@@ -97,10 +99,45 @@ fn main() -> anyhow::Result<()> {
             });
             
             let mut file = File::create(out_spec)?;
-            // serde_json::to_vec produces compact JSON with sorted keys (BTreeMap default)
             let json_bytes = serde_json::to_vec(&spec)?;
             file.write_all(&json_bytes)?;
             file.write_all(b"\n")?;
+        }
+        Commands::SpecToIr { spec_root, out } => {
+            let spec_path = spec_root.join("spec.json");
+            let mut file = File::open(&spec_path)?;
+            let mut content = Vec::new();
+            file.read_to_end(&mut content)?;
+            
+            let mut hasher = Sha256::new();
+            hasher.update(&content);
+            let spec_hash = hex::encode(hasher.finalize());
+
+            // Validate JSON (optional but good)
+            let _spec_json: Value = serde_json::from_slice(&content)?;
+
+            // Construct IR with correct schema nesting
+            let ir = serde_json::json!({
+                "ir_version": "v1",
+                "module_name": "stunir_bootstrap",
+                "docstring": "Bootstrap IR generated from source manifest.",
+                "types": [],
+                "functions": [],
+                "source": {
+                    "spec_sha256": spec_hash,
+                    "spec_logical_path": "spec.json"
+                },
+                "determinism": {
+                    "requires_utf8": true,
+                    "requires_lf_newlines": true,
+                    "requires_stable_ordering": true
+                }
+            });
+
+            let mut out_file = File::create(out)?;
+            let json_bytes = serde_json::to_vec(&ir)?;
+            out_file.write_all(&json_bytes)?;
+            out_file.write_all(b"\n")?;
         }
         _ => {
             println!("Command not yet implemented in native binary.");

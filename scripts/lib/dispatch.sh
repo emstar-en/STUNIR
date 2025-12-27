@@ -22,9 +22,11 @@ stunir_dispatch() {
              ./build/stunir_native epoch "$@"
              return $?
         elif [[ "$cmd" == "import_code" ]]; then
-             # Map arguments: --input-root X --out-spec Y -> import-code --input-root X --out-spec Y
-             # The flags match exactly, so we just pass "$@"
              ./build/stunir_native import-code "$@"
+             return $?
+        elif [[ "$cmd" == "spec_to_ir" ]]; then
+             # Map arguments: --spec-root X --out Y -> spec-to-ir --spec-root X --out Y
+             ./build/stunir_native spec-to-ir "$@"
              return $?
         elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
             ./build/stunir_native "$cmd" "$@"
@@ -69,7 +71,7 @@ stunir_dispatch() {
                     *) shift ;;
                 esac
             done
-            echo "Generating IR from $spec_root..."
+            echo "Generating IR from $spec_root (Python Fallback)..."
             
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/spec_to_ir.py --spec-root "$spec_root" --out "$out_ir"
