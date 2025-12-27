@@ -1,4 +1,4 @@
-# STUNIR
+# STUNIR - MADE BY AI FOR AI
 ## 🚀 Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
