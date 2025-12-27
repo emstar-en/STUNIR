@@ -11,7 +11,7 @@ You have two options:
 * Paste this into your chat: `https://github.com/emstar-en/STUNIR`
 * Most cloud AI models can read it directly
 ### **What Can You Do With This?**
-STUNIR is **harm reduction for "vibe-coders"**. If you've ever:
+If you've ever:
 * ✅ **Asked AI to generate a program** and got something that _almost_ works
 * ✅ **Needed to translate code** between languages (Python → Rust, JavaScript → Go, etc.)
 * ✅ **Had working code in one language** and wanted it in another (just paste your code/snippets as input!)
