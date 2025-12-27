@@ -28,11 +28,10 @@ stunir_dispatch() {
              ./build/stunir_native spec-to-ir "$@"
              return $?
         elif [[ "$cmd" == "gen_provenance" ]]; then
-             # Map args: --epoch X --epoch-source Y --out-json Z --out-header W
+             # Pass all args, including ignored ones
              ./build/stunir_native gen-provenance "$@"
              return $?
         elif [[ "$cmd" == "compile_provenance" ]]; then
-             # Map args: --prov-json X --out-bin Y
              ./build/stunir_native compile-provenance "$@"
              return $?
         elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
