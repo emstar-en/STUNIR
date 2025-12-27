@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 set -e
+# STUNIR: stage native binary into build/ if available
+STUNIR_NATIVE_SRC="tools/native/rust/stunir-native/target/release/stunir-native"
+if [[ -x "$STUNIR_NATIVE_SRC" ]]; then
+  mkdir -p build
+  cp "$STUNIR_NATIVE_SRC" build/stunir_native
+  chmod +x build/stunir_native
+  echo "Staged native: build/stunir_native"
+fi
+
 
 # Load Dispatcher
 source scripts/lib/dispatch.sh
