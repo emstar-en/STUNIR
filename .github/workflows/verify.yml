@@ -85,6 +85,51 @@ jobs:
           python3 -m py_compile tools/spec_to_ir.py
           python3 tools/spec_to_ir.py --spec-root build --out /tmp/ir.from.tool.json
 
+      - name: Receipt binding smoke (spec/ir/prov/toolchain)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/build.sh
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          def sha256_file(p: Path) -> str:
+              h = hashlib.sha256()
+              with p.open("rb") as f:
+                  for chunk in iter(lambda: f.read(1<<20), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
+          def load_json(p: Path):
+              return json.loads(p.read_text(encoding="utf-8"))
+
+          def all_string_values(x):
+              if isinstance(x, str):
+                  yield x
+              elif isinstance(x, dict):
+                  for k, v in x.items():
+                      yield from all_string_values(k)
+                      yield from all_string_values(v)
+              elif isinstance(x, list):
+                  for v in x:
+                      yield from all_string_values(v)
+
+          spec_h = sha256_file(Path("build/spec.json"))
+          ir_h   = sha256_file(Path("build/ir.json"))
+          prov_h = sha256_file(Path("build/provenance.json"))
+          tool_h = sha256_file(Path("build/local_toolchain.lock.json"))
+
+          ir = load_json(Path("build/ir.json"))
+          assert ir.get("spec_sha256") == spec_h
+
+          rcpt = load_json(Path("build/receipt.json"))
+          strings = set(all_string_values(rcpt))
+          for h in (spec_h, ir_h, prov_h, tool_h):
+              assert h in strings
+          print("OK: receipt binding smoke passed")
+          PY
+
       - name: Build + strict verify (after clean)
         shell: bash
         run: |
