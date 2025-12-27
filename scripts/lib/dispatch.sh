@@ -15,7 +15,7 @@ if [[ -n "${STUNIR_TOOL_PYTHON:-}" ]]; then
 fi
 
 # 2. Dispatch Function
-# Usage: stunir_dispatch <logical_operation> [args...]
+# Usage: stunir_dispatch <op> [args...]
 stunir_dispatch() {
     local op="$1"
     shift
@@ -80,6 +80,21 @@ stunir_dispatch() {
                 return $?
             fi
             ;;
+        # --- NEW: Code Generators ---
+        ir_to_lisp)
+            if [[ -f "scripts/lib/ir_to_lisp.sh" ]]; then
+                source "scripts/lib/ir_to_lisp.sh"
+                stunir_shell_ir_to_lisp "$@"
+                return $?
+            fi
+            ;;
+        ir_to_python)
+            if [[ -f "scripts/lib/ir_to_python.sh" ]]; then
+                source "scripts/lib/ir_to_python.sh"
+                stunir_shell_ir_to_python "$@"
+                return $?
+            fi
+            ;;
     esac
 
     # --- FAILURE ---
@@ -89,4 +104,5 @@ stunir_dispatch() {
     echo "  Shell Lib: scripts/lib/${op}.sh (Not Found)" >&2
     exit 99
 }
+
 export -f stunir_dispatch
