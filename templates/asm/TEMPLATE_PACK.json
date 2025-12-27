@@ -1,0 +1,7 @@
+{
+  "entry_template": "module.template",
+  "lang": "asm",
+  "notes": "Minimal raw-target template pack for STUNIR IR->Code. Deterministic text emission.",
+  "output_extension": ".s",
+  "template_pack_version": "v1"
+}

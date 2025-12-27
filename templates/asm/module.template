@@ -1,0 +1,16 @@
+/* STUNIR: asm emission (raw target) */
+/* module: {{ module_name }} */
+
+/* NOTE: This file is a deterministic placeholder.
+ * The instruction set / ABI are target-specific.
+ * The stubs below use a GAS-like style and a generic 'ret' as a marker.
+ */
+
+.text
+
+{% for fn in functions_render %}.globl {{ fn.name }}
+{{ fn.name }}:
+    /* TODO: implement {{ fn.name }} */
+    ret
+
+{% endfor %}
