@@ -32,3 +32,54 @@ jobs:
           set -euo pipefail
           ./scripts/build.sh
           ./scripts/verify.sh --local --strict
+
+  clean_smoke_then_verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Ensure exec bits (repo portability)
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x scripts/*.sh || true
+          chmod +x tools/*.sh || true
+          chmod +x tools/*.py || true
+
+      - name: Clean script smoke test (does not delete docs)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Create some fake generated artifacts to ensure clean.sh actually cleans
+          mkdir -p build _verify_build receipts tools/__pycache__
+          echo "junk" > build/junk.txt
+          echo "{}" > receipts/spec_ir.json
+          echo "{}" > receipts/prov_emit.json
+
+          # Run the cleaner
+          ./scripts/clean.sh
+
+          # Assert it removed generated artifacts
+          test ! -e build
+          test ! -e _verify_build
+          test ! -e tools/__pycache__ || true
+          test ! -e receipts/spec_ir.json
+          test ! -e receipts/prov_emit.json
+
+          # Assert it preserved tracked docs
+          test -f receipts/README.md
+          test -d asm || true
+
+      - name: Build + strict verify (after clean)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/build.sh
+          ./scripts/verify.sh --local --strict
