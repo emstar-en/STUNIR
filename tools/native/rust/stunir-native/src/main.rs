@@ -44,7 +44,7 @@ enum Commands {
         out_json: PathBuf,
         #[arg(long)]
         out_header: PathBuf,
-        // Ignored args for compatibility with dispatch.sh
+        // Ignored args for compatibility
         #[arg(long)]
         spec_root: Option<PathBuf>,
         #[arg(long)]
@@ -52,7 +52,7 @@ enum Commands {
     },
     CompileProvenance {
         #[arg(long)]
-        prov_json: PathBuf,
+        in_prov: PathBuf, // Renamed to match build.sh
         #[arg(long)]
         out_bin: PathBuf,
     },
@@ -130,7 +130,7 @@ fn main() -> anyhow::Result<()> {
                 "types": [],
                 "functions": [],
                 "source": { "spec_sha256": spec_hash.clone(), "spec_logical_path": "spec.json" },
-                "spec_sha256": spec_hash, // Top-level for backward compat
+                "spec_sha256": spec_hash,
                 "determinism": { "requires_utf8": true, "requires_lf_newlines": true, "requires_stable_ordering": true }
             });
 
@@ -150,8 +150,8 @@ fn main() -> anyhow::Result<()> {
             let mut f_header = File::create(out_header)?;
             f_header.write_all(header_content.as_bytes())?;
         }
-        Commands::CompileProvenance { prov_json, out_bin } => {
-            let f = File::open(prov_json)?;
+        Commands::CompileProvenance { in_prov, out_bin } => {
+            let f = File::open(in_prov)?;
             let prov: ProvenanceData = serde_json::from_reader(f)?;
             let magic = b"STUNIR\0\0";
             let epoch_bytes = prov.build_epoch.to_le_bytes();
