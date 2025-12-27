@@ -47,27 +47,30 @@ stunir_dispatch() {
             done
             
             echo "Importing Code from $input_root..."
-            
-            # Use the new Python tool if available
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/import_spec.py --input-root "$input_root" --out-spec "$out_spec"
             else
-                echo "ERROR: Python3 required for import_code (Shell fallback not implemented)"
+                echo "ERROR: Python3 required for import_code"
                 exit 1
             fi
             ;;
         spec_to_ir)
             local out_ir=""
+            local spec_root=""
             while [[ $# -gt 0 ]]; do
                 case "$1" in
                     --out) out_ir="$2"; shift 2 ;;
-                    --spec-root) shift 2 ;; # Ignored for now
+                    --spec-root) spec_root="$2"; shift 2 ;;
                     *) shift ;;
                 esac
             done
-            echo "Generated IR Summary"
-            if [[ -n "$out_ir" ]]; then
-                stunir_canon_echo '{}' > "$out_ir"
+            echo "Generating IR from $spec_root..."
+            
+            if command -v python3 >/dev/null 2>&1; then
+                python3 tools/spec_to_ir.py --spec-root "$spec_root" --out "$out_ir"
+            else
+                echo "ERROR: Python3 required for spec_to_ir"
+                exit 1
             fi
             ;;
         gen_provenance)
@@ -89,7 +92,6 @@ stunir_dispatch() {
             done
             echo "Generated Provenance"
             
-            # Use the Python tool for provenance (it handles the schema correctly)
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/gen_provenance.py \
                     --epoch "$epoch_val" \
@@ -97,7 +99,6 @@ stunir_dispatch() {
                     --out-json "$out_json" \
                     --out-header "$out_header"
             else
-                # Fallback (Risky, but keeps shell purity if needed)
                 local json_str="{\"build_epoch\": $epoch_val, \"epoch_source\": \"$epoch_src\"}"
                 stunir_canon_echo "$json_str" > "$out_json"
                 echo "#define STUNIR_EPOCH $epoch_val" > "$out_header"
