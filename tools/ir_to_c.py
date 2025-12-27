@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# STUNIR: minimal deterministic PHP codegen
+# STUNIR: minimal deterministic C codegen
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
@@ -19,14 +19,17 @@ def main() -> int:
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Generate Main Code
-    code = """<?php
-echo "STUNIR Generated PHP Artifact\n";
-echo "Hello from Deterministic PHP!\n";
-?>
-"""
-    _w(out_root / "index.php", code)
+    code = """#include <stdio.h>
 
-    _w(out_root / "README.md", "PHP output (minimal backend).\n")
+int main() {
+    printf("STUNIR Generated C Artifact\n");
+    printf("Hello from Deterministic C!\n");
+    return 0;
+}
+"""
+    _w(out_root / "main.c", code)
+
+    _w(out_root / "README.md", "C output (minimal backend).\n")
     return 0
 
 if __name__ == "__main__":

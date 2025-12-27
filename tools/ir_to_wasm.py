@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# STUNIR: minimal deterministic PHP codegen
+# STUNIR: minimal deterministic WASM codegen
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
@@ -19,14 +19,16 @@ def main() -> int:
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Generate Main Code
-    code = """<?php
-echo "STUNIR Generated PHP Artifact\n";
-echo "Hello from Deterministic PHP!\n";
-?>
+    code = """(module
+  (func $hello (import "imports" "hello"))
+  (func (export "run")
+    (call $hello)
+  )
+)
 """
-    _w(out_root / "index.php", code)
+    _w(out_root / "module.wat", code)
 
-    _w(out_root / "README.md", "PHP output (minimal backend).\n")
+    _w(out_root / "README.md", "WASM output (minimal backend).\n")
     return 0
 
 if __name__ == "__main__":

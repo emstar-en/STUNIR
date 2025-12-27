@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# STUNIR: minimal deterministic PHP codegen
+# STUNIR: minimal deterministic Go codegen
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
@@ -19,14 +19,17 @@ def main() -> int:
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Generate Main Code
-    code = """<?php
-echo "STUNIR Generated PHP Artifact\n";
-echo "Hello from Deterministic PHP!\n";
-?>
-"""
-    _w(out_root / "index.php", code)
+    code = """package main
+import "fmt"
 
-    _w(out_root / "README.md", "PHP output (minimal backend).\n")
+func main() {
+    fmt.Println("STUNIR Generated Go Artifact")
+    fmt.Println("Hello from Deterministic Go!")
+}
+"""
+    _w(out_root / "main.go", code)
+
+    _w(out_root / "README.md", "Go output (minimal backend).\n")
     return 0
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# STUNIR: minimal deterministic PHP codegen
+# STUNIR: minimal deterministic Erlang codegen
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
@@ -19,14 +19,16 @@ def main() -> int:
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Generate Main Code
-    code = """<?php
-echo "STUNIR Generated PHP Artifact\n";
-echo "Hello from Deterministic PHP!\n";
-?>
-"""
-    _w(out_root / "index.php", code)
+    code = """-module(main).
+-export([start/0]).
 
-    _w(out_root / "README.md", "PHP output (minimal backend).\n")
+start() ->
+    io:format("STUNIR Generated Erlang Artifact~n"),
+    io:format("Hello from Deterministic Erlang!~n").
+"""
+    _w(out_root / "main.erl", code)
+
+    _w(out_root / "README.md", "Erlang output (minimal backend).\n")
     return 0
 
 if __name__ == "__main__":

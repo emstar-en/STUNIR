@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# STUNIR: minimal deterministic PHP codegen
+# STUNIR: minimal deterministic C# codegen
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
@@ -19,14 +19,18 @@ def main() -> int:
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Generate Main Code
-    code = """<?php
-echo "STUNIR Generated PHP Artifact\n";
-echo "Hello from Deterministic PHP!\n";
-?>
-"""
-    _w(out_root / "index.php", code)
+    code = """using System;
 
-    _w(out_root / "README.md", "PHP output (minimal backend).\n")
+class Program {
+    static void Main() {
+        Console.WriteLine("STUNIR Generated C# Artifact");
+        Console.WriteLine("Hello from Deterministic C#!");
+    }
+}
+"""
+    _w(out_root / "Program.cs", code)
+
+    _w(out_root / "README.md", "C# output (minimal backend).\n")
     return 0
 
 if __name__ == "__main__":
