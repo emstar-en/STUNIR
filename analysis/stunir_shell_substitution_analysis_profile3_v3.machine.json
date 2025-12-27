@@ -1,0 +1,58 @@
+{
+  "analysis_id": "stunir.shell_substitution_analysis.profile3.v3",
+  "conclusions": {
+    "python_replacement": {
+      "reason": "Determinism + semantics require the canonical Python toolchain; shell can verify integrity but not reproduce meaning-preserving transformations.",
+      "status": "NOT_SAFE_FOR_FEATURE_PARITY"
+    },
+    "recommended_no_python_strategy": [
+      "Use Profile 2 (portable verifier binary) when possible.",
+      "Otherwise use Profile 3 minimal (root_attestation.txt + object store).",
+      "Optionally tighten Profile 3 with pack_manifest.tsv bound from root_attestation.txt."
+    ]
+  },
+  "profile3_strict": {
+    "invariants": {
+      "bootstrap": "root_attestation.txt (text v0)",
+      "ir_record": "exactly one ir record",
+      "manifest_binding": "artifact sha256:<hex> kind=manifest logical_path=pack_manifest.tsv",
+      "object_store": "objects/sha256/<hex>"
+    },
+    "normative_contract_file": "contracts/stunir_profile3_contract.json",
+    "scripts": {
+      "lib": "scripts/profile3_lib.sh",
+      "minimal": "scripts/verify_minimal.sh",
+      "strict": "scripts/verify_profile3.sh"
+    },
+    "security_notes": {
+      "integrity_vs_authenticity": "Profile 3 provides integrity only unless signatures/trust roots are configured.",
+      "path_safety": "Strict manifest path rules prevent traversal and option-injection via leading '-'."
+    }
+  },
+  "repo_update_bundle": {
+    "bundle_name": "stunir_profile3_repo_update_bundle_v3.zip",
+    "files": [
+      "analysis/stunir_shell_substitution_analysis_profile3_v3.machine.json",
+      "contracts/stunir_profile3_contract.json",
+      "contracts/profile3_shell_only_verifier_v1.json",
+      "scripts/verify_minimal.sh",
+      "scripts/profile3_lib.sh",
+      "scripts/verify_profile3.sh",
+      "docs/verification_profiles.md"
+    ],
+    "notes": {
+      "manual_cleanup_required": [
+        "If present in your repo root from earlier drafts, delete stunir_profile3_contract.json after applying this bundle."
+      ],
+      "no_root_loose_files": true
+    }
+  },
+  "scope": {
+    "goal": "Identify safe shell-only substitutions and define a normative Profile 3 (strict) verifier contract.",
+    "non_goals": [
+      "Re-implement Python semantic pipeline in shell",
+      "Generate IR from Spec without Python",
+      "Generate full stunir.receipt.build.v1 in shell"
+    ]
+  }
+}
