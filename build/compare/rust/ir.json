@@ -1,0 +1,17 @@
+{
+  "kind": "ir",
+  "generator": "stunir-native-rust",
+  "ir_version": "",
+  "module_name": "",
+  "functions": [],
+  "modules": [],
+  "metadata": {
+    "kind": "spec",
+    "modules": [
+      {
+        "code": "#include <stdio.h>\nint main() { printf(\"Hello STUNIR!\\n\"); return 0; }\n",
+        "name": "hello.c"
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "body": [
+        {
+          "op": "print",
+          "args": [
+            "Compiling from Rust!"
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            "x",
+            "10",
+            "32"
+          ]
+        },
+        {
+          "op": "print_var",
+          "args": [
+            "x"
+          ]
+        },
+        {
+          "op": "loop",
+          "args": [
+            "3"
+          ],
+          "body": [
+            {
+              "op": "print",
+              "args": [
+                "Echo..."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

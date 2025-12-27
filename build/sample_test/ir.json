@@ -1,0 +1,119 @@
+{
+  "kind": "ir",
+  "generator": "stunir-native-rust",
+  "ir_version": "",
+  "module_name": "",
+  "functions": [],
+  "modules": [],
+  "metadata": {
+    "constraints": {
+      "do_not_add_versions": true,
+      "exclude_from_plan": [
+        "build artifacts",
+        "changelogs"
+      ]
+    },
+    "core_principles": {
+      "accept_custom_dependencies_if_deterministic_and_attestable": true,
+      "capability_based_dependency_acceptance": true,
+      "no_hard_manifest_pinning": true,
+      "receipts_are_checkable": true
+    },
+    "created_utc": "2025-12-22T00:21:03Z",
+    "dependency_identification": {
+      "inputs_supported": [
+        "tool binary present on PATH or provided as file",
+        "attestation documents (SBOM/provenance/signature bundles) if provided by user"
+      ],
+      "method": [
+        "probe identity (e.g., --version/--help outputs)",
+        "probe determinism (repeat-run equivalence on fixed vectors)",
+        "probe capabilities via contract-specific tests",
+        "emit acceptance receipt with tool identity hash + evidence"
+      ]
+    },
+    "doc_type": "stunir_machine_plan",
+    "goals": {
+      "direct_to_env_binary": "Last milestone after raw Assembly emission is solid.",
+      "primary": "Deterministic, receipted spec ⇄ IR ⇄ outputs pipeline with user-provided dependencies."
+    },
+    "language_output_priority": {
+      "tier_a": [
+        {
+          "name": "WASM",
+          "rationale": "Portable binary format with strong standardization; enables early binary-like output without native ASM toolchains."
+        },
+        {
+          "name": "C (constrained subset)",
+          "rationale": "Extremely wide reach and stable industry practices; good text target for early backend contracts."
+        }
+      ],
+      "tier_b": [
+        {
+          "name": "Common Lisp (portable) + SBCL variant",
+          "rationale": "Useful hosted-runtime family with a concrete deterministic implementation (SBCL) already under contract; portable source target fits STUNIR’s receipt-first model."
+        },
+        {
+          "name": "OpenAPI/JSON Schema (as spec surfaces)",
+          "rationale": "Standardized; supports deterministic canonicalization and validation."
+        },
+        {
+          "name": "SQL",
+          "rationale": "Wide reach but dialect variance; use capability contracts per dialect."
+        },
+        {
+          "name": "Java/JVM",
+          "rationale": "Standard runtime; more plumbing if emitting bytecode."
+        },
+        {
+          "name": "JS/TS",
+          "rationale": "Wide reach; deterministic builds require careful tooling contracts."
+        },
+        {
+          "name": "Python",
+          "rationale": "Fast hosted runtime for reference emission + sample-input execution; helps bootstrap STUNIR semantics quickly."
+        },
+        {
+          "name": "SMT-LIB (SMT2)",
+          "rationale": "Logic/constraint target; solver-backed sample checks and equivalence testing help validate IR lowering."
+        }
+      ],
+      "tier_late": [
+        {
+          "name": "Raw Assembly",
+          "rationale": "Harder; requires ISA + ABI decisions; precedes direct-to-env native binaries."
+        },
+        {
+          "name": "Direct-to-env native binary",
+          "rationale": "Final milestone; requires external assembler/linker/disassembler (LLVM preferred)."
+        }
+      ]
+    },
+    "receipt_contract": {
+      "must_avoid": [
+        "timestamps other than controlled epoch inputs",
+        "non-deterministic environment leakage (locale, timezone, random seeds)"
+      ],
+      "must_record": [
+        "tool identity evidence (version text hash, executable hash where feasible)",
+        "platform triple (os, arch)",
+        "invocation args",
+        "input digest(s)",
+        "output digest(s)",
+        "determinism evidence (repeat-run digests)",
+        "capabilities passed"
+      ]
+    },
+    "tracking": {
+      "rule": "No version fields anywhere. Track by zip timestamp only.",
+      "source_zip_timestamp": "20251127"
+    },
+    "workplan_next": [
+      "Add contract format for dependency capabilities (JSON).",
+      "Add probe tool to evaluate user-provided dependencies and emit acceptance receipts.",
+      "Add verifier tool to recheck receipts and dependency acceptance evidence.",
+      "Add scaffolding for WASM and C backends (emit + normalize + parse/lift stubs).",
+      "After major changes, output backup zip using naming STUNIRpack_ALPHA_YYYYMMDD_HHMMSS.zip."
+    ]
+  }
+}

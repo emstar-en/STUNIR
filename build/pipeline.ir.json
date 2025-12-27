@@ -1,0 +1,1 @@
+{"functions":[{"name":"main","body":[{"op":"print","args":["Compiling from Rust!"],"body":[]},{"op":"add","args":["x","40","2"],"body":[]},{"op":"print_var","args":["x"],"body":[]},{"op":"loop","args":["3"],"body":[{"op":"print","args":["Echo..."],"body":[]},]}]}]}

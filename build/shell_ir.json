@@ -1,0 +1,55 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "body": [
+        {
+          "op": "print",
+          "args": [
+            "Hello World"
+          ],
+          "body": []
+        },
+        {
+          "op": "var_def",
+          "args": [
+            "a",
+            "10"
+          ],
+          "body": []
+        },
+        {
+          "op": "var_def",
+          "args": [
+            "b",
+            "20"
+          ],
+          "body": []
+        },
+        {
+          "op": "var_def",
+          "args": [
+            "c",
+            "a + b"
+          ],
+          "body": []
+        },
+        {
+          "op": "loop",
+          "args": [
+            "3"
+          ],
+          "body": [
+            {
+              "op": "print",
+              "args": [
+                "Looping..."
+              ],
+              "body": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

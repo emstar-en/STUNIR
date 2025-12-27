@@ -1,0 +1,10 @@
+{
+  "name": "test_spec",
+  "tasks": [
+    { "type": "say", "message": "Compiling from Rust!" },
+    { "type": "calc", "var": "x", "expr": "40 + 2" },
+    { "type": "repeat", "count": 3, "tasks": [
+      { "type": "say", "message": "Echo..." }
+    ]}
+  ]
+}

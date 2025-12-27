@@ -1,0 +1,12 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "body": [
+        { "op": "print", "args": ["Hello from STUNIR!"] },
+        { "op": "var_def", "args": ["x", "42"] },
+        { "op": "print_var", "args": ["x"] }
+      ]
+    }
+  ]
+}

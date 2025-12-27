@@ -1,0 +1,1 @@
+{"functions":[{"name":"main","body":[{"op":"print","args":["hello"],"body":[]},{"op":"add","args":["x","2","3"],"body":[]},{"op":"print_var","args":["x"],"body":[]},{"op":"loop","args":["2"],"body":[{"op":"print","args":["loop"],"body":[]},]}]}]}

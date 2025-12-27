@@ -1,0 +1,19 @@
+{
+  "tools": {
+    "git": {
+      "path": "/usr/local/bin/git",
+      "hash": "69918ff042e3d9e0297f86d5b802fcd441fc0f9a1423df50eb82d76ad414d51e",
+      "version_output": "git version 2.52.0"
+    },
+    "bash": {
+      "path": "/usr/bin/bash",
+      "hash": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1",
+      "version_output": "GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)\nCopyright (C) 2022 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\nThis is free software; you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."
+    },
+    "python3": {
+      "path": "/home/codespace/.python/current/bin/python3",
+      "hash": "8dcdcdbd12cc6c041bb583da8f209af216220a4e7954fb289778db58e233b487",
+      "version_output": "Python 3.12.1"
+    }
+  }
+}
