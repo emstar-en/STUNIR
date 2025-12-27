@@ -27,7 +27,7 @@ stunir_dispatch() {
         fi
     fi
 
-    # PRIORITY 2: Shell Implementation
+    # PRIORITY 2: Shell/Python Implementation
     case "$cmd" in
         epoch)
             stunir_shell_epoch "$@"
@@ -36,16 +36,24 @@ stunir_dispatch() {
             # No-op in shell mode
             ;;
         import_code)
+            local input_root=""
             local out_spec=""
             while [[ $# -gt 0 ]]; do
                 case "$1" in
+                    --input-root) input_root="$2"; shift 2 ;;
                     --out-spec) out_spec="$2"; shift 2 ;;
                     *) shift ;;
                 esac
             done
-            echo "Importing Code from src (Shell Mode)..."
-            if [[ -n "$out_spec" ]]; then
-                stunir_canon_echo '{"kind":"spec","modules":[]}' > "$out_spec"
+            
+            echo "Importing Code from $input_root..."
+            
+            # Use the new Python tool if available
+            if command -v python3 >/dev/null 2>&1; then
+                python3 tools/import_spec.py --input-root "$input_root" --out-spec "$out_spec"
+            else
+                echo "ERROR: Python3 required for import_code (Shell fallback not implemented)"
+                exit 1
             fi
             ;;
         spec_to_ir)
@@ -53,6 +61,7 @@ stunir_dispatch() {
             while [[ $# -gt 0 ]]; do
                 case "$1" in
                     --out) out_ir="$2"; shift 2 ;;
+                    --spec-root) shift 2 ;; # Ignored for now
                     *) shift ;;
                 esac
             done
@@ -73,17 +82,24 @@ stunir_dispatch() {
                     --out-header) out_header="$2"; shift 2 ;;
                     --epoch) epoch_val="$2"; shift 2 ;;
                     --epoch-source) epoch_src="$2"; shift 2 ;;
+                    --spec-root) shift 2 ;;
+                    --asm-root) shift 2 ;;
                     *) shift ;;
                 esac
             done
             echo "Generated Provenance"
-            if [[ -n "$out_json" ]]; then
-                # Construct JSON string manually to ensure structure, then canonicalize
-                # Note: epoch_val is int, epoch_src is string
+            
+            # Use the Python tool for provenance (it handles the schema correctly)
+            if command -v python3 >/dev/null 2>&1; then
+                python3 tools/gen_provenance.py \
+                    --epoch "$epoch_val" \
+                    --epoch-source "$epoch_src" \
+                    --out-json "$out_json" \
+                    --out-header "$out_header"
+            else
+                # Fallback (Risky, but keeps shell purity if needed)
                 local json_str="{\"build_epoch\": $epoch_val, \"epoch_source\": \"$epoch_src\"}"
                 stunir_canon_echo "$json_str" > "$out_json"
-            fi
-            if [[ -n "$out_header" ]]; then
                 echo "#define STUNIR_EPOCH $epoch_val" > "$out_header"
             fi
             ;;
