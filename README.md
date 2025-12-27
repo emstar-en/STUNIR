@@ -24,7 +24,7 @@ You have two options:
 
 ### **What Can You Do With This?**
 
-STUNIR is **harm reduction for vibe-coders**. If you've ever:
+STUNIR is **harm reduction for "vibe-coders"**. If you've ever:
 
 * ✅ **Asked AI to generate a program** and got something that _almost_ works
 
@@ -108,7 +108,7 @@ Think of it as a **safety harness for AI code generation**:
 
 ---
 
-**Below this point:** Technical deep-dive for people who want to understand how the sausage is made. If you just want to _use_ STUNIR, you're already done. Go forth and vibe-code responsibly.
+**Below this point:** Technical deep-dive for people who want to understand how the sausage is made. If you just want to _use_ STUNIR, you're already done. Go forth and "code" responsibly.
 
 ---
 
