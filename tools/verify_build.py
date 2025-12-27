@@ -604,6 +604,22 @@ def verify_build_receipt(
     # Tool identity (optional)
     if receipt.get("tool") is not None:
         verify_tool_identity(receipt["tool"], strict=strict)
+    # Toolchain identity (STUNIR-native)
+    tc_sha = receipt.get("toolchain_sha256")
+    if tc_sha is not None:
+        if not isinstance(tc_sha, str) or not HEX_RE.match(tc_sha.lower()):
+            die(f"{receipt_path}: toolchain_sha256 must be hex string")
+        
+        # Expect lockfile at build/local_toolchain.lock.json
+        lockfile = build_dir / "local_toolchain.lock.json"
+        if not lockfile.exists():
+             if strict:
+                 die(f"{receipt_path}: receipt claims toolchain {tc_sha[:8]}... but {lockfile} is missing")
+        else:
+            got_tc = sha256_file(lockfile)
+            if got_tc != tc_sha.lower():
+                die(f"{receipt_path}: toolchain mismatch! Receipt expects {tc_sha[:8]}..., disk has {got_tc[:8]}...")
+
 
     # Verify inputs closure (files + dirs)
     inputs = receipt.get("inputs")
