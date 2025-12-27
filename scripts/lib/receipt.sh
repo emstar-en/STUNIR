@@ -9,6 +9,7 @@ stunir_shell_receipt() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
+            --toolchain-lock) toolchain_lock="$2"; shift 2 ;;
             --in-bin) in_bin="$2"; shift 2 ;;
             --out-receipt) out_receipt="$2"; shift 2 ;;
             *) shift ;;

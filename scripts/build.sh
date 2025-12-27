@@ -10,7 +10,8 @@ echo ">>> [0/6] Checking Toolchain..."
 if [[ -f "build/local_toolchain.lock.json" ]]; then
     stunir_dispatch check_toolchain --lockfile build/local_toolchain.lock.json
 else
-    echo "WARNING: No toolchain lockfile found. Skipping check."
+    echo "Generating toolchain lockfile..."
+    ./tools/discover_toolchain.sh "build/local_toolchain.lock.json"
 fi
 
 echo ">>> [1/6] Determining Epoch..."
@@ -37,6 +38,6 @@ echo ">>> [6/6] Generating Receipt..."
 if [ ! -f build/provenance.bin ] && [ -f build/provenance.json ]; then
   cp build/provenance.json build/provenance.bin
 fi
-stunir_dispatch receipt --in-bin build/provenance.bin --out-receipt build/receipt.json
+stunir_dispatch receipt --toolchain-lock build/local_toolchain.lock.json --in-bin build/provenance.bin --out-receipt build/receipt.json
 
 echo ">>> Build Complete!"
