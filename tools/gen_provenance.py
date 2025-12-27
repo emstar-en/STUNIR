@@ -11,6 +11,13 @@ def main():
     ap.add_argument("--out-json")
     args = ap.parse_args()
 
+
+# normalize epoch to int (required by verify.sh)
+try:
+    args.epoch = int(args.epoch)
+except Exception:
+    pass
+
     if args.out_json:
         Path(args.out_json).parent.mkdir(parents=True, exist_ok=True)
         Path(args.out_json).write_text(json.dumps({"provenance": "mock"}), encoding="utf-8")
