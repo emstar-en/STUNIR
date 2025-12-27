@@ -5,6 +5,7 @@ set -euo pipefail
 if [[ -f "scripts/lib/toolchain.sh" ]]; then
     source "scripts/lib/toolchain.sh"
 fi
+
 if [[ -f "scripts/lib/dispatch.sh" ]]; then
     source "scripts/lib/dispatch.sh"
 else
@@ -21,6 +22,7 @@ umask 022
 # Policy
 export STUNIR_STRICT=${STUNIR_STRICT:-1}
 export STUNIR_BUILD_EPOCH="${STUNIR_BUILD_EPOCH:-}"
+
 # Default Targets (Fixes "no output" issue)
 export STUNIR_OUTPUT_TARGETS="${STUNIR_OUTPUT_TARGETS:-lisp}"
 
@@ -37,6 +39,13 @@ else
 fi
 echo "Build Epoch: $STUNIR_BUILD_EPOCH"
 
+# 3.5 Code Ingestion (New)
+# Scans inputs/ directory and wraps code into spec/imported/*.json
+if [[ -d "inputs" ]]; then
+    echo "Ingesting source code from inputs/..."
+    stunir_dispatch import_code --input-root inputs --out-root spec/imported
+fi
+
 # 4. Spec to IR
 echo "Generating IR..."
 stunir_dispatch spec_to_ir --spec-root spec --out asm/spec_ir.txt --epoch-json "$EPOCH_JSON"
@@ -48,7 +57,7 @@ stunir_dispatch spec_to_ir_files --spec-root spec --out-root asm/ir --epoch-json
 stunir_dispatch gen_provenance --epoch "$STUNIR_BUILD_EPOCH" --spec-root spec --asm-root asm --out-header build/provenance.h --out-json build/provenance.json
 
 # 7. Compile Provenance Emitter (Refactored)
-stunir_dispatch compile_provenance     --epoch "$STUNIR_BUILD_EPOCH"     --epoch-json "$EPOCH_JSON"     --provenance-json build/provenance.json     --ir-manifest receipts/ir_manifest.json     --bundle-manifest receipts/ir_bundle_manifest.json
+stunir_dispatch compile_provenance --epoch "$STUNIR_BUILD_EPOCH" --epoch-json "$EPOCH_JSON" --provenance-json build/provenance.json --ir-manifest receipts/ir_manifest.json --bundle-manifest receipts/ir_bundle_manifest.json
 
 # 8. Output Targets
 if [[ -n "${STUNIR_OUTPUT_TARGETS:-}" ]]; then
