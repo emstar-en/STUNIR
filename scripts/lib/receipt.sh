@@ -1,11 +1,44 @@
 #!/usr/bin/env bash
 
-# Renamed to match dispatch.sh expectation
 stunir_shell_receipt() {
-    local target="$1"
-    local out_file="$2"
-    local toolchain_lock="$3"
-    local epoch="${4:-0}"
+    local target=""
+    local out_file=""
+    local toolchain_lock=""
+    local epoch="0"
+
+    # Parse Arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --target)
+                target="$2"
+                shift 2
+                ;;
+            --out)
+                out_file="$2"
+                shift 2
+                ;;
+            --toolchain-lock)
+                toolchain_lock="$2"
+                shift 2
+                ;;
+            --epoch)
+                epoch="$2"
+                shift 2
+                ;;
+            *)
+                # Handle legacy positional arguments if any
+                if [[ -z "$target" && "$1" != --* ]]; then target="$1"; shift; continue; fi
+                if [[ -z "$out_file" && "$1" != --* ]]; then out_file="$1"; shift; continue; fi
+                if [[ -z "$toolchain_lock" && "$1" != --* ]]; then toolchain_lock="$1"; shift; continue; fi
+                shift
+                ;;
+        esac
+    done
+
+    # Validation
+    if [[ -z "$target" ]]; then echo "ERROR: Missing --target"; exit 1; fi
+    if [[ -z "$out_file" ]]; then echo "ERROR: Missing --out"; exit 1; fi
+    if [[ -z "$toolchain_lock" ]]; then echo "ERROR: Missing --toolchain-lock"; exit 1; fi
 
     # Ensure target exists
     if [[ ! -f "$target" ]]; then
