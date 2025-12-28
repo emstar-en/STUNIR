@@ -9,24 +9,11 @@ stunir_shell_receipt() {
     # Parse Arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --target)
-                target="$2"
-                shift 2
-                ;;
-            --out)
-                out_file="$2"
-                shift 2
-                ;;
-            --toolchain-lock)
-                toolchain_lock="$2"
-                shift 2
-                ;;
-            --epoch)
-                epoch="$2"
-                shift 2
-                ;;
+            --target) target="$2"; shift 2 ;;
+            --out) out_file="$2"; shift 2 ;;
+            --toolchain-lock) toolchain_lock="$2"; shift 2 ;;
+            --epoch) epoch="$2"; shift 2 ;;
             *)
-                # Handle legacy positional arguments if any
                 if [[ -z "$target" && "$1" != --* ]]; then target="$1"; shift; continue; fi
                 if [[ -z "$out_file" && "$1" != --* ]]; then out_file="$1"; shift; continue; fi
                 if [[ -z "$toolchain_lock" && "$1" != --* ]]; then toolchain_lock="$1"; shift; continue; fi
@@ -40,36 +27,23 @@ stunir_shell_receipt() {
     if [[ -z "$out_file" ]]; then echo "ERROR: Missing --out"; exit 1; fi
     if [[ -z "$toolchain_lock" ]]; then echo "ERROR: Missing --toolchain-lock"; exit 1; fi
 
-    # Ensure target exists
-    if [[ ! -f "$target" ]]; then
-        echo "ERROR: Target file not found for receipt: $target"
-        exit 1
-    fi
+    if [[ ! -f "$target" ]]; then echo "ERROR: Target file not found: $target"; exit 1; fi
+    if [[ ! -f "$toolchain_lock" ]]; then echo "ERROR: Toolchain lock not found: $toolchain_lock"; exit 1; fi
 
-    # Ensure toolchain lock exists
-    if [[ ! -f "$toolchain_lock" ]]; then
-        echo "ERROR: Toolchain lock not found: $toolchain_lock"
-        exit 1
-    fi
-
-    # NATIVE PATH: Use Rust binary if available
+    # NATIVE PATH (Opt-in)
     if [[ -x "build/stunir_native" ]] && [[ "${STUNIR_USE_NATIVE_RECEIPT:-0}" == "1" ]]; then
-        ./build/stunir_native gen-receipt \
-            --target "$target" \
-            --toolchain "$toolchain_lock" \
-            --epoch "$epoch" \
-            --out "$out_file"
+        ./build/stunir_native gen-receipt --target "$target" --toolchain "$toolchain_lock" --epoch "$epoch" --out "$out_file"
         return
     fi
 
-    # FALLBACK: Shell Implementation (jq + openssl)
+    # FALLBACK: Shell Implementation
     local target_hash
     target_hash=$(sha256sum "$target" | awk '{print $1}')
     
     local toolchain_hash
     toolchain_hash=$(sha256sum "$toolchain_lock" | awk '{print $1}')
 
-    # Construct JSON
+    # Construct JSON (without ID)
     local json_content
     json_content=$(jq -n \
         --arg schema "stunir.receipt.build.v1" \
@@ -91,9 +65,12 @@ stunir_shell_receipt() {
             tool: null
         }')
 
-    # Calculate ID on canonical core JSON (stunir-json-c14n-v1)
+    # Calculate ID on canonical core JSON
     local core_c14n
     core_c14n=$(echo "$json_content" | jq -cS .)
+
+    # DEBUG: Dump the string being hashed
+    echo "$core_c14n" > "${out_file}.debug_c14n"
 
     local core_id
     core_id=$(printf '%s' "$core_c14n" | sha256sum | awk '{print $1}')
