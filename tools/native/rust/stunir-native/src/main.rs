@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::PathBuf;
@@ -44,7 +45,6 @@ enum Commands {
         out_json: PathBuf,
         #[arg(long)]
         out_header: PathBuf,
-        // Ignored args for compatibility
         #[arg(long)]
         spec_root: Option<PathBuf>,
         #[arg(long)]
@@ -52,9 +52,19 @@ enum Commands {
     },
     CompileProvenance {
         #[arg(long)]
-        in_prov: PathBuf, // Renamed to match build.sh
+        in_prov: PathBuf,
         #[arg(long)]
         out_bin: PathBuf,
+    },
+    GenReceipt {
+        #[arg(long)]
+        target: PathBuf,
+        #[arg(long)]
+        toolchain: PathBuf,
+        #[arg(long)]
+        epoch: u64,
+        #[arg(long)]
+        out: PathBuf,
     },
     Receipt,
 }
@@ -158,6 +168,57 @@ fn main() -> anyhow::Result<()> {
             let mut f_bin = File::create(out_bin)?;
             f_bin.write_all(magic)?;
             f_bin.write_all(&epoch_bytes)?;
+        }
+        Commands::GenReceipt { target, toolchain, epoch, out } => {
+            // 1. Hash Target
+            let mut file = File::open(&target)?;
+            let mut hasher = Sha256::new();
+            std::io::copy(&mut file, &mut hasher)?;
+            let target_hash = hex::encode(hasher.finalize());
+
+            // 2. Hash Toolchain
+            let mut file = File::open(&toolchain)?;
+            let mut hasher = Sha256::new();
+            std::io::copy(&mut file, &mut hasher)?;
+            let toolchain_hash = hex::encode(hasher.finalize());
+
+            // 3. Construct Receipt (as BTreeMap for sorted keys)
+            let mut receipt_map = BTreeMap::new();
+            receipt_map.insert("schema".to_string(), json!("stunir.receipt.build.v1"));
+            receipt_map.insert("status".to_string(), json!("success"));
+            receipt_map.insert("build_epoch".to_string(), json!(epoch));
+            receipt_map.insert("epoch".to_string(), json!({
+                "selected_epoch": epoch,
+                "source": "default"
+            }));
+            receipt_map.insert("target".to_string(), json!(target.to_string_lossy()));
+            receipt_map.insert("sha256".to_string(), json!(target_hash));
+            receipt_map.insert("toolchain_sha256".to_string(), json!(toolchain_hash));
+            receipt_map.insert("argv".to_string(), json!(["native_generated"]));
+            receipt_map.insert("inputs".to_string(), json!([]));
+            receipt_map.insert("tool".to_string(), Value::Null);
+
+            // 4. Calculate Core ID (Hash of Pretty + Sorted JSON)
+            // We use to_vec_pretty to match jq's default output
+            let receipt_bytes = serde_json::to_vec_pretty(&receipt_map)?;
+            let mut hasher = Sha256::new();
+            hasher.update(&receipt_bytes);
+            // Note: jq usually adds a newline at the end of output. serde_json does not.
+            // If verifier uses `jq ... | sha256sum`, jq adds a newline.
+            // We might need to hash `receipt_bytes + b"\n"`.
+            // Let's try WITHOUT newline first, as `jq` inside a pipe might behave differently depending on version.
+            // Actually, `echo "$json" | sha256sum` adds a newline.
+            // So we should probably add a newline to the bytes before hashing to match shell `echo`.
+            hasher.update(b"\n"); 
+            let core_id = hex::encode(hasher.finalize());
+            
+            // 5. Add ID and Write
+            receipt_map.insert("receipt_core_id_sha256".to_string(), json!(core_id));
+            
+            let final_json = serde_json::to_vec_pretty(&receipt_map)?;
+            let mut out_file = File::create(out)?;
+            out_file.write_all(&final_json)?;
+            out_file.write_all(b"\n")?;
         }
         _ => {
             println!("Command not yet implemented.");
