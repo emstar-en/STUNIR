@@ -65,12 +65,9 @@ stunir_shell_receipt() {
             tool: null
         }')
 
-    # Calculate ID on canonical core JSON
+    # Calculate ID on canonical core JSON (stunir-json-c14n-v1)
     local core_c14n
     core_c14n=$(echo "$json_content" | jq -cS .)
-
-    # DEBUG: Dump the string being hashed
-    echo "$core_c14n" > "${out_file}.debug_c14n"
 
     local core_id
     core_id=$(printf '%s' "$core_c14n" | sha256sum | awk '{print $1}')
