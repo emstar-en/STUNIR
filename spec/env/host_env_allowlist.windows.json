@@ -1,17 +1,24 @@
 {
-  "comment": "Strict Runtime Allowlist for Windows. No PATH allowed.",
-  "inherit_env": [
-    "STUNIR_.*",
-    "SystemRoot",
-    "windir"
-  ],
-  "set_env": {
-    "LC_ALL": "C",
-    "LANG": "C"
+  "comment": "STRICT RUNTIME PROFILE - No implicit PATH access. All tools must be injected via STUNIR_TOOL_* vars.",
+  "env_vars": {
+    "allow": [
+      "STUNIR_.*",
+      "SYSTEMROOT",
+      "WINDIR",
+      "TEMP",
+      "TMP"
+    ],
+    "deny": [
+      "PATH",
+      "APPDATA",
+      "USERPROFILE"
+    ]
   },
-  "allow_env": {
-    "TEMP": "build/tmp",
-    "TMP": "build/tmp"
-  },
-  "deny_env": ["PATH"]
+  "filesystem": {
+    "read_only": true,
+    "allow_writes": [
+      "build/",
+      "logs/"
+    ]
+  }
 }

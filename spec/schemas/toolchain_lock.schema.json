@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "STUNIR Toolchain Lockfile",
+  "type": "object",
+  "required": [
+    "version",
+    "platform",
+    "tools"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "windows",
+        "linux",
+        "macos"
+      ]
+    },
+    "tools": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_]+$": {
+          "type": "object",
+          "required": [
+            "path",
+            "hash"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Absolute path to executable"
+            },
+            "hash": {
+              "type": "string",
+              "description": "SHA-256 of the executable file"
+            },
+            "version_output": {
+              "type": "string",
+              "description": "Captured output of --version"
+            }
+          }
+        }
+      }
+    }
+  }
+}
