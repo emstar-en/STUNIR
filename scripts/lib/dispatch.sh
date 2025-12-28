@@ -28,7 +28,6 @@ stunir_dispatch() {
              ./build/stunir_native spec-to-ir "$@"
              return $?
         elif [[ "$cmd" == "gen_provenance" ]]; then
-             # Pass all args, including ignored ones
              ./build/stunir_native gen-provenance "$@"
              return $?
         elif [[ "$cmd" == "compile_provenance" ]]; then
@@ -37,9 +36,8 @@ stunir_dispatch() {
         elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
             ./build/stunir_native "$cmd" "$@"
             return $?
-        # NOTE: 'receipt' command removed from native dispatch to ensure
-        # we use the strictly compliant shell implementation for now.
         fi
+        # NOTE: 'receipt' explicitly removed from native block
     fi
 
     # PRIORITY 2: Shell/Python Implementation
@@ -48,7 +46,6 @@ stunir_dispatch() {
             stunir_shell_epoch "$@"
             ;;
         check_toolchain)
-            # No-op in shell mode
             ;;
         import_code)
             local input_root=""
@@ -60,12 +57,9 @@ stunir_dispatch() {
                     *) shift ;;
                 esac
             done
-
-            echo "Importing Code from $input_root (Python Fallback)..."
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/import_spec.py --input-root "$input_root" --out-spec "$out_spec"
             else
-                echo "ERROR: Python3 required for import_code"
                 exit 1
             fi
             ;;
@@ -79,12 +73,9 @@ stunir_dispatch() {
                     *) shift ;;
                 esac
             done
-            echo "Generating IR from $spec_root (Python Fallback)..."
-
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/spec_to_ir.py --spec-root "$spec_root" --out "$out_ir"
             else
-                echo "ERROR: Python3 required for spec_to_ir"
                 exit 1
             fi
             ;;
@@ -93,7 +84,6 @@ stunir_dispatch() {
             local out_header=""
             local epoch_val=0
             local epoch_src="UNKNOWN"
-
             while [[ $# -gt 0 ]]; do
                 case "$1" in
                     --out-json) out_json="$2"; shift 2 ;;
@@ -105,10 +95,8 @@ stunir_dispatch() {
                     *) shift ;;
                 esac
             done
-            echo "Generated Provenance"
-
             if command -v python3 >/dev/null 2>&1; then
-                python3 tools/gen_provenance.py                     --epoch "$epoch_val"                     --epoch-source "$epoch_src"                     --out-json "$out_json"                     --out-header "$out_header"
+                python3 tools/gen_provenance.py --epoch "$epoch_val" --epoch-source "$epoch_src" --out-json "$out_json" --out-header "$out_header"
             else
                 local json_str="{"build_epoch": $epoch_val, "epoch_source": "$epoch_src"}"
                 stunir_canon_echo "$json_str" > "$out_json"
