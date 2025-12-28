@@ -97,4 +97,9 @@ stunir_shell_receipt() {
 
     # Add ID and Write
     echo "$json_content" | jq --arg id "$core_id" '.receipt_core_id_sha256 = $id' > "$out_file"
+
+    # Canonicalize receipt JSON (stunir-json-c14n-v1)
+    if command -v jq >/dev/null 2>&1; then
+        jq -cS . "$out_file" > "${out_file}.tmp" && mv "${out_file}.tmp" "$out_file"
+    fi
 }
