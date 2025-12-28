@@ -198,14 +198,11 @@ fn main() -> anyhow::Result<()> {
             receipt_map.insert("inputs".to_string(), json!([]));
             receipt_map.insert("tool".to_string(), Value::Null);
 
-            // 4. Calculate Core ID (Hash of COMPACT + Sorted JSON)
-            // Use to_vec (compact) instead of to_vec_pretty
+            // 4. Calculate Core ID (Hash of COMPACT + Sorted JSON + Newline)
             let receipt_bytes = serde_json::to_vec(&receipt_map)?;
             let mut hasher = Sha256::new();
             hasher.update(&receipt_bytes);
-            // No newline for compact hash usually, but let's check if verifier expects one.
-            // Standard canonicalization usually implies NO trailing newline in the hash input.
-            // hasher.update(b"\n"); // Removed
+            hasher.update(b"\n"); // Add newline to match jq output
             let core_id = hex::encode(hasher.finalize());
             
             // 5. Add ID and Write
