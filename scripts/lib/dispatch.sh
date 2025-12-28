@@ -37,6 +37,9 @@ stunir_dispatch() {
         elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
             ./build/stunir_native "$cmd" "$@"
             return $?
+        elif [[ "$cmd" == "receipt" ]]; then
+            ./build/stunir_native gen-receipt "$@"
+            return $?
         fi
     fi
 
@@ -58,7 +61,7 @@ stunir_dispatch() {
                     *) shift ;;
                 esac
             done
-            
+
             echo "Importing Code from $input_root (Python Fallback)..."
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/import_spec.py --input-root "$input_root" --out-spec "$out_spec"
@@ -78,7 +81,7 @@ stunir_dispatch() {
                 esac
             done
             echo "Generating IR from $spec_root (Python Fallback)..."
-            
+
             if command -v python3 >/dev/null 2>&1; then
                 python3 tools/spec_to_ir.py --spec-root "$spec_root" --out "$out_ir"
             else
@@ -91,7 +94,7 @@ stunir_dispatch() {
             local out_header=""
             local epoch_val=0
             local epoch_src="UNKNOWN"
-            
+
             while [[ $# -gt 0 ]]; do
                 case "$1" in
                     --out-json) out_json="$2"; shift 2 ;;
@@ -104,15 +107,11 @@ stunir_dispatch() {
                 esac
             done
             echo "Generated Provenance"
-            
+
             if command -v python3 >/dev/null 2>&1; then
-                python3 tools/gen_provenance.py \
-                    --epoch "$epoch_val" \
-                    --epoch-source "$epoch_src" \
-                    --out-json "$out_json" \
-                    --out-header "$out_header"
+                python3 tools/gen_provenance.py                     --epoch "$epoch_val"                     --epoch-source "$epoch_src"                     --out-json "$out_json"                     --out-header "$out_header"
             else
-                local json_str="{\"build_epoch\": $epoch_val, \"epoch_source\": \"$epoch_src\"}"
+                local json_str="{"build_epoch": $epoch_val, "epoch_source": "$epoch_src"}"
                 stunir_canon_echo "$json_str" > "$out_json"
                 echo "#define STUNIR_EPOCH $epoch_val" > "$out_header"
             fi
