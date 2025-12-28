@@ -198,24 +198,21 @@ fn main() -> anyhow::Result<()> {
             receipt_map.insert("inputs".to_string(), json!([]));
             receipt_map.insert("tool".to_string(), Value::Null);
 
-            // 4. Calculate Core ID (Hash of Pretty + Sorted JSON)
-            // We use to_vec_pretty to match jq's default output
-            let receipt_bytes = serde_json::to_vec_pretty(&receipt_map)?;
+            // 4. Calculate Core ID (Hash of COMPACT + Sorted JSON)
+            // Use to_vec (compact) instead of to_vec_pretty
+            let receipt_bytes = serde_json::to_vec(&receipt_map)?;
             let mut hasher = Sha256::new();
             hasher.update(&receipt_bytes);
-            // Note: jq usually adds a newline at the end of output. serde_json does not.
-            // If verifier uses `jq ... | sha256sum`, jq adds a newline.
-            // We might need to hash `receipt_bytes + b"\n"`.
-            // Let's try WITHOUT newline first, as `jq` inside a pipe might behave differently depending on version.
-            // Actually, `echo "$json" | sha256sum` adds a newline.
-            // So we should probably add a newline to the bytes before hashing to match shell `echo`.
-            hasher.update(b"\n"); 
+            // No newline for compact hash usually, but let's check if verifier expects one.
+            // Standard canonicalization usually implies NO trailing newline in the hash input.
+            // hasher.update(b"\n"); // Removed
             let core_id = hex::encode(hasher.finalize());
             
             // 5. Add ID and Write
             receipt_map.insert("receipt_core_id_sha256".to_string(), json!(core_id));
             
-            let final_json = serde_json::to_vec_pretty(&receipt_map)?;
+            // Write COMPACT JSON to file (with a single trailing newline for POSIX compliance)
+            let final_json = serde_json::to_vec(&receipt_map)?;
             let mut out_file = File::create(out)?;
             out_file.write_all(&final_json)?;
             out_file.write_all(b"\n")?;
