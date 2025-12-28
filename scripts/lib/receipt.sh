@@ -53,7 +53,7 @@ stunir_shell_receipt() {
     fi
 
     # NATIVE PATH: Use Rust binary if available
-    if [[ -x "build/stunir_native" ]]; then
+    if [[ -x "build/stunir_native" ]] && [[ "${STUNIR_USE_NATIVE_RECEIPT:-0}" == "1" ]]; then
         ./build/stunir_native gen-receipt \
             --target "$target" \
             --toolchain "$toolchain_lock" \
@@ -91,15 +91,13 @@ stunir_shell_receipt() {
             tool: null
         }')
 
-    # Calculate ID
+    # Calculate ID on canonical core JSON (stunir-json-c14n-v1)
+    local core_c14n
+    core_c14n=$(echo "$json_content" | jq -cS .)
+
     local core_id
-    core_id=$(echo "$json_content" | sha256sum | awk '{print $1}')
+    core_id=$(printf '%s' "$core_c14n" | sha256sum | awk '{print $1}')
 
-    # Add ID and Write
-    echo "$json_content" | jq --arg id "$core_id" '.receipt_core_id_sha256 = $id' > "$out_file"
-
-    # Canonicalize receipt JSON (stunir-json-c14n-v1)
-    if command -v jq >/dev/null 2>&1; then
-        jq -cS . "$out_file" > "${out_file}.tmp" && mv "${out_file}.tmp" "$out_file"
-    fi
+    # Add ID and write canonical receipt JSON
+    echo "$core_c14n" | jq --arg id "$core_id" '.receipt_core_id_sha256 = $id' | jq -cS . > "$out_file"
 }
