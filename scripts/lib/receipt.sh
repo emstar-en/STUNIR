@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-stunir_generate_receipt() {
+# Renamed to match dispatch.sh expectation
+stunir_shell_receipt() {
     local target="$1"
     local out_file="$2"
     local toolchain_lock="$3"
