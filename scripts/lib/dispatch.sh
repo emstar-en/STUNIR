@@ -37,9 +37,8 @@ stunir_dispatch() {
         elif [[ "$cmd" == "validate" || "$cmd" == "verify" ]]; then
             ./build/stunir_native "$cmd" "$@"
             return $?
-        elif [[ "$cmd" == "receipt" ]]; then
-            ./build/stunir_native gen-receipt "$@"
-            return $?
+        # NOTE: 'receipt' command removed from native dispatch to ensure
+        # we use the strictly compliant shell implementation for now.
         fi
     fi
 
