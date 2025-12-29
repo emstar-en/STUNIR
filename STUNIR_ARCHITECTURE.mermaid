@@ -1,0 +1,44 @@
+graph TD
+    %% Nodes
+    User[User / Model]
+    Spec[Spec Files (JSON)]
+    Disc[Discovery Script]
+    Lock[Toolchain Lock (JSON)]
+    Build[Build Script (sh)]
+    Norm[Normalizer (Py/Native)]
+    IR[Intermediate Ref (dCBOR)]
+    Gen[Generator]
+    Art[Artifacts (Bin/Src)]
+    Receipt[Receipt (KV/JSON)]
+
+    %% Flow
+    User -->|Authors| Spec
+    Disc -->|Scans Host| Lock
+    Lock -->|Injects Tools| Build
+    Spec -->|Input| Build
+    Build -->|Orchestrates| Norm
+    Norm -->|Produces| IR
+    IR -->|Input| Gen
+    Gen -->|Produces| Art
+    Build -->|Records| Receipt
+
+    %% Relationships
+    Receipt -.->|Binds| Spec
+    Receipt -.->|Binds| Lock
+    Receipt -.->|Binds| IR
+    Receipt -.->|Binds| Art
+
+    %% Subgraphs
+    subgraph "Determinism Boundary"
+        Build
+        Norm
+        IR
+        Gen
+        Art
+        Receipt
+    end
+
+    subgraph "Host Environment (Untrusted)"
+        Disc
+        Lock
+    end
