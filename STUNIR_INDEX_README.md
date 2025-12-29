@@ -1,14 +1,32 @@
-# STUNIR Index Bundle
-This bundle provides deterministic, model-agnostic indexing of the STUNIR repository to help humans and AI agents navigate without looping.
-## Files
-- `STUNIR_REPO_INDEX.json`: per-file metadata for the whole repo (including test vectors).
-- `STUNIR_CHUNK_INDEX.jsonl`: chunked text for markdown docs (excludes test vectors, `build/`, `receipts/` by default to avoid noise).
-## Design notes
-- Test vectors currently live under: `test_vectors/`, `samples/`.
-- Git blob SHAs in the index come from the repository tree (sha1). If you need sha256 for files, compute it locally during checkout/materialization.
-## Typical uses
-- Build a vector index externally using `STUNIR_CHUNK_INDEX.jsonl` (stable chunk IDs + sha256).
-- Validate documentation cross-references by using `outbound_repo_links` fields in `STUNIR_REPO_INDEX.json`.
-- Quickly answer: “where is X defined?” by scanning `category` + `path`.
-Generated against branch: `main`.
-Generated UTC: `2025-12-27T02:54:47Z`.
+# STUNIR Repository Index
+
+## Overview
+This repository is organized to support the **STUNIR (Standardization Theorem + Unique Normals + Intermediate Reference)** architecture.
+The current structure emphasizes a **Shell Primary** workflow, where orchestration is handled by POSIX-compliant shell scripts, and Python is treated as an optional accelerator.
+
+## Key Directories
+
+### `scripts/` - The Build System
+- **`build.sh`**: The entry point. Now uses a polyglot dispatch strategy.
+- **`lib/`**: **[NEW]** Contains core shell libraries (`dispatch.sh`, `receipt.sh`) for logic that was previously Python-only.
+- **`generate_manifest.sh`**: **[NEW]** Tool to generate deterministic file manifests.
+
+### `spec/` - The Source of Truth
+- **`env/`**: **[NEW]** Environment allowlists (Strict vs. Discovery).
+- **`schemas/`**: **[NEW]** Markdown-based specifications for file formats (Manifest V1, KV Receipts).
+
+### `tools/` - Deterministic Toolchain
+- Contains the Python reference implementations (`epoch.py`, `spec_to_ir.py`).
+- `epoch.py` has been patched to output strict canonical JSON.
+
+### `asm/` - Artifacts
+- Stores the Intermediate Reference (IR) and compiled outputs.
+
+## Navigation for Models
+- **`STUNIR_REPO_INDEX.json`**: A complete machine-readable list of files and descriptions.
+- **`STUNIR_REFERENCE_RULES.md`**: The "Constitution" of this repo. Read this to understand the constraints (e.g., "No Python" fallback).
+
+## Recent Changes (Shell Primary)
+- Added `scripts/lib/` for shell-native logic.
+- Added `spec/schemas/` for explicit format definitions.
+- Split environment allowlists into `discovery` (permissive) and `runtime` (strict).

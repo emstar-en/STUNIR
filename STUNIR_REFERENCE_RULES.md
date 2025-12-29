@@ -1,17 +1,24 @@
-# STUNIR_REFERENCE_RULES
+# STUNIR Reference Rules
 
-This file describes how repository documents should reference other repository documents.
-It is intended to reduce navigation ambiguity for humans and AI agents.
+## Core Philosophy
+1.  **Models Propose, Tools Commit**: AI models generate specs; only deterministic tools generate artifacts and receipts.
+2.  **Shell Primary**: The orchestration layer MUST run in a standard POSIX shell environment without requiring Python. Python is an *accelerator*, not a hard dependency for the build loop.
+3.  **Determinism First**: If it cannot be reproduced byte-for-byte, it is a bug.
 
-## Rules
+## File Format Rules
+1.  **Manifests**: MUST follow `spec/schemas/stunir_manifest_v1.md`. Sorted, relative paths, SHA-256.
+2.  **Receipts**: 
+    - Primary: Canonical JSON (RFC 8785 style).
+    - Fallback: Shell KV-Text (`spec/schemas/stunir_receipt_kv.md`) for environments without JSON tools.
+3.  **JSON**: All machine-generated JSON must be **Canonical** (sorted keys, no whitespace) when used for hashing.
 
-1. Use repo-relative paths in markdown links.
-2. Do not link to per-run output artifacts under `build/` and `receipts/` unless referencing fixtures.
-3. If a directory is referenced, prefer an explicit `README.md` target.
-4. Avoid placeholder READMEs that have no outbound references; they should point back to `ENTRYPOINT.md` and `AI_START_HERE.md`.
-5. Keep at least one stable root entrypoint (`ENTRYPOINT.md`) and one stable navigation index (`AI_START_HERE.md`).
+## Environment Rules
+1.  **PATH is Toxic**: The `PATH` environment variable is a determinism leak.
+    - **Discovery Phase**: `PATH` is allowed to find tools.
+    - **Runtime Phase**: `PATH` is BLOCKED. Tools must be invoked via absolute paths found during discovery.
+2.  **Locale**: Always `LC_ALL=C`.
+3.  **Time**: Always `UTC`. Timestamps must be derived from `STUNIR_BUILD_EPOCH` or `SOURCE_DATE_EPOCH`.
 
-## Recommended minimum cross-links
-
-- `ENTRYPOINT.md` should link to `AI_START_HERE.md`.
-- Placeholder files should link back to `ENTRYPOINT.md`.
+## Implementation Constraints
+- **No Hidden State**: Everything required to build must be in the `inputs/` or `spec/` directories.
+- **No Network**: The build phase is offline. Network is only allowed during the "Fetch/Discovery" phase.
