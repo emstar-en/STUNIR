@@ -14,15 +14,18 @@ common warnings
 executable stunir-native
     import:           warnings
     main-is:          Main.hs
-    -- other-modules:
+    other-modules:    Stunir.Canonical
+                      Stunir.Receipt
     -- other-extensions:
     build-depends:    base ^>=4.17.2.1,
                       text,
                       bytestring,
-                      aeson,
+                      aeson >= 2.0,
                       containers,
                       directory,
                       filepath,
-                      cryptohash-sha256
+                      cryptohash-sha256,
+                      base16-bytestring,
+                      vector
     hs-source-dirs:   src
     default-language: Haskell2010
