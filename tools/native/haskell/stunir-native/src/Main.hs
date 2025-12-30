@@ -2,26 +2,27 @@
 module Main where
 
 import System.Environment (getArgs)
-import System.Exit (exitFailure, exitSuccess)
+import System.Exit (exitFailure)
 import qualified Data.ByteString.Lazy.Char8 as BL
-import qualified Data.ByteString as BS
-import Data.Aeson (encode, decode)
+import Data.Aeson (encode, decode, object, (.=))
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import qualified Data.Map.Strict as Map
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath (takeDirectory)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Crypto.Hash.SHA256 (hash)
 import qualified Data.ByteString.Base16 as Hex
 import qualified Data.Text.Encoding as TE
+import System.Process (callProcess)
 
 import Stunir.Receipt
 import Stunir.Canonical (canonicalEncode)
 import Stunir.Spec
 import Stunir.IR
 import Stunir.Import
+import Stunir.Provenance
 
 -- Helper to write JSON
 writeJson :: ToJSON a => FilePath -> a -> IO ()
@@ -37,23 +38,23 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
-        ["version"] -> putStrLn "stunir-native-hs v0.2.0.0"
+        ["version"] -> putStrLn "stunir-native-hs v0.3.0.0"
 
-        -- epoch --out-json <path> --print-epoch
+        -- epoch
         ("epoch":"--out-json":outPath:"--print-epoch":_) -> do
             t <- getPOSIXTime
             let epoch = round t :: Integer
             writeJson outPath (object ["epoch" .= epoch])
             print epoch
 
-        -- import-code --input-root <src> --out-spec <dest>
+        -- import-code
         ("import-code":"--input-root":inRoot:"--out-spec":outSpec:_) -> do
             modules <- scanDirectory inRoot
             let spec = Spec "spec" modules
             writeJson outSpec spec
             putStrLn $ "Imported " ++ show (length modules) ++ " modules to " ++ outSpec
 
-        -- spec-to-ir --spec-root <root> --out <out>
+        -- spec-to-ir
         ("spec-to-ir":"--spec-root":specRoot:"--out":outPath:_) -> do
             let specPath = specRoot ++ "/spec.json"
             specContent <- BL.readFile specPath
@@ -64,7 +65,7 @@ main = do
                 Just spec -> do
                     let ir = IR {
                         ir_version = "v1",
-                        ir_module_name = "stunir_module", -- Default
+                        ir_module_name = "stunir_module",
                         ir_types = [],
                         ir_functions = [],
                         ir_spec_sha256 = specHash,
@@ -74,7 +75,32 @@ main = do
                     writeJson outPath ir
                     putStrLn $ "Generated IR at " ++ outPath
 
-        -- gen-receipt (existing)
+        -- gen-provenance
+        ("gen-provenance":"--epoch":epochStr:"--spec-root":specRoot:"--asm-root":_:"--out-json":outJson:"--out-header":outHeader:_) -> do
+            let epoch = read epochStr :: Integer
+            let specPath = specRoot ++ "/spec.json"
+            specContent <- BL.readFile specPath
+            let specHash = sha256Hex specContent
+
+            case decode specContent :: Maybe Spec of
+                Nothing -> error "Failed to parse spec.json"
+                Just spec -> do
+                    let modNames = map sm_name (sp_modules spec)
+                    let prov = Provenance epoch specHash modNames
+
+                    writeJson outJson prov
+                    TIO.writeFile outHeader (generateCHeader prov)
+                    putStrLn $ "Generated Provenance: " ++ outJson ++ ", " ++ outHeader
+
+        -- compile-provenance
+        ("compile-provenance":"--in-prov":_:"--out-bin":outBin:_) -> do
+            let cFile = "tools/prov_emit.c"
+            exists <- doesFileExist cFile
+            if not exists then error ("Missing C source: " ++ cFile) else do
+                callProcess "gcc" [cFile, "-o", outBin, "-Ibuild"] 
+                putStrLn $ "Compiled provenance binary to " ++ outBin
+
+        -- gen-receipt
         ("gen-receipt":target:status:epochStr:tName:tPath:tHash:tVer:rest) -> do
             let epoch = read epochStr :: Integer
             let tool = ToolInfo (T.pack tName) (T.pack tPath) (T.pack tHash) (T.pack tVer)
@@ -92,5 +118,4 @@ main = do
 
         _ -> do
             putStrLn "Error: Unknown command or missing arguments."
-            putStrLn "Commands: version, epoch, import-code, spec-to-ir, gen-receipt"
             exitFailure

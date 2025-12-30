@@ -7,6 +7,7 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import Control.Monad (forM)
 import Stunir.Spec
+import Data.Text (Text)
 
 -- | Map extensions to languages
 extToLang :: String -> Maybe Text
@@ -34,7 +35,7 @@ scanDirectory root = do
                 Nothing -> return Nothing
                 Just lang -> do
                     content <- TIO.readFile f
-                    let name = T.pack $ takeBaseName f -- Simplified name
+                    let name = T.pack $ takeBaseName f
                     return $ Just $ SpecModule name content lang
         return [m | Just m <- modules]
 
