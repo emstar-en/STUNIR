@@ -1,0 +1,5 @@
+{
+  "title": "Windows Host Environment Refactoring",
+  "status": "RESOLVED",
+  "resolution_notes": "Strict Windows allowlist implemented."
+}
