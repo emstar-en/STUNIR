@@ -1,0 +1,15 @@
+cabal-version: 3.10
+name: pack-attestation
+version: 0.1.0.0
+
+library
+  exposed-modules: Attestation
+  hs-source-dirs: src
+  build-depends: base, cborg, cryptonite, bytestring
+  default-language: GHC2021
+
+executable pack-attestation
+  main-is: Attestation.hs
+  build-depends: base, cborg, cryptonite, bytestring
+  ghc-options: -threaded -Wall -static
+  default-language: GHC2021

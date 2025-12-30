@@ -1,0 +1,7 @@
+{
+  "artifacts": [
+    {"path": "asm/ir_0001.dcbor", "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+    {"path": "bin/stunir-native-hs", "digest": "a1b2c3d4e5f67890..."}
+  ],
+  "toolchain": {"ghc": "9.4.8", "cabal": "3.10.2.0"}
+}
