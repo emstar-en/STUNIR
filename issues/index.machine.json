@@ -1,9 +1,13 @@
 {
-  "version": "2.1",
+  "version": "3.0",
+  "status": "COMPLETE",
   "haskell_first_policy": true,
-  "quick_wins_master": 11,
-  "build_native_batch": 4,
-  "total_closed": 15,
-  "remaining": 5,
-  "timestamp": 1735500000
+  "issues_closed": 20,
+  "issues_total": 20,
+  "completion": 100,
+  "timestamp": 1735500000,
+  "artifacts": {
+    "manifest": "manifests/stunir_complete_v1.json",
+    "verifier": "tools/native/haskell/bin/stunir-native-hs"
+  }
 }

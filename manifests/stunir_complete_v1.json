@@ -1,0 +1,24 @@
+{
+  "schema": "stunir.manifest.complete.v1",
+  "epoch": 1735500000,
+  "profile": "3",
+  "haskell_first": true,
+  "artifacts": {
+    "native": {
+      "haskell": "tools/native/haskell/bin/stunir-native-hs",
+      "rust": "tools/native/rust/target/release/stunir-rust"
+    },
+    "hosted": {
+      "wasm": "hosted/wasm/stunir-wasm.wasm",
+      "js": "hosted/js/stunir-js.js"
+    },
+    "ir": "asm/ir_0001.dcbor",
+    "pack": "test_vectors/pack_0001.dcbor"
+  },
+  "receipts": ["receipts/build_v1.json", "receipts/pack_v1.json"],
+  "digests": {
+    "ir_0001": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pack_0001": "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592"
+  },
+  "verifier": "stunir-native-hs verify manifest"
+}

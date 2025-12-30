@@ -1,126 +1,16 @@
 {
-  "constraints": {
-    "authenticity": {
-      "recommended": "If root_attestation.txt.sig exists and a public key is provided, verify with OpenSSL.",
-      "rule": "Not provided by default; optional signature verification MAY be performed when tooling and trust roots are provided."
-    },
-    "epoch_handling": {
-      "rule": "MUST be externally provided (pinned) or read from root_attestation.txt; MUST NOT be derived from Spec in Profile 3.",
-      "verifier_semantics": "The epoch value is opaque; the verifier only checks presence when configured to require it."
-    },
-    "semantic_generation": "FORBIDDEN"
+  "schema": "stunir.contract.profile.v3",
+  "rules": {
+    "integer_only": true,
+    "sorted_keys": true,
+    "no_floats": true,
+    "canonical_json": "strict",
+    "dcbor_output": true
   },
-  "contract_id": "stunir.profile3.shell_only_verifier.contract.v1",
-  "failure_semantics": {
-    "exit_codes": {
-      "0": "OK",
-      "1": "verification failed (integrity or contract violation)",
-      "2": "usage error / unknown arg",
-      "3": "missing required tool (hasher, awk, sort, find, etc.)"
-    },
-    "named_failures": {
-      "bad_digest": "FATAL",
-      "bad_version_line": "FATAL",
-      "crlf_detected_in_pack_manifest": "FATAL (strict)",
-      "ir_count_not_one": "FATAL",
-      "manifest_file_hash_mismatch": "FATAL (strict)",
-      "manifest_file_missing": "FATAL (strict)",
-      "manifest_incomplete_or_extra_files": "FATAL (strict, when completeness check enabled)",
-      "manifest_not_sorted": "FATAL (strict)",
-      "manifest_scope_violation": "FATAL (strict)",
-      "missing_hasher": "FATAL",
-      "missing_manifest_binding": "FATAL (strict)",
-      "missing_object": "FATAL",
-      "missing_objects_dir": "FATAL",
-      "missing_pack_manifest": "FATAL (strict)",
-      "missing_root_attestation": "FATAL",
-      "object_hash_mismatch": "FATAL",
-      "pack_manifest_hash_mismatch": "FATAL (strict)",
-      "unknown_record_type": "FATAL",
-      "unsafe_filename": "FATAL (strict)"
-    }
+  "toolchain": {
+    "haskell": "GHC 9.4.8",
+    "rust": "1.75.0",
+    "cabal": "3.10.2.0"
   },
-  "inputs": {
-    "objects_dir": {
-      "default": "objects/sha256",
-      "type": "path"
-    },
-    "pack_manifest_tsv": {
-      "default": "pack_manifest.tsv",
-      "type": "path"
-    },
-    "root_attestation_txt": {
-      "default": "root_attestation.txt",
-      "type": "path"
-    },
-    "root_dir": {
-      "default": ".",
-      "type": "path"
-    }
-  },
-  "normative_rules": {
-    "pack_manifest": {
-      "binding_mechanism": "root_attestation.txt MUST contain an artifact record with kind=manifest and logical_path=pack_manifest.tsv whose digest matches the manifest bytes stored under objects/sha256/<hex>.",
-      "binding_required": true,
-      "file_type_policy": "Verifier MUST require regular files for all manifest-listed paths.",
-      "line_format": "<64 lowercase hex><SPACE><relative forward-slash path>",
-      "ordering": "MUST be sorted lexicographically by <path> under LC_ALL=C.",
-      "path_safety_policy": {
-        "allowed_chars_regex": "^[A-Za-z0-9._/-]+$",
-        "no_backslashes": true,
-        "no_dotdot_segments": true,
-        "no_empty_segments": true,
-        "no_leading_slash": true,
-        "no_prefix_dot_slash": true,
-        "no_segment_begins_with_dash": true,
-        "no_whitespace": true,
-        "relative_only": true
-      },
-      "scope_exclusions": [
-        "objects/sha256/**",
-        "pack_manifest.tsv"
-      ]
-    },
-    "root_attestation": {
-      "crlf": {
-        "pack_manifest_tsv": "REJECT (MUST hard-fail if any \\r present)",
-        "root_attestation_txt": "ACCEPT (SHOULD accept CRLF by stripping trailing \\r)"
-      },
-      "digest_format": "sha256:<64 lowercase hex>",
-      "ir_record": {
-        "exactly_one": true
-      },
-      "object_store_mapping": "For each referenced sha256 digest, bytes MUST exist at objects/sha256/<hex> and hash-match.",
-      "version_line": "stunir.pack.root_attestation_text.v0"
-    }
-  },
-  "objective": "Deterministic pack integrity verification in environments with no Python and no custom verifier binaries.",
-  "profile_name": "Profile 3 (strict): Shell-Only Verifier + pack_manifest.tsv",
-  "provided_scripts": {
-    "library": "scripts/profile3_lib.sh",
-    "minimal_integrity": "scripts/verify_minimal.sh",
-    "strict_integrity": "scripts/verify_profile3.sh"
-  },
-  "references": {
-    "pack_manifest_spec": "docs/root/stunir_pack_manifest_v1.md",
-    "root_attestation_text_spec": "docs/root/stunir_pack_root_attestation_text_v0.md",
-    "verification_profiles": "docs/verification_profiles.md"
-  },
-  "toolchain_requirements": {
-    "hash": [
-      "sha256sum OR shasum -a 256 OR openssl dgst -sha256"
-    ],
-    "optional": [
-      "openssl (for signature verification)"
-    ],
-    "posix_like": [
-      "sh",
-      "awk",
-      "sed",
-      "sort"
-    ],
-    "strict_manifest_completeness": [
-      "find"
-    ]
-  }
+  "receipt_schema": "stunir.receipt.build.v1"
 }
