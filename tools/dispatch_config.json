@@ -1,0 +1,5 @@
+{
+  "priority_order": ["haskell", "rust", "python"],
+  "canonical_ref": "tools/native/haskell/bin/stunir-native-hs",
+  "conformance_test": "scripts/test_conformance.sh"
+}

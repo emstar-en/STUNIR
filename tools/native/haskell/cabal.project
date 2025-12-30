@@ -1,0 +1,12 @@
+packages: .
+index-state: 
+    2025-01-01T00:00:00Z
+
+allow-newer: 
+    base:cryptonite
+
+package cryptonite
+  flags: -integer-gmp -support_deepseq -internal
+
+package cborg
+  flags: +native

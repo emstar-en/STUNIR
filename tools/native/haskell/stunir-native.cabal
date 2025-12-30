@@ -1,0 +1,20 @@
+cabal-version:      3.10
+name:               stunir-native
+version:            0.1.0.0
+x-revision:         1
+
+executable stunir-native-hs
+  main-is:             StunirNative.hs
+  build-depends:       
+      base ^>=4.18.2.1,
+      bytestring ^==0.11.*,
+      cryptonite ^==0.30.*,
+      memory ^==0.18.*,
+      cborg ^==0.2.8.0
+  ghc-options:        
+      -threaded
+      -Wall
+      -static
+      -optl-static
+      -optl-pthread
+  default-language:   GHC2021
