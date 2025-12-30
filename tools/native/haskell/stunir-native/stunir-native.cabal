@@ -1,8 +1,28 @@
-cabal-version: 2.4
-name: stunir-native
-version: 0.1.0
+cabal-version:       3.0
+name:                stunir-native
+version:             0.1.0.0
+synopsis:            STUNIR Native Core (Haskell)
+description:         Deterministic build tool and verifier for STUNIR
+license:             MIT
+author:              STUNIR Authors
+maintainer:          maintainer@example.com
+build-type:          Simple
+
+common warnings
+    ghc-options: -Wall
+
 executable stunir-native
-  hs-source-dirs: app, src
-  main-is: Main.hs
-  default-language: Haskell2010
-  build-depends: base, aeson, bytestring, text, directory, filepath, optparse-applicative, cryptonite, memory
+    import:           warnings
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:    base ^>=4.17.2.1,
+                      text,
+                      bytestring,
+                      aeson,
+                      containers,
+                      directory,
+                      filepath,
+                      cryptohash-sha256
+    hs-source-dirs:   src
+    default-language: Haskell2010
