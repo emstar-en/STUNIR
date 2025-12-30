@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "sustainability/metrics/*"
+  ],
+  "id": "sustainability/metrics/1161",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete sustainability \u2192 metrics pipeline stage"
+}
