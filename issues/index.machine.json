@@ -1,11 +1,1 @@
-{
-  "batch": 5,
-  "epoch": 1735500000,
-  "haskell_first_policy": true,
-  "new_issues_placed": 39,
-  "open_issues": 169,
-  "schema": "stunir.issues.index.v3",
-  "structure_complete": "86% of 196 dirs",
-  "total_issues": 226,
-  "version": "3.9"
-}
+{"stunir_next_steps.json":"Plan: Remaining tasks (Manifest V1, Lockfile)","stunir_shell_native_status.json":"Status: Shell Primary Progress Report","stunir_shell_native_issues.json":"[RESOLVED] Shell-Native Gaps","stunir_windows_env_optimization.json":"[RESOLVED] Windows Env Refactor","stunir_toolchain_lock_spec.json":"[OPEN] Toolchain Lock Spec","stunir_architecture_refinement.json":"[PARTIAL] Arch Refinement"}

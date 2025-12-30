@@ -3,20 +3,23 @@
   "components": {
     "orchestration": {
       "status": "PARTIAL",
-      "notes": "Polyglot dispatch logic detected"
+      "notes": "Polyglot dispatch active. Waiting for Manifest V1 integration."
     },
     "receipts": {
       "status": "IMPLEMENTED",
-      "notes": "Shell-native receipt generation library"
+      "notes": "Shell-native receipt generation library active."
     },
     "environment": {
-      "status": "DEFINED",
-      "notes": "Strict Windows allowlist present"
+      "status": "IMPLEMENTED",
+      "notes": "Strict Windows allowlist active."
     },
     "schemas": {
-      "status": "MISSING",
-      "notes": "Manifest V1 and Types defined"
+      "status": "PARTIAL",
+      "notes": "Types defined. Manifest V1 spec MISSING."
     }
   },
-  "remaining_gaps": []
+  "remaining_gaps": [
+    "Manifest V1 Spec",
+    "Toolchain Lockfile"
+  ]
 }
