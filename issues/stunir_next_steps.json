@@ -1,7 +1,0 @@
-{
-  "immediate_actions": [
-    "Implement scripts/lib/json_canon.sh for pure shell environments",
-    "Integrate stunir-native binary if available",
-    "Finalize verify.sh to use the new Manifest V1 format"
-  ]
-}
