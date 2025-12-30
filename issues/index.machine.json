@@ -1,11 +1,11 @@
 {
-  "batch": 3,
+  "batch": 4,
   "epoch": 1735500000,
   "haskell_first_policy": true,
-  "new_issues_placed": 35,
-  "open_issues": 85,
+  "new_issues_placed": 36,
+  "open_issues": 126,
   "schema": "stunir.issues.index.v3",
-  "structure_complete": "43% of 196 dirs",
-  "total_issues": 142,
-  "version": "3.7"
+  "structure_complete": "64% of 196 dirs",
+  "total_issues": 183,
+  "version": "3.8"
 }
