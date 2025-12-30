@@ -1,8 +1,8 @@
 {
   "meta": {
-    "generated_at": "2025-12-29T23:23:35.846314Z",
+    "generated_at": "2025-12-30T00:18:51.617471Z",
     "branch": "devsite",
-    "profile": "Shell Primary"
+    "profile": "Shell Primary + AI Assisted"
   },
   "files": [
     {
@@ -44,6 +44,11 @@
       "path": "meta",
       "type": "dir",
       "desc": "Project metadata"
+    },
+    {
+      "path": "meta/ai_bins",
+      "type": "dir",
+      "desc": "AI Memory Bins (Swap Space)"
     },
     {
       "path": "plans",
@@ -181,6 +186,21 @@
       "desc": "Machine-readable index of all files"
     },
     {
+      "path": "STUNIR_ANTI_PATTERNS.md",
+      "type": "file",
+      "desc": "Critical 'Do Not Do This' list for models"
+    },
+    {
+      "path": "STUNIR_ARCHITECTURE.mermaid",
+      "type": "file",
+      "desc": "Visual graph of the data flow"
+    },
+    {
+      "path": "spec/STUNIR_TYPES.d.ts",
+      "type": "file",
+      "desc": "TypeScript definitions for core JSON structures"
+    },
+    {
       "path": "scripts/build.sh",
       "type": "file",
       "desc": "Main build script (Polyglot dispatch)"
@@ -199,6 +219,11 @@
       "path": "scripts/lib/receipt.sh",
       "type": "file",
       "desc": "Receipt generation logic"
+    },
+    {
+      "path": "scripts/reset_ai_bins.sh",
+      "type": "file",
+      "desc": "Resets AI memory bins"
     },
     {
       "path": "spec/env/host_env_allowlist.windows.json",
@@ -224,6 +249,36 @@
       "path": "tools/epoch.py",
       "type": "file",
       "desc": "Epoch tool (Canonical JSON output)"
+    },
+    {
+      "path": "meta/ai_bins/README.md",
+      "type": "file",
+      "desc": "Instructions for AI Memory Bins"
+    },
+    {
+      "path": "meta/ai_bins/A_TASK.md",
+      "type": "file",
+      "desc": "Bin A: Current Task Focus"
+    },
+    {
+      "path": "meta/ai_bins/B_CONTEXT.md",
+      "type": "file",
+      "desc": "Bin B: Active Context"
+    },
+    {
+      "path": "meta/ai_bins/C_DRAFT.md",
+      "type": "file",
+      "desc": "Bin C: Code Draft Workbench"
+    },
+    {
+      "path": "meta/ai_bins/D_ERRORS.md",
+      "type": "file",
+      "desc": "Bin D: Error Analysis"
+    },
+    {
+      "path": "meta/ai_bins/E_DECISIONS.md",
+      "type": "file",
+      "desc": "Bin E: Architecture Decisions"
     }
   ]
 }
