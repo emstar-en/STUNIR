@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "targets/embedded/*"
+  ],
+  "id": "targets/embedded/1133",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete targets \u2192 embedded pipeline stage"
+}
