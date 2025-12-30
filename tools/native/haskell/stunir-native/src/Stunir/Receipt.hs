@@ -8,7 +8,6 @@ import Data.Text (Text)
 import Data.Map.Strict (Map)
 import qualified Data.ByteString.Base16 as Hex
 import qualified Data.Text.Encoding as TE
-
 import Stunir.Canonical (hashCanonical)
 
 data ToolInfo = ToolInfo {
@@ -35,7 +34,6 @@ data Receipt = Receipt {
 instance ToJSON Receipt where
     toJSON = genericToJSON defaultOptions
 
--- | Generate the Core ID (SHA256 of canonical JSON)
 computeCoreId :: Receipt -> Text
 computeCoreId r = 
     let h = hashCanonical r
