@@ -1,29 +1,11 @@
 {
+  "batch": 2,
   "epoch": 1735500000,
   "haskell_first_policy": true,
-  "new_issues_placed": [
-    "contracts/profile3",
-    "contracts/profile4",
-    "tools/ir_emitter",
-    "tools/native/python",
-    "tools/asm",
-    "scripts/master_dispatch",
-    "scripts/build_pipeline",
-    "targets/polyglot/haskell",
-    "targets/asm/ir",
-    "test_vectors/full_pipeline",
-    "test_vectors/contracts",
-    "docs/receipt_schema",
-    "docs/policy/haskell_first",
-    "analysis/coverage",
-    "manifests/ir",
-    "manifests/receipts",
-    "meta/ai_bins",
-    "pipeline/inputs",
-    "pipeline/docker"
-  ],
-  "open_issues": 19,
+  "new_issues_placed": 30,
+  "open_issues": 50,
   "schema": "stunir.issues.index.v3",
-  "total_issues": 76,
-  "version": "3.5"
+  "structure_complete": "26% of 196 dirs",
+  "total_issues": 107,
+  "version": "3.6"
 }
