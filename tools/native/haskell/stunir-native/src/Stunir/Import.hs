@@ -9,7 +9,6 @@ import Control.Monad (forM)
 import Stunir.Spec
 import Data.Text (Text)
 
--- | Map extensions to languages
 extToLang :: String -> Maybe Text
 extToLang ".py" = Just "python"
 extToLang ".js" = Just "javascript"

@@ -21,7 +21,6 @@ instance ToJSON Provenance where
         "modules" .= m
         ]
 
--- | Generate C Header content
 generateCHeader :: Provenance -> Text
 generateCHeader p = T.unlines [
     "#ifndef STUNIR_PROVENANCE_H",

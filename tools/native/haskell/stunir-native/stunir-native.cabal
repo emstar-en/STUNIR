@@ -1,6 +1,6 @@
 cabal-version:       3.0
 name:                stunir-native
-version:             0.3.0.0
+version:             0.4.0.0
 synopsis:            STUNIR Native Core (Haskell)
 description:         Deterministic build tool and verifier for STUNIR
 license:             MIT
@@ -20,6 +20,7 @@ executable stunir-native
                       Stunir.IR
                       Stunir.Import
                       Stunir.Provenance
+                      Stunir.Toolchain
     build-depends:    base ^>=4.17.2.1,
                       text,
                       bytestring,

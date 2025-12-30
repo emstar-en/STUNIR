@@ -23,6 +23,7 @@ import Stunir.Spec
 import Stunir.IR
 import Stunir.Import
 import Stunir.Provenance
+import Stunir.Toolchain
 
 -- Helper to write JSON
 writeJson :: ToJSON a => FilePath -> a -> IO ()
@@ -38,7 +39,11 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
-        ["version"] -> putStrLn "stunir-native-hs v0.3.0.0"
+        ["version"] -> putStrLn "stunir-native-hs v0.4.0.0"
+
+        -- check-toolchain --lockfile <path>
+        ("check-toolchain":"--lockfile":lockPath:_) -> do
+            verifyToolchain lockPath
 
         -- epoch
         ("epoch":"--out-json":outPath:"--print-epoch":_) -> do
