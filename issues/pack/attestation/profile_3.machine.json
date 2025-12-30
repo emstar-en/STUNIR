@@ -1,0 +1,1 @@
+{"category":"pack","created":1735500000,"dependencies":["ISSUE.HASKELL.0002","ISSUE.CONFORMANCE.0001"],"description":"tools/pack_attestation/: generate + verify root_attestation.dcbor","id":"ISSUE.PACK.0001","priority":2,"status":"closed","subcategory":"attestation","title":"Profile-3 root_attestation.dcbor schema (vs .txt bridge)","updated":1735500000}

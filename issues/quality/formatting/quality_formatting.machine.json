@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "quality/formatting/*"
+  ],
+  "id": "quality/formatting/1104",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete quality \u2192 formatting pipeline stage"
+}
