@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "monitoring/dashboards/*"
+  ],
+  "id": "monitoring/dashboards/1156",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete monitoring \u2192 dashboards pipeline stage"
+}
