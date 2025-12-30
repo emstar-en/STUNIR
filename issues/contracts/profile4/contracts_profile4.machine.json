@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "contracts/profile4/*"
+  ],
+  "id": "contracts/profile4/1002",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete contracts \u2192 profile4 pipeline stage"
+}

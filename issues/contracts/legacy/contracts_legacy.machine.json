@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "contracts/legacy/*"
+  ],
+  "id": "contracts/legacy/1021",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete contracts \u2192 legacy pipeline stage"
+}

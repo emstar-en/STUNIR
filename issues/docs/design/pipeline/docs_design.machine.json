@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "docs/design/pipeline/*"
+  ],
+  "id": "docs/design/pipeline/1037",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete docs \u2192 design \u2192 pipeline pipeline stage"
+}
