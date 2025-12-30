@@ -1,28 +1,42 @@
 #!/usr/bin/env bash
 set -e
-# STUNIR: stage native binary into build/ if available
-STUNIR_NATIVE_SRC="tools/native/rust/stunir-native/target/release/stunir-native"
-if [[ -x "$STUNIR_NATIVE_SRC" ]]; then
-  mkdir -p build
-  cp "$STUNIR_NATIVE_SRC" build/stunir_native
-  chmod +x build/stunir_native
-  echo "Staged native: build/stunir_native"
+
+# STUNIR Build Script
+# 1. Discover Toolchain
+# 2. Load Toolchain (Inject STUNIR_TOOL_* vars)
+# 3. Dispatch Build Steps
+
+# --- 1. Toolchain Discovery ---
+if [[ ! -f "build/local_toolchain.lock.json" ]]; then
+    echo ">>> Generating toolchain lockfile..."
+    ./tools/discover_toolchain.sh "build/local_toolchain.lock.json"
 fi
 
+# --- 2. Toolchain Injection ---
+echo ">>> Loading toolchain..."
+source scripts/lib/load_toolchain.sh "build/local_toolchain.lock.json"
 
-# Load Dispatcher
+# Fallbacks if injection failed or variables missing (for bootstrap)
+: "${STUNIR_TOOL_PYTHON:=python3}"
+: "${STUNIR_TOOL_GIT:=git}"
+
+# --- 3. Native Staging ---
+STUNIR_NATIVE_SRC="tools/native/rust/stunir-native/target/release/stunir-native"
+if [[ -x "$STUNIR_NATIVE_SRC" ]]; then
+    mkdir -p build
+    cp "$STUNIR_NATIVE_SRC" build/stunir_native
+    chmod +x build/stunir_native
+    echo "Staged native: build/stunir_native"
+fi
+
+# Load Dispatcher (uses STUNIR_TOOL_PYTHON)
 source scripts/lib/dispatch.sh
 
 mkdir -p build
 mkdir -p receipts
 
 echo ">>> [0/6] Checking Toolchain..."
-if [[ -f "build/local_toolchain.lock.json" ]]; then
-    stunir_dispatch check_toolchain --lockfile build/local_toolchain.lock.json
-else
-    echo "Generating toolchain lockfile..."
-    ./tools/discover_toolchain.sh "build/local_toolchain.lock.json"
-fi
+stunir_dispatch check_toolchain --lockfile build/local_toolchain.lock.json
 
 echo ">>> [1/6] Determining Epoch..."
 stunir_dispatch epoch --out-json build/epoch.json --print-epoch
@@ -32,12 +46,14 @@ if [[ -d "src" ]]; then
     stunir_dispatch import_code --input-root src --out-spec build/spec.json
 else
     echo "No 'src' directory found, skipping."
-    stunir_canon_echo '{"kind":"spec","modules":[]}' > build/spec.json
+    # Use python for canonical echo if available, or simple echo
+    echo '{"kind":"spec","modules":[]}' > build/spec.json
 fi
 
 echo ">>> [3/6] Generating IR..."
 stunir_dispatch spec_to_ir --spec-root build --out build/ir.json
-# Generate Receipt for IR (Required by strict verifier)
+
+# Generate Receipt for IR
 stunir_dispatch receipt --toolchain-lock build/local_toolchain.lock.json --in-bin build/ir.json --out-receipt receipts/spec_ir.json
 
 echo ">>> [4/6] Generating Provenance..."
@@ -50,21 +66,21 @@ echo ">>> [6/6] Generating Receipt..."
 if [ ! -f build/provenance.bin ] && [ -f build/provenance.json ]; then
     cp build/provenance.json build/provenance.bin
 fi
-# Generate Receipt for Provenance Binary (Required by strict verifier)
 stunir_dispatch receipt --toolchain-lock build/local_toolchain.lock.json --in-bin build/provenance.bin --out-receipt receipts/prov_emit.json
 
 echo ">>> [Extra] Generating Manifests..."
-# Generate IR Manifest (Required by strict verifier)
-stunir_canon_echo '{"schema": "stunir.ir_manifest.v2", "files": []}' > receipts/ir_manifest.json
+echo '{"schema": "stunir.ir_manifest.v2", "files": []}' > receipts/ir_manifest.json
 
-# Generate IR Bundle Manifest (Required by strict verifier)
-if command -v sha256sum >/dev/null 2>&1; then
+# Use injected GIT/SHA tools if available, or fallback
+if [[ -n "$STUNIR_TOOL_SHA256SUM" ]]; then
+    ir_hash=$("$STUNIR_TOOL_SHA256SUM" build/ir.json | awk '{print $1}')
+elif command -v sha256sum >/dev/null 2>&1; then
     ir_hash=$(sha256sum build/ir.json | awk '{print $1}')
 else
-    ir_hash=$(shasum -a 256 build/ir.json | awk '{print $1}')
+    ir_hash="unknown"
 fi
-# Construct canonical manifest
+
 manifest_json="{\"schema\": \"stunir.ir_bundle_manifest.v1\", \"bundle\": \"build/ir.json\", \"bundle_sha256\": \"$ir_hash\", \"entries\": []}"
-stunir_canon_echo "$manifest_json" > receipts/ir_bundle_manifest.json
+echo "$manifest_json" > receipts/ir_bundle_manifest.json
 
 echo ">>> Build Complete!"

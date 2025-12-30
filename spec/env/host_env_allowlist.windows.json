@@ -1,24 +1,38 @@
 {
-  "comment": "STRICT RUNTIME PROFILE - No implicit PATH access. All tools must be injected via STUNIR_TOOL_* vars.",
-  "env_vars": {
-    "allow": [
-      "STUNIR_.*",
-      "SYSTEMROOT",
-      "WINDIR",
-      "TEMP",
-      "TMP"
-    ],
-    "deny": [
-      "PATH",
-      "APPDATA",
-      "USERPROFILE"
-    ]
-  },
-  "filesystem": {
-    "read_only": true,
-    "allow_writes": [
-      "build/",
-      "logs/"
-    ]
-  }
+  "schema": "stunir_env_allowlist_v1",
+  "platform": "windows",
+  "policy": "STRICT",
+  "allowed_vars": [
+    "ALLUSERSPROFILE",
+    "APPDATA",
+    "COMPUTERNAME",
+    "COMSPEC",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "LOCALAPPDATA",
+    "LOGONSERVER",
+    "NUMBER_OF_PROCESSORS",
+    "OS",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "PROCESSOR_LEVEL",
+    "PROCESSOR_REVISION",
+    "PROGRAMDATA",
+    "PROGRAMFILES",
+    "PROGRAMFILES(X86)",
+    "PUBLIC",
+    "SYSTEMDRIVE",
+    "SYSTEMROOT",
+    "TEMP",
+    "TMP",
+    "USERDOMAIN",
+    "USERNAME",
+    "USERPROFILE",
+    "WINDIR"
+  ],
+  "required_vars": [
+    "STUNIR_TOOL_PYTHON",
+    "STUNIR_TOOL_GIT",
+    "STUNIR_TOOL_BASH"
+  ]
 }
