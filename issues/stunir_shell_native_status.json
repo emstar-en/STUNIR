@@ -1,0 +1,22 @@
+{
+  "profile": "Shell Primary (Profile 3)",
+  "components": {
+    "orchestration": {
+      "status": "PARTIAL",
+      "notes": "Polyglot dispatch logic detected"
+    },
+    "receipts": {
+      "status": "IMPLEMENTED",
+      "notes": "Shell-native receipt generation library"
+    },
+    "environment": {
+      "status": "DEFINED",
+      "notes": "Strict Windows allowlist present"
+    },
+    "schemas": {
+      "status": "MISSING",
+      "notes": "Manifest V1 and Types defined"
+    }
+  },
+  "remaining_gaps": []
+}
