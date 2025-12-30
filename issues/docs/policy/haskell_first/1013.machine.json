@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "docs/policy/haskell_first/*"
+  ],
+  "id": "docs/policy/haskell_first/1013",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete docs \u2192 policy \u2192 haskell_first pipeline stage"
+}
