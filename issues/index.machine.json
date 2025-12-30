@@ -1,12 +1,8 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "haskell_first_policy": true,
-  "entries": [
-    {"id": "ISSUE.HASKELL.0001", "title": "Haskell-First Pipeline Policy", "status": "closed", "priority": 1},
-    {"id": "ISSUE.HASKELL.0002", "title": "Verifier Binary", "status": "closed", "priority": 1},
-    {"id": "ISSUE.HASKELL.0003", "title": "Toolchain Lock", "status": "closed", "priority": 2},
-    {"id": "ISSUE.IR.0001", "title": "dCBOR Canonicalization", "status": "closed", "priority": 1},
-    {"id": "ISSUE.CONFORMANCE.0001", "title": "Rust/Python Conformance", "status": "open", "priority": 1},
-    {"id": "ISSUE.PACK.0001", "title": "root_attestation.dcbor", "status": "open", "priority": 2}
-  ]
+  "quick_wins_v1": 6,
+  "quick_wins_v2": 5,
+  "total_closed": 11,
+  "timestamp": 1735500000
 }
