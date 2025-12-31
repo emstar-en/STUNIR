@@ -1,12 +1,12 @@
+# STUNIR Build Artifacts
+local_toolchain.lock.json
+receipts/
+asm/
+build/
 
-# STUNIR local build outputs
-build/
-tools/native/rust/stunir-native/target/
-*.tar.gz
-# STUNIR generated artifacts
-_verify_build/
-tools/__pycache__/
+# Python
+__pycache__/
 *.pyc
-receipts/*.json
-dist-newstyle/
-build/
+
+# System
+.DS_Store
