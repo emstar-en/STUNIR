@@ -1,1 +1,4 @@
-{"robot-safety-stub.rfc6902.json":"JSON data/config","stunir_machine_plan.json":"JSON data/config"}
+{
+  "robot-safety-stub.rfc6902.json": "File",
+  "stunir_machine_plan.json": "File"
+}

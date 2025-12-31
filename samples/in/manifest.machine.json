@@ -1,1 +1,6 @@
-[]
+[
+  "minimal",
+  "multifile",
+  "patch_like",
+  "unicode"
+]
