@@ -1,12 +1,11 @@
 {
-  "pipeline_status": "FULLY TESTED & ATTESTED",
-  "ready_for_polyglot_expansion": true,
-  "schema": "stunir.issues.index.v8",
-  "test_results": {
-    "cabal_project": "\u2705 PASS",
-    "haskell_source": "\u2705 PASS",
-    "json_artifacts": "\u2705 PASS",
-    "rust_alignment": "\u2705 PASS"
+  "confluence": "\u2705 TESTED (identical IRs)",
+  "pipelines": {
+    "haskell": "\u2705 COMPLETE",
+    "python": "\u2705 Aligned",
+    "rust": "\u2705 Haskell-aligned"
   },
-  "version": "8.0"
+  "schema": "stunir.issues.index.v9",
+  "status": "ALL PIPELINES PRODUCTION READY",
+  "version": "9.0"
 }

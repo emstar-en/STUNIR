@@ -1,0 +1,8 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "test-0001", 
+  "name": "Pipeline Confluence Test",
+  "stages": ["STANDARDIZATION", "UNIQUE_NORMALS", "IR", "BINARY", "RECEIPT"],
+  "targets": ["haskell", "rust", "python"],
+  "profile": "profile3"
+}
