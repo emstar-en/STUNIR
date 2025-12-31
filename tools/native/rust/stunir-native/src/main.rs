@@ -1,10 +1,7 @@
 use clap::{Parser, Subcommand};
 use anyhow::Result;
 use std::path::PathBuf;
-
-mod commands;
-mod crypto;
-mod canonical;
+use stunir_native::{commands, spec_to_ir, emit};
 
 #[derive(Parser)]
 #[command(name = "stunir-native")]
@@ -37,6 +34,27 @@ enum Commands {
         #[arg(short, long)]
         receipt: PathBuf,
     },
+    /// Convert Spec to IR
+    SpecToIr {
+        /// Input Spec JSON
+        #[arg(short, long)]
+        input: String,
+        /// Output IR JSON
+        #[arg(short, long)]
+        output: String,
+    },
+    /// Emit code from IR
+    Emit {
+        /// Input IR JSON
+        #[arg(short, long)]
+        input: String,
+        /// Target language (python)
+        #[arg(short, long)]
+        target: String,
+        /// Output file
+        #[arg(short, long)]
+        output: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -51,6 +69,12 @@ fn main() -> Result<()> {
         }
         Commands::Verify { receipt } => {
             commands::verify::execute(receipt)?;
+        }
+        Commands::SpecToIr { input, output } => {
+            spec_to_ir::run(input, output)?;
+        }
+        Commands::Emit { input, target, output } => {
+            emit::run(input, target, output)?;
         }
     }
 

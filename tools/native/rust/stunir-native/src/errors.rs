@@ -6,9 +6,10 @@ pub enum StunirError {
     Io(String),
     #[error("JSON: {0}")]
     Json(String),
-    #[allow(dead_code)]
     #[error("Validation: {0}")]
     Validation(String),
     #[error("Verify Failed: {0}")]
     VerifyFailed(String),
+    #[error("Usage: {0}")]
+    Usage(String),
 }
