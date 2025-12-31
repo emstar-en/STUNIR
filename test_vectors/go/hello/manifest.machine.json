@@ -1,1 +1,4 @@
-["go.mod","main.go"]
+[
+  "go.mod",
+  "main.go"
+]

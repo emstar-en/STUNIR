@@ -1,1 +1,5 @@
-{"TEMPLATE_PACK.json":"JSON data/config","module.template":"File","templates_manifest.tsv":"File"}
+{
+  "TEMPLATE_PACK.json": "File",
+  "module.template": "File",
+  "templates_manifest.tsv": "File"
+}

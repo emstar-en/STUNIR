@@ -1,1 +1,6 @@
-{}
+{
+  "asm": "Directory",
+  "c": "Directory",
+  "rust": "Directory",
+  "wasm": "Directory"
+}
