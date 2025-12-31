@@ -1,15 +1,14 @@
-use serde::Serialize;
-use serde::ser::Error;
+use anyhow::Result;
+use serde_json::Value;
 
-#[allow(dead_code)]
-pub fn to_string_canonical<T>(value: &T) -> Result<String, serde_json::Error>
-where
-    T: Serialize,
-{
-    let mut buf = Vec::new();
-    let formatter = serde_json::ser::CompactFormatter;
-    let mut ser = serde_json::Serializer::with_formatter(&mut buf, formatter);
-    value.serialize(&mut ser)?;
-    
-    String::from_utf8(buf).map_err(|e| serde_json::Error::custom(e.to_string()))
+pub fn normalize(json_str: &str) -> Result<String> {
+    // Parse as generic Value
+    let v: Value = serde_json::from_str(json_str)?;
+
+    // Serialize with pretty printing turned OFF, keys sorted (preserve_order feature in Cargo.toml handles this if map is used, 
+    // but standard serde_json maps are BTreeMaps which are sorted by key).
+    // Note: True JCS requires more strict handling of floats/unicode, but this is the "v0" implementation.
+    let normalized = serde_json::to_string(&v)?;
+
+    Ok(normalized)
 }
