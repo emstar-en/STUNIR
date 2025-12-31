@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["contracts/profile2/*"],"id":"contracts/profile2/1020","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete contracts → profile2 pipeline stage"}

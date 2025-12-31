@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["docs/architecture/*"],"id":"docs/architecture/1139","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete docs → architecture pipeline stage"}

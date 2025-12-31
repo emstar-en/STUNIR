@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["docs/policy/haskell_first/*"],"id":"docs/policy/haskell_first/1013","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete docs → policy → haskell_first pipeline stage"}
