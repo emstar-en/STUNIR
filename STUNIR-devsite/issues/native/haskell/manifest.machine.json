@@ -1,0 +1,5 @@
+[
+  "build_integration.machine.json",
+  "error_handling.machine.json",
+  "compiler_determinism.machine.json"
+]

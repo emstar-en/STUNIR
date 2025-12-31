@@ -1,0 +1,15 @@
+{
+  "dependencies": [
+    "native/haskell/1201"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "scripts/build.sh",
+    "scripts/lib/dispatch.sh"
+  ],
+  "id": "scripts/build_pipeline/1202",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Align Native Binary Paths"
+}
