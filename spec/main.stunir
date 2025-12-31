@@ -1,0 +1,8 @@
+{
+  "id": "example-project",
+  "name": "Example Project",
+  "schema": "v1",
+  "stages": [],
+  "targets": [],
+  "profile": "3"
+}
