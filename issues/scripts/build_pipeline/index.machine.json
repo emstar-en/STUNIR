@@ -1,0 +1,4 @@
+{
+  "bootstrap_verification.machine.json": "Issue scripts/build_pipeline/1301 [Deps: ]",
+  "integration_tests.machine.json": "Issue scripts/build_pipeline/1302 [Deps: native/haskell/1201]"
+}

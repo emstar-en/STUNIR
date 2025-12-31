@@ -1,0 +1,12 @@
+{
+  "dependencies": [],
+  "epoch": 1735500000,
+  "files_affected": [
+    "scripts/build.sh"
+  ],
+  "id": "scripts/build_pipeline/1301",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Verify Haskell Toolchain Availability During Bootstrap"
+}
