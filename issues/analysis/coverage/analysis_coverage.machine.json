@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["analysis/coverage/*"],"id":"analysis/coverage/1014","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete analysis → coverage pipeline stage"}
