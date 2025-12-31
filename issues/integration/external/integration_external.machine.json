@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["integration/external/*"],"id":"integration/external/1094","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete integration → external pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "integration/external/*"
+  ],
+  "id": "integration/external/1094",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete integration \u2192 external pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

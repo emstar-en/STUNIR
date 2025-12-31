@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["docker/production/*"],"id":"docker/production/1082","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete docker → production pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "docker/production/*"
+  ],
+  "id": "docker/production/1082",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete docker \u2192 production pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["analysis/dependencies/*"],"id":"analysis/dependencies/1072","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete analysis → dependencies pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "analysis/dependencies/*"
+  ],
+  "id": "analysis/dependencies/1072",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete analysis \u2192 dependencies pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["packaging/docker_multiarch/*"],"id":"packaging/docker_multiarch/1108","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete packaging → docker_multiarch pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "packaging/docker_multiarch/*"
+  ],
+  "id": "packaging/docker_multiarch/1108",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete packaging \u2192 docker_multiarch pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

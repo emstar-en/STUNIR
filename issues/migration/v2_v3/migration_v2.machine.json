@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["migration/v2_v3/*"],"id":"migration/v2_v3/1112","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete migration → v2_v3 pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "migration/v2_v3/*"
+  ],
+  "id": "migration/v2_v3/1112",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete migration \u2192 v2_v3 pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

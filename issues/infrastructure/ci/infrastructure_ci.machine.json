@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["infrastructure/ci/*"],"id":"infrastructure/ci/1085","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete infrastructure → ci pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "infrastructure/ci/*"
+  ],
+  "id": "infrastructure/ci/1085",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete infrastructure \u2192 ci pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

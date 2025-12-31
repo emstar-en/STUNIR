@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["deployment/hybrid/*"],"id":"deployment/hybrid/1099","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete deployment → hybrid pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "deployment/hybrid/*"
+  ],
+  "id": "deployment/hybrid/1099",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete deployment \u2192 hybrid pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

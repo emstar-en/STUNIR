@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["packaging/debian/*"],"id":"packaging/debian/1106","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete packaging → debian pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "packaging/debian/*"
+  ],
+  "id": "packaging/debian/1106",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete packaging \u2192 debian pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

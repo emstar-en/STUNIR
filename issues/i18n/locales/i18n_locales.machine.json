@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["i18n/locales/*"],"id":"i18n/locales/1159","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete i18n → locales pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "i18n/locales/*"
+  ],
+  "id": "i18n/locales/1159",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete i18n \u2192 locales pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

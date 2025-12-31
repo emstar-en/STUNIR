@@ -1,1 +1,14 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"analysis/coverage/*","id":"analysis/coverage/1008","priority":"LOW","schema":"stunir.issue.v2","status":"open","title":"Code coverage + conformance matrix"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": "analysis/coverage/*",
+  "id": "analysis/coverage/1008",
+  "priority": "LOW",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Code coverage + conformance matrix",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}

@@ -1,1 +1,16 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["benchmarking/micro/*"],"id":"benchmarking/micro/1109","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete benchmarking → micro pipeline stage"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "benchmarking/micro/*"
+  ],
+  "id": "benchmarking/micro/1109",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Complete benchmarking \u2192 micro pipeline stage",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Deferred/Closed: Premature optimization for Shell-Native MVP"
+}
