@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["spec/outputs/*"],"id":"spec/outputs/1049","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete spec → outputs pipeline stage"}
