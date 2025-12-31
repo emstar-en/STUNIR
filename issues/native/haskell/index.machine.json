@@ -1,10 +1,4 @@
 {
-  "build_integration.machine.json": "Issue native/haskell/1201 [Deps: ]",
-  "path_alignment.machine.json": "Issue native/haskell/1202 [Deps: native/haskell/1201]",
-  "error_handling.machine.json": "Issue native/haskell/1203 [Deps: ]",
-  "toolchain_resolution.machine.json": "Issue native/haskell/1204 [Deps: ]",
-  "manifest_generation.machine.json": "Issue native/haskell/1205 [Deps: ]",
-  "canonical_compliance.machine.json": "Issue native/haskell/1206 [Deps: ]",
-  "argument_parsing.machine.json": "Issue native/haskell/1207 [Deps: ]",
-  "source_scanning.machine.json": "Issue native/haskell/1208 [Deps: ]"
+  "manifest_generation.machine.json": "Implement Deterministic IR Bundle Manifest Generation",
+  "source_scanning.machine.json": "Implement Gitignore-Aware Source Code Scanning"
 }

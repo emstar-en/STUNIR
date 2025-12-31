@@ -1,3 +1,3 @@
 {
-  "manifests_performance.machine.json": "Issue manifests_performance [Deps: native/haskell]"
+  "manifests_performance.machine.json": "Complete manifests \u2192 performance pipeline stage"
 }

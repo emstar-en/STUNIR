@@ -1,3 +1,3 @@
 {
-  "packaging_docker.machine.json": "Issue packaging_docker [Deps: native/haskell]"
+  "packaging_docker.machine.json": "Complete packaging \u2192 docker_multiarch pipeline stage"
 }
