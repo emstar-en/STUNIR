@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["tools/profilers/*"],"id":"tools/profilers/1125","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete tools → profilers pipeline stage"}

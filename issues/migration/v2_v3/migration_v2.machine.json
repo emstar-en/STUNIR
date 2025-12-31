@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["migration/v2_v3/*"],"id":"migration/v2_v3/1112","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete migration → v2_v3 pipeline stage"}

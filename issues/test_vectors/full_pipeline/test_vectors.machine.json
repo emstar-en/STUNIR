@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["test_vectors/full_pipeline/*"],"id":"test_vectors/full_pipeline/1010","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete test_vectors → full_pipeline pipeline stage"}

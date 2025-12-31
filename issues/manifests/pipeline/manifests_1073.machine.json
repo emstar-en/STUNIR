@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["manifests/pipeline/*"],"id":"manifests/pipeline/1073","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete manifests → pipeline pipeline stage"}

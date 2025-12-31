@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["manifests/runtime/*"],"id":"manifests/runtime/1074","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete manifests → runtime pipeline stage"}

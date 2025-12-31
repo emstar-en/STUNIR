@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["configuration/prod/*"],"id":"configuration/prod/1113","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete configuration → prod pipeline stage"}

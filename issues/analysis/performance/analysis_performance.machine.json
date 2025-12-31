@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["analysis/performance/*"],"id":"analysis/performance/1041","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete analysis → performance pipeline stage"}

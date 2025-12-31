@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["analysis/conformance/*"],"id":"analysis/conformance/1040","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete analysis → conformance pipeline stage"}

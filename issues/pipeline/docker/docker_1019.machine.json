@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["pipeline/docker/*"],"id":"pipeline/docker/1019","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete pipeline → docker pipeline stage"}

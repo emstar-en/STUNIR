@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["analysis/threading/*"],"id":"analysis/threading/1142","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete analysis → threading pipeline stage"}

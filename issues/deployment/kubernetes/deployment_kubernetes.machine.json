@@ -1,1 +1,0 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["deployment/kubernetes/*"],"id":"deployment/kubernetes/1097","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete deployment → kubernetes pipeline stage"}
