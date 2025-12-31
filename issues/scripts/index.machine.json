@@ -1,0 +1,11 @@
+{
+  "attest": "Category",
+  "benchmark": "Category",
+  "deploy": "Category",
+  "healthcheck": "Category",
+  "migrate": "Category",
+  "profile_gen": "Category",
+  "rollback": "Category",
+  "test_runner": "Category",
+  "verify_pipeline": "Category"
+}
