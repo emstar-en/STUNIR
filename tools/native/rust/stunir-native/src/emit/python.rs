@@ -22,9 +22,9 @@ pub fn emit(ir: &IrV1, out_file: &str) -> Result<()> {
         for instr in &func.body {
             match instr.op.as_str() {
                 "print" => {
-                    // Simple print wrapper
+                    // Simple print wrapper - ESCAPED QUOTES
                     if let Some(arg) = instr.args.get(0) {
-                        code.push_str(&format!("    print("{}")\n", arg));
+                        code.push_str(&format!("    print(\"{}\")\n", arg));
                     }
                 },
                 "comment" => {
