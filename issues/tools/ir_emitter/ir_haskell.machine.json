@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"tools/ir_emitter/*","id":"tools/ir_emitter/1001","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"IR→Haskell emitter (spec→code)"}
