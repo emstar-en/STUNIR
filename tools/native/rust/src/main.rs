@@ -15,22 +15,23 @@ struct StunirSpec {
     profile: String,
 }
 
+// Fields reordered alphabetically to match Haskell's default sorting
 #[derive(Debug, Serialize, Deserialize)]
 struct IrInstruction {
-    op: String,
     args: Vec<String>,
+    op: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct IrFunction {
-    name: String,
     body: Vec<IrInstruction>,
+    name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct StunirIR {
-    version: String,
     functions: Vec<IrFunction>,
+    version: String,
 }
 
 // --- Commands ---

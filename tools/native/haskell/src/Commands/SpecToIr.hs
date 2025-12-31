@@ -5,15 +5,12 @@ module Commands.SpecToIr (run) where
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.ByteString.Lazy as B
-import Data.Aeson.Encode.Pretty (encodePretty)
+import Data.Aeson.Encode.Pretty (encodePretty', Config(..), defConfig, Indent(Spaces))
 import IR.V1 (IrV1(..), IrFunction(..), IrInstruction(..))
 
 -- | Mock implementation of the Spec -> IR transformation.
--- In a real scenario, this would parse the input JSON spec.
--- Here we demonstrate producing the structured IR to match the Rust side.
 run :: FilePath -> FilePath -> IO ()
 run _inJson outIr = do
-    -- Example: Constructing a structured function
     let mainFn = IrFunction
           { name = "main"
           , body = 
@@ -27,6 +24,9 @@ run _inJson outIr = do
           , functions = [mainFn]
           }
 
-    -- Write the JSON output (Pretty Printed)
-    B.writeFile outIr (encodePretty ir)
+    -- Configure pretty-printer to use 2 spaces (matches Rust serde_json default)
+    let config = defConfig { confIndent = Spaces 2 }
+
+    -- Write the JSON output
+    B.writeFile outIr (encodePretty' config ir)
     putStrLn $ "Generated IR at: " ++ outIr
