@@ -1,1 +1,14 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"targets/polyglot/haskell/*","id":"targets/polyglot/haskell/1005","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Polyglot Haskell targets (c89/c99 equiv)"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": "targets/polyglot/haskell/*",
+  "id": "targets/polyglot/haskell/1005",
+  "priority": "MEDIUM",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Polyglot Haskell targets (c89/c99 equiv)",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Superseded by Shell-Native Architecture"
+}

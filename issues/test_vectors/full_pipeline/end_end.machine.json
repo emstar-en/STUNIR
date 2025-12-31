@@ -1,1 +1,14 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"test_vectors/full_pipeline/*","id":"test_vectors/full_pipeline/1006","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"End-to-end test vectors (spec→binary+receipt)"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": "test_vectors/full_pipeline/*",
+  "id": "test_vectors/full_pipeline/1006",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "End-to-end test vectors (spec\u2192binary+receipt)",
+  "closed_at": "2025-12-30T00:00:00Z",
+  "closure_reason": "Superseded by Shell-Native Architecture"
+}
