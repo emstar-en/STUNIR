@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["integration/databases/*"],"id":"integration/databases/1095","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete integration → databases pipeline stage"}

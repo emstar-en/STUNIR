@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["integration/queues/*"],"id":"integration/queues/1096","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete integration → queues pipeline stage"}

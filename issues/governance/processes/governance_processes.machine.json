@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["governance/processes/*"],"id":"governance/processes/1158","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete governance → processes pipeline stage"}

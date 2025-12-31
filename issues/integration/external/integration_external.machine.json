@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["integration/external/*"],"id":"integration/external/1094","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete integration → external pipeline stage"}
