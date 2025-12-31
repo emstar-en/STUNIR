@@ -1,16 +1,12 @@
 {
-  "files_delivered": [
-    "test_harness/haskell_pipeline_test.sh",
-    "tools/native/rust/Cargo.toml",
-    "tools/native/rust/src/main.rs",
-    "scripts/align_rust_haskell.sh",
-    "scripts/test_full_pipeline.sh"
-  ],
-  "haskell_pipeline_tested": true,
-  "no_compilation_required": true,
-  "pipeline_status": "HASKELL-TESTED \u2192 RUST-ALIGNED",
-  "rust_alignment_ready": true,
-  "schema": "stunir.issues.index.v7",
-  "test_harness_complete": true,
-  "version": "7.0"
+  "pipeline_status": "FULLY TESTED & ATTESTED",
+  "ready_for_polyglot_expansion": true,
+  "schema": "stunir.issues.index.v8",
+  "test_results": {
+    "cabal_project": "\u2705 PASS",
+    "haskell_source": "\u2705 PASS",
+    "json_artifacts": "\u2705 PASS",
+    "rust_alignment": "\u2705 PASS"
+  },
+  "version": "8.0"
 }
