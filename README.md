@@ -173,15 +173,23 @@ STUNIR also aims to make integrity verification possible in constrained environm
   * IR validation (standardization gate): `stunir-native validate ...`
   * Pack / receipt verification (Profile-3-style pack verifier): `stunir-native verify pack ...`
 * For pack verification, it aims to match the failure tags and behavior contract in `contracts/stunir_profile3_contract.json` (stable tag string + exit 1).
-### Profile 3: Minimal verification (no Python, no custom binaries)
-* Uses `root_attestation.txt` and OS-provided hashing tools.
-* Intended for environments that forbid Python and forbid installing custom binaries.
-Scripts provided:
-* `scripts/verify_minimal.sh`
-* `scripts/verify_minimal.ps1`
-* `scripts/verify_minimal.cmd`
+### Profile 3: Shell-Native (Minimal)
+*   **Status:** Fully Implemented (Bootstrapping & Verification).
+*   **Runtime:** POSIX Shell (Bash) + Coreutils. No Python required.
+*   **Capabilities:**
+    *   Toolchain Discovery & Locking (`scripts/lib/manifest.sh`)
+    *   Receipt Generation (`scripts/lib/receipt.sh`)
+    *   JSON Generation (`scripts/lib/json.sh`)
+*   **Documentation:** See [docs/shell_native.md](docs/shell_native.md).
+
 ## Mechanics (how this repo works)
 This section is intentionally concrete. If you want to understand "how STUNIR works", start with `scripts/build.sh`.
+### Polyglot Build System
+The entry point `scripts/build.sh` now implements a **Polyglot Dispatcher**:
+1.  **Detects Runtime:** Checks for Native Binary -> Python -> Shell.
+2.  **Selects Profile:** Automatically picks the best available profile (Standard, Native, or Shell-Native).
+3.  **Locks Toolchain:** Generates `local_toolchain.lock.json` to pin absolute paths and hashes of all tools.
+
 ### Determinism baseline
 `scripts/build.sh` sets determinism-oriented defaults:
 * `LC_ALL=C`, `LANG=C`, `TZ=UTC`
