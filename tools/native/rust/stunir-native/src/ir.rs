@@ -1,19 +1,15 @@
-use serde::Serialize;
-use crate::spec::SpecModule;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[allow(dead_code)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct IRSource {
-    pub spec_sha256: String,
-    pub spec_path: String,
+    pub file: String,
+    pub line: u32,
 }
 
-#[derive(Serialize, Debug)]
+#[allow(dead_code)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct IR {
-    pub ir_version: String,
-    pub module_name: String,
-    pub types: Vec<String>,
-    pub functions: Vec<String>,
-    pub spec_sha256: String,
-    pub source: IRSource,
-    pub source_modules: Vec<SpecModule>,
+    pub version: String,
+    pub sources: Vec<IRSource>,
 }

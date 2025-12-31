@@ -10,3 +10,6 @@ sha2 = "0.10"
 hex = "0.4"
 walkdir = "2.3"
 chrono = "0.4"
+clap = { version = "4.4", features = ["derive"] }
+anyhow = "1.0"
+thiserror = "1.0"

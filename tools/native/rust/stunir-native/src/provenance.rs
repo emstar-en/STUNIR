@@ -1,15 +1,13 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[allow(dead_code)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Provenance {
-    pub epoch: u64,
-    pub spec_sha256: String,
-    pub modules: Vec<String>,
+    pub tool_id: String,
+    pub timestamp: String,
 }
 
-pub fn generate_c_header(prov: &Provenance) -> String {
-    format!(
-        "#ifndef STUNIR_PROVENANCE_H\n#define STUNIR_PROVENANCE_H\n\n#define STUNIR_EPOCH {}\n#define STUNIR_SPEC_SHA256 \"{}\"\n\n#endif // STUNIR_PROVENANCE_H\n",
-        prov.epoch, prov.spec_sha256
-    )
+#[allow(dead_code)]
+pub fn generate_c_header(_prov: &Provenance) -> String {
+    "// Provenance Header".to_string()
 }
