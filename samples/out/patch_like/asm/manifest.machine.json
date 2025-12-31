@@ -1,1 +1,9 @@
-["README.txt","ir_bundle.bin","spec_ir.txt"]
+[
+  "ir",
+  "lisp",
+  "python",
+  "smt",
+  "README.txt",
+  "ir_bundle.bin",
+  "spec_ir.txt"
+]

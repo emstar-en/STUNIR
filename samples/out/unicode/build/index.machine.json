@@ -1,1 +1,6 @@
-{"README.md":"Documentation","epoch.json":"JSON data/config","provenance.h":"C header","provenance.json":"JSON data/config"}
+{
+  "README.md": "File",
+  "epoch.json": "File",
+  "provenance.h": "File",
+  "provenance.json": "File"
+}

@@ -1,1 +1,7 @@
-["machine_plan.add_lisp.rfc6902.dcbor","machine_plan.add_python_smt.rfc6902.dcbor","target_requirements.lisp_split.rfc6902.dcbor","target_requirements.python_split.rfc6902.dcbor","target_requirements.smt_split.rfc6902.dcbor"]
+[
+  "machine_plan.add_lisp.rfc6902.dcbor",
+  "machine_plan.add_python_smt.rfc6902.dcbor",
+  "target_requirements.lisp_split.rfc6902.dcbor",
+  "target_requirements.python_split.rfc6902.dcbor",
+  "target_requirements.smt_split.rfc6902.dcbor"
+]

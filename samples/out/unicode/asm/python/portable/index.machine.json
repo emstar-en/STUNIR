@@ -1,1 +1,5 @@
-{"README.md":"Documentation","program.py":"Python script","runtime.py":"Python script"}
+{
+  "README.md": "File",
+  "program.py": "File",
+  "runtime.py": "File"
+}

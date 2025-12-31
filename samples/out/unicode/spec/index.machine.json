@@ -1,1 +1,17 @@
-{"README.txt":"Text file","README_\u00fcn\u00ef\u00e7\u00f8d\u00e9.txt":"Text file","comprehensive-consolidation.rfc6902.json":"JSON data/config","core-simple-m_of_n.rfc6902.json":"JSON data/config","entity-autonomy-ecc-delta.rfc6902.json":"JSON data/config","generalized-provenance-accounting.rfc6902.json":"JSON data/config","io-discrete.rfc6902.json":"JSON data/config","ld-namespacing.comprehensive.rfc6902.json":"JSON data/config","pipeline-to-nld.rfc6902.json":"JSON data/config","quorum-arming.rfc6902.json":"JSON data/config","robot-safety-stub.rfc6902.json":"JSON data/config","schema_fix_catalog.json":"JSON data/config","stunir_machine_plan.json":"JSON data/config"}
+{
+  "patches": "Directory",
+  "targets": "Directory",
+  "README.txt": "File",
+  "README_\u00fcn\u00ef\u00e7\u00f8d\u00e9.txt": "File",
+  "comprehensive-consolidation.rfc6902.json": "File",
+  "core-simple-m_of_n.rfc6902.json": "File",
+  "entity-autonomy-ecc-delta.rfc6902.json": "File",
+  "generalized-provenance-accounting.rfc6902.json": "File",
+  "io-discrete.rfc6902.json": "File",
+  "ld-namespacing.comprehensive.rfc6902.json": "File",
+  "pipeline-to-nld.rfc6902.json": "File",
+  "quorum-arming.rfc6902.json": "File",
+  "robot-safety-stub.rfc6902.json": "File",
+  "schema_fix_catalog.json": "File",
+  "stunir_machine_plan.json": "File"
+}

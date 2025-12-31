@@ -1,1 +1,6 @@
-["output_language_plans_manifest.json"]
+[
+  "lisp",
+  "python",
+  "smt",
+  "output_language_plans_manifest.json"
+]
