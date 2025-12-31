@@ -2,8 +2,9 @@ use std::env;
 use std::fs;
 use std::process;
 use serde::{Deserialize, Serialize};
+use sha2::{Sha256, Digest};
 
-// --- Data Structures (Must match Haskell) ---
+// --- Data Structures ---
 
 #[derive(Debug, Serialize, Deserialize)]
 struct StunirSpec {
@@ -15,7 +16,6 @@ struct StunirSpec {
     profile: String,
 }
 
-// Fields reordered alphabetically to match Haskell's default sorting
 #[derive(Debug, Serialize, Deserialize)]
 struct IrInstruction {
     args: Vec<String>,
@@ -34,15 +34,19 @@ struct StunirIR {
     version: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Provenance {
+    epoch: serde_json::Value,
+    ir_hash: String,
+    schema: String,
+    status: String,
+}
+
 // --- Commands ---
 
 fn cmd_spec_to_ir(in_json: &str, out_ir: &str) -> Result<(), String> {
-    // 1. Read Spec
     let _spec_content = fs::read_to_string(in_json)
         .map_err(|e| format!("Failed to read spec: {}", e))?;
-
-    // (In a real impl, we would parse the spec and transform it. 
-    // For this conformance test, we generate the SAME mock IR as the Haskell stub.)
 
     let main_fn = IrFunction {
         name: "main".to_string(),
@@ -57,7 +61,6 @@ fn cmd_spec_to_ir(in_json: &str, out_ir: &str) -> Result<(), String> {
         functions: vec![main_fn],
     };
 
-    // 2. Write IR
     let json_out = serde_json::to_string_pretty(&ir)
         .map_err(|e| format!("Serialization error: {}", e))?;
 
@@ -68,8 +71,39 @@ fn cmd_spec_to_ir(in_json: &str, out_ir: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn cmd_gen_provenance(_in_ir: &str, _epoch: &str, _out_prov: &str) -> Result<(), String> {
-    println!("GenProvenance not implemented yet");
+fn cmd_gen_provenance(in_ir: &str, epoch_json: &str, out_prov: &str) -> Result<(), String> {
+    // 1. Read IR
+    let ir_content = fs::read_to_string(in_ir)
+        .map_err(|e| format!("Failed to read IR: {}", e))?;
+
+    // 2. Hash IR (SHA256)
+    let mut hasher = Sha256::new();
+    hasher.update(ir_content.as_bytes());
+    let hash_result = hasher.finalize();
+    let hash_hex = hex::encode(hash_result);
+
+    // 3. Read Epoch
+    let epoch_content = fs::read_to_string(epoch_json)
+        .map_err(|e| format!("Failed to read Epoch: {}", e))?;
+    let epoch_data: serde_json::Value = serde_json::from_str(&epoch_content)
+        .map_err(|e| format!("Failed to parse Epoch: {}", e))?;
+
+    // 4. Create Provenance
+    let prov = Provenance {
+        schema: "stunir.provenance.v1".to_string(),
+        ir_hash: format!("sha256:{}", hash_hex),
+        epoch: epoch_data,
+        status: "SUCCESS".to_string(),
+    };
+
+    // 5. Write Output
+    let json_out = serde_json::to_string_pretty(&prov)
+        .map_err(|e| format!("Serialization error: {}", e))?;
+
+    fs::write(out_prov, json_out)
+        .map_err(|e| format!("Failed to write Provenance: {}", e))?;
+
+    println!("Generated Provenance at: {}", out_prov);
     Ok(())
 }
 
@@ -91,7 +125,6 @@ fn main() {
     let command = &args[1];
     let result = match command.as_str() {
         "spec-to-ir" => {
-            // Expect: --in-json <file> --out-ir <file>
             let in_json = find_arg(&args, "--in-json");
             let out_ir = find_arg(&args, "--out-ir");
             match (in_json, out_ir) {

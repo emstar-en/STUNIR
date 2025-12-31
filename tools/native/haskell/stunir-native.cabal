@@ -14,6 +14,7 @@ executable stunir-native
                      , Commands.GenProvenance
                      , Commands.CheckToolchain
                      , IR.V1
+                     , IR.Provenance
   hs-source-dirs:      src
   build-depends:       base >= 4.7 && < 5
                      , aeson
@@ -21,4 +22,6 @@ executable stunir-native
                      , text
                      , bytestring
                      , optparse-applicative
+                     , cryptohash-sha256
+                     , base16-bytestring
   default-language:    Haskell2010

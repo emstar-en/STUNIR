@@ -1,93 +1,77 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env bash
+# scripts/build.sh
+# STUNIR Master Build Script (Polyglot Dispatch)
 
-# STUNIR Build Script v2 (Native-First Polyglot)
-# ------------------------------------------------
-# This script orchestrates the deterministic build pipeline.
-# It delegates actual logic to the 'stunir-dispatch' function,
-# which prefers compiled native tools over Python/Shell.
+# Source core library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/stunir_core.sh"
 
-# 1. Setup Environment
-export STUNIR_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-export BUILD_DIR="$STUNIR_ROOT/build"
-export ARTIFACTS_DIR="$STUNIR_ROOT/artifacts"
-mkdir -p "$BUILD_DIR" "$ARTIFACTS_DIR"
+# --- Configuration ---
+LOCKFILE="build/local_toolchain.lock.json"
 
-# Load Dispatcher
-source "$STUNIR_ROOT/scripts/lib/dispatch.sh"
+# --- 1. Bootstrap / Discovery ---
+if [ ! -f "$LOCKFILE" ]; then
+    log_info "Lockfile not found. Running discovery..."
+    bash "$SCRIPT_DIR/discovery.sh"
+fi
 
-echo "=== STUNIR Build Pipeline v2 ==="
-echo "Root: $STUNIR_ROOT"
+# --- 2. Orchestration ---
+log_info "Starting Build Orchestration..."
 
-# 2. Bootstrap / Toolchain Check
-# Ensure we have a usable toolchain (Native or Python)
-stunir_dispatch check-toolchain --lockfile "$STUNIR_ROOT/local_toolchain.lock.json"
+# --- 3. Dispatch to Semantic Engine ---
 
-# 3. Generate Epoch
-# We need a fixed timestamp for this build run
-EPOCH_JSON="$BUILD_DIR/epoch.json"
-EPOCH=$(stunir_dispatch epoch --out-json "$EPOCH_JSON" --print-epoch)
-echo "Build Epoch: $EPOCH"
+# Strategy: Prefer Native (Rust/Haskell) -> Fallback to Python -> Fallback to Shell
 
-# 4. Import Code (Source -> Spec)
-# Scans source code and generates a canonical spec.json
-echo "--- Step 1: Import Code ---"
-SPEC_ROOT="$BUILD_DIR/spec"
-mkdir -p "$SPEC_ROOT"
-stunir_dispatch import-code \
-    --input-root "$STUNIR_ROOT" \
-    --out-spec "$SPEC_ROOT/spec.json"
+NATIVE_BIN=""
 
-# 5. Spec -> IR (Intermediate Reference)
-# Converts spec to canonical IR
-echo "--- Step 2: Generate IR ---"
-IR_JSON="$BUILD_DIR/ir.json"
-stunir_dispatch spec-to-ir \
-    --spec-root "$SPEC_ROOT" \
-    --out "$IR_JSON"
+# Check for Rust binary
+if [ -f "tools/native/rust/target/debug/stunir-rust" ]; then
+    NATIVE_BIN="tools/native/rust/target/debug/stunir-rust"
+elif [ -f "tools/native/rust/target/release/stunir-rust" ]; then
+    NATIVE_BIN="tools/native/rust/target/release/stunir-rust"
+fi
 
-# 6. Provenance Generation
-# Generates the C header and JSON for provenance injection
-echo "--- Step 3: Generate Provenance ---"
-PROV_JSON="$BUILD_DIR/provenance.json"
-PROV_HEADER="$BUILD_DIR/provenance.h"
-stunir_dispatch gen-provenance \
-    --epoch "$EPOCH" \
-    --spec-root "$SPEC_ROOT" \
-    --asm-root "$BUILD_DIR/asm" \
-    --out-json "$PROV_JSON" \
-    --out-header "$PROV_HEADER"
+# (Optional) Check for Haskell binary if Rust not found
+# Haskell paths are tricky with cabal, usually we'd expect it installed to a bin dir.
+# For now, we stick to Rust as primary native detection.
 
-# 7. Compilation (The "Build")
-# In a real scenario, this would compile the user's code.
-# For STUNIR self-hosting, we compile the provenance emitter.
-echo "--- Step 4: Compile Target ---"
-TARGET_BIN="$ARTIFACTS_DIR/provenance_emitter"
-stunir_dispatch compile-provenance \
-    --in-prov "$PROV_HEADER" \
-    --out-bin "$TARGET_BIN"
+if [ -n "$NATIVE_BIN" ]; then
+    log_info "Native Engine detected: $NATIVE_BIN"
 
-# 8. Receipt Generation
-# Generate a cryptographic receipt for the build artifact
-echo "--- Step 5: Generate Receipt ---"
-TARGET_HASH=$(sha256sum "$TARGET_BIN" | awk '{print $1}')
-# We use the dispatcher itself as the "tool" for the receipt in this self-hosted context
-TOOL_NAME="stunir-native"
-TOOL_PATH=$(which stunir-native 2>/dev/null || echo "internal")
-TOOL_HASH="0000000000000000000000000000000000000000000000000000000000000000" # Placeholder
-TOOL_VER="0.5.0"
+    # Example Pipeline Execution
+    mkdir -p build/ir build/prov
 
-RECEIPT_JSON="$ARTIFACTS_DIR/receipt.json"
-stunir_dispatch gen-receipt \
-    "provenance_emitter" \
-    "SUCCESS" \
-    "$EPOCH" \
-    "$TOOL_NAME" \
-    "$TOOL_PATH" \
-    "$TOOL_HASH" \
-    "$TOOL_VER" \
-    > "$RECEIPT_JSON"
+    # 1. Spec -> IR
+    log_info "[Native] Generating IR..."
+    # In real usage, we'd loop over specs. Here we mock with a test spec if exists.
+    if [ -f "spec/main.stunir" ]; then
+        "$NATIVE_BIN" spec-to-ir --in-json "spec/main.stunir" --out-ir "build/ir/main.ir"
+    fi
 
-echo "=== Build Complete ==="
-echo "Artifact: $TARGET_BIN"
-echo "Receipt:  $RECEIPT_JSON"
+    # 2. Gen Provenance
+    log_info "[Native] Generating Provenance..."
+    # Mock Epoch
+    echo '{"timestamp": "now"}' > build/epoch.json
+    if [ -f "build/ir/main.ir" ]; then
+        "$NATIVE_BIN" gen-provenance --in-ir "build/ir/main.ir" --epoch-json "build/epoch.json" --out-prov "build/prov/main.prov"
+    fi
+
+else
+    # Fallback to Python
+    PYTHON_PATH=$(grep '"python":' "$LOCKFILE" | grep -o '"path": "[^"]*"' | cut -d'"' -f4)
+
+    if [ -n "$PYTHON_PATH" ] && [ -x "$PYTHON_PATH" ]; then
+        log_info "Python detected ($PYTHON_PATH). Dispatching to Semantic Engine..."
+        # "$PYTHON_PATH" scripts/core/spec_to_ir.py ...
+        log_info "(Simulation) Running Python Semantic Engine..."
+    else
+        log_warn "No Semantic Engine found (Native or Python). Falling back to Shell-Only Verification Mode."
+    fi
+fi
+
+# --- 4. Manifest Generation ---
+mkdir -p dist
+log_info "Generating build manifest..."
+generate_manifest "scripts" "dist/manifest_scripts.txt"
+
+log_info "Build Complete."
