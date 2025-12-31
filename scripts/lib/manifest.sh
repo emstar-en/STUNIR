@@ -34,18 +34,16 @@ discover_tool() {
 generate_lockfile() {
     log_info "Generating toolchain lockfile..."
 
+    # Initialize variable
     json_init "$LOCKFILE"
 
-    # Root Object
-    echo "{" >> "$LOCKFILE"
-
-    # Metadata
+    # Write Header manually
+    echo "{" > "$LOCKFILE"
     echo '  "version": "1.0",' >> "$LOCKFILE"
     echo '  "type": "toolchain_lock",' >> "$LOCKFILE"
-    echo '  "tools": [' >> "$LOCKFILE"
+    printf '  "tools": [' >> "$LOCKFILE"
 
     # Reset helper state for the array items
-    _JSON_FILE="$LOCKFILE"
     _JSON_FIRST_ITEM=1
 
     discover_tool "git" "git"
@@ -53,9 +51,8 @@ generate_lockfile() {
     discover_tool "python" "python3"
     discover_tool "sh" "sh"
 
-    echo "" >> "$LOCKFILE"
-    echo "  ]" >> "$LOCKFILE"
-    echo "}" >> "$LOCKFILE"
+    # Close Array and Object
+    printf "\n  ]\n}\n" >> "$LOCKFILE"
 
     log_info "Lockfile written to $LOCKFILE"
 }
