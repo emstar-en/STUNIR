@@ -93,8 +93,12 @@ class Toolchain:
 # Singleton instance
 _instance = Toolchain()
 
+# Module-level exports
 def require(name: str) -> str:
     return _instance.verify_tool(name)
+
+def get_tool(name: str) -> Optional[str]:
+    return _instance.get_tool(name)
 
 def load(path: str = "local_toolchain.lock.json"):
     _instance.lockfile_path = Path(path).resolve()
