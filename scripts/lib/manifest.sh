@@ -15,8 +15,11 @@ stunir_generate_lockfile() {
     json_init
     json_start_object
     json_key_val "schema_version" "1.0.0"
+    json_add_comma
     json_key_val "generated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+    json_add_comma
     json_key_val "host_os" "$(uname -s)"
+    json_add_comma
 
     json_key_start_array "tools"
 
@@ -37,7 +40,8 @@ stunir_generate_lockfile() {
     json_add_comma
 
     # 3. Bash (Self)
-    _scan_tool "bash" "bash" "--version" | head -n 1
+    # Fix: Do not pipe this function call, or it runs in a subshell and loses state
+    _scan_tool "bash" "bash" "--version"
 
     json_end_array
     json_end_object
@@ -53,6 +57,7 @@ _scan_tool() {
     local ver_arg=$3
 
     local path=$(command -v "$bin")
+    # Fix: Ensure we only get the first line of version output and strip quotes
     local version=$("$bin" $ver_arg 2>&1 | head -n 1 | tr -d '"')
 
     # Calculate Hash (Try sha256sum, then shasum)
