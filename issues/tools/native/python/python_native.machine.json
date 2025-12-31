@@ -1,1 +1,13 @@
-{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"tools/native/python/*","id":"tools/native/python/1002","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Python native verifier (Haskell conformance)"}
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": "tools/native/python/*",
+  "id": "tools/native/python/1002",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "closed",
+  "title": "Python native verifier (Haskell conformance)",
+  "resolution": "implemented in polyglot architecture"
+}
