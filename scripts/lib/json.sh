@@ -1,15 +1,6 @@
 #!/bin/sh
 # STUNIR Shell-Native JSON Builder
 # A simple, dependency-free append-only JSON writer.
-# NOTE: This is NOT a parser. It is for generating receipts/locks.
-
-# Usage:
-#   json_init "output.json"
-#   json_obj_start
-#   json_key_str "key" "value"
-#   json_key_int "count" 42
-#   json_obj_end
-#   json_close
 
 _JSON_FILE=""
 _JSON_FIRST_ITEM=1
@@ -67,12 +58,4 @@ json_key_int() {
     # Usage: json_key_int "key" 123
     _json_comma
     echo "\"\"$1\": $2" >> "$_JSON_FILE"
-}
-
-json_key_obj_start() {
-    # Usage: json_key_obj_start "key"
-    _json_comma
-    echo "\"\"$1\": {" >> "$_JSON_FILE"
-    _JSON_FIRST_ITEM=1
-    _JSON_DEPTH=$((_JSON_DEPTH + 1))
 }

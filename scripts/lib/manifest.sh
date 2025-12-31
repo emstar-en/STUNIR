@@ -35,21 +35,16 @@ generate_lockfile() {
     log_info "Generating toolchain lockfile..."
 
     json_init "$LOCKFILE"
-    json_obj_start
-    json_key_str "version" "1.0"
-    json_key_str "type" "toolchain_lock"
 
-    json_key_str "tools" "" # Header for array (hacky but works with our simple builder)
-    # Actually, let's do it properly with array support if we had it, 
-    # but for now we'll just manually construct the array structure
-    # Re-initializing to use manual structure for the array part
+    # Root Object
+    echo "{" >> "$LOCKFILE"
 
-    echo "{" > "$LOCKFILE"
+    # Metadata
     echo '  "version": "1.0",' >> "$LOCKFILE"
     echo '  "type": "toolchain_lock",' >> "$LOCKFILE"
     echo '  "tools": [' >> "$LOCKFILE"
 
-    # Reset helper state for the array
+    # Reset helper state for the array items
     _JSON_FILE="$LOCKFILE"
     _JSON_FIRST_ITEM=1
 
@@ -64,3 +59,8 @@ generate_lockfile() {
 
     log_info "Lockfile written to $LOCKFILE"
 }
+
+# Execute if run directly
+if [ "$(basename "$0")" = "manifest.sh" ]; then
+    generate_lockfile
+fi
