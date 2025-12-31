@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["targets/polyglot/c89/*"],"id":"targets/polyglot/c89/1031","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete targets → polyglot → c89 pipeline stage"}

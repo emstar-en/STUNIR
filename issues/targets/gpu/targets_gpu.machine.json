@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["targets/gpu/*"],"id":"targets/gpu/1131","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete targets → gpu pipeline stage"}

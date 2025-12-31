@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"targets/polyglot/haskell/*","id":"targets/polyglot/haskell/1005","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Polyglot Haskell targets (c89/c99 equiv)"}
