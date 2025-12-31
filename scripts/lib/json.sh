@@ -1,42 +1,78 @@
-#!/usr/bin/env bash
-# STUNIR Shell-Native JSON Writer
-# A simple, dependency-free JSON builder using string concatenation.
+#!/bin/sh
+# STUNIR Shell-Native JSON Builder
+# A simple, dependency-free append-only JSON writer.
+# NOTE: This is NOT a parser. It is for generating receipts/locks.
 
-JSON_BUFFER=""
+# Usage:
+#   json_init "output.json"
+#   json_obj_start
+#   json_key_str "key" "value"
+#   json_key_int "count" 42
+#   json_obj_end
+#   json_close
+
+_JSON_FILE=""
+_JSON_FIRST_ITEM=1
+_JSON_DEPTH=0
 
 json_init() {
-    JSON_BUFFER=""
+    _JSON_FILE="$1"
+    echo "" > "$_JSON_FILE"
+    _JSON_FIRST_ITEM=1
+    _JSON_DEPTH=0
 }
 
-json_start_object() {
-    JSON_BUFFER="${JSON_BUFFER}{"
+_json_comma() {
+    if [ "$_JSON_FIRST_ITEM" -eq 0 ]; then
+        echo "," >> "$_JSON_FILE"
+    fi
+    _JSON_FIRST_ITEM=0
 }
 
-json_end_object() {
-    JSON_BUFFER="${JSON_BUFFER}}"
+json_obj_start() {
+    _json_comma
+    echo "{" >> "$_JSON_FILE"
+    _JSON_FIRST_ITEM=1
+    _JSON_DEPTH=$((_JSON_DEPTH + 1))
 }
 
-json_start_array() {
-    JSON_BUFFER="${JSON_BUFFER}["
+json_obj_end() {
+    echo "" >> "$_JSON_FILE"
+    echo "}" >> "$_JSON_FILE"
+    _JSON_FIRST_ITEM=0
+    _JSON_DEPTH=$((_JSON_DEPTH - 1))
 }
 
-json_end_array() {
-    JSON_BUFFER="${JSON_BUFFER}]"
+json_arr_start() {
+    _json_comma
+    echo "[" >> "$_JSON_FILE"
+    _JSON_FIRST_ITEM=1
 }
 
-json_key_start_array() {
-    local key=$1
-    JSON_BUFFER="${JSON_BUFFER}\"$key\":["
+json_arr_end() {
+    echo "" >> "$_JSON_FILE"
+    echo "]" >> "$_JSON_FILE"
+    _JSON_FIRST_ITEM=0
 }
 
-json_key_val() {
-    local key=$1
-    local val=$2
-    # Basic escaping for quotes
-    val=${val//\"/\\\"}
-    JSON_BUFFER="${JSON_BUFFER}\"$key\":\"$val\""
+json_key_str() {
+    # Usage: json_key_str "key" "value"
+    _json_comma
+    # Basic escaping for quotes and backslashes
+    val=$(echo "$2" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    echo "\"\"$1\": \"$val\"" >> "$_JSON_FILE"
 }
 
-json_add_comma() {
-    JSON_BUFFER="${JSON_BUFFER},"
+json_key_int() {
+    # Usage: json_key_int "key" 123
+    _json_comma
+    echo "\"\"$1\": $2" >> "$_JSON_FILE"
+}
+
+json_key_obj_start() {
+    # Usage: json_key_obj_start "key"
+    _json_comma
+    echo "\"\"$1\": {" >> "$_JSON_FILE"
+    _JSON_FIRST_ITEM=1
+    _JSON_DEPTH=$((_JSON_DEPTH + 1))
 }

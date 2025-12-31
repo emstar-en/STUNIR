@@ -1,70 +1,44 @@
-#!/usr/bin/env bash
-# STUNIR Receipt Generation (Shell-Native)
+#!/bin/sh
+# STUNIR Receipt Generator
+# Generates a basic receipt.json for the build
 
-source "$STUNIR_ROOT/scripts/lib/json.sh"
+. "$(dirname "$0")/core.sh"
+. "$(dirname "$0")/json.sh"
 
-stunir_generate_receipt() {
-    local build_dir="$STUNIR_ROOT/build"
-    local lockfile="$build_dir/local_toolchain.lock.json"
-    local receipt_file="$build_dir/receipt.json"
+generate_receipt() {
+    ensure_dir "receipts"
+    RECEIPT_FILE="receipts/build_receipt.json"
 
-    stunir_log "Generating Receipt..."
+    log_info "Generating receipt..."
 
-    # 1. Hash Inputs
-    # For now, we assume a default spec if none provided, or just hash the lockfile
-    local lock_hash=$(stunir_hash_file "$lockfile")
+    # Calculate input digest (simple recursive hash of spec/)
+    if [ -d "spec" ]; then
+        SPEC_DIGEST=$(find spec -type f -exec sha256sum {} + | sort | sha256sum | awk '{print $1}')
+    else
+        SPEC_DIGEST="empty"
+    fi
 
-    # 2. Hash Outputs
-    # Scan build dir for outputs (excluding receipt and lockfile)
-    # This is a simplified "Manifest" approach
+    json_init "$RECEIPT_FILE"
+    json_obj_start
 
-    json_init
-    json_start_object
-    json_key_val "schema_version" "1.0.0"
-    json_add_comma
-    json_key_val "timestamp" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    json_add_comma
+    json_key_str "type" "stunir_receipt"
+    json_key_str "profile" "shell_native"
 
-    # Toolchain Section
-    json_key_start_array "toolchain"
-    json_start_object
-    json_key_val "type" "lockfile"
-    json_add_comma
-    json_key_val "path" "build/local_toolchain.lock.json"
-    json_add_comma
-    json_key_val "sha256" "$lock_hash"
-    json_end_object
-    json_end_array
-    json_add_comma
+    # Timestamp (allowed in receipt metadata)
+    DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    json_key_str "timestamp" "$DATE"
 
-    # Outputs Section
-    json_key_start_array "outputs"
+    json_key_str "spec_digest" "$SPEC_DIGEST"
 
-    local first=true
-    for f in "$build_dir"/*; do
-        local fname=$(basename "$f")
-        if [[ "$fname" == "receipt.json" || "$fname" == "local_toolchain.lock.json" ]]; then
-            continue
-        fi
+    # Toolchain Lock Hash
+    if [ -f "local_toolchain.lock.json" ]; then
+        LOCK_HASH=$(calc_sha256 "local_toolchain.lock.json")
+        json_key_str "toolchain_lock_sha256" "$LOCK_HASH"
+    fi
 
-        if [ "$first" = true ]; then
-            first=false
-        else
-            json_add_comma
-        fi
+    json_key_str "status" "SUCCESS"
 
-        local fhash=$(stunir_hash_file "$f")
-        json_start_object
-        json_key_val "path" "build/$fname"
-        json_add_comma
-        json_key_val "sha256" "$fhash"
-        json_end_object
-    done
+    json_obj_end
 
-    json_end_array
-
-    json_end_object
-
-    echo "$JSON_BUFFER" > "$receipt_file"
-    stunir_ok "Receipt generated at: $receipt_file"
+    log_info "Receipt written to $RECEIPT_FILE"
 }
