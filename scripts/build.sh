@@ -11,6 +11,7 @@ SPEC_ROOT="spec"
 OUT_IR="asm/spec_ir.json"
 OUT_PY="asm/output.py"
 LOCK_FILE="local_toolchain.lock.json"
+# Correct path to the Rust binary we built
 NATIVE_BIN="tools/native/rust/stunir-native/target/release/stunir-native"
 
 log() { echo "[STUNIR] $1"; }
@@ -55,28 +56,29 @@ chmod +x scripts/lib/*.sh 2>/dev/null || true
 
 case "$RUNTIME" in
     native)
+        if [ ! -x "$NATIVE_BIN" ]; then
+            log "Error: Native binary not found at $NATIVE_BIN"
+            log "Please run: cd tools/native/rust/stunir-native && cargo build --release"
+            exit 1
+        fi
+        
         log "Using Native Core: $NATIVE_BIN"
-
-        # 1. Spec -> IR
-        # Note: Native currently takes a single file input, we might need to loop or aggregate
-        # For now, we assume a single entry point spec or aggregate it.
-        # TODO: Update native to handle directory scanning like Python does.
-        # Temporary hack: Create a dummy aggregate spec if none exists
-        AGG_SPEC="asm/aggregate_spec.json"
-        mkdir -p asm
-        echo '{"kind": "spec", "modules": []}' > "$AGG_SPEC"
-
-        "$NATIVE_BIN" spec-to-ir --input "$AGG_SPEC" --output "$OUT_IR"
-
+        
+        # 1. Spec -> IR (Native Directory Scan)
+        "$NATIVE_BIN" spec-to-ir --input "$SPEC_ROOT" --output "$OUT_IR"
+        
         # 2. IR -> Code
         "$NATIVE_BIN" emit --input "$OUT_IR" --target python --output "$OUT_PY"
-
+        
         log "Build complete (Native)"
         ;;
 
     python)
         # Original Python path
-        exec python3 -B tools/spec_to_ir.py             --spec-root "$SPEC_ROOT"             --out "$OUT_IR"             --lockfile "$LOCK_FILE"
+        exec python3 -B tools/spec_to_ir.py \
+            --spec-root "$SPEC_ROOT" \
+            --out "$OUT_IR" \
+            --lockfile "$LOCK_FILE"
         ;;
 
     shell)
