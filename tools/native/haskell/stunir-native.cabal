@@ -1,20 +1,23 @@
-cabal-version:      3.8
 name:                stunir-native
 version:             0.1.0.0
-synopsis:            STUNIR Native Haskell Pipeline
+synopsis:            STUNIR Native Toolchain (Haskell Implementation)
+license:             MIT
+author:              STUNIR Team
+maintainer:          maintainer@example.com
+category:            Development
+build-type:          Simple
+cabal-version:       >=1.10
 
 executable stunir-native
-  main-is:             StunirNative.hs
-  build-depends:       
-      base ^>=4.18.0.0,
-      aeson,
-      bytestring,
-      text,
-      generic-deriving
-  hs-source-dirs:      .
-  default-language:    GHC2021
-  ghc-options:         
-    -Wall
-    -O2
-    -dynamic
-    -threaded
+  main-is:             Main.hs
+  other-modules:       Commands.SpecToIr
+                     , Commands.GenProvenance
+                     , Commands.CheckToolchain
+                     , IR.V1
+  hs-source-dirs:      src
+  build-depends:       base >= 4.7 && < 5
+                     , aeson
+                     , text
+                     , bytestring
+                     , optparse-applicative
+  default-language:    Haskell2010
