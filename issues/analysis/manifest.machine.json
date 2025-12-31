@@ -1,0 +1,10 @@
+[
+  "conformance",
+  "coverage",
+  "dependencies",
+  "memory",
+  "network",
+  "performance",
+  "security",
+  "threading"
+]
