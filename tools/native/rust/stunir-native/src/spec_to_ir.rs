@@ -14,6 +14,7 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
 
     // 2. Transform Spec -> IR
     let mut functions = Vec::new();
+    let mut module_names = Vec::new();
 
     for module in &spec.modules {
         let func = IrFunction {
@@ -23,34 +24,46 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
                     op: "comment".to_string(),
                     args: vec![format!("Source Language: {}", module.lang)],
                 },
+                // Use 'raw' op to emit source code directly without wrapping
                 IrInstruction {
-                    op: "print".to_string(),
-                    args: vec![format!("Executing module: {}", module.name)],
-                },
-                // Pass-through: Emit source as a print for now
-                IrInstruction {
-                    op: "print".to_string(),
+                    op: "raw".to_string(),
                     args: vec![module.source.clone()],
                 },
             ],
         };
         functions.push(func);
+        module_names.push(module.name.clone());
     }
 
-    // If no modules, add a default main
-    if functions.is_empty() {
-        functions.push(IrFunction {
-            name: "main".to_string(),
-            body: vec![
-                IrInstruction {
-                    op: "print".to_string(),
-                    args: vec!["STUNIR: No modules defined in spec.".to_string()],
-                }
-            ],
+    // 3. Generate Main Orchestrator
+    // If we have modules, create a main that calls them in order.
+    // If no modules, create a default main.
+    let mut main_body = Vec::new();
+
+    if module_names.is_empty() {
+        main_body.push(IrInstruction {
+            op: "print".to_string(),
+            args: vec!["STUNIR: No modules defined in spec.".to_string()],
         });
+    } else {
+        main_body.push(IrInstruction {
+            op: "print".to_string(),
+            args: vec!["STUNIR: Orchestrating modules...".to_string()],
+        });
+        for name in module_names {
+            main_body.push(IrInstruction {
+                op: "call".to_string(),
+                args: vec![name],
+            });
+        }
     }
 
-    // 3. Construct Final IR
+    functions.push(IrFunction {
+        name: "main".to_string(),
+        body: main_body,
+    });
+
+    // 4. Construct Final IR
     let ir = IrV1 {
         kind: "ir".to_string(),
         generator: "stunir-native-rust".to_string(),
@@ -64,7 +77,7 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
         },
     };
 
-    // 4. Write Output
+    // 5. Write Output
     let ir_json = serde_json::to_string_pretty(&ir)
         .map_err(|e| StunirError::Json(e.to_string()))?;
 
