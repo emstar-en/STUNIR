@@ -1,50 +1,53 @@
-#!/usr/bin/env bash
-# scripts/lib/dispatch.sh
-# STUNIR Polyglot Dispatcher
+#!/bin/bash
 
-# Configuration
-: "${STUNIR_NATIVE_BIN:=build/bin/stunir-native}"
-: "${STUNIR_PYTHON_BIN:=python3}"
+# STUNIR Dispatcher
+# -----------------
+# Routes commands to the best available implementation:
+# 1. Native Binary (stunir-native) - Preferred for speed and strictness
+# 2. Python Scripts (tools/*.py)   - Fallback for development
+# 3. Shell Functions (lib/*.sh)    - Last resort / bootstrapping
 
-# Load Shell Libraries
-source scripts/lib/json_canon.sh
-source scripts/lib/receipt.sh
-
-can_dispatch_native() {
-    if [[ "${STUNIR_FORCE_NO_NATIVE:-0}" == "1" ]]; then return 1; fi
-    if [[ -x "$STUNIR_NATIVE_BIN" ]]; then return 0; fi
-    return 1
-}
+# Locate Native Binary
+# We look in the standard build location or PATH
+NATIVE_BIN="$STUNIR_ROOT/tools/native/haskell/stunir-native/dist-newstyle/build/x86_64-linux/ghc-9.4.8/stunir-native-0.5.0.0/x/stunir-native/build/stunir-native/stunir-native"
+# Also check for Rust binary location
+if [ ! -f "$NATIVE_BIN" ]; then
+    NATIVE_BIN="$STUNIR_ROOT/tools/native/rust/stunir-native/target/release/stunir-native"
+fi
 
 stunir_dispatch() {
     local cmd="$1"
     shift
 
-    # 1. Native Route
-    if can_dispatch_native; then
-        local native_cmd="${cmd//_/-}"
-        "$STUNIR_NATIVE_BIN" "$native_cmd" "$@"
+    # Strategy 1: Native Binary
+    if [ -x "$NATIVE_BIN" ]; then
+        # echo "[DEBUG] Dispatching to Native: $cmd" >&2
+        "$NATIVE_BIN" "$cmd" "$@"
         return $?
     fi
 
-    # 2. Python Route
-    local py_tool="tools/${cmd}.py"
-    if [[ -f "$py_tool" && "${STUNIR_FORCE_NO_PYTHON:-0}" != "1" ]]; then
-        "$STUNIR_PYTHON_BIN" "$py_tool" "$@"
+    # Strategy 2: Python Tools
+    # Map kebab-case commands to python scripts
+    # e.g. spec-to-ir -> tools/spec_to_ir.py
+    local py_script="$STUNIR_ROOT/tools/${cmd//-/_}.py"
+    if [ -f "$py_script" ]; then
+        # echo "[DEBUG] Dispatching to Python: $cmd" >&2
+        python3 "$py_script" "$@"
         return $?
     fi
 
-    # 3. Shell Fallback Route
-    # Map "gen_receipt" -> "cmd_gen_receipt"
-    local shell_func="cmd_${cmd}"
-    if declare -f "$shell_func" > /dev/null; then
-        "$shell_func" "$@"
+    # Strategy 3: Shell Fallback
+    # Load shell library if needed
+    local sh_lib="$STUNIR_ROOT/scripts/lib/${cmd//-/_}.sh"
+    if [ -f "$sh_lib" ]; then
+        source "$sh_lib"
+        "stunir_${cmd//-/_}" "$@"
         return $?
     fi
 
-    echo "STUNIR DISPATCH ERROR: No implementation found for '$cmd'" >&2
-    return 127
+    echo "Error: No implementation found for command '$cmd'" >&2
+    echo "  Checked Native: $NATIVE_BIN" >&2
+    echo "  Checked Python: $py_script" >&2
+    echo "  Checked Shell:  $sh_lib" >&2
+    exit 127
 }
-
-export -f stunir_dispatch
-export -f can_dispatch_native

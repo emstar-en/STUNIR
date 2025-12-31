@@ -1,86 +1,93 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
+set -euo pipefail
 
-# STUNIR Build Script
-# 1. Discover Toolchain
-# 2. Load Toolchain (Inject STUNIR_TOOL_* vars)
-# 3. Dispatch Build Steps
+# STUNIR Build Script v2 (Native-First Polyglot)
+# ------------------------------------------------
+# This script orchestrates the deterministic build pipeline.
+# It delegates actual logic to the 'stunir-dispatch' function,
+# which prefers compiled native tools over Python/Shell.
 
-# --- 1. Toolchain Discovery ---
-if [[ ! -f "build/local_toolchain.lock.json" ]]; then
-    echo ">>> Generating toolchain lockfile..."
-    ./tools/discover_toolchain.sh "build/local_toolchain.lock.json"
-fi
+# 1. Setup Environment
+export STUNIR_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export BUILD_DIR="$STUNIR_ROOT/build"
+export ARTIFACTS_DIR="$STUNIR_ROOT/artifacts"
+mkdir -p "$BUILD_DIR" "$ARTIFACTS_DIR"
 
-# --- 2. Toolchain Injection ---
-echo ">>> Loading toolchain..."
-source scripts/lib/load_toolchain.sh "build/local_toolchain.lock.json"
+# Load Dispatcher
+source "$STUNIR_ROOT/scripts/lib/dispatch.sh"
 
-# Fallbacks if injection failed or variables missing (for bootstrap)
-: "${STUNIR_TOOL_PYTHON:=python3}"
-: "${STUNIR_TOOL_GIT:=git}"
+echo "=== STUNIR Build Pipeline v2 ==="
+echo "Root: $STUNIR_ROOT"
 
-# --- 3. Native Staging ---
-STUNIR_NATIVE_SRC="tools/native/rust/stunir-native/target/release/stunir-native"
-if [[ -x "$STUNIR_NATIVE_SRC" ]]; then
-    mkdir -p build
-    cp "$STUNIR_NATIVE_SRC" build/stunir_native
-    chmod +x build/stunir_native
-    echo "Staged native: build/stunir_native"
-fi
+# 2. Bootstrap / Toolchain Check
+# Ensure we have a usable toolchain (Native or Python)
+stunir_dispatch check-toolchain --lockfile "$STUNIR_ROOT/local_toolchain.lock.json"
 
-# Load Dispatcher (uses STUNIR_TOOL_PYTHON)
-source scripts/lib/dispatch.sh
+# 3. Generate Epoch
+# We need a fixed timestamp for this build run
+EPOCH_JSON="$BUILD_DIR/epoch.json"
+EPOCH=$(stunir_dispatch epoch --out-json "$EPOCH_JSON" --print-epoch)
+echo "Build Epoch: $EPOCH"
 
-mkdir -p build
-mkdir -p receipts
+# 4. Import Code (Source -> Spec)
+# Scans source code and generates a canonical spec.json
+echo "--- Step 1: Import Code ---"
+SPEC_ROOT="$BUILD_DIR/spec"
+mkdir -p "$SPEC_ROOT"
+stunir_dispatch import-code \
+    --input-root "$STUNIR_ROOT" \
+    --out-spec "$SPEC_ROOT/spec.json"
 
-echo ">>> [0/6] Checking Toolchain..."
-stunir_dispatch check_toolchain --lockfile build/local_toolchain.lock.json
+# 5. Spec -> IR (Intermediate Reference)
+# Converts spec to canonical IR
+echo "--- Step 2: Generate IR ---"
+IR_JSON="$BUILD_DIR/ir.json"
+stunir_dispatch spec-to-ir \
+    --spec-root "$SPEC_ROOT" \
+    --out "$IR_JSON"
 
-echo ">>> [1/6] Determining Epoch..."
-stunir_dispatch epoch --out-json build/epoch.json --print-epoch
+# 6. Provenance Generation
+# Generates the C header and JSON for provenance injection
+echo "--- Step 3: Generate Provenance ---"
+PROV_JSON="$BUILD_DIR/provenance.json"
+PROV_HEADER="$BUILD_DIR/provenance.h"
+stunir_dispatch gen-provenance \
+    --epoch "$EPOCH" \
+    --spec-root "$SPEC_ROOT" \
+    --asm-root "$BUILD_DIR/asm" \
+    --out-json "$PROV_JSON" \
+    --out-header "$PROV_HEADER"
 
-echo ">>> [2/6] Importing Code..."
-if [[ -d "src" ]]; then
-    stunir_dispatch import_code --input-root src --out-spec build/spec.json
-else
-    echo "No 'src' directory found, skipping."
-    # Use python for canonical echo if available, or simple echo
-    echo '{"kind":"spec","modules":[]}' > build/spec.json
-fi
+# 7. Compilation (The "Build")
+# In a real scenario, this would compile the user's code.
+# For STUNIR self-hosting, we compile the provenance emitter.
+echo "--- Step 4: Compile Target ---"
+TARGET_BIN="$ARTIFACTS_DIR/provenance_emitter"
+stunir_dispatch compile-provenance \
+    --in-prov "$PROV_HEADER" \
+    --out-bin "$TARGET_BIN"
 
-echo ">>> [3/6] Generating IR..."
-stunir_dispatch spec_to_ir --spec-root build --out build/ir.json
+# 8. Receipt Generation
+# Generate a cryptographic receipt for the build artifact
+echo "--- Step 5: Generate Receipt ---"
+TARGET_HASH=$(sha256sum "$TARGET_BIN" | awk '{print $1}')
+# We use the dispatcher itself as the "tool" for the receipt in this self-hosted context
+TOOL_NAME="stunir-native"
+TOOL_PATH=$(which stunir-native 2>/dev/null || echo "internal")
+TOOL_HASH="0000000000000000000000000000000000000000000000000000000000000000" # Placeholder
+TOOL_VER="0.5.0"
 
-# Generate Receipt for IR
-stunir_dispatch receipt --toolchain-lock build/local_toolchain.lock.json --in-bin build/ir.json --out-receipt receipts/spec_ir.json
+RECEIPT_JSON="$ARTIFACTS_DIR/receipt.json"
+stunir_dispatch gen-receipt \
+    "provenance_emitter" \
+    "SUCCESS" \
+    "$EPOCH" \
+    "$TOOL_NAME" \
+    "$TOOL_PATH" \
+    "$TOOL_HASH" \
+    "$TOOL_VER" \
+    > "$RECEIPT_JSON"
 
-echo ">>> [4/6] Generating Provenance..."
-stunir_dispatch gen_provenance --epoch 0 --spec-root build --asm-root src --out-json build/provenance.json --out-header build/provenance.h
-
-echo ">>> [5/6] Compiling Provenance..."
-stunir_dispatch compile_provenance --in-prov build/provenance.json --out-bin build/provenance.bin
-
-echo ">>> [6/6] Generating Receipt..."
-if [ ! -f build/provenance.bin ] && [ -f build/provenance.json ]; then
-    cp build/provenance.json build/provenance.bin
-fi
-stunir_dispatch receipt --toolchain-lock build/local_toolchain.lock.json --in-bin build/provenance.bin --out-receipt receipts/prov_emit.json
-
-echo ">>> [Extra] Generating Manifests..."
-echo '{"schema": "stunir.ir_manifest.v2", "files": []}' > receipts/ir_manifest.json
-
-# Use injected GIT/SHA tools if available, or fallback
-if [[ -n "$STUNIR_TOOL_SHA256SUM" ]]; then
-    ir_hash=$("$STUNIR_TOOL_SHA256SUM" build/ir.json | awk '{print $1}')
-elif command -v sha256sum >/dev/null 2>&1; then
-    ir_hash=$(sha256sum build/ir.json | awk '{print $1}')
-else
-    ir_hash="unknown"
-fi
-
-manifest_json="{\"schema\": \"stunir.ir_bundle_manifest.v1\", \"bundle\": \"build/ir.json\", \"bundle_sha256\": \"$ir_hash\", \"entries\": []}"
-echo "$manifest_json" > receipts/ir_bundle_manifest.json
-
-echo ">>> Build Complete!"
+echo "=== Build Complete ==="
+echo "Artifact: $TARGET_BIN"
+echo "Receipt:  $RECEIPT_JSON"
