@@ -5,7 +5,7 @@ import json
 import subprocess
 import platform
 from datetime import datetime, timezone
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 # Import the core logic from minimal (Code Reuse)
 # In a real package structure, this would be `from . import stunir_minimal`
