@@ -1,1 +1,12 @@
-["comprehensive-consolidation.rfc6902.json","core-simple-m_of_n.rfc6902.json","entity-autonomy-ecc-delta.rfc6902.json","generalized-provenance-accounting.rfc6902.json","io-discrete.rfc6902.json","ld-namespacing.comprehensive.rfc6902.json","pipeline-to-nld.rfc6902.json","quorum-arming.rfc6902.json","robot-safety-stub.rfc6902.json","schema_fix_catalog.json"]
+[
+  "comprehensive-consolidation.rfc6902.json",
+  "core-simple-m_of_n.rfc6902.json",
+  "entity-autonomy-ecc-delta.rfc6902.json",
+  "generalized-provenance-accounting.rfc6902.json",
+  "io-discrete.rfc6902.json",
+  "ld-namespacing.comprehensive.rfc6902.json",
+  "pipeline-to-nld.rfc6902.json",
+  "quorum-arming.rfc6902.json",
+  "robot-safety-stub.rfc6902.json",
+  "schema_fix_catalog.json"
+]

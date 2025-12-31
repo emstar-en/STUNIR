@@ -1,1 +1,17 @@
-{"code_emission.md":"Documentation","dependencies.txt":"Text file","ir_bundle_v1.md":"Documentation","receipt_policy_blurb.txt":"Text file","receipt_storage_policy.md":"Documentation","relayout_report.md":"Documentation","requirements.txt":"Text file","toolchain_contracts.md":"Documentation","verification.md":"Documentation","verification_profiles.md":"Documentation"}
+{
+  "design": "Directory",
+  "examples": "Directory",
+  "policy": "Directory",
+  "root": "Directory",
+  "targets": "Directory",
+  "code_emission.md": "File",
+  "dependencies.txt": "File",
+  "ir_bundle_v1.md": "File",
+  "receipt_policy_blurb.txt": "File",
+  "receipt_storage_policy.md": "File",
+  "relayout_report.md": "File",
+  "requirements.txt": "File",
+  "toolchain_contracts.md": "File",
+  "verification.md": "File",
+  "verification_profiles.md": "File"
+}

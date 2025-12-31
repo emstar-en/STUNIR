@@ -1,1 +1,27 @@
-["c_compiler.json","cargo.json","clingo.json","dotnet_sdk.json","go_toolchain.json","javac.json","julia_runtime.json","lua_runtime.json","minizinc.json","node_runtime.json","php_runtime.json","profile3_shell_only_verifier_v1.json","python_runtime.json","r_runtime.json","receipt_build_v1.schema.json","receipt_emit_v1.schema.json","ruby_runtime.json","runghc.json","sbcl.json","souffle.json","stunir_profile3_contract.json","swi_prolog.json","target_requirements.json","wasm_wat_to_wasm.json","z3_solver.json"]
+[
+  "c_compiler.json",
+  "cargo.json",
+  "clingo.json",
+  "dotnet_sdk.json",
+  "go_toolchain.json",
+  "javac.json",
+  "julia_runtime.json",
+  "lua_runtime.json",
+  "minizinc.json",
+  "node_runtime.json",
+  "php_runtime.json",
+  "profile3_shell_only_verifier_v1.json",
+  "python_runtime.json",
+  "r_runtime.json",
+  "receipt_build_v1.schema.json",
+  "receipt_emit_v1.schema.json",
+  "ruby_runtime.json",
+  "runghc.json",
+  "sbcl.json",
+  "souffle.json",
+  "stunir_profile3_contract.json",
+  "swi_prolog.json",
+  "target_requirements.json",
+  "wasm_wat_to_wasm.json",
+  "z3_solver.json"
+]

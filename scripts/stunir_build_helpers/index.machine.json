@@ -1,1 +1,6 @@
-{"README.md":"Documentation","build_targets.ps1":"File","build_targets.sh":"Shell script"}
+{
+  "presets": "Directory",
+  "README.md": "File",
+  "build_targets.ps1": "File",
+  "build_targets.sh": "File"
+}

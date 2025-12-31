@@ -1,1 +1,18 @@
-["build_default_wasm_c.ps1","build_default_wasm_c.sh","build_lisp.ps1","build_lisp.sh","build_lisp_all.ps1","build_lisp_all.sh","build_lisp_sbcl.ps1","build_lisp_sbcl.sh","build_python.ps1","build_python.sh","build_python_cpython.ps1","build_python_cpython.sh","build_smt.ps1","build_smt.sh","build_smt_z3.ps1","build_smt_z3.sh"]
+[
+  "build_default_wasm_c.ps1",
+  "build_default_wasm_c.sh",
+  "build_lisp.ps1",
+  "build_lisp.sh",
+  "build_lisp_all.ps1",
+  "build_lisp_all.sh",
+  "build_lisp_sbcl.ps1",
+  "build_lisp_sbcl.sh",
+  "build_python.ps1",
+  "build_python.sh",
+  "build_python_cpython.ps1",
+  "build_python_cpython.sh",
+  "build_smt.ps1",
+  "build_smt.sh",
+  "build_smt_z3.ps1",
+  "build_smt_z3.sh"
+]

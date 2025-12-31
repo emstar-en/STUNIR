@@ -1,1 +1,4 @@
-{"test_ir_bundle_v1.py":"Python script","test_ir_bundle_v1_vectors.json":"JSON data/config"}
+{
+  "test_ir_bundle_v1.py": "File",
+  "test_ir_bundle_v1_vectors.json": "File"
+}

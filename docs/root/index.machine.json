@@ -1,1 +1,11 @@
-{"ENTRYPOINT.md":"Documentation","stunir_pack_archiving_v0.md":"Documentation","stunir_pack_manifest_v0.md":"Documentation","stunir_pack_manifest_v1.md":"Documentation","stunir_pack_materialization_v0.md":"Documentation","stunir_pack_root_attestation_text_v0.md":"Documentation","stunir_pack_root_attestation_v0.md":"Documentation","stunir_pack_security_v0.md":"Documentation","stunir_pack_spec_v0.md":"Documentation"}
+{
+  "ENTRYPOINT.md": "File",
+  "stunir_pack_archiving_v0.md": "File",
+  "stunir_pack_manifest_v0.md": "File",
+  "stunir_pack_manifest_v1.md": "File",
+  "stunir_pack_materialization_v0.md": "File",
+  "stunir_pack_root_attestation_text_v0.md": "File",
+  "stunir_pack_root_attestation_v0.md": "File",
+  "stunir_pack_security_v0.md": "File",
+  "stunir_pack_spec_v0.md": "File"
+}

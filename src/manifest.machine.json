@@ -1,1 +1,13 @@
-["emit.rs","hello.c","hello.txt","ir_v1.rs","main.rs","spec_to_ir.rs","validate.rs"]
+[
+  "emit",
+  "canonical.rs",
+  "emit.rs",
+  "hello.c",
+  "hello.txt",
+  "import.rs",
+  "ir_v1.rs",
+  "main.rs",
+  "spec_to_ir.rs",
+  "toolchain.rs",
+  "validate.rs"
+]

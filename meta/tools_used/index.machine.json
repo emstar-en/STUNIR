@@ -1,1 +1,8 @@
-{"epoch.py":"Python script","gen_provenance.py":"Python script","ir_to_lisp.py":"Python script","ir_to_python.py":"Python script","ir_to_smt2.py":"Python script","record_receipt.py":"Python script"}
+{
+  "epoch.py": "File",
+  "gen_provenance.py": "File",
+  "ir_to_lisp.py": "File",
+  "ir_to_python.py": "File",
+  "ir_to_smt2.py": "File",
+  "record_receipt.py": "File"
+}

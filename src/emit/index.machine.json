@@ -1,1 +1,7 @@
-{"bash.rs":"File","js.rs":"File","powershell.rs":"File","python.rs":"File","wat.rs":"File"}
+{
+  "bash.rs": "File",
+  "js.rs": "File",
+  "powershell.rs": "File",
+  "python.rs": "File",
+  "wat.rs": "File"
+}

@@ -1,1 +1,7 @@
-["bash.rs","js.rs","powershell.rs","python.rs","wat.rs"]
+[
+  "bash.rs",
+  "js.rs",
+  "powershell.rs",
+  "python.rs",
+  "wat.rs"
+]
