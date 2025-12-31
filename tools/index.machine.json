@@ -1,1 +1,15 @@
-{"INDEX.json":"JSON data/config","build_ir_bundle_v1.py":"Python script","compile_provenance.py":"Python script","dcbor.py":"Python script","dep_receipt_tool.py":"Python script","discover_toolchain.py":"Python script","discover_toolchain.sh":"Shell script","dispatch_config.json":"JSON data/config","emit_output_manifest.py":"Python script","epoch.py":"Python script","gen_provenance.py":"Python script","gen_receipt.py":"Python script","import_code.py":"Python script","import_spec.py":"Python script","inspect_attestation.py":"Python script","ir_bundle_v1.py":"Python script","ir_in_source_ingest.py":"Python script","ir_to_asm.py":"Python script","ir_to_c.py":"Python script","ir_to_code.py":"Python script","ir_to_cpp.py":"Python script","ir_to_csharp.py":"Python script","ir_to_dotnet.py":"Python script","ir_to_erlang.py":"Python script","ir_to_go.py":"Python script","ir_to_haskell.py":"Python script","ir_to_java.py":"Python script","ir_to_lisp.py":"Python script","ir_to_node.py":"Python script","ir_to_php.py":"Python script","ir_to_prolog.py":"Python script","ir_to_python.py":"Python script","ir_to_ruby.py":"Python script","ir_to_rust.py":"Python script","ir_to_smt2.py":"Python script","ir_to_wasm.py":"Python script","probe_dependency.py":"Python script","prov_emit.c":"C source","receipt.py":"Python script","record_receipt.py":"Python script","resolve_requirements.py":"Python script","snippet_ingest.py":"Python script","spec_to_ir.py":"Python script","spec_to_ir_files.py":"Python script","verify_build.py":"Python script","verify_dependency_receipt.py":"Python script","verify_requirements.py":"Python script"}
+{
+  "asm": "Category",
+  "canonicalizers": "Category",
+  "debuggers": "Category",
+  "emitters": "Category",
+  "inspectors": "Category",
+  "ir_emitter": "Category",
+  "manifest": "Category",
+  "native": "Category",
+  "parsers": "Category",
+  "profilers": "Category",
+  "receipt_emitter": "Category",
+  "serializers": "Category",
+  "validators": "Category"
+}

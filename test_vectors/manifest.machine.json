@@ -1,1 +1,13 @@
-["conformance_0001.sha256","pack_0001.dcbor.sha256","pack_0001.json"]
+[
+  "chaos",
+  "contracts",
+  "edge_cases",
+  "full_pipeline",
+  "fuzz",
+  "mutation",
+  "native",
+  "performance",
+  "polyglot",
+  "property",
+  "receipts"
+]
