@@ -1,0 +1,1 @@
+{"category":"conformance","created":1735500000,"dependencies":["ISSUE.HASKELL.0002","ISSUE.IR.0001"],"description":"scripts/test_conformance.sh: All paths → e3b0c442... (Haskell canonical)","id":"ISSUE.CONFORMANCE.0001","priority":1,"status":"closed","subcategory":"haskell_first","title":"Byte-for-byte conformance: Rust/Python MUST match Haskell","updated":1735500000}
