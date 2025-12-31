@@ -7,8 +7,18 @@ set -u
 # --- Configuration ---
 # Allow override via env var: STUNIR_PROFILE=native|python|shell
 PROFILE="${STUNIR_PROFILE:-auto}"
+SPEC_ROOT="spec"
+OUT_FILE="asm/spec_ir.txt"
+LOCK_FILE="local_toolchain.lock.json"
 
 log() { echo "[STUNIR] $1"; }
+
+# --- Pre-flight ---
+# Ensure spec directory exists so tools don't crash on empty repo
+if [ ! -d "$SPEC_ROOT" ]; then
+    log "Creating default spec directory..."
+    mkdir -p "$SPEC_ROOT"
+fi
 
 # --- Detection ---
 
@@ -34,24 +44,31 @@ detect_runtime() {
 RUNTIME=$(detect_runtime)
 log "Runtime selected: $RUNTIME"
 
+# 1. Discovery Phase (Always run shell manifest first to generate lockfile)
+# This ensures Python has a lockfile to verify against
+log "Running Toolchain Discovery..."
+chmod +x scripts/lib/*.sh 2>/dev/null
+./scripts/lib/manifest.sh
+
 case "$RUNTIME" in
     python)
         # Original Python path
         # We use -B to prevent __pycache__ clutter
-        exec python3 -B tools/spec_to_ir.py "$@"
+        exec python3 -B tools/spec_to_ir.py \
+            --spec-root "$SPEC_ROOT" \
+            --out "$OUT_FILE" \
+            --lockfile "$LOCK_FILE"
         ;;
 
     shell)
         # Shell-Native path
-        # Ensure scripts are executable
-        chmod +x scripts/lib/*.sh 2>/dev/null
-        exec ./scripts/lib/runner.sh "$@"
+        exec ./scripts/lib/runner.sh
         ;;
 
     native)
         # Native binary path (future)
         if [ -x "bin/stunir-cli" ]; then
-            exec ./bin/stunir-cli "$@"
+            exec ./bin/stunir-cli build --spec "$SPEC_ROOT" --out "$OUT_FILE"
         else
             log "Error: Native binary not found at bin/stunir-cli"
             exit 1
