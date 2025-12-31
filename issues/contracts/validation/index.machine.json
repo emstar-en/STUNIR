@@ -1,3 +1,3 @@
 {
-  "contracts_validation.machine.json": "Issue contracts_validation [Deps: native/haskell]"
+  "contracts_validation.machine.json": "Complete contracts \u2192 validation pipeline stage"
 }

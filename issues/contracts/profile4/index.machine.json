@@ -1,4 +1,4 @@
 {
-  "contracts_profile4.machine.json": "Issue contracts_profile4 [Deps: native/haskell]",
-  "profile_4.machine.json": "Issue profile_4 [Deps: native/haskell]"
+  "contracts_profile4.machine.json": "Complete contracts \u2192 profile4 pipeline stage",
+  "profile_4.machine.json": "Profile-4 contract (extend Profile-3)"
 }

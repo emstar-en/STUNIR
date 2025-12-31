@@ -1,3 +1,3 @@
 {
-  "deployment_hybrid.machine.json": "Issue deployment_hybrid [Deps: native/haskell]"
+  "deployment_hybrid.machine.json": "Complete deployment \u2192 hybrid pipeline stage"
 }
