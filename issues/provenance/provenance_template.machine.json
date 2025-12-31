@@ -1,0 +1,13 @@
+{
+  "dependencies": [],
+  "epoch": 1735500000,
+  "files_affected": [
+    "tools/prov_emit.c",
+    "tools/native/haskell/stunir-native/src/Main.hs"
+  ],
+  "id": "provenance/1401",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Standardize C Provenance Template Management"
+}

@@ -1,0 +1,12 @@
+[
+  "attestation",
+  "build",
+  "dispatch",
+  "docker",
+  "inputs",
+  "orchestration",
+  "production",
+  "scheduling",
+  "staging",
+  "validation"
+]
