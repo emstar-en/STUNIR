@@ -1,0 +1,15 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://stunir.io/vex/2025Q4",
+  "author": "STUNIR Security Team",
+  "timestamp": "2025-12-31T12:00:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": "CVE-2025-0000",
+      "products": ["pkg:github/emstar-en/STUNIR@omnibus"],
+      "status": "not_affected",
+      "justification": "component_not_present"
+    }
+  ]
+}
