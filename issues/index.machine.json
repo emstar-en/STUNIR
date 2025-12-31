@@ -1,18 +1,16 @@
 {
   "files_delivered": [
-    "tools/native/haskell/StunirNative.hs",
-    "tools/native/haskell/stunir-native.cabal",
-    "tools/native/haskell/cabal.project",
-    "scripts/build_pipeline.sh",
-    "scripts/verify_pipeline.sh",
-    "test_vectors/pipeline/spec_pipeline_001.json",
-    "test_vectors/pipeline/expected_pipeline.sha256",
-    "receipts/pipeline_complete.json"
+    "test_harness/haskell_pipeline_test.sh",
+    "tools/native/rust/Cargo.toml",
+    "tools/native/rust/src/main.rs",
+    "scripts/align_rust_haskell.sh",
+    "scripts/test_full_pipeline.sh"
   ],
-  "haskell_pipeline_complete": true,
-  "issues_addressed": 0,
-  "pipeline_status": "HASKELL-FIRST COMPLETE",
-  "ready_for_polyglot": true,
-  "schema": "stunir.issues.index.v6",
-  "version": "6.0"
+  "haskell_pipeline_tested": true,
+  "no_compilation_required": true,
+  "pipeline_status": "HASKELL-TESTED \u2192 RUST-ALIGNED",
+  "rust_alignment_ready": true,
+  "schema": "stunir.issues.index.v7",
+  "test_harness_complete": true,
+  "version": "7.0"
 }
