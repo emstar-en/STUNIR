@@ -1,3 +1,3 @@
 {
-  "scripts_healthcheck.machine.json": "Issue scripts_healthcheck [Deps: native/haskell]"
+  "scripts_healthcheck.machine.json": "Complete scripts \u2192 healthcheck pipeline stage"
 }

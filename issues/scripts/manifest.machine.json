@@ -1,6 +1,7 @@
 [
   "attest",
   "benchmark",
+  "build_pipeline",
   "deploy",
   "healthcheck",
   "migrate",

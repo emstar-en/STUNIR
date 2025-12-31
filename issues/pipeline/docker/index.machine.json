@@ -1,3 +1,3 @@
 {
-  "docker_1019.machine.json": "Issue docker_1019 [Deps: native/haskell]"
+  "docker_1019.machine.json": "Complete pipeline \u2192 docker pipeline stage"
 }
