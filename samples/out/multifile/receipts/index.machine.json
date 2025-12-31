@@ -1,1 +1,14 @@
-{"README.md":"Documentation","ir_bundle_manifest.json":"JSON data/config","ir_manifest.json":"JSON data/config","lisp_portable.json":"JSON data/config","lisp_portable_manifest.json":"JSON data/config","prov_emit.json":"JSON data/config","python_portable.json":"JSON data/config","python_portable_manifest.json":"JSON data/config","requirements.json":"JSON data/config","smt_portable.json":"JSON data/config","smt_portable_manifest.json":"JSON data/config","spec_ir.json":"JSON data/config"}
+{
+  "README.md": "File",
+  "ir_bundle_manifest.json": "File",
+  "ir_manifest.json": "File",
+  "lisp_portable.json": "File",
+  "lisp_portable_manifest.json": "File",
+  "prov_emit.json": "File",
+  "python_portable.json": "File",
+  "python_portable_manifest.json": "File",
+  "requirements.json": "File",
+  "smt_portable.json": "File",
+  "smt_portable_manifest.json": "File",
+  "spec_ir.json": "File"
+}

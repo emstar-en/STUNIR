@@ -1,1 +1,4 @@
-{"README.md":"Documentation","problem.smt2":"File"}
+{
+  "README.md": "File",
+  "problem.smt2": "File"
+}

@@ -1,1 +1,9 @@
-{"README.txt":"Text file","ir_bundle.bin":"File","spec_ir.txt":"Text file"}
+{
+  "ir": "Directory",
+  "lisp": "Directory",
+  "python": "Directory",
+  "smt": "Directory",
+  "README.txt": "File",
+  "ir_bundle.bin": "File",
+  "spec_ir.txt": "File"
+}

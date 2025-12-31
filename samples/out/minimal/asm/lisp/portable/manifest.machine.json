@@ -1,1 +1,7 @@
-["README.md","package.lisp","payload.json","program.lisp","runtime.lisp"]
+[
+  "README.md",
+  "package.lisp",
+  "payload.json",
+  "program.lisp",
+  "runtime.lisp"
+]

@@ -1,1 +1,6 @@
-["output_language_plans_manifest.dcbor"]
+[
+  "lisp",
+  "python",
+  "smt",
+  "output_language_plans_manifest.dcbor"
+]

@@ -1,1 +1,6 @@
-{"output_language_plans_manifest.dcbor":"File"}
+{
+  "lisp": "Directory",
+  "python": "Directory",
+  "smt": "Directory",
+  "output_language_plans_manifest.dcbor": "File"
+}
