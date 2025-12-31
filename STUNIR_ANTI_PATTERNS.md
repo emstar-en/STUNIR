@@ -1,36 +1,23 @@
-# STUNIR Anti-Patterns & Forbidden Actions
+# STUNIR Anti-Patterns
 
-## 🛑 CRITICAL: READ BEFORE GENERATING CODE
+To maintain determinism and verification standards, avoid the following patterns in the STUNIR codebase.
 
-STUNIR is a **deterministic build system**. Standard CI/CD practices often violate its core theorems.
-If you suggest any of the following, you are breaking the build.
+## 1. Implicit Toolchains
+**Bad:** Relying on `git`, `python`, or `gcc` being in the system `PATH` without verification.
+**Good:** Use the `local_toolchain.lock.json` to resolve absolute paths and verify hashes before execution.
 
-### 1. The "PATH" Trap
-- **BAD:** `python3 script.py` or `gcc main.c` (Relying on system PATH)
-- **GOOD:** `$STUNIR_TOOL_PYTHON script.py` or `$STUNIR_TOOL_CC main.c`
-- **WHY:** `PATH` is a determinism leak. We do not know which version of a tool we are getting.
+## 2. Non-Deterministic Output
+**Bad:** Using `datetime.now()` or random seeds in generated code or IR.
+**Good:** All outputs must be a pure function of the Input Spec. Timestamps in receipts are allowed but must be clearly separated from the semantic content.
 
-### 2. The "Network" Trap
-- **BAD:** `pip install requests`, `npm install`, `cargo build` (fetching crates)
-- **GOOD:** All dependencies must be vendored in `inputs/` or `tools/`.
-- **WHY:** The build phase is **OFFLINE**. Network access is only allowed in the explicit "Discovery/Fetch" phase, never in `build.sh`.
+## 3. Hardcoded Paths
+**Bad:** `C:\Windows\System32` or `/usr/bin/python`.
+**Good:** Discover paths dynamically during the `discover` phase and lock them.
 
-### 3. The "Timestamp" Trap
-- **BAD:** `datetime.now()`, `date`, `touch file`
-- **GOOD:** Use `STUNIR_BUILD_EPOCH` or `SOURCE_DATE_EPOCH`.
-- **WHY:** Builds must be bit-for-bit identical whether run today or next year.
+## 4. Shell Dependency Creep
+**Bad:** Using `jq`, `curl`, or `perl` in core shell scripts.
+**Good:** Stick to POSIX standard utilities (`sed`, `awk`, `grep`, `cat`) for the Shell-Native profile to ensure maximum portability.
 
-### 4. The "JSON" Trap
-- **BAD:** `json.dump(data, f)` (Default formatting)
-- **GOOD:** `json.dump(data, f, sort_keys=True, separators=(',', ':'))`
-- **WHY:** JSON serialization is non-deterministic by default (whitespace, key order). We need Canonical JSON for hashing.
-
-### 5. The "Python Dependency" Trap
-- **BAD:** Assuming Python is available for orchestration logic.
-- **GOOD:** Write orchestration in POSIX `sh`. Use Python only if `STUNIR_TOOL_PYTHON` is set.
-- **WHY:** STUNIR must run in "Shell Primary" mode (Profile 3) on constrained systems.
-
-### 6. The "AbsolutePath" Trap (in Artifacts)
-- **BAD:** Embedding `/home/user/stunir/build/...` in a binary or generated file.
-- **GOOD:** Use relative paths or deterministic placeholders (`/src`, `/build`).
-- **WHY:** The build directory varies per user. Artifacts must be portable.
+## 5. "Works on My Machine"
+**Bad:** Assuming a specific environment (e.g., "It works because I have Python 3.11 installed").
+**Good:** The Polyglot Build System (`scripts/build.sh`) must handle environment detection and graceful degradation (e.g., falling back to Shell mode).

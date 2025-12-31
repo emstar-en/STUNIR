@@ -1,79 +1,119 @@
 #!/usr/bin/env bash
-# scripts/build.sh
-# STUNIR Master Build Script (Polyglot Dispatch)
+# STUNIR Polyglot Build Dispatcher
+#
+# This script serves as the entry point for the STUNIR build pipeline.
+# It implements the "Models Propose, Tools Commit" philosophy by dispatching
+# to the appropriate runtime (Python, Native Binary, or Shell-Only) based on
+# the environment and availability.
 
-# Source core library
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/lib/stunir_core.sh"
+set -e
 
 # --- Configuration ---
-LOCKFILE="build/local_toolchain.lock.json"
+STUNIR_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+STUNIR_PROFILE="${STUNIR_PROFILE:-default}" # Options: default, native, shell
+STUNIR_STRICT="${STUNIR_STRICT:-0}"
 
-# --- 1. Bootstrap / Discovery ---
-if [ ! -f "$LOCKFILE" ]; then
-    log_info "Lockfile not found. Running discovery..."
-    bash "$SCRIPT_DIR/discovery.sh"
-fi
-
-# --- 2. Orchestration ---
-log_info "Starting Build Orchestration..."
-
-# --- 3. Dispatch to Semantic Engine ---
-
-NATIVE_BIN=""
-PYTHON_MINIMAL="tools/python/stunir_minimal.py"
-
-# Priority 1: Compiled Native (Rust)
-if [ -f "tools/native/rust/target/debug/stunir-rust" ]; then
-    NATIVE_BIN="tools/native/rust/target/debug/stunir-rust"
-elif [ -f "tools/native/rust/target/release/stunir-rust" ]; then
-    NATIVE_BIN="tools/native/rust/target/release/stunir-rust"
-fi
-
-# Priority 2: Minimal Python (if Native missing)
-if [ -z "$NATIVE_BIN" ] && [ -f "$PYTHON_MINIMAL" ]; then
-    # Check if we have python3
-    PYTHON_PATH=$(grep '"python":' "$LOCKFILE" | grep -o '"path": "[^"]*"' | cut -d'"' -f4)
-    if [ -n "$PYTHON_PATH" ]; then
-        log_info "Native binary not found. Using Minimal Python Pipeline ($PYTHON_MINIMAL)..."
-        NATIVE_BIN="$PYTHON_PATH $PYTHON_MINIMAL"
-    fi
-fi
-
-# Execute Generation
-if [ -n "$NATIVE_BIN" ]; then
-    log_info "Semantic Engine: $NATIVE_BIN"
-
-    mkdir -p build/ir build/prov
-
-    # 1. Spec -> IR
-    log_info "[Engine] Generating IR..."
-    if [ -f "spec/main.stunir" ]; then
-        $NATIVE_BIN spec-to-ir --in-json "spec/main.stunir" --out-ir "build/ir/main.ir"
-    fi
-
-    # 2. Gen Provenance
-    log_info "[Engine] Generating Provenance..."
-    echo '{"timestamp": "now"}' > build/epoch.json
-    if [ -f "build/ir/main.ir" ]; then
-        $NATIVE_BIN gen-provenance --in-ir "build/ir/main.ir" --epoch-json "build/epoch.json" --out-prov "build/prov/main.prov"
-    fi
-
+# --- Colors ---
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    NC='\033[0m' # No Color
 else
-    log_warn "No Semantic Engine found (Native or Python). Skipping Generation."
+    RED=''
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    NC=''
 fi
 
-# --- 4. Shell-Native Verification ---
-log_info "Running Shell-Native Verification..."
-if [ -f "build/ir/main.ir" ] && [ -f "build/prov/main.prov" ]; then
-    bash "$SCRIPT_DIR/verify_shell.sh" "build/ir/main.ir" "build/prov/main.prov"
-else
-    log_warn "Artifacts missing, skipping verification."
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_err()  { echo -e "${RED}[ERROR]${NC} $1"; }
+log_ok()   { echo -e "${GREEN}[OK]${NC} $1"; }
+
+# --- Discovery Phase ---
+
+detect_python() {
+    if command -v python3 >/dev/null 2>&1; then
+        echo "python3"
+    elif command -v python >/dev/null 2>&1; then
+        echo "python"
+    else
+        echo ""
+    fi
+}
+
+detect_native() {
+    if [ -x "$STUNIR_ROOT/bin/stunir-cli" ]; then
+        echo "$STUNIR_ROOT/bin/stunir-cli"
+    else
+        echo ""
+    fi
+}
+
+# --- Dispatch Logic ---
+
+log_info "Initializing STUNIR Build Pipeline..."
+log_info "Root: $STUNIR_ROOT"
+log_info "Profile: $STUNIR_PROFILE"
+
+# 1. Check for Native Binary (Profile 2 - Pre-Compiled)
+# Priority: Highest (if explicitly requested or available)
+NATIVE_BIN=$(detect_native)
+if [ "$STUNIR_PROFILE" = "native" ]; then
+    if [ -n "$NATIVE_BIN" ]; then
+        log_info "Dispatching to Native Core ($NATIVE_BIN)..."
+        exec "$NATIVE_BIN" build "$@"
+    else
+        log_err "Profile 'native' requested but 'bin/stunir-cli' not found."
+        exit 1
+    fi
 fi
 
-# --- 5. Manifest Generation ---
-mkdir -p dist
-log_info "Generating build manifest..."
-generate_manifest "scripts" "dist/manifest_scripts.txt"
+# 2. Check for Python (Profile 1 - Standard)
+# Priority: High (unless Shell-Only requested)
+PYTHON_BIN=$(detect_python)
+if [ "$STUNIR_PROFILE" != "shell" ] && [ -n "$PYTHON_BIN" ]; then
+    log_info "Python detected: $PYTHON_BIN"
 
-log_info "Build Complete."
+    # Ensure PYTHONPATH includes the repo root
+    export PYTHONPATH="$STUNIR_ROOT:$PYTHONPATH"
+
+    # Check if the python module exists
+    if [ -d "$STUNIR_ROOT/stunir" ]; then
+         log_info "Dispatching to Python Toolchain..."
+         exec "$PYTHON_BIN" -m stunir.main build "$@"
+    else
+         log_warn "Python detected but 'stunir' module not found. Falling back to shell..."
+         # Force fallback to shell mode
+         STUNIR_PROFILE="shell"
+    fi
+fi
+
+# 3. Fallback to Shell-Native (Profile 3 - Minimal/Verification)
+# Priority: Fallback (or explicit request)
+if [ "$STUNIR_PROFILE" = "shell" ] || [ -z "$PYTHON_BIN" ]; then
+    if [ -z "$PYTHON_BIN" ]; then
+        log_warn "No Python detected. Falling back to Shell-Native mode."
+    else
+        log_info "Shell-Only profile active."
+    fi
+
+    log_info "Dispatching to Shell-Native Library..."
+
+    # Check for Shell Library
+    SHELL_LIB="$STUNIR_ROOT/scripts/lib/core.sh"
+    if [ ! -f "$SHELL_LIB" ]; then
+        log_err "Shell library not found at $SHELL_LIB"
+        log_err "Cannot proceed in Shell-Only mode."
+        exit 1
+    fi
+
+    # Source the shell core and run
+    exec "$STUNIR_ROOT/scripts/lib/runner.sh" "$@"
+fi
+
+log_err "Unexpected state: No suitable runtime found."
+exit 1
