@@ -20,53 +20,46 @@ log_info "Starting Build Orchestration..."
 
 # --- 3. Dispatch to Semantic Engine ---
 
-# Strategy: Prefer Native (Rust/Haskell) -> Fallback to Python -> Fallback to Shell
-
 NATIVE_BIN=""
+PYTHON_MINIMAL="tools/python/stunir_minimal.py"
 
-# Check for Rust binary
+# Priority 1: Compiled Native (Rust)
 if [ -f "tools/native/rust/target/debug/stunir-rust" ]; then
     NATIVE_BIN="tools/native/rust/target/debug/stunir-rust"
 elif [ -f "tools/native/rust/target/release/stunir-rust" ]; then
     NATIVE_BIN="tools/native/rust/target/release/stunir-rust"
 fi
 
-# (Optional) Check for Haskell binary if Rust not found
-# Haskell paths are tricky with cabal, usually we'd expect it installed to a bin dir.
-# For now, we stick to Rust as primary native detection.
+# Priority 2: Minimal Python (if Native missing)
+if [ -z "$NATIVE_BIN" ] && [ -f "$PYTHON_MINIMAL" ]; then
+    # Check if we have python3
+    PYTHON_PATH=$(grep '"python":' "$LOCKFILE" | grep -o '"path": "[^"]*"' | cut -d'"' -f4)
+    if [ -n "$PYTHON_PATH" ]; then
+        log_info "Native binary not found. Using Minimal Python Pipeline ($PYTHON_MINIMAL)..."
+        NATIVE_BIN="$PYTHON_PATH $PYTHON_MINIMAL"
+    fi
+fi
 
 if [ -n "$NATIVE_BIN" ]; then
-    log_info "Native Engine detected: $NATIVE_BIN"
+    log_info "Semantic Engine: $NATIVE_BIN"
 
-    # Example Pipeline Execution
     mkdir -p build/ir build/prov
 
     # 1. Spec -> IR
-    log_info "[Native] Generating IR..."
-    # In real usage, we'd loop over specs. Here we mock with a test spec if exists.
+    log_info "[Engine] Generating IR..."
     if [ -f "spec/main.stunir" ]; then
-        "$NATIVE_BIN" spec-to-ir --in-json "spec/main.stunir" --out-ir "build/ir/main.ir"
+        $NATIVE_BIN spec-to-ir --in-json "spec/main.stunir" --out-ir "build/ir/main.ir"
     fi
 
     # 2. Gen Provenance
-    log_info "[Native] Generating Provenance..."
-    # Mock Epoch
+    log_info "[Engine] Generating Provenance..."
     echo '{"timestamp": "now"}' > build/epoch.json
     if [ -f "build/ir/main.ir" ]; then
-        "$NATIVE_BIN" gen-provenance --in-ir "build/ir/main.ir" --epoch-json "build/epoch.json" --out-prov "build/prov/main.prov"
+        $NATIVE_BIN gen-provenance --in-ir "build/ir/main.ir" --epoch-json "build/epoch.json" --out-prov "build/prov/main.prov"
     fi
 
 else
-    # Fallback to Python
-    PYTHON_PATH=$(grep '"python":' "$LOCKFILE" | grep -o '"path": "[^"]*"' | cut -d'"' -f4)
-
-    if [ -n "$PYTHON_PATH" ] && [ -x "$PYTHON_PATH" ]; then
-        log_info "Python detected ($PYTHON_PATH). Dispatching to Semantic Engine..."
-        # "$PYTHON_PATH" scripts/core/spec_to_ir.py ...
-        log_info "(Simulation) Running Python Semantic Engine..."
-    else
-        log_warn "No Semantic Engine found (Native or Python). Falling back to Shell-Only Verification Mode."
-    fi
+    log_warn "No Semantic Engine found (Native or Python). Falling back to Shell-Only Verification Mode."
 fi
 
 # --- 4. Manifest Generation ---
