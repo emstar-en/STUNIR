@@ -40,7 +40,6 @@ stunir_generate_lockfile() {
     json_add_comma
 
     # 3. Bash (Self)
-    # Fix: Do not pipe this function call, or it runs in a subshell and loses state
     _scan_tool "bash" "bash" "--version"
 
     json_end_array
@@ -74,9 +73,13 @@ _scan_tool() {
 
     json_start_object
     json_key_val "name" "$name"
+    json_add_comma
     json_key_val "path" "$path"
+    json_add_comma
     json_key_val "version" "$version"
+    json_add_comma
     json_key_val "sha256" "$hash"
+    json_add_comma
     json_key_val "status" "OK"
     json_end_object
 }
@@ -87,6 +90,7 @@ _scan_tool_missing() {
 
     json_start_object
     json_key_val "name" "$name"
+    json_add_comma
     json_key_val "status" "MISSING"
     json_end_object
 }
