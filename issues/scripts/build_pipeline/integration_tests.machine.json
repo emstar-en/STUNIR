@@ -1,15 +1,15 @@
 {
   "dependencies": [
-    "native/haskell"
+    "native/haskell/1201"
   ],
   "epoch": 1735500000,
   "files_affected": [
-    "pipeline/validation/*"
+    "scripts/test_pipeline.sh"
   ],
-  "id": "pipeline/validation/1077",
-  "priority": "MEDIUM",
+  "id": "scripts/build_pipeline/1302",
+  "priority": "HIGH",
   "schema": "stunir.issue.v2",
   "status": "closed",
-  "title": "Complete pipeline \u2192 validation pipeline stage",
+  "title": "Create End-to-End Pipeline Integration Tests",
   "resolution": "implemented in polyglot architecture"
 }
