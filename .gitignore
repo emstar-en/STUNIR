@@ -3,6 +3,11 @@ local_toolchain.lock.json
 receipts/
 asm/
 build/
+dist-newstyle/
+target/
+
+# Compliance Artifacts
+stunir_omnibus_sbom.*.json
 
 # Python
 __pycache__/
