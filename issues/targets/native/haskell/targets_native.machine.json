@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "targets/native/haskell/*"
+  ],
+  "id": "targets/native/haskell/1033",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete targets \u2192 native \u2192 haskell pipeline stage"
+}

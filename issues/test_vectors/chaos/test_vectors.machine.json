@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "native/haskell"
+  ],
+  "epoch": 1735500000,
+  "files_affected": [
+    "test_vectors/chaos/*"
+  ],
+  "id": "test_vectors/chaos/1137",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "status": "open",
+  "title": "Complete test_vectors \u2192 chaos pipeline stage"
+}

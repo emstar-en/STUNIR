@@ -1,0 +1,4 @@
+{
+  "end_end.machine.json": "Issue end_end [Deps: native/haskell]",
+  "test_vectors.machine.json": "Issue test_vectors [Deps: native/haskell]"
+}
