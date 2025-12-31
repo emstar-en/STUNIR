@@ -1,4 +1,0 @@
-{
-  "polyglot_haskell.machine.json": "Issue polyglot_haskell [Deps: native/haskell]",
-  "targets_polyglot.machine.json": "Issue targets_polyglot [Deps: native/haskell]"
-}
