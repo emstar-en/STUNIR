@@ -77,16 +77,18 @@ fi
 PYTHON_BIN=$(detect_python)
 if [ "$STUNIR_PROFILE" != "shell" ] && [ -n "$PYTHON_BIN" ]; then
     log_info "Python detected: $PYTHON_BIN"
-    log_info "Dispatching to Python Toolchain..."
 
     # Ensure PYTHONPATH includes the repo root
     export PYTHONPATH="$STUNIR_ROOT:$PYTHONPATH"
 
-    # Check if the python module exists, otherwise warn
+    # Check if the python module exists
     if [ -d "$STUNIR_ROOT/stunir" ]; then
+         log_info "Dispatching to Python Toolchain..."
          exec "$PYTHON_BIN" -m stunir.main build "$@"
     else
          log_warn "Python detected but 'stunir' module not found. Falling back to shell..."
+         # Force fallback to shell mode
+         STUNIR_PROFILE="shell"
     fi
 fi
 
@@ -96,7 +98,7 @@ if [ "$STUNIR_PROFILE" = "shell" ] || [ -z "$PYTHON_BIN" ]; then
     if [ -z "$PYTHON_BIN" ]; then
         log_warn "No Python detected. Falling back to Shell-Native mode."
     else
-        log_info "Shell-Only profile active. Ignoring Python."
+        log_info "Shell-Only profile active."
     fi
 
     log_info "Dispatching to Shell-Native Library..."
