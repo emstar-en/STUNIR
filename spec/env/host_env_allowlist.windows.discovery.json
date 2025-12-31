@@ -1,11 +1,11 @@
 {
-  "comment": "DISCOVERY PROFILE - Permissive. Used only by 'scripts/discover_toolchain.sh' to find tools.",
-  "env_vars": {
-    "allow": [
+  "schema": "stunir.env.allowlist.v1",
+  "platform": "windows",
+  "policy": "DISCOVERY",
+  "variables": {
+    "allowed": [
       "*"
-    ]
-  },
-  "filesystem": {
-    "read_only": false
+    ],
+    "notes": "Permissive allowlist for the discovery phase only. Allows PATH to find tools."
   }
 }

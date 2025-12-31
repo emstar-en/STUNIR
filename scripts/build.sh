@@ -40,6 +40,7 @@ if [ -z "$NATIVE_BIN" ] && [ -f "$PYTHON_MINIMAL" ]; then
     fi
 fi
 
+# Execute Generation
 if [ -n "$NATIVE_BIN" ]; then
     log_info "Semantic Engine: $NATIVE_BIN"
 
@@ -59,10 +60,18 @@ if [ -n "$NATIVE_BIN" ]; then
     fi
 
 else
-    log_warn "No Semantic Engine found (Native or Python). Falling back to Shell-Only Verification Mode."
+    log_warn "No Semantic Engine found (Native or Python). Skipping Generation."
 fi
 
-# --- 4. Manifest Generation ---
+# --- 4. Shell-Native Verification ---
+log_info "Running Shell-Native Verification..."
+if [ -f "build/ir/main.ir" ] && [ -f "build/prov/main.prov" ]; then
+    bash "$SCRIPT_DIR/verify_shell.sh" "build/ir/main.ir" "build/prov/main.prov"
+else
+    log_warn "Artifacts missing, skipping verification."
+fi
+
+# --- 5. Manifest Generation ---
 mkdir -p dist
 log_info "Generating build manifest..."
 generate_manifest "scripts" "dist/manifest_scripts.txt"

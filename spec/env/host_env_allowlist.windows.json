@@ -1,38 +1,26 @@
 {
-  "schema": "stunir_env_allowlist_v1",
+  "schema": "stunir.env.allowlist.v1",
   "platform": "windows",
   "policy": "STRICT",
-  "allowed_vars": [
-    "ALLUSERSPROFILE",
-    "APPDATA",
-    "COMPUTERNAME",
-    "COMSPEC",
-    "HOMEDRIVE",
-    "HOMEPATH",
-    "LOCALAPPDATA",
-    "LOGONSERVER",
-    "NUMBER_OF_PROCESSORS",
-    "OS",
-    "PROCESSOR_ARCHITECTURE",
-    "PROCESSOR_IDENTIFIER",
-    "PROCESSOR_LEVEL",
-    "PROCESSOR_REVISION",
-    "PROGRAMDATA",
-    "PROGRAMFILES",
-    "PROGRAMFILES(X86)",
-    "PUBLIC",
-    "SYSTEMDRIVE",
-    "SYSTEMROOT",
-    "TEMP",
-    "TMP",
-    "USERDOMAIN",
-    "USERNAME",
-    "USERPROFILE",
-    "WINDIR"
-  ],
-  "required_vars": [
-    "STUNIR_TOOL_PYTHON",
-    "STUNIR_TOOL_GIT",
-    "STUNIR_TOOL_BASH"
-  ]
+  "variables": {
+    "allowed": [
+      "SystemRoot",
+      "windir",
+      "TEMP",
+      "TMP",
+      "COMSPEC"
+    ],
+    "blocked": [
+      "PATH",
+      "Path",
+      "PYTHONPATH",
+      "CLASSPATH"
+    ],
+    "required": [
+      "STUNIR_TOOL_PYTHON",
+      "STUNIR_TOOL_GIT",
+      "STUNIR_TOOL_BASH"
+    ]
+  },
+  "notes": "PATH is explicitly blocked to prevent tool shadowing. All tools must be injected via absolute paths in STUNIR_TOOL_* variables."
 }
