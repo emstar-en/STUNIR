@@ -1,0 +1,10 @@
+{
+  "contracts": "Category",
+  "ir": "Category",
+  "performance": "Category",
+  "pipeline": "Category",
+  "receipts": "Category",
+  "runtime": "Category",
+  "security": "Category",
+  "targets": "Category"
+}

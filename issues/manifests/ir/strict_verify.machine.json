@@ -1,0 +1,87 @@
+{
+  "category": [
+    "manifests",
+    "ir"
+  ],
+  "evidence": [
+    {
+      "lines": {
+        "end": 70,
+        "start": 56
+      },
+      "note": "Writes stub receipts/ir_manifest.json and constructs ir_bundle_manifest manually.",
+      "path": "scripts/build.sh",
+      "sha256": "62e9cfb279b0c0f1519117f570d27e8c40146fb0cef802398765160523f17b58",
+      "snippet_sha256": "f737091fa5870baeb273c7cd58fe13eb1a77fc46e30c6811277511fde40f72ff"
+    },
+    {
+      "lines": {
+        "end": 735,
+        "start": 694
+      },
+      "note": "Strict verifier checks that ir_manifest set matches actual asm/ir/*.dcbor set.",
+      "path": "tools/verify_build.py",
+      "sha256": "7eb1cee982e44b32a3d3e795ec36b287912fba522bcbfb65d0f8a1659b9c4bb8",
+      "snippet_sha256": "aa39e29f7c8838c9b2156ec50f91e8bbff1a1fb112c3c94ddf821a274761765c"
+    },
+    {
+      "lines": {
+        "end": 260,
+        "start": 1
+      },
+      "note": "Can emit receipts/ir_manifest.json.",
+      "path": "tools/spec_to_ir_files.py",
+      "sha256": "204560b48a0747f1256235c7506de7d4aafe6746ec67316e424ecd6215188daf",
+      "snippet_sha256": "cb1505f0ae64decd7e8124e04cf1b02998bb13637b6e943627b327d152751d77"
+    }
+  ],
+  "expected": [
+    "receipts/ir_manifest.json must be canonical JSON with schema stunir.ir_manifest.v2 and include sha256 for each asm/ir/*.dcbor file.",
+    "In strict mode, the manifest set must exactly equal the on-disk set of asm/ir/*.dcbor."
+  ],
+  "id": "ISSUE.MANIFEST.0001",
+  "impact": {
+    "breaks_build": false,
+    "breaks_local_verify_strict": true,
+    "breaks_receipt_generation": false
+  },
+  "proposed_fixes": [
+    {
+      "description": "Replace placeholder manifest emission in scripts/build.sh with a call to tools/spec_to_ir_files.py (or compiled equivalent) and ensure asm/ir exists.",
+      "touched_paths": [
+        "scripts/build.sh"
+      ]
+    }
+  ],
+  "related": [
+    "ISSUE.BUILD.0001",
+    "ISSUE.PROV.0001"
+  ],
+  "reproduction": [
+    "./scripts/verify.sh --local --strict"
+  ],
+  "root_causes": [
+    {
+      "details": "scripts/build.sh writes a placeholder ir_manifest.json rather than invoking tools/spec_to_ir_files.py (which can emit a correct manifest).",
+      "type": "stub_output"
+    }
+  ],
+  "schema": "stunir.issues.issue.v1",
+  "severity": "high",
+  "status": "open",
+  "symptoms": [
+    "Strict verify fails with 'ir manifest set mismatch (strict)' or 'missing IR file listed in manifest' if asm/ir exists.",
+    "Current scripts/build.sh always writes files:[] without computing sha256 entries."
+  ],
+  "title": "Strict verify requires receipts/ir_manifest.json to match asm/ir/*.dcbor set; build.sh writes an empty stub",
+  "workarounds": [
+    {
+      "commands": [
+        "mkdir -p asm/ir receipts build",
+        "python3 -B tools/epoch.py --out-json build/epoch.json --print-epoch",
+        "python3 -B tools/spec_to_ir_files.py --spec-root spec --out-root asm/ir --epoch-json build/epoch.json --manifest-out receipts/ir_manifest.json"
+      ],
+      "description": "Regenerate IR files + manifest using tools/spec_to_ir_files.py."
+    }
+  ]
+}
