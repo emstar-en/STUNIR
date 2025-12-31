@@ -4,19 +4,44 @@ use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
-pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
-    // 1. Read Input Spec
-    let content = fs::read_to_string(in_json)
-        .map_err(|e| StunirError::Io(format!("Failed to read spec: {}", e)))?;
+pub fn run(input_path: &str, out_ir: &str) -> Result<()> {
+    let path = Path::new(input_path);
+    let mut combined_spec = Spec {
+        kind: "spec".to_string(),
+        modules: Vec::new(),
+        metadata: std::collections::HashMap::new(),
+    };
 
-    let spec: Spec = serde_json::from_str(&content)
-        .map_err(|e| StunirError::Json(format!("Invalid spec JSON: {}", e)))?;
+    // 1. Load Spec(s)
+    if path.is_dir() {
+        println!("Scanning directory: {}", input_path);
+        for entry in fs::read_dir(path).map_err(|e| StunirError::Io(e.to_string()))? {
+            let entry = entry.map_err(|e| StunirError::Io(e.to_string()))?;
+            let path = entry.path();
+            if path.is_file() && path.extension().map_or(false, |ext| ext == "json") {
+                println!("Loading spec: {:?}", path);
+                let content = fs::read_to_string(&path)
+                    .map_err(|e| StunirError::Io(format!("Failed to read {:?}: {}", path, e)))?;
+                let spec: Spec = serde_json::from_str(&content)
+                    .map_err(|e| StunirError::Json(format!("Invalid spec JSON in {:?}: {}", path, e)))?;
+                combined_spec.modules.extend(spec.modules);
+                combined_spec.metadata.extend(spec.metadata);
+            }
+        }
+    } else {
+        // Single file mode
+        let content = fs::read_to_string(input_path)
+            .map_err(|e| StunirError::Io(format!("Failed to read spec: {}", e)))?;
+        let spec: Spec = serde_json::from_str(&content)
+            .map_err(|e| StunirError::Json(format!("Invalid spec JSON: {}", e)))?;
+        combined_spec = spec;
+    }
 
     // 2. Transform Spec -> IR
     let mut functions = Vec::new();
     let mut module_names = Vec::new();
 
-    for module in &spec.modules {
+    for module in &combined_spec.modules {
         let func = IrFunction {
             name: module.name.clone(),
             body: vec![
@@ -24,7 +49,6 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
                     op: "comment".to_string(),
                     args: vec![format!("Source Language: {}", module.lang)],
                 },
-                // Use 'raw' op to emit source code directly without wrapping
                 IrInstruction {
                     op: "raw".to_string(),
                     args: vec![module.source.clone()],
@@ -36,8 +60,6 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
     }
 
     // 3. Generate Main Orchestrator
-    // If we have modules, create a main that calls them in order.
-    // If no modules, create a default main.
     let mut main_body = Vec::new();
 
     if module_names.is_empty() {
@@ -72,8 +94,8 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
         functions,
         modules: vec![],
         metadata: IrMetadata {
-            original_spec_kind: spec.kind,
-            source_modules: spec.modules,
+            original_spec_kind: combined_spec.kind,
+            source_modules: combined_spec.modules,
         },
     };
 
@@ -82,10 +104,10 @@ pub fn run(in_json: &str, out_ir: &str) -> Result<()> {
         .map_err(|e| StunirError::Json(e.to_string()))?;
 
     if let Some(parent) = Path::new(out_ir).parent() {
-        fs::create_dir_all(parent)?;
+        fs::create_dir_all(parent).map_err(|e| StunirError::Io(e.to_string()))?;
     }
 
-    fs::write(out_ir, ir_json)?;
+    fs::write(out_ir, ir_json).map_err(|e| StunirError::Io(e.to_string()))?;
     println!("Generated IR at {}", out_ir);
 
     Ok(())
