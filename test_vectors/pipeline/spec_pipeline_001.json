@@ -1,0 +1,8 @@
+{
+  "schema": "stunir.profile3.ir.v1",
+  "version": "0.1.0",
+  "specId": "pipeline-001",
+  "canonical": true,
+  "integersOnly": true,
+  "stages": ["ST→UN→IR", "IR→HASKELL", "BINARY", "RECEIPT"]
+}

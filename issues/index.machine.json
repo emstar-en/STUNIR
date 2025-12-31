@@ -1,1 +1,18 @@
-{"accessibility":"Category","analysis":"Category","asm":"Category","backup":"Category","benchmarking":"Category","compliance":"Category","configuration":"Category","contracts":"Category","deployment":"Category","disaster_recovery":"Category","docker":"Category","docs":"Category","ecosystem":"Category","experimental":"Category","governance":"Category","i18n":"Category","infrastructure":"Category","inputs":"Category","integration":"Category","ir":"Category","manifests":"Category","migration":"Category","monitoring":"Category","native":"Category","observability":"Category","packaging":"Category","performance":"Category","pipeline":"Category","quality":"Category","receipts":"Category","scripts":"Category","security":"Category","spec":"Category","sustainability":"Category","targets":"Category","test_vectors":"Category","tools":"Category"}
+{
+  "files_delivered": [
+    "tools/native/haskell/StunirNative.hs",
+    "tools/native/haskell/stunir-native.cabal",
+    "tools/native/haskell/cabal.project",
+    "scripts/build_pipeline.sh",
+    "scripts/verify_pipeline.sh",
+    "test_vectors/pipeline/spec_pipeline_001.json",
+    "test_vectors/pipeline/expected_pipeline.sha256",
+    "receipts/pipeline_complete.json"
+  ],
+  "haskell_pipeline_complete": true,
+  "issues_addressed": 0,
+  "pipeline_status": "HASKELL-FIRST COMPLETE",
+  "ready_for_polyglot": true,
+  "schema": "stunir.issues.index.v6",
+  "version": "6.0"
+}

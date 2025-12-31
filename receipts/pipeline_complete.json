@@ -1,0 +1,7 @@
+{
+  "schema": "stunir.receipt.v1",
+  "pipeline": "haskell-first",
+  "status": "COMPLETE",
+  "binary": "stunir-native",
+  "timestamp": 1735700000
+}
