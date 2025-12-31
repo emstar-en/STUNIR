@@ -2,7 +2,6 @@ use std::env;
 use std::fs;
 use std::process;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct StunirSpec {
@@ -25,9 +24,11 @@ struct StunirIR {
 
 // EXACT HASKELL validateIR mirror
 fn validate_ir(ir_json: &str) -> Result<bool, String> {
-    let ir: StunirIR = serde_json::from_str(ir_json)?;
-    Ok(ir.schema == "stunir.profile3.ir.v1" 
-        && ir.integers_only 
+    // FIX: Map serde_json error to String explicitly
+    let ir: StunirIR = serde_json::from_str(ir_json).map_err(|e| e.to_string())?;
+
+    Ok(ir.schema == "stunir.profile3.ir.v1"
+        && ir.integers_only
         && ir.stages.contains(&"STANDARDIZATION".to_string()))
 }
 
@@ -70,7 +71,7 @@ fn main() {
             }
         }
         _ => {
-            eprintln!("Usage: stunir-rust <spec.json>");
+            eprintln!("Usage: stunir-rust <spec_file>");
             process::exit(1);
         }
     }
