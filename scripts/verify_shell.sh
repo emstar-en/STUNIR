@@ -2,13 +2,19 @@
 # scripts/verify_shell.sh
 # STUNIR Shell-Native Verifier
 # Dependencies: grep, sed, shasum (or sha256sum)
-# NO Python, NO jq, NO compiled binaries.
 
 set -e
 export LC_ALL=C
 
-log_info() { echo "[STUNIR:SHELL-VERIFY] $1"; }
-log_err() { echo "[STUNIR:SHELL-VERIFY] ERROR: $1" >&2; }
+# Source logging if available, else define fallback
+# We use relative path logic to find the lib
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/lib/stunir_core.sh" ]; then
+    source "$SCRIPT_DIR/lib/stunir_core.sh"
+else
+    log_info() { echo "[STUNIR:SHELL-VERIFY] $1"; }
+    log_err() { echo "[STUNIR:SHELL-VERIFY] ERROR: $1" >&2; }
+fi
 
 IR_FILE="$1"
 PROV_FILE="$2"
@@ -29,7 +35,6 @@ if [ ! -f "$PROV_FILE" ]; then
 fi
 
 # 1. Calculate Hash of IR
-# Detect hashing tool
 if command -v sha256sum >/dev/null 2>&1; then
     HASHER="sha256sum"
 elif command -v shasum >/dev/null 2>&1; then
@@ -40,22 +45,32 @@ else
 fi
 
 log_info "Hashing IR file..."
-# Calculate hash and grab the first field (the hex string)
 CALC_HASH=$($HASHER "$IR_FILE" | awk '{print $1}')
 log_info "Calculated Hash: $CALC_HASH"
 
-# 2. Extract Hash from Provenance (Pure Shell JSON parsing is fragile, but we use regex for this specific field)
-# Looking for: "ir_hash": "sha256:<HEX>"
-# We use sed to extract the value inside the quotes after ir_hash
+# 2. Extract Hash from Provenance
 log_info "Reading Provenance..."
 
-# Grep the line, then sed to extract. 
-# Assumption: "ir_hash" is on its own line or we can match the pattern reliably.
-# Pattern: "ir_hash"\s*:\s*"sha256:([a-f0-9]+)"
-EXTRACTED_HASH=$(grep -o '"ir_hash"[[:space:]]*:[[:space:]]*"sha256:[a-f0-9]*"' "$PROV_FILE" | sed -E 's/.*"sha256:([a-f0-9]+)".*//')
+# Debug: Show the line we are matching against
+# We look for the line containing "ir_hash"
+MATCHED_LINE=$(grep '"ir_hash"' "$PROV_FILE" | head -n 1)
+
+if [ -z "$MATCHED_LINE" ]; then
+    log_err "Could not find 'ir_hash' key in provenance file."
+    log_err "File Content:"
+    cat "$PROV_FILE"
+    exit 1
+fi
+
+log_info "Found Provenance Line: $MATCHED_LINE"
+
+# Robust extraction using sed
+# Matches: ... "sha256:<HEX>" ...
+# We use basic regex to be safe across sed versions
+EXTRACTED_HASH=$(echo "$MATCHED_LINE" | sed -n 's/.*"sha256:\([a-f0-9]*\)".*//p')
 
 if [ -z "$EXTRACTED_HASH" ]; then
-    log_err "Could not extract ir_hash from provenance file."
+    log_err "Could not extract hash value from line."
     exit 1
 fi
 
