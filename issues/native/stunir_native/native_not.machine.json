@@ -1,1 +1,111 @@
-{"category":["native","stunir_native"],"evidence":[{"lines":{"end":220,"start":1},"note":"Shows current subcommands + placeholder SpecToIr/GenProvenance/GenReceipt implementations.","path":"tools/native/rust/stunir-native/src/main.rs","sha256":"33fb0f551aab0fe4a4c3bfe53ee31332f58e74d8bfc8de534ca3d7d06e2d9a31","snippet_sha256":"33fb0f551aab0fe4a4c3bfe53ee31332f58e74d8bfc8de534ca3d7d06e2d9a31"},{"lines":{"end":567,"start":517},"note":"Defines receipt core-id hashing: sha256(canonical_json_bytes(core_object)) with no extra newline in the hash input.","path":"tools/verify_build.py","sha256":"7eb1cee982e44b32a3d3e795ec36b287912fba522bcbfb65d0f8a1659b9c4bb8","snippet_sha256":"be08948a8333fcb27afc916ee66027496223fd8300bafb40fe6693e12e308d2c"},{"lines":{"end":90,"start":1},"note":"Shows the strict-mode output graph that native route must match (asm/spec_ir.txt, asm/ir, build/provenance.*, bin/prov_emit, receipts/*).","path":"scripts/build_docker.sh","sha256":"8af694aadf57adb39a0a53e508a107af7da5f4b55dd4a1e381537f9fe76ee3fc","snippet_sha256":"5234b5dda5bb8905ae382da486a76c8e48e81b39d8060855df1a92803f5cc161"}],"expected":["stunir-native provides (or the dispatcher provides via stable mapping) the local build graph primitives required by scripts/build.sh strict mode: epoch, spec_to_ir (text IR), spec_to_ir_files (dcbor IR set + receipts/ir_manifest.json), gen_provenance (verifier-reproducible with spec-root=spec and asm-root=asm and epoch from build/epoch.json), and gen_receipt/record_receipt producing stunir.receipt.build.v1 with receipt_core_id_sha256 identical to tools/verify_build.py.","All native-emitted JSON is stunir-json-c14n-v1 canonical (sorted keys, separators=(',',':'), UTF-8, no floats)."],"id":"ISSUE.NATIVE.0003","impact":{"breaks_build":true,"breaks_local_verify_strict":true,"breaks_receipt_generation":true},"proposed_fixes":[{"description":"Implement native equivalents (or dispatcher-routed fallbacks) for strict local build primitives: (1) spec_to_ir consuming spec/ root and emitting asm/spec_ir.txt (text, stable), (2) spec_to_ir_files emitting asm/ir/*.dcbor and a correct receipts/ir_manifest.json (schema stunir.ir_manifest.v2, strict set equality), (3) gen_provenance matching tools/gen_provenance.py output bytes given build/epoch.json + roots spec and asm.","touched_paths":["tools/native/rust/stunir-native/src/main.rs","tools/native/rust/stunir-native/src"]},{"description":"Make native receipt generation match tools/verify_build.py exactly: core fields schema,target,status,build_epoch,sha256,epoch,inputs,tool,argv; receipt_core_id_sha256 = sha256(canonical_json_bytes(core)) with no newline. Ensure canonical JSON output (sorted keys; separators=(',',':'); UTF-8; no floats). Ensure status values align with the pipeline vocabulary (e.g., GENERATED_IR, BINARY_EMITTED) and argv/tool/inputs are populated consistently.","touched_paths":["tools/native/rust/stunir-native/src/main.rs"]},{"description":"Provide CLI compatibility for underscore-form subcommands used by scripts/build.sh either by adding Clap aliases in stunir-native or by relying on dispatcher underscore->kebab mapping (preferred).","touched_paths":["tools/native/rust/stunir-native/src/main.rs","scripts/lib/dispatch.sh"]}],"related":["ISSUE.NATIVE.0001","ISSUE.NATIVE.0002","ISSUE.DISPATCH.0002","ISSUE.RECEIPT.0001","ISSUE.BUILD.0002"],"reproduction":["set -euxo pipefail","./scripts/build.sh","./scripts/verify.sh --local --strict"],"root_causes":[{"details":"stunir-native implements placeholder semantics (e.g., SpecToIr reads spec.json) and does not provide the IR-files + manifest path required for strict verification.","type":"incomplete_native_backend"},{"details":"Receipt generation must match verifier core-id hashing and core-field set exactly; any mismatch in hashing/canonicalization, status vocabulary, argv/tool identity, or inputs closure breaks strict mode.","type":"contract_mismatch"}],"schema":"stunir.issues.issue.v1","severity":"blocking","status":"open","symptoms":["Even if scripts/lib/dispatch.sh is restored, routing to stunir-native cannot satisfy tools/verify_build.py --local --strict because key subcommands are absent or semantically incompatible.","Current native SpecToIr expects a spec.json file, but the local-strict contract treats spec/ as the spec root and produces asm/spec_ir.txt (text IR) plus asm/ir/*.dcbor (file IR set).","Native receipt generation must exactly match compute_receipt_core_id() canonicalization and required fields; status naming and argv/tool/inputs closure must be verifier-compatible."],"title":"stunir-native is not parity-complete with local-strict verifier contract (missing spec_to_ir_files + provenance roots/epoch + receipt fields/status + canonicalization guarantees)","workarounds":[{"commands":["python3 -B tools/spec_to_ir_files.py --spec-root spec --out-root asm/ir --epoch-json build/epoch.json --manifest-out receipts/ir_manifest.json","python3 -B tools/record_receipt.py --target asm/spec_ir.txt --receipt receipts/spec_ir.json --status GENERATED_IR --build-epoch $(python3 - <<'PY'\\nimport json; print(json.load(open('build/epoch.json'))['selected_epoch'])\\nPY) --epoch-json build/epoch.json --inputs build/provenance.json receipts/ir_manifest.json --input-dirs spec asm"],"description":"Route receipt generation and IR-file manifest generation through Python tools until native parity is complete."}]}
+{
+  "category": [
+    "native",
+    "stunir_native"
+  ],
+  "evidence": [
+    {
+      "lines": {
+        "end": 220,
+        "start": 1
+      },
+      "note": "Shows current subcommands + placeholder SpecToIr/GenProvenance/GenReceipt implementations.",
+      "path": "tools/native/rust/stunir-native/src/main.rs",
+      "sha256": "33fb0f551aab0fe4a4c3bfe53ee31332f58e74d8bfc8de534ca3d7d06e2d9a31",
+      "snippet_sha256": "33fb0f551aab0fe4a4c3bfe53ee31332f58e74d8bfc8de534ca3d7d06e2d9a31"
+    },
+    {
+      "lines": {
+        "end": 567,
+        "start": 517
+      },
+      "note": "Defines receipt core-id hashing: sha256(canonical_json_bytes(core_object)) with no extra newline in the hash input.",
+      "path": "tools/verify_build.py",
+      "sha256": "7eb1cee982e44b32a3d3e795ec36b287912fba522bcbfb65d0f8a1659b9c4bb8",
+      "snippet_sha256": "be08948a8333fcb27afc916ee66027496223fd8300bafb40fe6693e12e308d2c"
+    },
+    {
+      "lines": {
+        "end": 90,
+        "start": 1
+      },
+      "note": "Shows the strict-mode output graph that native route must match (asm/spec_ir.txt, asm/ir, build/provenance.*, bin/prov_emit, receipts/*).",
+      "path": "scripts/build_docker.sh",
+      "sha256": "8af694aadf57adb39a0a53e508a107af7da5f4b55dd4a1e381537f9fe76ee3fc",
+      "snippet_sha256": "5234b5dda5bb8905ae382da486a76c8e48e81b39d8060855df1a92803f5cc161"
+    }
+  ],
+  "expected": [
+    "stunir-native provides (or the dispatcher provides via stable mapping) the local build graph primitives required by scripts/build.sh strict mode: epoch, spec_to_ir (text IR), spec_to_ir_files (dcbor IR set + receipts/ir_manifest.json), gen_provenance (verifier-reproducible with spec-root=spec and asm-root=asm and epoch from build/epoch.json), and gen_receipt/record_receipt producing stunir.receipt.build.v1 with receipt_core_id_sha256 identical to tools/verify_build.py.",
+    "All native-emitted JSON is stunir-json-c14n-v1 canonical (sorted keys, separators=(',',':'), UTF-8, no floats)."
+  ],
+  "id": "ISSUE.NATIVE.0003",
+  "impact": {
+    "breaks_build": true,
+    "breaks_local_verify_strict": true,
+    "breaks_receipt_generation": true
+  },
+  "proposed_fixes": [
+    {
+      "description": "Implement native equivalents (or dispatcher-routed fallbacks) for strict local build primitives: (1) spec_to_ir consuming spec/ root and emitting asm/spec_ir.txt (text, stable), (2) spec_to_ir_files emitting asm/ir/*.dcbor and a correct receipts/ir_manifest.json (schema stunir.ir_manifest.v2, strict set equality), (3) gen_provenance matching tools/gen_provenance.py output bytes given build/epoch.json + roots spec and asm.",
+      "touched_paths": [
+        "tools/native/rust/stunir-native/src/main.rs",
+        "tools/native/rust/stunir-native/src"
+      ]
+    },
+    {
+      "description": "Make native receipt generation match tools/verify_build.py exactly: core fields schema,target,status,build_epoch,sha256,epoch,inputs,tool,argv; receipt_core_id_sha256 = sha256(canonical_json_bytes(core)) with no newline. Ensure canonical JSON output (sorted keys; separators=(',',':'); UTF-8; no floats). Ensure status values align with the pipeline vocabulary (e.g., GENERATED_IR, BINARY_EMITTED) and argv/tool/inputs are populated consistently.",
+      "touched_paths": [
+        "tools/native/rust/stunir-native/src/main.rs"
+      ]
+    },
+    {
+      "description": "Provide CLI compatibility for underscore-form subcommands used by scripts/build.sh either by adding Clap aliases in stunir-native or by relying on dispatcher underscore->kebab mapping (preferred).",
+      "touched_paths": [
+        "tools/native/rust/stunir-native/src/main.rs",
+        "scripts/lib/dispatch.sh"
+      ]
+    }
+  ],
+  "related": [
+    "ISSUE.NATIVE.0001",
+    "ISSUE.NATIVE.0002",
+    "ISSUE.DISPATCH.0002",
+    "ISSUE.RECEIPT.0001",
+    "ISSUE.BUILD.0002"
+  ],
+  "reproduction": [
+    "set -euxo pipefail",
+    "./scripts/build.sh",
+    "./scripts/verify.sh --local --strict"
+  ],
+  "root_causes": [
+    {
+      "details": "stunir-native implements placeholder semantics (e.g., SpecToIr reads spec.json) and does not provide the IR-files + manifest path required for strict verification.",
+      "type": "incomplete_native_backend"
+    },
+    {
+      "details": "Receipt generation must match verifier core-id hashing and core-field set exactly; any mismatch in hashing/canonicalization, status vocabulary, argv/tool identity, or inputs closure breaks strict mode.",
+      "type": "contract_mismatch"
+    }
+  ],
+  "schema": "stunir.issues.issue.v1",
+  "severity": "blocking",
+  "status": "CLOSED",
+  "symptoms": [
+    "Even if scripts/lib/dispatch.sh is restored, routing to stunir-native cannot satisfy tools/verify_build.py --local --strict because key subcommands are absent or semantically incompatible.",
+    "Current native SpecToIr expects a spec.json file, but the local-strict contract treats spec/ as the spec root and produces asm/spec_ir.txt (text IR) plus asm/ir/*.dcbor (file IR set).",
+    "Native receipt generation must exactly match compute_receipt_core_id() canonicalization and required fields; status naming and argv/tool/inputs closure must be verifier-compatible."
+  ],
+  "title": "stunir-native is not parity-complete with local-strict verifier contract (missing spec_to_ir_files + provenance roots/epoch + receipt fields/status + canonicalization guarantees)",
+  "workarounds": [
+    {
+      "commands": [
+        "python3 -B tools/spec_to_ir_files.py --spec-root spec --out-root asm/ir --epoch-json build/epoch.json --manifest-out receipts/ir_manifest.json",
+        "python3 -B tools/record_receipt.py --target asm/spec_ir.txt --receipt receipts/spec_ir.json --status GENERATED_IR --build-epoch $(python3 - <<'PY'\\nimport json; print(json.load(open('build/epoch.json'))['selected_epoch'])\\nPY) --epoch-json build/epoch.json --inputs build/provenance.json receipts/ir_manifest.json --input-dirs spec asm"
+      ],
+      "description": "Route receipt generation and IR-file manifest generation through Python tools until native parity is complete."
+    }
+  ],
+  "resolution": "Implemented in Native Core / Shell Integration Pack"
+}

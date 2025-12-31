@@ -1,1 +1,100 @@
-{"category":["pipeline","build"],"evidence":[{"lines":{"end":70,"start":1},"note":"Build entrypoint and pipeline orchestration for local strict; should align with plan/receipt/dispatch contracts.","path":"scripts/build.sh","sha256":"62e9cfb279b0c0f1519117f570d27e8c40146fb0cef802398765160523f17b58","snippet_sha256":"62e9cfb279b0c0f1519117f570d27e8c40146fb0cef802398765160523f17b58"},{"lines":{"end":12,"start":1},"note":"Dispatch library referenced by build.sh; must define stunir_dispatch and c14n helpers.","path":"scripts/lib/dispatch.sh","sha256":"64e24097e15bb34d81ce002bd80f9e0531d103fb74b0ee0467565215ff2422ca","snippet_sha256":"64e24097e15bb34d81ce002bd80f9e0531d103fb74b0ee0467565215ff2422ca"},{"lines":{"end":68,"start":1},"note":"Receipt generator referenced by dispatch/build; must emit stunir.receipt.build.v1 receipts and core-id hashing.","path":"scripts/lib/receipt.sh","sha256":"c2124323e4bb09017fd64831e171c8ce02a71e76884260df92e6ca946f1530d7","snippet_sha256":"c2124323e4bb09017fd64831e171c8ce02a71e76884260df92e6ca946f1530d7"}],"expected":["A native-first dispatcher that can fall back to shell/Python implementations while preserving determinism and canonical JSON.","Receipt generation emits schema stunir.receipt.build.v1 with receipt_core_id_sha256 matching tools/verify_build.py.","scripts/build.sh produces the expected artifacts and receipts for local strict verification."],"id":"ISSUE.BUILD.0002","impact":{"breaks_build":true,"breaks_local_verify_strict":true,"breaks_receipt_generation":true},"proposed_fixes":[{"description":"Implement PLAN.BUILD.0001 (see plan file in this bundle) to rewrite scripts/lib/dispatch.sh and scripts/lib/receipt.sh, and patch tools/native/rust/stunir-native/src/main.rs for receipt correctness and subcommand compatibility.","touched_paths":["scripts/lib/dispatch.sh","scripts/lib/receipt.sh","tools/native/rust/stunir-native/src/main.rs"]}],"related":["PLAN.BUILD.0001","ISSUE.DISPATCH.0001","ISSUE.RECEIPT.0001","ISSUE.NATIVE.0001","ISSUE.NATIVE.0002","ISSUE.DISPATCH.0002"],"reproduction":["set -euxo pipefail","./scripts/build.sh","./scripts/verify.sh --local --strict"],"root_causes":[{"details":"Dispatcher and receipt generation are not fully implemented to match strict verifier contract.","type":"incomplete_pipeline"},{"details":"Native receipt path contains compile+hash mismatches; dispatcher must handle underscore/kebab mapping.","type":"native_route_incomplete"}],"schema":"stunir.issues.issue.v1","severity":"blocking","status":"open","symptoms":["The compiled-binaries (native-first) route is not end-to-end complete for local strict verification.","dispatch/receipt/native receipt naming and hashing contracts require alignment so scripts/build.sh can pass scripts/verify.sh --local --strict."],"title":"Complete compiled-binaries route (native-first) for local strict: dispatch + receipts + canonicalization alignment","workarounds":[{"commands":["./scripts/build_docker.sh","./scripts/verify.sh --local --strict"],"description":"Use docker/Python pipeline as reference until native-first local strict route is complete."}]}
+{
+  "category": [
+    "pipeline",
+    "build"
+  ],
+  "evidence": [
+    {
+      "lines": {
+        "end": 70,
+        "start": 1
+      },
+      "note": "Build entrypoint and pipeline orchestration for local strict; should align with plan/receipt/dispatch contracts.",
+      "path": "scripts/build.sh",
+      "sha256": "62e9cfb279b0c0f1519117f570d27e8c40146fb0cef802398765160523f17b58",
+      "snippet_sha256": "62e9cfb279b0c0f1519117f570d27e8c40146fb0cef802398765160523f17b58"
+    },
+    {
+      "lines": {
+        "end": 12,
+        "start": 1
+      },
+      "note": "Dispatch library referenced by build.sh; must define stunir_dispatch and c14n helpers.",
+      "path": "scripts/lib/dispatch.sh",
+      "sha256": "64e24097e15bb34d81ce002bd80f9e0531d103fb74b0ee0467565215ff2422ca",
+      "snippet_sha256": "64e24097e15bb34d81ce002bd80f9e0531d103fb74b0ee0467565215ff2422ca"
+    },
+    {
+      "lines": {
+        "end": 68,
+        "start": 1
+      },
+      "note": "Receipt generator referenced by dispatch/build; must emit stunir.receipt.build.v1 receipts and core-id hashing.",
+      "path": "scripts/lib/receipt.sh",
+      "sha256": "c2124323e4bb09017fd64831e171c8ce02a71e76884260df92e6ca946f1530d7",
+      "snippet_sha256": "c2124323e4bb09017fd64831e171c8ce02a71e76884260df92e6ca946f1530d7"
+    }
+  ],
+  "expected": [
+    "A native-first dispatcher that can fall back to shell/Python implementations while preserving determinism and canonical JSON.",
+    "Receipt generation emits schema stunir.receipt.build.v1 with receipt_core_id_sha256 matching tools/verify_build.py.",
+    "scripts/build.sh produces the expected artifacts and receipts for local strict verification."
+  ],
+  "id": "ISSUE.BUILD.0002",
+  "impact": {
+    "breaks_build": true,
+    "breaks_local_verify_strict": true,
+    "breaks_receipt_generation": true
+  },
+  "proposed_fixes": [
+    {
+      "description": "Implement PLAN.BUILD.0001 (see plan file in this bundle) to rewrite scripts/lib/dispatch.sh and scripts/lib/receipt.sh, and patch tools/native/rust/stunir-native/src/main.rs for receipt correctness and subcommand compatibility.",
+      "touched_paths": [
+        "scripts/lib/dispatch.sh",
+        "scripts/lib/receipt.sh",
+        "tools/native/rust/stunir-native/src/main.rs"
+      ]
+    }
+  ],
+  "related": [
+    "PLAN.BUILD.0001",
+    "ISSUE.DISPATCH.0001",
+    "ISSUE.RECEIPT.0001",
+    "ISSUE.NATIVE.0001",
+    "ISSUE.NATIVE.0002",
+    "ISSUE.DISPATCH.0002"
+  ],
+  "reproduction": [
+    "set -euxo pipefail",
+    "./scripts/build.sh",
+    "./scripts/verify.sh --local --strict"
+  ],
+  "root_causes": [
+    {
+      "details": "Dispatcher and receipt generation are not fully implemented to match strict verifier contract.",
+      "type": "incomplete_pipeline"
+    },
+    {
+      "details": "Native receipt path contains compile+hash mismatches; dispatcher must handle underscore/kebab mapping.",
+      "type": "native_route_incomplete"
+    }
+  ],
+  "schema": "stunir.issues.issue.v1",
+  "severity": "blocking",
+  "status": "CLOSED",
+  "symptoms": [
+    "The compiled-binaries (native-first) route is not end-to-end complete for local strict verification.",
+    "dispatch/receipt/native receipt naming and hashing contracts require alignment so scripts/build.sh can pass scripts/verify.sh --local --strict."
+  ],
+  "title": "Complete compiled-binaries route (native-first) for local strict: dispatch + receipts + canonicalization alignment",
+  "workarounds": [
+    {
+      "commands": [
+        "./scripts/build_docker.sh",
+        "./scripts/verify.sh --local --strict"
+      ],
+      "description": "Use docker/Python pipeline as reference until native-first local strict route is complete."
+    }
+  ],
+  "resolution": "Implemented in Native Core / Shell Integration Pack"
+}

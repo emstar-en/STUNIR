@@ -1,0 +1,8 @@
+[
+  "path_alignment.machine.json",
+  "build_integration.machine.json",
+  "argument_parsing.machine.json",
+  "error_handling.machine.json",
+  "canonical_compliance.machine.json",
+  "toolchain_resolution.machine.json"
+]

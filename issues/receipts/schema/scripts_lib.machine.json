@@ -1,1 +1,91 @@
-{"category":["receipts","schema"],"evidence":[{"lines":{"end":120,"start":1},"note":"Defines generate_receipt() but it does not implement STUNIR receipt schema or hashing contract.","path":"scripts/lib/receipt.sh","sha256":"c2124323e4bb09017fd64831e171c8ce02a71e76884260df92e6ca946f1530d7","snippet_sha256":"fe873d56fd1b4b46ffc0a623386dc1dcbb48ac101090bebc0c0f56e539474a5b"},{"lines":{"end":621,"start":542},"note":"compute_receipt_core_id() defines required core fields + canonicalization + sha256.","path":"tools/verify_build.py","sha256":"7eb1cee982e44b32a3d3e795ec36b287912fba522bcbfb65d0f8a1659b9c4bb8","snippet_sha256":"b27e24d9073b9a110d297fcdfb51fa50d6a9097ce698a88e635245d5d99e5d7b"},{"lines":{"end":260,"start":1},"note":"Provides receipt recording implementation used by docker build path.","path":"tools/record_receipt.py","sha256":"544f0597715cbd9131a59f48c9ab4536cad6a49b30eef4ee6157e3f1de8e35f6","snippet_sha256":"222f516c81c24659c63a85abd72fddaa3cf00d4339a025f3b3da46832bbad388"}],"expected":["Receipt JSON must conform to tools/verify_build.py expectations for schema stunir.receipt.build.v1.","receipt_core_id_sha256 must equal sha256(canonical_json_bytes(core_fields)) where core_fields are schema,target,status,build_epoch,sha256,epoch,inputs,tool,argv."],"id":"ISSUE.RECEIPT.0001","impact":{"breaks_build":true,"breaks_local_verify_strict":true,"breaks_receipt_generation":true},"proposed_fixes":[{"description":"Replace scripts/lib/receipt.sh with a thin wrapper around tools/record_receipt.py (or native stunir-native) while preserving canonical JSON rules.","touched_paths":["scripts/lib/receipt.sh","scripts/lib/dispatch.sh"]}],"related":["ISSUE.DISPATCH.0001","ISSUE.BUILD.0001"],"reproduction":["mkdir -p receipts","bash -c 'source scripts/lib/receipt.sh; generate_receipt receipts/_test.json FOO=bar'","python3 -B tools/verify_build.py --local --repo . --strict"],"root_causes":[{"details":"receipt.sh currently serializes a small environment-derived dict; it is not wired to build targets, hashing, epoch.json, or inputs closure.","type":"placeholder"}],"schema":"stunir.issues.issue.v1","severity":"blocking","status":"open","symptoms":["receipts/spec_ir.json and receipts/prov_emit.json (if generated via this script) will not match verifier expectations.","Missing required fields: schema,target,status,build_epoch,sha256,epoch,inputs,argv,receipt_core_id_sha256."],"title":"scripts/lib/receipt.sh generates unrelated env-key JSON; does not emit stunir.receipt.build.v1 receipts required by verifier","workarounds":[{"commands":["python3 -B tools/record_receipt.py --help","# Example (IR receipt):","python3 -B tools/record_receipt.py --target asm/spec_ir.txt --receipt receipts/spec_ir.json --status GENERATED_IR --build-epoch $(python3 - <<'PY'\nimport json; print(json.load(open('build/epoch.json'))['selected_epoch'])\nPY) --epoch-json build/epoch.json --inputs build/provenance.json receipts/ir_manifest.json --input-dirs spec asm"],"description":"Use the maintained receipt generator tools/record_receipt.py (used by scripts/build_docker.sh)."}]}
+{
+  "category": [
+    "receipts",
+    "schema"
+  ],
+  "evidence": [
+    {
+      "lines": {
+        "end": 120,
+        "start": 1
+      },
+      "note": "Defines generate_receipt() but it does not implement STUNIR receipt schema or hashing contract.",
+      "path": "scripts/lib/receipt.sh",
+      "sha256": "c2124323e4bb09017fd64831e171c8ce02a71e76884260df92e6ca946f1530d7",
+      "snippet_sha256": "fe873d56fd1b4b46ffc0a623386dc1dcbb48ac101090bebc0c0f56e539474a5b"
+    },
+    {
+      "lines": {
+        "end": 621,
+        "start": 542
+      },
+      "note": "compute_receipt_core_id() defines required core fields + canonicalization + sha256.",
+      "path": "tools/verify_build.py",
+      "sha256": "7eb1cee982e44b32a3d3e795ec36b287912fba522bcbfb65d0f8a1659b9c4bb8",
+      "snippet_sha256": "b27e24d9073b9a110d297fcdfb51fa50d6a9097ce698a88e635245d5d99e5d7b"
+    },
+    {
+      "lines": {
+        "end": 260,
+        "start": 1
+      },
+      "note": "Provides receipt recording implementation used by docker build path.",
+      "path": "tools/record_receipt.py",
+      "sha256": "544f0597715cbd9131a59f48c9ab4536cad6a49b30eef4ee6157e3f1de8e35f6",
+      "snippet_sha256": "222f516c81c24659c63a85abd72fddaa3cf00d4339a025f3b3da46832bbad388"
+    }
+  ],
+  "expected": [
+    "Receipt JSON must conform to tools/verify_build.py expectations for schema stunir.receipt.build.v1.",
+    "receipt_core_id_sha256 must equal sha256(canonical_json_bytes(core_fields)) where core_fields are schema,target,status,build_epoch,sha256,epoch,inputs,tool,argv."
+  ],
+  "id": "ISSUE.RECEIPT.0001",
+  "impact": {
+    "breaks_build": true,
+    "breaks_local_verify_strict": true,
+    "breaks_receipt_generation": true
+  },
+  "proposed_fixes": [
+    {
+      "description": "Replace scripts/lib/receipt.sh with a thin wrapper around tools/record_receipt.py (or native stunir-native) while preserving canonical JSON rules.",
+      "touched_paths": [
+        "scripts/lib/receipt.sh",
+        "scripts/lib/dispatch.sh"
+      ]
+    }
+  ],
+  "related": [
+    "ISSUE.DISPATCH.0001",
+    "ISSUE.BUILD.0001"
+  ],
+  "reproduction": [
+    "mkdir -p receipts",
+    "bash -c 'source scripts/lib/receipt.sh; generate_receipt receipts/_test.json FOO=bar'",
+    "python3 -B tools/verify_build.py --local --repo . --strict"
+  ],
+  "root_causes": [
+    {
+      "details": "receipt.sh currently serializes a small environment-derived dict; it is not wired to build targets, hashing, epoch.json, or inputs closure.",
+      "type": "placeholder"
+    }
+  ],
+  "schema": "stunir.issues.issue.v1",
+  "severity": "blocking",
+  "status": "CLOSED",
+  "symptoms": [
+    "receipts/spec_ir.json and receipts/prov_emit.json (if generated via this script) will not match verifier expectations.",
+    "Missing required fields: schema,target,status,build_epoch,sha256,epoch,inputs,argv,receipt_core_id_sha256."
+  ],
+  "title": "scripts/lib/receipt.sh generates unrelated env-key JSON; does not emit stunir.receipt.build.v1 receipts required by verifier",
+  "workarounds": [
+    {
+      "commands": [
+        "python3 -B tools/record_receipt.py --help",
+        "# Example (IR receipt):",
+        "python3 -B tools/record_receipt.py --target asm/spec_ir.txt --receipt receipts/spec_ir.json --status GENERATED_IR --build-epoch $(python3 - <<'PY'\nimport json; print(json.load(open('build/epoch.json'))['selected_epoch'])\nPY) --epoch-json build/epoch.json --inputs build/provenance.json receipts/ir_manifest.json --input-dirs spec asm"
+      ],
+      "description": "Use the maintained receipt generator tools/record_receipt.py (used by scripts/build_docker.sh)."
+    }
+  ],
+  "resolution": "Implemented in Native Core / Shell Integration Pack"
+}

@@ -1,1 +1,4 @@
-["scripts_lib.machine.json","underscore_kebab.machine.json"]
+[
+  "scripts_lib.machine.json",
+  "underscore_kebab.machine.json"
+]

@@ -1,1 +1,4 @@
-["native_not.machine.json","stunir_native.machine.json"]
+[
+  "native_not.machine.json",
+  "stunir_native.machine.json"
+]
