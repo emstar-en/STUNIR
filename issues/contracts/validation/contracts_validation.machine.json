@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["contracts/validation/*"],"id":"contracts/validation/1050","priority":"HIGH","schema":"stunir.issue.v2","status":"open","title":"Complete contracts → validation pipeline stage"}

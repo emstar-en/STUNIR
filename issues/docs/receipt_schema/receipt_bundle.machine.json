@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":"docs/receipt_schema/*","id":"docs/receipt_schema/1007","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Receipt bundle schema v1"}
