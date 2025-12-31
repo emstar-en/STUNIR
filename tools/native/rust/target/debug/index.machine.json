@@ -1,0 +1,8 @@
+{
+  ".fingerprint": "Directory",
+  "deps": "Directory",
+  "incremental": "Directory",
+  ".cargo-lock": "File",
+  "stunir-rust": "File",
+  "stunir-rust.d": "File"
+}

@@ -1,5 +1,7 @@
 {
-  "c": "Category",
-  "python": "Category",
-  "rust": "Category"
+  "haskell": "Directory",
+  "python": "Directory",
+  "rust": "Directory",
+  "shell": "Directory",
+  "router.sh": "File"
 }

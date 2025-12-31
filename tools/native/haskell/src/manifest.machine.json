@@ -1,1 +1,7 @@
-["StunirPack.hs"]
+[
+  "Commands",
+  "IR",
+  "Main.hs",
+  "StunirPack.hs",
+  "StunirPipeline.hs"
+]

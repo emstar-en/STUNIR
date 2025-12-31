@@ -1,0 +1,8 @@
+[
+  ".fingerprint",
+  "deps",
+  "incremental",
+  ".cargo-lock",
+  "stunir-rust",
+  "stunir-rust.d"
+]

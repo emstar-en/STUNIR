@@ -1,1 +1,23 @@
-["check_toolchain.rs","emit.rs","errors.rs","gen_provenance.rs","hash.rs","ir_v1.rs","jcs.rs","main.rs","path_policy.rs","spec_to_ir.rs","validate.rs","verify_emit.rs","verify_pack.rs"]
+[
+  "emit",
+  "canonical.rs",
+  "check_toolchain.rs",
+  "emit.rs",
+  "errors.rs",
+  "gen_provenance.rs",
+  "hash.rs",
+  "import.rs",
+  "ir.rs",
+  "ir_v1.rs",
+  "jcs.rs",
+  "main.rs",
+  "path_policy.rs",
+  "provenance.rs",
+  "receipt.rs",
+  "spec.rs",
+  "spec_to_ir.rs",
+  "toolchain.rs",
+  "validate.rs",
+  "verify_emit.rs",
+  "verify_pack.rs"
+]

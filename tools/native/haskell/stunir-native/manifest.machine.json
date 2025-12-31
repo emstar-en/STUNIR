@@ -1,1 +1,6 @@
-["stunir-native.cabal"]
+[
+  "app",
+  "src",
+  "Setup.hs",
+  "stunir-native.cabal"
+]

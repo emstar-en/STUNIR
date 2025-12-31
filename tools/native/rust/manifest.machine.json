@@ -1,3 +1,8 @@
 [
-  "tools_native.machine.json"
+  "src",
+  "stunir-native",
+  "target",
+  "Cargo.lock",
+  "Cargo.toml",
+  "build.rs"
 ]

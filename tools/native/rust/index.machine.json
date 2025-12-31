@@ -1,3 +1,8 @@
 {
-  "tools_native.machine.json": "Complete tools \u2192 native \u2192 rust pipeline stage"
+  "src": "Directory",
+  "stunir-native": "Directory",
+  "target": "Directory",
+  "Cargo.lock": "File",
+  "Cargo.toml": "File",
+  "build.rs": "File"
 }

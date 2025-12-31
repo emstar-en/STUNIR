@@ -1,1 +1,4 @@
-{"Cargo.toml":"File"}
+{
+  "src": "Directory",
+  "Cargo.toml": "File"
+}

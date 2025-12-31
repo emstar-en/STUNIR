@@ -1,0 +1,5 @@
+[
+  "CheckToolchain.hs",
+  "GenProvenance.hs",
+  "SpecToIr.hs"
+]

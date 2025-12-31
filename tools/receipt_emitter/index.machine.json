@@ -1,3 +1,3 @@
 {
-  "tools_receipt.machine.json": "Complete tools \u2192 receipt_emitter pipeline stage"
+  "emit_receipt.py": "File"
 }

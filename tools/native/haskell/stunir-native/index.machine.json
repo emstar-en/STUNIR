@@ -1,1 +1,6 @@
-{"stunir-native.cabal":"File"}
+{
+  "app": "Directory",
+  "src": "Directory",
+  "Setup.hs": "File",
+  "stunir-native.cabal": "File"
+}

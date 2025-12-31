@@ -1,5 +1,7 @@
 [
-  "c",
+  "haskell",
   "python",
-  "rust"
+  "rust",
+  "shell",
+  "router.sh"
 ]

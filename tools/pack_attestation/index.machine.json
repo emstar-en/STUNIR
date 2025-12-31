@@ -1,1 +1,5 @@
-{"Attestation.hs":"File","generate_root.sh":"Shell script","pack-attestation.cabal":"File"}
+{
+  "Attestation.hs": "File",
+  "generate_root.sh": "File",
+  "pack-attestation.cabal": "File"
+}

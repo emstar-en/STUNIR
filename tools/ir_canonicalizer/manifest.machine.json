@@ -1,1 +1,6 @@
-["StunirIR.hs","stunir-ir.cabal"]
+[
+  "test_vectors",
+  "StunirIR.hs",
+  "canonicalize.py",
+  "stunir-ir.cabal"
+]

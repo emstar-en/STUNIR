@@ -1,1 +1,4 @@
-["Cargo.toml"]
+[
+  "src",
+  "Cargo.toml"
+]
