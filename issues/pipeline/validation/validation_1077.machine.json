@@ -1,0 +1,1 @@
+{"dependencies":["native/haskell"],"epoch":1735500000,"files_affected":["pipeline/validation/*"],"id":"pipeline/validation/1077","priority":"MEDIUM","schema":"stunir.issue.v2","status":"open","title":"Complete pipeline → validation pipeline stage"}
