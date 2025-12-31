@@ -22,6 +22,24 @@ stunir_fail() {
     exit 1
 }
 
+# Calculate SHA256 of a file
+# Usage: stunir_hash_file "filename"
+stunir_hash_file() {
+    local file=$1
+    if [ ! -f "$file" ]; then
+        echo "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" # Empty hash
+        return
+    fi
+
+    if command -v sha256sum >/dev/null; then
+        sha256sum "$file" | awk '{print $1}'
+    elif command -v shasum >/dev/null; then
+        shasum -a 256 "$file" | awk '{print $1}'
+    else
+        echo "unknown_no_hasher"
+    fi
+}
+
 # Simple JSON value extractor (grep/sed based)
 json_get_key() {
     local key=$1

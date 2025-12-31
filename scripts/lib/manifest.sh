@@ -56,18 +56,10 @@ _scan_tool() {
     local ver_arg=$3
 
     local path=$(command -v "$bin")
-    # Fix: Ensure we only get the first line of version output and strip quotes
     local version=$("$bin" $ver_arg 2>&1 | head -n 1 | tr -d '"')
 
-    # Calculate Hash (Try sha256sum, then shasum)
-    local hash=""
-    if command -v sha256sum >/dev/null; then
-        hash=$(sha256sum "$path" | awk '{print $1}')
-    elif command -v shasum >/dev/null; then
-        hash=$(shasum -a 256 "$path" | awk '{print $1}')
-    else
-        hash="unknown_no_hasher"
-    fi
+    # Use core hashing function
+    local hash=$(stunir_hash_file "$path")
 
     stunir_log "Found $name: $path ($hash)"
 
