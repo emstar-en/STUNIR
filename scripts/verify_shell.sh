@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # scripts/verify_shell.sh
 # STUNIR Shell-Native Verifier
-# Dependencies: grep, sed, shasum (or sha256sum)
+# Dependencies: grep, sed, shasum (or sha256sum), cut
 
 set -e
 export LC_ALL=C
 
-# Source logging if available, else define fallback
-# We use relative path logic to find the lib
+# Source logging if available
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -f "$SCRIPT_DIR/lib/stunir_core.sh" ]; then
     source "$SCRIPT_DIR/lib/stunir_core.sh"
@@ -51,8 +50,7 @@ log_info "Calculated Hash: $CALC_HASH"
 # 2. Extract Hash from Provenance
 log_info "Reading Provenance..."
 
-# Debug: Show the line we are matching against
-# We look for the line containing "ir_hash"
+# Find the line containing "ir_hash"
 MATCHED_LINE=$(grep '"ir_hash"' "$PROV_FILE" | head -n 1)
 
 if [ -z "$MATCHED_LINE" ]; then
@@ -64,10 +62,17 @@ fi
 
 log_info "Found Provenance Line: $MATCHED_LINE"
 
-# Robust extraction using sed
-# Matches: ... "sha256:<HEX>" ...
-# We use basic regex to be safe across sed versions
-EXTRACTED_HASH=$(echo "$MATCHED_LINE" | sed -n 's/.*"sha256:\([a-f0-9]*\)".*//p')
+# Robust extraction using cut
+# Assumes standard JSON string format: "key": "value"
+# Splitting by double-quote (") usually puts the value in field 4
+# 1: indent/brace
+# 2: key (ir_hash)
+# 3: separator (: )
+# 4: value (sha256:...)
+RAW_VALUE=$(echo "$MATCHED_LINE" | cut -d'"' -f4)
+
+# Remove "sha256:" prefix
+EXTRACTED_HASH=${RAW_VALUE#sha256:}
 
 if [ -z "$EXTRACTED_HASH" ]; then
     log_err "Could not extract hash value from line."
