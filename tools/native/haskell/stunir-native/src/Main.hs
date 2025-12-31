@@ -5,7 +5,7 @@ import System.Environment (getArgs, lookupEnv)
 import System.Exit (exitFailure, exitSuccess)
 import System.IO (hPutStrLn, stderr)
 import qualified Data.ByteString.Lazy.Char8 as BL
-import Data.Aeson (encode, decode, object, (.=))
+import Data.Aeson (encode, decode, object, (.=), ToJSON)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
