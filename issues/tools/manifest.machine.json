@@ -1,0 +1,14 @@
+[
+  "asm",
+  "canonicalizers",
+  "debuggers",
+  "emitters",
+  "inspectors",
+  "ir_emitter",
+  "native",
+  "parsers",
+  "profilers",
+  "receipt_emitter",
+  "serializers",
+  "validators"
+]
