@@ -19,17 +19,35 @@ pub fn run(input_path: &str, out_ir: &str) -> Result<()> {
             let entry = entry.map_err(|e| StunirError::Io(e.to_string()))?;
             let path = entry.path();
             if path.is_file() && path.extension().map_or(false, |ext| ext == "json") {
-                println!("Loading spec: {:?}", path);
+                // Robust Loading: Check 'kind' before parsing schema
                 let content = fs::read_to_string(&path)
                     .map_err(|e| StunirError::Io(format!("Failed to read {:?}: {}", path, e)))?;
-                let spec: Spec = serde_json::from_str(&content)
-                    .map_err(|e| StunirError::Json(format!("Invalid spec JSON in {:?}: {}", path, e)))?;
-                combined_spec.modules.extend(spec.modules);
-                combined_spec.metadata.extend(spec.metadata);
+
+                let v: serde_json::Value = match serde_json::from_str(&content) {
+                    Ok(v) => v,
+                    Err(e) => {
+                        println!("WARNING: Skipping invalid JSON {:?}: {}", path, e);
+                        continue;
+                    }
+                };
+
+                if let Some(kind) = v.get("kind").and_then(|k| k.as_str()) {
+                    if kind == "spec" {
+                        println!("Loading spec: {:?}", path);
+                        let spec: Spec = serde_json::from_value(v)
+                            .map_err(|e| StunirError::Json(format!("Invalid Spec schema in {:?}: {}", path, e)))?;
+                        combined_spec.modules.extend(spec.modules);
+                        combined_spec.metadata.extend(spec.metadata);
+                    } else {
+                        println!("Skipping non-spec file (kind='{}'): {:?}", kind, path);
+                    }
+                } else {
+                    println!("Skipping unknown JSON (no 'kind' field): {:?}", path);
+                }
             }
         }
     } else {
-        // Single file mode
+        // Single file mode - Enforce strictness
         let content = fs::read_to_string(input_path)
             .map_err(|e| StunirError::Io(format!("Failed to read spec: {}", e)))?;
         let spec: Spec = serde_json::from_str(&content)
