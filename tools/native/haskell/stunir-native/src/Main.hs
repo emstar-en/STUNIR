@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import System.Environment (getArgs)
-import System.Exit (exitFailure)
+import System.Environment (getArgs, lookupEnv)
+import System.Exit (exitFailure, exitSuccess)
+import System.IO (hPutStrLn, stderr)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Aeson (encode, decode, object, (.=))
 import Data.Text (Text)
@@ -25,23 +26,29 @@ import Stunir.Import
 import Stunir.Provenance
 import Stunir.Toolchain
 
--- Helper to write JSON
+-- | Helper to write JSON safely
 writeJson :: ToJSON a => FilePath -> a -> IO ()
 writeJson path obj = do
     createDirectoryIfMissing True (takeDirectory path)
     BL.writeFile path (canonicalEncode obj)
 
--- Helper for SHA256
+-- | Helper for SHA256
 sha256Hex :: BL.ByteString -> Text
 sha256Hex bs = TE.decodeUtf8 $ Hex.encode $ hash $ BL.toStrict bs
+
+-- | Fail with a message
+die :: String -> IO a
+die msg = do
+    hPutStrLn stderr $ "Error: " ++ msg
+    exitFailure
 
 main :: IO ()
 main = do
     args <- getArgs
     case args of
-        ["version"] -> putStrLn "stunir-native-hs v0.4.0.0"
+        ["version"] -> putStrLn "stunir-native-hs v0.5.0.0"
 
-        -- check-toolchain --lockfile <path>
+        -- check-toolchain
         ("check-toolchain":"--lockfile":lockPath:_) -> do
             verifyToolchain lockPath
 
@@ -62,48 +69,60 @@ main = do
         -- spec-to-ir
         ("spec-to-ir":"--spec-root":specRoot:"--out":outPath:_) -> do
             let specPath = specRoot ++ "/spec.json"
-            specContent <- BL.readFile specPath
-            let specHash = sha256Hex specContent
+            exists <- doesFileExist specPath
+            if not exists then die $ "Spec file not found: " ++ specPath else do
+                specContent <- BL.readFile specPath
+                let specHash = sha256Hex specContent
 
-            case decode specContent :: Maybe Spec of
-                Nothing -> error "Failed to parse spec.json"
-                Just spec -> do
-                    let ir = IR {
-                        ir_version = "v1",
-                        ir_module_name = "stunir_module",
-                        ir_types = [],
-                        ir_functions = [],
-                        ir_spec_sha256 = specHash,
-                        ir_source = IRSource specHash (T.pack specPath),
-                        ir_source_modules = sp_modules spec
-                    }
-                    writeJson outPath ir
-                    putStrLn $ "Generated IR at " ++ outPath
+                case decode specContent :: Maybe Spec of
+                    Nothing -> die "Failed to parse spec.json"
+                    Just spec -> do
+                        let ir = IR {
+                            ir_version = "v1",
+                            ir_module_name = "stunir_module",
+                            ir_types = [],
+                            ir_functions = [],
+                            ir_spec_sha256 = specHash,
+                            ir_source = IRSource specHash (T.pack specPath),
+                            ir_source_modules = sp_modules spec
+                        }
+                        writeJson outPath ir
+                        putStrLn $ "Generated IR at " ++ outPath
 
         -- gen-provenance
         ("gen-provenance":"--epoch":epochStr:"--spec-root":specRoot:"--asm-root":_:"--out-json":outJson:"--out-header":outHeader:_) -> do
             let epoch = read epochStr :: Integer
             let specPath = specRoot ++ "/spec.json"
-            specContent <- BL.readFile specPath
-            let specHash = sha256Hex specContent
+            exists <- doesFileExist specPath
+            if not exists then die $ "Spec file not found: " ++ specPath else do
+                specContent <- BL.readFile specPath
+                let specHash = sha256Hex specContent
 
-            case decode specContent :: Maybe Spec of
-                Nothing -> error "Failed to parse spec.json"
-                Just spec -> do
-                    let modNames = map sm_name (sp_modules spec)
-                    let prov = Provenance epoch specHash modNames
+                case decode specContent :: Maybe Spec of
+                    Nothing -> die "Failed to parse spec.json"
+                    Just spec -> do
+                        let modNames = map sm_name (sp_modules spec)
+                        let prov = Provenance epoch specHash modNames
 
-                    writeJson outJson prov
-                    TIO.writeFile outHeader (generateCHeader prov)
-                    putStrLn $ "Generated Provenance: " ++ outJson ++ ", " ++ outHeader
+                        writeJson outJson prov
+                        TIO.writeFile outHeader (generateCHeader prov)
+                        putStrLn $ "Generated Provenance: " ++ outJson ++ ", " ++ outHeader
 
         -- compile-provenance
         ("compile-provenance":"--in-prov":_:"--out-bin":outBin:_) -> do
             let cFile = "tools/prov_emit.c"
             exists <- doesFileExist cFile
-            if not exists then error ("Missing C source: " ++ cFile) else do
-                callProcess "gcc" [cFile, "-o", outBin, "-Ibuild"] 
-                putStrLn $ "Compiled provenance binary to " ++ outBin
+            if not exists then die ("Missing C source: " ++ cFile) else do
+                -- Deterministic Compiler Lookup
+                -- 1. Try STUNIR_TOOL_GCC
+                -- 2. Fallback to 'gcc' (but warn)
+                envGcc <- lookupEnv "STUNIR_TOOL_GCC"
+                let gccCmd = case envGcc of
+                        Just p -> p
+                        Nothing -> "gcc"
+
+                callProcess gccCmd [cFile, "-o", outBin, "-Ibuild"] 
+                putStrLn $ "Compiled provenance binary to " ++ outBin ++ " using " ++ gccCmd
 
         -- gen-receipt
         ("gen-receipt":target:status:epochStr:tName:tPath:tHash:tVer:rest) -> do
@@ -121,6 +140,4 @@ main = do
             }
             BL.putStrLn (canonicalEncode receipt)
 
-        _ -> do
-            putStrLn "Error: Unknown command or missing arguments."
-            exitFailure
+        _ -> die "Unknown command or missing arguments."

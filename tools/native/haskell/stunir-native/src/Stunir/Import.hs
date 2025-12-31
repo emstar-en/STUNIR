@@ -8,6 +8,7 @@ import qualified Data.Text.IO as TIO
 import Control.Monad (forM)
 import Stunir.Spec
 import Data.Text (Text)
+import Data.List (isPrefixOf)
 
 extToLang :: String -> Maybe Text
 extToLang ".py" = Just "python"
@@ -22,6 +23,14 @@ extToLang ".rb" = Just "ruby"
 extToLang ".php" = Just "php"
 extToLang ".sh" = Just "bash"
 extToLang _     = Nothing
+
+-- | Directories to ignore
+ignoredDirs :: [String]
+ignoredDirs = [".git", "build", "node_modules", "dist", "target", "__pycache__"]
+
+shouldIgnore :: FilePath -> Bool
+shouldIgnore path = any (`elem` parts) ignoredDirs
+  where parts = splitDirectories path
 
 scanDirectory :: FilePath -> IO [SpecModule]
 scanDirectory root = do
@@ -40,10 +49,12 @@ scanDirectory root = do
 
 listDirectoryRecursive :: FilePath -> IO [FilePath]
 listDirectoryRecursive path = do
-    isFile <- doesFileExist path
-    if isFile then return [path] else do
-        isDir <- doesDirectoryExist path
-        if not isDir then return [] else do
-            entries <- listDirectory path
-            let fullEntries = map (path </>) entries
-            concat <$> mapM listDirectoryRecursive fullEntries
+    -- Check ignore list first
+    if shouldIgnore path then return [] else do
+        isFile <- doesFileExist path
+        if isFile then return [path] else do
+            isDir <- doesDirectoryExist path
+            if not isDir then return [] else do
+                entries <- listDirectory path
+                let fullEntries = map (path </>) entries
+                concat <$> mapM listDirectoryRecursive fullEntries
