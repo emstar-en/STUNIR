@@ -6,16 +6,34 @@ set -e
 
 STUNIR_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 source "$STUNIR_ROOT/scripts/lib/core.sh"
+source "$STUNIR_ROOT/scripts/lib/manifest.sh"
 
-echo "STUNIR Shell-Native Runner (v0.1.0)"
-echo "-----------------------------------"
-echo "Mode: Shell-Only (Profile 3)"
-echo "Workdir: $(pwd)"
+# --- CLI Dispatch ---
 
-# TODO: Implement argument parsing and stage execution
-# 1. Parse Spec (grep/sed based)
-# 2. Generate IR (stub)
-# 3. Verify Receipts
+COMMAND="${1:-help}"
+shift || true
 
-echo "Error: Shell-Native implementation is currently a stub."
-exit 1
+case "$COMMAND" in
+    discover|init)
+        stunir_log "Running Toolchain Discovery..."
+        stunir_generate_lockfile
+        ;;
+    build)
+        stunir_log "Starting Build..."
+        # Check for lockfile
+        if [ ! -f "$STUNIR_ROOT/build/local_toolchain.lock.json" ]; then
+            stunir_warn "Toolchain lockfile not found. Running discovery first..."
+            stunir_generate_lockfile
+        fi
+        stunir_log "Build logic pending..."
+        ;;
+    clean)
+        stunir_log "Cleaning build artifacts..."
+        rm -rf "$STUNIR_ROOT/build"
+        stunir_ok "Clean complete."
+        ;;
+    help|*)
+        echo "Usage: $0 {discover|build|clean}"
+        exit 1
+        ;;
+esac
