@@ -13,7 +13,6 @@ BUILD_PASS=true
 CONFLUENCE_PASS=true
 
 # TEST 1: TTL
-# (Simulated check for now as script is missing)
 if [[ -f "scripts/scan_ttl_validator.sh" ]]; then
     ./scripts/scan_ttl_validator.sh && TTL_PASS=true || TTL_PASS=false
 else
@@ -22,8 +21,10 @@ else
 fi
 
 # TEST 2: VEX/PINNING/SIGS  
-FLOATING=$(grep -r -E "\^|~>|>=" tools/ scripts/ requirements.txt 2>/dev/null | wc -l)
+# Fix: grep returns 1 if no matches found. We must allow this for pipefail.
+FLOATING=$( (grep -r -E "\^|~>|>=" tools/ scripts/ requirements.txt 2>/dev/null || true) | wc -l )
 SIGS=$(find . -name "*.sig" | wc -l)
+
 if [[ -f "vex.attestation.json" ]]; then
     VEX_STATUS=$(jq -r '.statements[0].status // "unknown"' vex.attestation.json 2>/dev/null || echo "pending")
 else
