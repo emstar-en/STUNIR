@@ -1,1 +1,5 @@
-{"README.md":"Documentation","rebar.config":"File"}
+{
+  "src": "Directory",
+  "README.md": "File",
+  "rebar.config": "File"
+}

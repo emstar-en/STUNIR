@@ -1,1 +1,6 @@
-{"README.md":"Documentation","stunir.cabal":"File"}
+{
+  "app": "Directory",
+  "src": "Directory",
+  "README.md": "File",
+  "stunir.cabal": "File"
+}

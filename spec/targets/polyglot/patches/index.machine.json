@@ -1,1 +1,4 @@
-{"rfc6902_machine_plan_add_polyglot.json":"JSON data/config","rfc6902_target_requirements_polyglot_add.json":"JSON data/config"}
+{
+  "rfc6902_machine_plan_add_polyglot.json": "File",
+  "rfc6902_target_requirements_polyglot_add.json": "File"
+}

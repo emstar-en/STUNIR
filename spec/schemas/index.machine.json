@@ -1,1 +1,3 @@
-{"toolchain_lock.schema.json":"JSON data/config"}
+{
+  "toolchain_lock.schema.json": "File"
+}

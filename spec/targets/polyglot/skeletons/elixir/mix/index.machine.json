@@ -1,1 +1,5 @@
-{"README.md":"Documentation","mix.exs":"File"}
+{
+  "lib": "Directory",
+  "README.md": "File",
+  "mix.exs": "File"
+}

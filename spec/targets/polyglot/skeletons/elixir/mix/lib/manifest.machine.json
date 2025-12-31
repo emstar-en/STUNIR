@@ -1,1 +1,4 @@
-["stunir_program.ex","stunir_runtime.ex"]
+[
+  "stunir_program.ex",
+  "stunir_runtime.ex"
+]

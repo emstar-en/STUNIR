@@ -1,1 +1,5 @@
-["README.md","mix.exs"]
+[
+  "lib",
+  "README.md",
+  "mix.exs"
+]

@@ -1,1 +1,7 @@
-{"output_language_plans_manifest.json":"JSON data/config"}
+{
+  "lisp": "Directory",
+  "polyglot": "Directory",
+  "python": "Directory",
+  "smt": "Directory",
+  "output_language_plans_manifest.json": "File"
+}

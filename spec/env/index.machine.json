@@ -1,1 +1,5 @@
-{"host_env_allowlist.windows.discovery.json":"JSON data/config","host_env_allowlist.windows.json":"JSON data/config","host_env_allowlist.windows.runtime.json":"JSON data/config"}
+{
+  "host_env_allowlist.windows.discovery.json": "File",
+  "host_env_allowlist.windows.json": "File",
+  "host_env_allowlist.windows.runtime.json": "File"
+}

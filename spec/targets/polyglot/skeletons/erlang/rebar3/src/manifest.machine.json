@@ -1,1 +1,5 @@
-["stunir_program.app.src","stunir_program.erl","stunir_runtime.erl"]
+[
+  "stunir_program.app.src",
+  "stunir_program.erl",
+  "stunir_runtime.erl"
+]

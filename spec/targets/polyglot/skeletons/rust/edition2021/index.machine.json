@@ -1,1 +1,5 @@
-{"Cargo.toml":"File","README.md":"Documentation"}
+{
+  "src": "Directory",
+  "Cargo.toml": "File",
+  "README.md": "File"
+}

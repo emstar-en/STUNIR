@@ -1,1 +1,6 @@
-["README.md","stunir.cabal"]
+[
+  "app",
+  "src",
+  "README.md",
+  "stunir.cabal"
+]
