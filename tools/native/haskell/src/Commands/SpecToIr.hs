@@ -5,7 +5,7 @@ module Commands.SpecToIr (run) where
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.ByteString.Lazy as B
-import Data.Aeson (encode)
+import Data.Aeson.Encode.Pretty (encodePretty)
 import IR.V1 (IrV1(..), IrFunction(..), IrInstruction(..))
 
 -- | Mock implementation of the Spec -> IR transformation.
@@ -27,6 +27,6 @@ run _inJson outIr = do
           , functions = [mainFn]
           }
 
-    -- Write the JSON output
-    B.writeFile outIr (encode ir)
+    -- Write the JSON output (Pretty Printed)
+    B.writeFile outIr (encodePretty ir)
     putStrLn $ "Generated IR at: " ++ outIr
