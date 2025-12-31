@@ -1,0 +1,14 @@
+{
+  "id": "tools/manifest/1050",
+  "title": "Implement Toolchain Manifest Generation",
+  "status": "open",
+  "priority": "HIGH",
+  "schema": "stunir.issue.v2",
+  "epoch": 1735600000,
+  "files_affected": [
+    "tools/manifest/*"
+  ],
+  "dependencies": [
+    "scripts/build_pipeline"
+  ]
+}
