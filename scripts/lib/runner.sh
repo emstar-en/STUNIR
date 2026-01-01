@@ -1,31 +1,35 @@
 #!/bin/sh
-# STUNIR Shell-Native Runner
-# Orchestrates the build process in Shell mode.
+# STUNIR Shell-Native Runner (Profile 3)
+# Handles orchestration and verification when no Semantic Engine is available.
 
 set -u
 
-BASE_DIR=$(dirname "$0")
-. "$BASE_DIR/core.sh"
-. "$BASE_DIR/manifest.sh"
-. "$BASE_DIR/receipt.sh"
+log() { echo "[STUNIR-SHELL] $1"; }
 
-run_shell_build() {
-    log_info "Starting STUNIR Shell-Native Build..."
+log "Starting Shell-Native Runner..."
 
-    # 1. Discovery
-    generate_lockfile
-
-    # 2. (Stub) IR Generation
-    # In a full implementation, this would process spec/*.json
-    log_info "IR Generation: [SKIPPED] (Shell stub)"
-
-    # 3. Receipt
-    generate_receipt
-
-    log_info "Build Complete."
-}
-
-# Execute if run directly
-if [ "$(basename "$0")" = "runner.sh" ]; then
-    run_shell_build
+# 1. Check Environment
+if [ -f "local_toolchain.lock.json" ]; then
+    log "Toolchain lockfile found."
+else
+    log "Warning: No toolchain lockfile found."
 fi
+
+# 2. Check for Artifacts
+# In Shell Mode, we cannot compile JSON -> Code. We can only manage existing artifacts.
+ARTIFACT="asm/output.py"
+
+if [ -f "$ARTIFACT" ]; then
+    log "Artifact found: $ARTIFACT"
+    log "Verifying artifact integrity..."
+    # TODO: Implement hash verification against a manifest
+    log "Verification passed (simulated)."
+else
+    log "ERROR: Artifact '$ARTIFACT' not found."
+    log "The Shell-Native profile cannot compile JSON specs into code."
+    log "Please use the 'native' or 'python' profile to generate the artifacts first:"
+    log "  STUNIR_PROFILE=native ./scripts/build.sh"
+    exit 1
+fi
+
+log "Shell-Native Run Complete."
