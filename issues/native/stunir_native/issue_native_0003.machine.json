@@ -1,0 +1,8 @@
+{
+  "id": "ISSUE.NATIVE.0003",
+  "status": "closed",
+  "resolution": "Fixed in Native Core (Profile 2)",
+  "title": "stunir-native is not parity-complete",
+  "severity": "blocking",
+  "schema": "stunir.issues.issue.v1"
+}

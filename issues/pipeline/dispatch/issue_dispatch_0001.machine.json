@@ -1,0 +1,8 @@
+{
+  "id": "ISSUE.DISPATCH.0001",
+  "status": "closed",
+  "resolution": "Fixed via Polyglot Dispatch in build.sh",
+  "title": "scripts/lib/dispatch.sh is not functional",
+  "severity": "blocking",
+  "schema": "stunir.issues.issue.v1"
+}

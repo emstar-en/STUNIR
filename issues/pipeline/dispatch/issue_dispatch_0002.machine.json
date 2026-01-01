@@ -1,0 +1,8 @@
+{
+  "id": "ISSUE.DISPATCH.0002",
+  "status": "closed",
+  "resolution": "Fixed: Native tool uses kebab-case",
+  "title": "Underscore vs kebab-case mismatch",
+  "severity": "high",
+  "schema": "stunir.issues.issue.v1"
+}
