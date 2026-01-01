@@ -1,43 +1,74 @@
-#!/usr/bin/env bash
-# scripts/lib/json_canon.sh
-# Shell-Native JSON Canonicalization Helpers
-#
-# STRATEGY:
-# We do not parse arbitrary JSON. We construct JSON deterministically.
-# 1. Keys must be sorted.
-# 2. No whitespace between separators.
-# 3. Strings must be properly escaped.
+#!/bin/bash
+# STUNIR JSON Canonicalizer (Polyglot)
+# Usage: ./json_canon.sh <input_file>
+# Output: Canonicalized JSON to stdout
 
-stunir_json_escape() {
-    local input="$1"
-    # Escape backslash, double quote, newline, tab
-    # This is a minimal escaper.
-    echo -n "$input" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr '\n' ' '
-}
+set -e
 
-# Usage: stunir_canon_object "key1" "val1" "key2" "val2" ...
-# keys MUST be passed in sorted order if you want canonical output!
-# This function does NOT sort for you (shell sorting is tricky with arrays).
-# It assumes the CALLER provides sorted keys.
-stunir_canon_object() {
-    echo -n "{"
-    local first=1
-    while [[ $# -gt 0 ]]; do
-        local key="$1"
-        local val="$2"
-        shift 2
+INPUT_FILE="$1"
 
-        if [[ $first -eq 0 ]]; then
-            echo -n ","
-        fi
-        echo -n "\"$key\":\"$val\""
-        first=0
-    done
-    echo -n "}"
-}
+if [ -z "$INPUT_FILE" ]; then
+    echo "Usage: $0 <input_file>" >&2
+    exit 1
+fi
 
-# Usage: stunir_canon_echo '{"a":1}'
-# Just echoes the argument. In shell mode, we often cheat and just echo the pre-calculated string.
-stunir_canon_echo() {
-    echo "$1"
-}
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Error: File not found: $INPUT_FILE" >&2
+    exit 1
+fi
+
+# --- Strategy 1: STUNIR Native (The Enterprise Binary) ---
+# Check for the binary in standard locations or PATH
+if command -v stunir-native >/dev/null 2>&1; then
+    stunir-native canon --file "$INPUT_FILE"
+    exit 0
+fi
+
+# Check local build locations (Linux/Windows)
+if [ -f "./stunir-native" ]; then
+    ./stunir-native canon --file "$INPUT_FILE"
+    exit 0
+elif [ -f "./stunir-native.exe" ]; then
+    ./stunir-native.exe canon --file "$INPUT_FILE"
+    exit 0
+fi
+
+# --- Strategy 2: jq (The Shell Standard) ---
+if command -v jq >/dev/null 2>&1; then
+    # -c: Compact (no whitespace)
+    # --sort-keys: Deterministic key ordering
+    jq -c --sort-keys . "$INPUT_FILE"
+    exit 0
+fi
+
+# --- Strategy 3: Python (The Forbidden Fruit) ---
+# Only used if explicitly allowed or present
+if command -v python3 >/dev/null 2>&1; then
+    python3 -c "import sys, json; print(json.dumps(json.load(sys.stdin), sort_keys=True, separators=(',', ':')))" < "$INPUT_FILE"
+    exit 0
+fi
+
+# --- Strategy 4: Perl (The Old Guard) ---
+# Often available on 'minimal' Linux distros where Python is missing
+if command -v perl >/dev/null 2>&1; then
+    # Try to use core JSON::PP (Standard since Perl 5.14)
+    if perl -MJSON::PP -e 1 >/dev/null 2>&1; then
+        perl -MJSON::PP -e 'local $/; print JSON::PP->new->canonical->encode(decode_json(<>))' < "$INPUT_FILE"
+        exit 0
+    fi
+fi
+
+# --- Strategy 5: Pure Shell (The Desperate Fallback) ---
+# WARNING: This CANNOT sort keys. It only removes whitespace.
+# If we reach here, the Model MUST have outputted sorted keys.
+echo "WARNING: Using pure shell fallback. Keys are NOT sorted. Determinism depends on input order." >&2
+
+# Simple sed minifier:
+# 1. Remove newlines
+# 2. Remove spaces around structural characters
+# Note: This is fragile with strings containing escaped quotes/spaces.
+# For a robust enterprise silo, this is a 'Fail Open' risk.
+
+# We use a safer 'tr' approach to just strip newlines and leading/trailing space
+# This assumes the input is "Pretty Printed" standard JSON.
+cat "$INPUT_FILE" | tr -d '\n' | sed 's/ : /:/g' | sed 's/, /,/g'
