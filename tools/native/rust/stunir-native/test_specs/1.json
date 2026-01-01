@@ -1,0 +1,1 @@
+{"kind": "spec", "modules": [{"name": "mod1", "lang": "python", "source": "print(1)"}]}
