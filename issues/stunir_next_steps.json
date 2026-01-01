@@ -1,0 +1,12 @@
+{
+  "immediate_actions": [
+    "Implement scripts/lib/json_canon.sh for pure shell environments (Profile 3)",
+    "Implement Native Receipt Generation (ISSUE.NATIVE.0002)",
+    "Finalize verify.sh to use the new Manifest V1 format"
+  ],
+  "completed_actions": [
+    "Integrate stunir-native binary",
+    "Implement Shell-Native Runner (Profile 3)",
+    "Define Toolchain Lockfile Schema"
+  ]
+}
