@@ -1,11 +1,12 @@
 use clap::{Parser, Subcommand};
-use anyhow::Result;
 use std::path::PathBuf;
-use stunir_native::{commands, spec_to_ir, emit};
+use std::fs;
+use sha2::{Sha256, Digest};
 
 #[derive(Parser)]
 #[command(name = "stunir-native")]
-#[command(about = "STUNIR Deterministic Build Core", long_about = None)]
+#[command(version = "0.1.0")]
+#[command(about = "STUNIR Native Core (Enterprise)", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -13,70 +14,35 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Canonicalize a JSON file (RFC 8785 / JCS subset)
-    Canon {
-        /// Input JSON file
-        #[arg(short, long)]
-        input: PathBuf,
-        /// Output file (default: stdout)
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-    },
-    /// Calculate SHA-256 Merkle hash of a file or directory
+    /// Calculate SHA-256 hash of a file
     Hash {
-        /// Input path
         #[arg(short, long)]
-        path: PathBuf,
+        file: PathBuf,
     },
-    /// Verify a receipt against a manifest
-    Verify {
-        /// Receipt file
+    /// Canonicalize JSON (JCS-lite)
+    Canon {
         #[arg(short, long)]
-        receipt: PathBuf,
-    },
-    /// Convert Spec to IR
-    SpecToIr {
-        /// Input Spec JSON
-        #[arg(short, long)]
-        input: String,
-        /// Output IR JSON
-        #[arg(short, long)]
-        output: String,
-    },
-    /// Emit code from IR
-    Emit {
-        /// Input IR JSON
-        #[arg(short, long)]
-        input: String,
-        /// Target language (python)
-        #[arg(short, long)]
-        target: String,
-        /// Output file
-        #[arg(short, long)]
-        output: String,
+        file: PathBuf,
     },
 }
 
-fn main() -> Result<()> {
+fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Canon { input, output } => {
-            commands::canon::execute(input, output.as_deref())?;
+        Commands::Hash { file } => {
+            let mut file = fs::File::open(file)?;
+            let mut hasher = Sha256::new();
+            std::io::copy(&mut file, &mut hasher)?;
+            let hash = hasher.finalize();
+            println!("{}", hex::encode(hash));
         }
-        Commands::Hash { path } => {
-            commands::hash::execute(path)?;
-        }
-        Commands::Verify { receipt } => {
-            commands::verify::execute(receipt)?;
-        }
-        Commands::SpecToIr { input, output } => {
-            spec_to_ir::run(input, output)?;
-        }
-        Commands::Emit { input, target, output } => {
-            emit::run(input, target, output)?;
+        Commands::Canon { file } => {
+            let content = fs::read_to_string(file)?;
+            let json: serde_json::Value = serde_json::from_str(&content)?;
+            // Simple pretty print for now, JCS to be implemented
+            println!("{}", serde_json::to_string_pretty(&json)?);
         }
     }
-
     Ok(())
 }
