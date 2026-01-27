@@ -23,8 +23,9 @@ import Stunir.Canonical (canonicalEncode)
 import Stunir.Spec
 import Stunir.IR
 import Stunir.Import
-import Stunir.Provenance
+import Stunir.Provenance (Provenance(..), generateCHeader, generateCHeaderExtended)
 import Stunir.Toolchain
+import Stunir.Manifest (generateIrManifest, writeIrManifest, IrManifest(..))
 
 -- | Helper to write JSON safely
 writeJson :: ToJSON a => FilePath -> a -> IO ()
@@ -89,10 +90,11 @@ main = do
                         writeJson outPath ir
                         putStrLn $ "Generated IR at " ++ outPath
 
-        -- gen-provenance
-        ("gen-provenance":"--epoch":epochStr:"--spec-root":specRoot:"--asm-root":_:"--out-json":outJson:"--out-header":outHeader:_) -> do
+        -- gen-provenance (Issue: provenance/1401 - Standardized C template)
+        ("gen-provenance":"--epoch":epochStr:"--spec-root":specRoot:"--asm-root":asmRoot:"--out-json":outJson:"--out-header":outHeader:rest) -> do
             let epoch = read epochStr :: Integer
             let specPath = specRoot ++ "/spec.json"
+            let useExtended = "--extended" `elem` rest
             exists <- doesFileExist specPath
             if not exists then die $ "Spec file not found: " ++ specPath else do
                 specContent <- BL.readFile specPath
@@ -102,10 +104,20 @@ main = do
                     Nothing -> die "Failed to parse spec.json"
                     Just spec -> do
                         let modNames = map sm_name (sp_modules spec)
-                        let prov = Provenance epoch specHash modNames
+                        -- Create provenance with standardized schema
+                        let prov = Provenance {
+                            prov_epoch = epoch,
+                            prov_spec_sha256 = specHash,
+                            prov_modules = modNames,
+                            prov_asm_sha256 = Nothing,  -- Will be computed later if ASM exists
+                            prov_schema = "stunir.provenance.v2"
+                        }
 
                         writeJson outJson prov
-                        TIO.writeFile outHeader (generateCHeader prov)
+                        -- Use extended header if requested
+                        if useExtended
+                            then TIO.writeFile outHeader (generateCHeaderExtended prov)
+                            else TIO.writeFile outHeader (generateCHeader prov)
                         putStrLn $ "Generated Provenance: " ++ outJson ++ ", " ++ outHeader
 
         -- compile-provenance
@@ -139,5 +151,20 @@ main = do
                 receipt_argv = map T.pack rest
             }
             BL.putStrLn (canonicalEncode receipt)
+
+        -- gen-ir-manifest (Issue: native/haskell/1205)
+        -- Generates deterministic IR bundle manifest with SHA256 hashes
+        ("gen-ir-manifest":"--ir-dir":irDir:"--out":outPath:_) -> do
+            manifest <- generateIrManifest irDir
+            writeIrManifest outPath manifest
+            putStrLn $ "Generated IR manifest at " ++ outPath ++ " with " 
+                    ++ show (im_ir_count manifest) ++ " files"
+
+        -- gen-ir-manifest with defaults
+        ["gen-ir-manifest"] -> do
+            manifest <- generateIrManifest "asm/ir"
+            writeIrManifest "receipts/ir_manifest.json" manifest
+            putStrLn $ "Generated IR manifest at receipts/ir_manifest.json with "
+                    ++ show (im_ir_count manifest) ++ " files"
 
         _ -> die "Unknown command or missing arguments."

@@ -1,158 +1,98 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+# STUNIR Receipt Verifier
+# Usage: ./verify.sh <receipt_file> [base_dir]
 
-# STUNIR verify wrapper.
-#
-# Modes:
-#   - Local mode (default): verifies receipts/manifests produced by scripts/build.sh
-#   - DSSE mode: verifies a DSSE envelope + in-toto Statement receipt (requires --trust-key)
-#
-# Auto-mode selection:
-#   - If --local is given: local
-#   - Else if --dsse is given: dsse
-#   - Else if first positional arg is an existing .json file that looks like a DSSE envelope: dsse
-#   - Else: local
+set -e
 
-MODE=""
-REPO="."
-TMP_DIR="_verify_build"
-FIXTURE_ROOT=""   # aka snapshot root
+RECEIPT_FILE="$1"
+BASE_DIR="${2:-.}"
 
-print_help() {
-  cat <<'EOF'
-Usage:
-  # Local verification (default)
-  ./scripts/verify.sh
-  ./scripts/verify.sh --local
-
-  # Verify a snapshot/fixture produced by scripts/snapshot_receipts.sh
-  ./scripts/verify.sh --root fixtures/receipts/TAG
-  ./scripts/verify.sh --snapshot fixtures/receipts/TAG
-
-  # DSSE verification
-  ./scripts/verify.sh receipt.dsse.json --trust-key KEYID=keys/pubkey.pem [--required-algs sha256,sha512]
-  ./scripts/verify.sh --dsse receipt.dsse.json --trust-key KEYID=keys/pubkey.pem
-
-Wrapper flags:
-  --local            Force local mode
-  --dsse             Force DSSE mode
-  --repo PATH        Repo root (default: .)
-  --tmp-dir PATH     Temp dir for verifier (default: _verify_build)
-  --root PATH        Alias for --snapshot
-  --snapshot PATH    Fixture root containing receipts/ and build/ (and optionally bin/)
-  -h, --help         Show this help
-
-All remaining args are forwarded to tools/verify_build.py.
-EOF
-}
-
-# Parse wrapper flags (leave the rest to the Python verifier)
-FORWARD=()
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --local)
-      MODE="local"; shift 1 ;;
-    --dsse)
-      MODE="dsse"; shift 1 ;;
-    --repo)
-      REPO="$2"; shift 2 ;;
-    --tmp-dir)
-      TMP_DIR="$2"; shift 2 ;;
-    --snapshot)
-      FIXTURE_ROOT="$2"; shift 2 ;;
-    --root)
-      FIXTURE_ROOT="$2"; shift 2 ;;
-    -h|--help)
-      print_help; exit 0 ;;
-    *)
-      FORWARD+=("$1"); shift 1 ;;
-  esac
-done
-
-# Extract possible envelope path from first positional argument (compat with historical usage)
-ENVELOPE=""
-REST=()
-if [[ ${#FORWARD[@]} -gt 0 ]]; then
-  if [[ "${FORWARD[0]}" == *.json ]]; then
-    ENVELOPE="${FORWARD[0]}"
-    REST=("${FORWARD[@]:1}")
-  else
-    REST=("${FORWARD[@]}")
-  fi
+if [ -z "$RECEIPT_FILE" ]; then
+    echo "Usage: $0 <receipt_file> [base_dir]"
+    exit 1
 fi
 
-looks_like_dsse() {
-  local p="$1"
-  python3 - <<'PY' "$p" >/dev/null 2>&1
-import json, sys
-from pathlib import Path
-p = Path(sys.argv[1])
-try:
-    obj = json.loads(p.read_text(encoding='utf-8'))
-except Exception:
-    sys.exit(1)
-# Minimal DSSE v1 JSON envelope shape
-ok = (
-    isinstance(obj, dict)
-    and isinstance(obj.get('payloadType'), str)
-    and isinstance(obj.get('payload'), str)
-    and isinstance(obj.get('signatures'), list)
-)
-sys.exit(0 if ok else 1)
-PY
-}
-
-contains_dsse_only_flags() {
-  # If the user passed DSSE-specific flags, do not silently fall back to local.
-  for a in "${REST[@]}"; do
-    case "$a" in
-      --trust-key|--required-algs|--no-require-canonical-payload)
-        return 0 ;;
-    esac
-  done
-  return 1
-}
-
-# Auto select mode if not forced
-if [[ -z "$MODE" ]]; then
-  if [[ -n "$ENVELOPE" ]] && [[ -f "$ENVELOPE" ]] && looks_like_dsse "$ENVELOPE"; then
-    MODE="dsse"
-  else
-    MODE="local"
-    # If user *intended* DSSE (passed DSSE flags), keep DSSE and fail loudly.
-    if [[ -n "$ENVELOPE" ]] && ! [[ -f "$ENVELOPE" ]] && contains_dsse_only_flags; then
-      MODE="dsse"
+# --- Helper: Polyglot SHA-256 (Same as receipt.sh) ---
+calc_hash() {
+    local file="$1"
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$file" | awk '{print $1}'
+    elif command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "$file" | awk '{print $1}'
+    elif command -v openssl >/dev/null 2>&1; then
+        openssl dgst -sha256 "$file" | awk '{print $2}'
+    else
+        echo "ERROR: No SHA-256 tool found" >&2
+        exit 1
     fi
-  fi
+}
+
+echo "[Verify] Reading receipt: $RECEIPT_FILE"
+
+# 1. Extract the "outputs" block
+# We use a polyglot strategy to get the JSON content of "outputs"
+if command -v jq >/dev/null 2>&1; then
+    # Easy mode
+    OUTPUTS_RAW=$(jq -r '.outputs | to_entries | .[] | "\(.key)|\(.value)"' "$RECEIPT_FILE")
+elif command -v python3 >/dev/null 2>&1; then
+    # Python mode
+    OUTPUTS_RAW=$(python3 -c "import sys, json; d=json.load(sys.stdin)['outputs']; [print(f'{k}|{v}') for k,v in d.items()]" < "$RECEIPT_FILE")
+else
+    # Shell mode (The "Desperate" Parser)
+    # Relies on Canonical JSON format: {"key":"value","key2":"value2"}
+    # 1. Extract everything between "outputs":{ and the closing }
+    # 2. Split by comma
+    # 3. Clean up quotes
+    echo "[Verify] Warning: Using Shell-Native JSON parser (relies on canonical format)"
+    
+    # Extract the outputs object content. 
+    # This sed is specific to the canonical format produced by json_canon.sh
+    RAW_CONTENT=$(cat "$RECEIPT_FILE" | sed -n 's/.*"outputs":{\([^}]*\)}.*/\1/p')
+    
+    # Split "file":"hash","file2":"hash2" into lines
+    OUTPUTS_RAW=$(echo "$RAW_CONTENT" | sed 's/,"/\n"/g' | sed 's/"//g' | sed 's/:/|/')
 fi
 
-mkdir -p "$TMP_DIR"
+# 2. Verify Each File
+FAILURES=0
+TOTAL=0
 
-if [[ "$MODE" == "dsse" ]]; then
-  if [[ -z "$ENVELOPE" ]]; then
-    ENVELOPE="receipt.dsse.json"
-  fi
-  if [[ ! -f "$ENVELOPE" ]]; then
-    echo "ERROR: DSSE envelope not found: $ENVELOPE" 1>&2
-    exit 2
-  fi
-  exec python3 -B tools/verify_build.py \
-    --envelope "$ENVELOPE" \
-    --repo "$REPO" \
-    --tmp-dir "$TMP_DIR" \
-    "${REST[@]}"
+# Set Internal Field Separator to newline to handle the loop correctly
+IFS=$'\n'
+for entry in $OUTPUTS_RAW; do
+    [ -z "$entry" ] && continue
+    
+    # Split "filename|hash"
+    FILE_PATH=$(echo "$entry" | cut -d'|' -f1)
+    EXPECTED_HASH=$(echo "$entry" | cut -d'|' -f2)
+    
+    FULL_PATH="$BASE_DIR/$FILE_PATH"
+    
+    if [ ! -f "$FULL_PATH" ]; then
+        echo "❌ MISSING: $FILE_PATH"
+        FAILURES=$((FAILURES + 1))
+        continue
+    fi
+    
+    ACTUAL_HASH=$(calc_hash "$FULL_PATH")
+    
+    if [ "$ACTUAL_HASH" == "$EXPECTED_HASH" ]; then
+        echo "✅ OK: $FILE_PATH"
+    else
+        echo "❌ MISMATCH: $FILE_PATH"
+        echo "   Expected: $EXPECTED_HASH"
+        echo "   Actual:   $ACTUAL_HASH"
+        FAILURES=$((FAILURES + 1))
+    fi
+    TOTAL=$((TOTAL + 1))
+done
+unset IFS
+
+echo "---------------------------------------------------"
+if [ "$FAILURES" -eq 0 ]; then
+    echo "[Verify] PASSED. All $TOTAL files match the receipt."
+    exit 0
+else
+    echo "[Verify] FAILED. Found $FAILURES errors."
+    exit 1
 fi
-
-# Local mode
-if [[ -n "$ENVELOPE" ]] && [[ ! -f "$ENVELOPE" ]]; then
-  echo "NOTE: '$ENVELOPE' not found; running local verification instead." 1>&2
-fi
-
-LOCAL_ARGS=("--local" "--repo" "$REPO" "--tmp-dir" "$TMP_DIR" "--strict")
-if [[ -n "$FIXTURE_ROOT" ]]; then
-  LOCAL_ARGS+=("--root" "$FIXTURE_ROOT")
-fi
-
-exec python3 -B tools/verify_build.py \
-  "${LOCAL_ARGS[@]}" \
-  "${REST[@]}"

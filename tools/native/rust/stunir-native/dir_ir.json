@@ -1,0 +1,81 @@
+{
+  "kind": "ir",
+  "generator": "stunir-native-rust",
+  "ir_version": "v1",
+  "module_name": "main",
+  "functions": [
+    {
+      "name": "mod2",
+      "body": [
+        {
+          "op": "comment",
+          "args": [
+            "Source Language: python"
+          ]
+        },
+        {
+          "op": "raw",
+          "args": [
+            "print(2)"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mod1",
+      "body": [
+        {
+          "op": "comment",
+          "args": [
+            "Source Language: python"
+          ]
+        },
+        {
+          "op": "raw",
+          "args": [
+            "print(1)"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "body": [
+        {
+          "op": "print",
+          "args": [
+            "STUNIR: Orchestrating modules..."
+          ]
+        },
+        {
+          "op": "call",
+          "args": [
+            "mod2"
+          ]
+        },
+        {
+          "op": "call",
+          "args": [
+            "mod1"
+          ]
+        }
+      ]
+    }
+  ],
+  "modules": [],
+  "metadata": {
+    "original_spec_kind": "spec",
+    "source_modules": [
+      {
+        "name": "mod2",
+        "source": "print(2)",
+        "lang": "python"
+      },
+      {
+        "name": "mod1",
+        "source": "print(1)",
+        "lang": "python"
+      }
+    ]
+  }
+}

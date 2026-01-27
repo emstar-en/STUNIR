@@ -1,88 +1,63 @@
-#!/usr/bin/env bash
-# STUNIR Toolchain Discovery (Shell-Native)
+#!/bin/sh
+# STUNIR Toolchain Discovery & Locking
+# Generates local_toolchain.lock.json
 
-source "$STUNIR_ROOT/scripts/lib/json.sh"
+. "$(dirname "$0")/core.sh"
+. "$(dirname "$0")/json.sh"
 
-stunir_generate_lockfile() {
-    local build_dir="$STUNIR_ROOT/build"
-    local lockfile="$build_dir/local_toolchain.lock.json"
+LOCKFILE="local_toolchain.lock.json"
 
-    mkdir -p "$build_dir"
+discover_tool() {
+    name="$1"
+    binary="$2"
 
-    stunir_log "Scanning environment for required tools..."
+    path=$(command -v "$binary" 2>/dev/null)
+    if [ -n "$path" ]; then
+        hash=$(calc_sha256 "$path")
+        log_info "Found $name: $path ($hash)"
 
-    # Initialize JSON object
-    json_init
-    json_start_object
-    json_key_val "schema_version" "1.0.0"
-    json_add_comma
-    json_key_val "generated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    json_add_comma
-    json_key_val "host_os" "$(uname -s)"
-    json_add_comma
-
-    json_key_start_array "tools"
-
-    # --- Scan Tools ---
-
-    # 1. Git
-    _scan_tool "git" "git" "--version"
-    json_add_comma
-
-    # 2. Python (Optional but recommended)
-    if command -v python3 >/dev/null; then
-        _scan_tool "python" "python3" "--version"
-    elif command -v python >/dev/null; then
-        _scan_tool "python" "python" "--version"
+        json_obj_start
+        json_key_str "name" "$name"
+        json_key_str "path" "$path"
+        json_key_str "sha256" "$hash"
+        json_key_str "status" "OK"
+        json_obj_end
     else
-        _scan_tool_missing "python"
+        log_warn "Tool not found: $name"
+        json_obj_start
+        json_key_str "name" "$name"
+        json_key_str "status" "MISSING"
+        json_obj_end
     fi
-    json_add_comma
-
-    # 3. Bash (Self)
-    _scan_tool "bash" "bash" "--version"
-
-    json_end_array
-    json_end_object
-
-    # Write to file
-    echo "$JSON_BUFFER" > "$lockfile"
-    stunir_ok "Toolchain lockfile generated at: $lockfile"
 }
 
-_scan_tool() {
-    local name=$1
-    local bin=$2
-    local ver_arg=$3
+generate_lockfile() {
+    log_info "Generating toolchain lockfile..."
 
-    local path=$(command -v "$bin")
-    local version=$("$bin" $ver_arg 2>&1 | head -n 1 | tr -d '"')
+    # Initialize variable
+    json_init "$LOCKFILE"
 
-    # Use core hashing function
-    local hash=$(stunir_hash_file "$path")
+    # Write Header manually
+    echo "{" > "$LOCKFILE"
+    echo '  "version": "1.0",' >> "$LOCKFILE"
+    echo '  "type": "toolchain_lock",' >> "$LOCKFILE"
+    printf '  "tools": [' >> "$LOCKFILE"
 
-    stunir_log "Found $name: $path ($hash)"
+    # Reset helper state for the array items
+    _JSON_FIRST_ITEM=1
 
-    json_start_object
-    json_key_val "name" "$name"
-    json_add_comma
-    json_key_val "path" "$path"
-    json_add_comma
-    json_key_val "version" "$version"
-    json_add_comma
-    json_key_val "sha256" "$hash"
-    json_add_comma
-    json_key_val "status" "OK"
-    json_end_object
+    discover_tool "git" "git"
+    discover_tool "bash" "bash"
+    discover_tool "python" "python3"
+    discover_tool "sh" "sh"
+
+    # Close Array and Object
+    printf "\n  ]\n}\n" >> "$LOCKFILE"
+
+    log_info "Lockfile written to $LOCKFILE"
 }
 
-_scan_tool_missing() {
-    local name=$1
-    stunir_warn "Tool '$name' not found."
-
-    json_start_object
-    json_key_val "name" "$name"
-    json_add_comma
-    json_key_val "status" "MISSING"
-    json_end_object
-}
+# Execute if run directly
+if [ "$(basename "$0")" = "manifest.sh" ]; then
+    generate_lockfile
+fi

@@ -1,0 +1,53 @@
+{
+  "kind": "ir",
+  "generator": "stunir-native-rust",
+  "ir_version": "v1",
+  "module_name": "main",
+  "functions": [
+    {
+      "name": "hello",
+      "body": [
+        {
+          "op": "comment",
+          "args": [
+            "Source Language: python"
+          ]
+        },
+        {
+          "op": "raw",
+          "args": [
+            "print(\"Real Logic Works!\")"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "body": [
+        {
+          "op": "print",
+          "args": [
+            "STUNIR: Orchestrating modules..."
+          ]
+        },
+        {
+          "op": "call",
+          "args": [
+            "hello"
+          ]
+        }
+      ]
+    }
+  ],
+  "modules": [],
+  "metadata": {
+    "original_spec_kind": "spec",
+    "source_modules": [
+      {
+        "name": "hello",
+        "source": "print(\"Real Logic Works!\")",
+        "lang": "python"
+      }
+    ]
+  }
+}
