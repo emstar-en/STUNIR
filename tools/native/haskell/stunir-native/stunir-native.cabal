@@ -21,10 +21,12 @@ executable stunir-native
                       Stunir.Import
                       Stunir.Provenance
                       Stunir.Toolchain
+                      Stunir.Manifest
     build-depends:    base >=4.17.0.0,
                       text,
                       bytestring,
                       aeson >= 2.0,
+                      aeson-pretty,
                       containers,
                       directory,
                       filepath,
