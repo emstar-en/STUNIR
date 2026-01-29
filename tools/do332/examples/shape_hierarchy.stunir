@@ -1,0 +1,117 @@
+# Example: Shape Hierarchy for DO-332 Analysis
+# STUNIR IR Format v1
+
+module shapes {
+  oop_constructs: {
+    classes: [
+      {
+        name: "Shape",
+        kind: "abstract",
+        is_abstract: true,
+        is_final: false,
+        parent_count: 0,
+        methods: ["draw", "area", "perimeter"],
+        fields: ["x", "y"]
+      },
+      {
+        name: "Circle",
+        kind: "regular",
+        is_abstract: false,
+        is_final: false,
+        parent_count: 1,
+        parents: ["Shape"],
+        methods: ["draw", "area", "perimeter", "radius"],
+        fields: ["radius"]
+      },
+      {
+        name: "Rectangle",
+        kind: "regular",
+        is_abstract: false,
+        is_final: false,
+        parent_count: 1,
+        parents: ["Shape"],
+        methods: ["draw", "area", "perimeter"],
+        fields: ["width", "height"]
+      },
+      {
+        name: "Square",
+        kind: "final",
+        is_abstract: false,
+        is_final: true,
+        parent_count: 1,
+        parents: ["Rectangle"],
+        methods: ["area"],
+        fields: []
+      }
+    ],
+    
+    inheritance: [
+      {child: "Circle", parent: "Shape"},
+      {child: "Rectangle", parent: "Shape"},
+      {child: "Square", parent: "Rectangle"}
+    ],
+    
+    methods: [
+      {
+        name: "draw",
+        class: "Shape",
+        kind: "abstract",
+        visibility: "public",
+        params: [{name: "canvas", type: "Canvas"}],
+        returns: "void"
+      },
+      {
+        name: "area",
+        class: "Shape",
+        kind: "abstract",
+        visibility: "public",
+        params: [],
+        returns: "float64"
+      },
+      {
+        name: "draw",
+        class: "Circle",
+        kind: "virtual",
+        visibility: "public",
+        overrides: "Shape.draw",
+        params: [{name: "canvas", type: "Canvas"}],
+        returns: "void"
+      },
+      {
+        name: "area",
+        class: "Circle",
+        kind: "virtual",
+        visibility: "public",
+        overrides: "Shape.area",
+        params: [],
+        returns: "float64"
+      },
+      {
+        name: "area",
+        class: "Square",
+        kind: "final",
+        visibility: "public",
+        overrides: "Rectangle.area",
+        params: [],
+        returns: "float64"
+      }
+    ],
+    
+    dispatch_sites: [
+      {
+        id: "DS_001",
+        location: "main.stunir:42",
+        receiver: "Shape",
+        method: "draw",
+        comment: "Draw any shape"
+      },
+      {
+        id: "DS_002",
+        location: "main.stunir:55",
+        receiver: "Shape",
+        method: "area",
+        comment: "Calculate area"
+      }
+    ]
+  }
+}

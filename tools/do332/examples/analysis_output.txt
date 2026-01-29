@@ -1,0 +1,70 @@
+========================================
+  STUNIR DO-332 OOP Verification Tool
+  Version 1.0.0
+========================================
+
+Running demonstration analysis...
+
+[1/5] Analyzing inheritance...
+      Classes analyzed:  3
+      Max inheritance depth:  2
+      Diamond patterns:  0
+      Circular inheritance:  0
+      Invalid overrides:  0
+      Status: PASS
+
+[2/5] Verifying polymorphism...
+      Virtual methods:  6
+      LSP violations:  0
+      Covariance issues:  0
+      Type safe: YES
+      Status: PASS
+
+[3/5] Analyzing dynamic dispatch...
+      Dispatch sites:  2
+      Bounded sites:  2
+      Devirtualizable:  1
+      Max targets:  3
+      Status: PASS
+
+[4/5] Analyzing coupling...
+      Average CBO:  2.3
+      Max CBO:  4
+      Circular dependencies:  0
+      Threshold violations:  0
+      Status: PASS
+
+[5/5] Generating tests...
+      Inheritance tests:  4
+      Polymorphism tests:  3
+      Dispatch tests:  6
+      Coupling tests:  4
+      Total tests:  17
+
+========================================
+  DO-332 Analysis Summary
+========================================
+  Module:           shapes
+  Total classes:     4
+  Total methods:     8
+  Inheritance depth: 2
+  Diamond patterns:  0
+  Virtual methods:   6
+  Dispatch sites:    2
+  Bounded sites:     2 (100%)
+  Tests generated:   17
+  
+  OO.1 Inheritance:  PASS
+  OO.2 Polymorphism: PASS
+  OO.3 Dispatch:     PASS
+  OO.4 Coupling:     PASS
+  
+  Overall status:    PASS
+========================================
+
+Reports written to: receipts/do332/
+  - inheritance_report.json
+  - polymorphism_report.json
+  - dispatch_report.json
+  - coupling_report.json
+  - generated_tests.json
