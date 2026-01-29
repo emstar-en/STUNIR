@@ -1,16 +1,55 @@
-"""STUNIR IR Analysis Module.
+#!/usr/bin/env python3
+"""STUNIR IR Tools Package.
 
-Provides control flow analysis, IR manipulation, and CFG construction.
+Provides IR processing, control flow analysis, and symbolic extensions.
 """
 
-from .control_flow import (
-    BasicBlock, BlockType, ControlFlowType,
-    LoopInfo, BranchInfo,
-    ControlFlowGraph, ControlFlowAnalyzer, ControlFlowTranslator
+from .symbolic_ir import (
+    SymbolicExprKind,
+    SymbolicStmtKind,
+    SYMBOLIC_KINDS,
+    Symbol,
+    Atom,
+    SList,
+    Cons,
+    Quote,
+    Quasiquote,
+    Unquote,
+    UnquoteSplicing,
+    Lambda,
+    Macro,
+    SymbolicIRExtension,
+    sexpr,
+    sym,
+    quote,
+    quasiquote,
+    unquote,
+    unquote_splicing
 )
 
 __all__ = [
-    'BasicBlock', 'BlockType', 'ControlFlowType',
-    'LoopInfo', 'BranchInfo',
-    'ControlFlowGraph', 'ControlFlowAnalyzer', 'ControlFlowTranslator'
+    # Enums
+    'SymbolicExprKind',
+    'SymbolicStmtKind',
+    'SYMBOLIC_KINDS',
+    # Data classes
+    'Symbol',
+    'Atom',
+    'SList',
+    'Cons',
+    'Quote',
+    'Quasiquote',
+    'Unquote',
+    'UnquoteSplicing',
+    'Lambda',
+    'Macro',
+    # Processor
+    'SymbolicIRExtension',
+    # Builders
+    'sexpr',
+    'sym',
+    'quote',
+    'quasiquote',
+    'unquote',
+    'unquote_splicing'
 ]
