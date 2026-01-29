@@ -1,0 +1,259 @@
+{
+  "$id": "stunir.symbolic_ir.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "STUNIR Symbolic IR Extensions",
+  "description": "Schema for symbolic programming constructs in STUNIR IR",
+  
+  "definitions": {
+    "symbol": {
+      "type": "object",
+      "description": "A symbolic name reference",
+      "properties": {
+        "kind": {"const": "symbol"},
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_\\-*+!?<>=]*$"
+        },
+        "package": {
+          "type": "string",
+          "description": "Optional package/namespace qualifier"
+        }
+      },
+      "required": ["kind", "name"],
+      "additionalProperties": false
+    },
+    
+    "quoted_datum": {
+      "description": "A quoted S-expression datum",
+      "oneOf": [
+        {"type": "number"},
+        {"type": "string"},
+        {"type": "boolean"},
+        {"type": "null"},
+        {"$ref": "#/definitions/symbol"},
+        {"$ref": "#/definitions/list_datum"},
+        {"$ref": "#/definitions/cons_cell"}
+      ]
+    },
+    
+    "list_datum": {
+      "type": "object",
+      "description": "A list S-expression",
+      "properties": {
+        "kind": {"const": "list"},
+        "elements": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/quoted_datum"}
+        }
+      },
+      "required": ["kind", "elements"],
+      "additionalProperties": false
+    },
+    
+    "cons_cell": {
+      "type": "object",
+      "description": "A cons cell (pair)",
+      "properties": {
+        "kind": {"const": "cons"},
+        "car": {"$ref": "#/definitions/expression"},
+        "cdr": {"$ref": "#/definitions/expression"}
+      },
+      "required": ["kind", "car", "cdr"],
+      "additionalProperties": false
+    },
+    
+    "quote_expr": {
+      "type": "object",
+      "description": "A quoted expression",
+      "properties": {
+        "kind": {"const": "quote"},
+        "value": {"$ref": "#/definitions/quoted_datum"}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    
+    "quasiquote_expr": {
+      "type": "object",
+      "description": "A quasiquoted template",
+      "properties": {
+        "kind": {"const": "quasiquote"},
+        "value": {"$ref": "#/definitions/template"}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    
+    "unquote_expr": {
+      "type": "object",
+      "description": "An unquoted expression within quasiquote",
+      "properties": {
+        "kind": {"const": "unquote"},
+        "value": {"$ref": "#/definitions/expression"}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    
+    "unquote_splicing_expr": {
+      "type": "object",
+      "description": "A splice-unquoted expression within quasiquote",
+      "properties": {
+        "kind": {"const": "unquote_splicing"},
+        "value": {"$ref": "#/definitions/expression"}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    
+    "lambda_expr": {
+      "type": "object",
+      "description": "An anonymous function (lambda)",
+      "properties": {
+        "kind": {"const": "lambda"},
+        "params": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/parameter"}
+        },
+        "rest_param": {
+          "type": "string",
+          "description": "Optional rest parameter name"
+        },
+        "body": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/statement"}
+        },
+        "docstring": {
+          "type": "string",
+          "description": "Optional documentation string"
+        }
+      },
+      "required": ["kind", "params", "body"],
+      "additionalProperties": false
+    },
+    
+    "defmacro_stmt": {
+      "type": "object",
+      "description": "A macro definition",
+      "properties": {
+        "kind": {"const": "defmacro"},
+        "name": {"type": "string"},
+        "params": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/parameter"}
+        },
+        "rest_param": {
+          "type": "string",
+          "description": "Optional rest parameter name"
+        },
+        "body": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/statement"}
+        },
+        "docstring": {
+          "type": "string"
+        }
+      },
+      "required": ["kind", "name", "params", "body"],
+      "additionalProperties": false
+    },
+    
+    "multiple_value_stmt": {
+      "type": "object",
+      "description": "Multiple return values statement",
+      "properties": {
+        "kind": {"const": "multiple_value"},
+        "values": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/expression"}
+        }
+      },
+      "required": ["kind", "values"],
+      "additionalProperties": false
+    },
+    
+    "parameter": {
+      "type": "object",
+      "description": "A function/macro parameter",
+      "properties": {
+        "name": {"type": "string"},
+        "type": {"type": "string"},
+        "default": {"$ref": "#/definitions/expression"},
+        "optional": {"type": "boolean"}
+      },
+      "required": ["name"]
+    },
+    
+    "template": {
+      "description": "A quasiquote template element",
+      "oneOf": [
+        {"$ref": "#/definitions/quoted_datum"},
+        {"$ref": "#/definitions/unquote_expr"},
+        {"$ref": "#/definitions/unquote_splicing_expr"},
+        {"$ref": "#/definitions/template_list"}
+      ]
+    },
+    
+    "template_list": {
+      "type": "object",
+      "properties": {
+        "kind": {"const": "template_list"},
+        "elements": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/template"}
+        }
+      },
+      "required": ["kind", "elements"]
+    },
+    
+    "expression": {
+      "description": "Placeholder for general expression type",
+      "type": "object"
+    },
+    
+    "statement": {
+      "description": "Placeholder for general statement type",
+      "type": "object"
+    },
+    
+    "symbolic_expression": {
+      "description": "Any symbolic expression",
+      "oneOf": [
+        {"$ref": "#/definitions/symbol"},
+        {"$ref": "#/definitions/quote_expr"},
+        {"$ref": "#/definitions/quasiquote_expr"},
+        {"$ref": "#/definitions/unquote_expr"},
+        {"$ref": "#/definitions/unquote_splicing_expr"},
+        {"$ref": "#/definitions/lambda_expr"},
+        {"$ref": "#/definitions/list_datum"},
+        {"$ref": "#/definitions/cons_cell"}
+      ]
+    },
+    
+    "symbolic_statement": {
+      "description": "Any symbolic statement",
+      "oneOf": [
+        {"$ref": "#/definitions/defmacro_stmt"},
+        {"$ref": "#/definitions/multiple_value_stmt"}
+      ]
+    }
+  },
+  
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "stunir.symbolic_ir.v1"
+    },
+    "module": {
+      "type": "string"
+    },
+    "symbolic_extensions": {
+      "type": "boolean",
+      "description": "Indicates IR uses symbolic extensions"
+    },
+    "macros": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/defmacro_stmt"}
+    }
+  }
+}

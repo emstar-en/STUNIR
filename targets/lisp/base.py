@@ -1,0 +1,464 @@
+#!/usr/bin/env python3
+"""STUNIR Lisp Emitter Base Module.
+
+Provides shared utilities and base class for all Lisp-family emitters.
+Part of Phase 5A: Core Lisp Implementation.
+"""
+
+import json
+import hashlib
+import time
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+
+def canonical_json(data: Any) -> str:
+    """Generate RFC 8785 / JCS subset canonical JSON."""
+    return json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
+
+
+def compute_sha256(content: Any) -> str:
+    """Compute SHA256 hash of content."""
+    if isinstance(content, str):
+        content = content.encode('utf-8')
+    return hashlib.sha256(content).hexdigest()
+
+
+@dataclass
+class EmitterResult:
+    """Result of code emission."""
+    code: str
+    files: Dict[str, str] = field(default_factory=dict)
+    manifest: Dict[str, Any] = field(default_factory=dict)
+    errors: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+    
+    @property
+    def success(self) -> bool:
+        return len(self.errors) == 0
+
+
+@dataclass
+class LispEmitterConfig:
+    """Base configuration for Lisp emitters."""
+    target_dir: Path
+    module_prefix: str = "stunir"
+    emit_comments: bool = True
+    emit_type_hints: bool = True
+    line_width: int = 80
+    indent_size: int = 2
+
+
+class LispEmitterBase(ABC):
+    """Base class for all Lisp-family emitters.
+    
+    Provides common functionality for emitting S-expressions,
+    type mapping, and manifest generation.
+    """
+    
+    DIALECT: str = "lisp"  # Override in subclasses
+    FILE_EXTENSION: str = ".lisp"  # Override in subclasses
+    
+    # Common IR types that all Lisp dialects need to map
+    BASE_TYPE_MAP: Dict[str, str] = {
+        'i8': 'integer',
+        'i16': 'integer',
+        'i32': 'integer',
+        'i64': 'integer',
+        'u8': 'integer',
+        'u16': 'integer',
+        'u32': 'integer',
+        'u64': 'integer',
+        'f32': 'float',
+        'f64': 'float',
+        'bool': 'boolean',
+        'string': 'string',
+        'void': 'void',
+        'any': 'any',
+    }
+    
+    # Binary operators
+    BINARY_OPS: Dict[str, str] = {
+        '+': '+',
+        '-': '-',
+        '*': '*',
+        '/': '/',
+        '%': 'mod',
+        '==': '=',
+        '!=': '/=',
+        '<': '<',
+        '>': '>',
+        '<=': '<=',
+        '>=': '>=',
+        'and': 'and',
+        'or': 'or',
+    }
+    
+    # Unary operators
+    UNARY_OPS: Dict[str, str] = {
+        '-': '-',
+        'not': 'not',
+        '!': 'not',
+    }
+    
+    def __init__(self, config: LispEmitterConfig):
+        """Initialize the emitter.
+        
+        Args:
+            config: Emitter configuration.
+        """
+        self.config = config
+        self.generated_files: List[Dict[str, Any]] = []
+        self.epoch = int(time.time())
+        self._indent_level = 0
+    
+    @abstractmethod
+    def emit(self, ir: Dict[str, Any]) -> EmitterResult:
+        """Emit code from IR.
+        
+        Args:
+            ir: STUNIR IR dictionary.
+            
+        Returns:
+            EmitterResult with generated code and metadata.
+        """
+        pass
+    
+    def _map_type(self, ir_type: str) -> str:
+        """Map IR type to Lisp type.
+        
+        Override in subclasses for dialect-specific types.
+        """
+        return self.BASE_TYPE_MAP.get(ir_type, 'any')
+    
+    def _map_operator(self, op: str) -> str:
+        """Map IR operator to Lisp operator."""
+        return self.BINARY_OPS.get(op, op)
+    
+    def _lisp_name(self, name: str) -> str:
+        """Convert name to Lisp naming convention.
+        
+        Converts snake_case and camelCase to kebab-case.
+        """
+        result = []
+        for i, char in enumerate(name):
+            if char == '_':
+                result.append('-')
+            elif char.isupper() and i > 0 and name[i-1].islower():
+                result.append('-')
+                result.append(char.lower())
+            else:
+                result.append(char.lower())
+        return ''.join(result)
+    
+    def _indent(self, text: str = "") -> str:
+        """Return indented text."""
+        return " " * (self._indent_level * self.config.indent_size) + text
+    
+    def _push_indent(self):
+        """Increase indentation level."""
+        self._indent_level += 1
+    
+    def _pop_indent(self):
+        """Decrease indentation level."""
+        self._indent_level = max(0, self._indent_level - 1)
+    
+    def _emit_comment(self, text: str, style: str = ";") -> str:
+        """Emit a comment line."""
+        if not self.config.emit_comments:
+            return ""
+        return f"{style} {text}"
+    
+    def _emit_header(self, module_name: str) -> str:
+        """Emit file header comment."""
+        lines = [
+            f";;; Generated by STUNIR {self.DIALECT.title()} Emitter",
+            f";;; Module: {module_name}",
+            f";;; Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}",
+            ""
+        ]
+        return "\n".join(lines)
+    
+    def _emit_literal(self, value: Any) -> str:
+        """Emit a literal value.
+        
+        Override in subclasses for dialect-specific handling.
+        """
+        if value is None:
+            return "nil"
+        if isinstance(value, bool):
+            return "t" if value else "nil"
+        if isinstance(value, str):
+            escaped = value.replace('\\', '\\\\').replace('"', '\\"')
+            return f'"{escaped}"'
+        return str(value)
+    
+    def _emit_symbol(self, data: Dict[str, Any]) -> str:
+        """Emit a symbol reference."""
+        name = data.get('name', '')
+        package = data.get('package')
+        if package:
+            return f"{package}:{self._lisp_name(name)}"
+        return self._lisp_name(name)
+    
+    def _emit_var(self, data: Dict[str, Any]) -> str:
+        """Emit a variable reference."""
+        return self._lisp_name(data.get('name', '_'))
+    
+    def _emit_binary_op(self, data: Dict[str, Any]) -> str:
+        """Emit a binary operation."""
+        op = self._map_operator(data.get('op', '+'))
+        left = self._emit_expression(data.get('left', {}))
+        right = self._emit_expression(data.get('right', {}))
+        return f"({op} {left} {right})"
+    
+    def _emit_unary_op(self, data: Dict[str, Any]) -> str:
+        """Emit a unary operation."""
+        op = self.UNARY_OPS.get(data.get('op', '-'), data.get('op', '-'))
+        operand = self._emit_expression(data.get('operand', {}))
+        return f"({op} {operand})"
+    
+    def _emit_call(self, data: Dict[str, Any]) -> str:
+        """Emit a function call."""
+        func = self._lisp_name(data.get('function', data.get('name', 'unknown')))
+        args = data.get('arguments', data.get('args', []))
+        arg_strs = [self._emit_expression(arg) for arg in args]
+        if arg_strs:
+            return f"({func} {' '.join(arg_strs)})"
+        return f"({func})"
+    
+    def _emit_expression(self, data: Any) -> str:
+        """Emit an expression.
+        
+        Dispatches to appropriate emission method based on kind.
+        """
+        if not isinstance(data, dict):
+            return self._emit_literal(data)
+        
+        kind = data.get('kind', '')
+        
+        if kind == 'literal':
+            return self._emit_literal(data.get('value'))
+        if kind == 'var':
+            return self._emit_var(data)
+        if kind == 'symbol':
+            return self._emit_symbol(data)
+        if kind == 'binary_op':
+            return self._emit_binary_op(data)
+        if kind == 'unary_op':
+            return self._emit_unary_op(data)
+        if kind == 'call':
+            return self._emit_call(data)
+        if kind == 'quote':
+            return self._emit_quote(data)
+        if kind == 'quasiquote':
+            return self._emit_quasiquote(data)
+        if kind == 'unquote':
+            return self._emit_unquote(data)
+        if kind == 'unquote_splicing':
+            return self._emit_unquote_splicing(data)
+        if kind == 'lambda':
+            return self._emit_lambda(data)
+        if kind == 'list':
+            return self._emit_list(data)
+        if kind == 'cons':
+            return self._emit_cons(data)
+        if kind == 'if':
+            return self._emit_if_expr(data)
+        
+        # Unknown expression kind - emit as comment
+        return f";; Unknown expression: {kind}"
+    
+    def _emit_quote(self, data: Dict[str, Any]) -> str:
+        """Emit a quoted value."""
+        value = data.get('value')
+        return f"'{self._emit_quoted_datum(value)}"
+    
+    def _emit_quoted_datum(self, data: Any) -> str:
+        """Emit a quoted datum (not evaluated)."""
+        if not isinstance(data, dict):
+            return self._emit_literal(data)
+        
+        kind = data.get('kind', '')
+        if kind == 'symbol':
+            return self._emit_symbol(data)
+        if kind == 'list':
+            elements = data.get('elements', [])
+            inner = ' '.join(self._emit_quoted_datum(el) for el in elements)
+            return f"({inner})"
+        
+        return self._emit_literal(data)
+    
+    def _emit_quasiquote(self, data: Dict[str, Any]) -> str:
+        """Emit a quasiquoted template."""
+        value = data.get('value')
+        return f"`{self._emit_template(value)}"
+    
+    def _emit_template(self, data: Any) -> str:
+        """Emit a quasiquote template."""
+        if not isinstance(data, dict):
+            return self._emit_literal(data)
+        
+        kind = data.get('kind', '')
+        if kind == 'unquote':
+            return f",{self._emit_expression(data.get('value'))}"
+        if kind == 'unquote_splicing':
+            return f",@{self._emit_expression(data.get('value'))}"
+        if kind == 'symbol':
+            return self._emit_symbol(data)
+        if kind in ('list', 'template_list'):
+            elements = data.get('elements', [])
+            inner = ' '.join(self._emit_template(el) for el in elements)
+            return f"({inner})"
+        
+        return self._emit_quoted_datum(data)
+    
+    def _emit_unquote(self, data: Dict[str, Any]) -> str:
+        """Emit an unquote."""
+        return f",{self._emit_expression(data.get('value'))}"
+    
+    def _emit_unquote_splicing(self, data: Dict[str, Any]) -> str:
+        """Emit an unquote-splicing."""
+        return f",@{self._emit_expression(data.get('value'))}"
+    
+    def _emit_lambda(self, data: Dict[str, Any]) -> str:
+        """Emit a lambda expression.
+        
+        Override in subclasses for dialect-specific syntax.
+        """
+        params = data.get('params', [])
+        param_names = ' '.join(self._lisp_name(p.get('name', '_')) for p in params)
+        body = data.get('body', [])
+        body_str = ' '.join(self._emit_statement(stmt) for stmt in body)
+        return f"(lambda ({param_names}) {body_str})"
+    
+    def _emit_list(self, data: Dict[str, Any]) -> str:
+        """Emit a list constructor."""
+        elements = data.get('elements', [])
+        el_strs = [self._emit_expression(el) for el in elements]
+        return f"(list {' '.join(el_strs)})"
+    
+    def _emit_cons(self, data: Dict[str, Any]) -> str:
+        """Emit a cons cell."""
+        car = self._emit_expression(data.get('car'))
+        cdr = self._emit_expression(data.get('cdr'))
+        return f"(cons {car} {cdr})"
+    
+    def _emit_if_expr(self, data: Dict[str, Any]) -> str:
+        """Emit an if expression."""
+        cond = self._emit_expression(data.get('condition', data.get('cond')))
+        then_branch = data.get('then', data.get('consequent', {}))
+        else_branch = data.get('else', data.get('alternate'))
+        
+        then_str = self._emit_expression(then_branch)
+        if else_branch:
+            else_str = self._emit_expression(else_branch)
+            return f"(if {cond} {then_str} {else_str})"
+        return f"(if {cond} {then_str})"
+    
+    def _emit_statement(self, stmt: Dict[str, Any]) -> str:
+        """Emit a statement.
+        
+        Override in subclasses for dialect-specific handling.
+        """
+        if not isinstance(stmt, dict):
+            return self._emit_literal(stmt)
+        
+        kind = stmt.get('kind', '')
+        
+        if kind == 'return':
+            return self._emit_expression(stmt.get('value', {'kind': 'literal', 'value': None}))
+        if kind == 'var_decl':
+            return self._emit_var_decl(stmt)
+        if kind == 'assignment':
+            return self._emit_assignment(stmt)
+        if kind == 'if':
+            return self._emit_if_stmt(stmt)
+        if kind == 'while':
+            return self._emit_while(stmt)
+        if kind == 'for':
+            return self._emit_for(stmt)
+        if kind == 'block':
+            return self._emit_block(stmt)
+        if kind in ('call', 'expression'):
+            return self._emit_expression(stmt.get('value', stmt))
+        
+        # Try to emit as expression
+        return self._emit_expression(stmt)
+    
+    @abstractmethod
+    def _emit_var_decl(self, stmt: Dict[str, Any]) -> str:
+        """Emit variable declaration."""
+        pass
+    
+    @abstractmethod
+    def _emit_assignment(self, stmt: Dict[str, Any]) -> str:
+        """Emit assignment statement."""
+        pass
+    
+    @abstractmethod
+    def _emit_if_stmt(self, stmt: Dict[str, Any]) -> str:
+        """Emit if statement."""
+        pass
+    
+    @abstractmethod
+    def _emit_while(self, stmt: Dict[str, Any]) -> str:
+        """Emit while loop."""
+        pass
+    
+    @abstractmethod
+    def _emit_for(self, stmt: Dict[str, Any]) -> str:
+        """Emit for loop."""
+        pass
+    
+    def _emit_block(self, stmt: Dict[str, Any]) -> str:
+        """Emit a block of statements."""
+        body = stmt.get('body', stmt.get('statements', []))
+        if len(body) == 0:
+            return "nil"
+        if len(body) == 1:
+            return self._emit_statement(body[0])
+        stmts = ' '.join(self._emit_statement(s) for s in body)
+        return f"(progn {stmts})"
+    
+    def _emit_function(self, func: Dict[str, Any]) -> str:
+        """Emit a function definition.
+        
+        Override in subclasses for dialect-specific syntax.
+        """
+        name = self._lisp_name(func.get('name', 'unnamed'))
+        params = func.get('params', [])
+        param_names = ' '.join(self._lisp_name(p.get('name', '_')) for p in params)
+        body = func.get('body', [])
+        
+        if body:
+            body_str = ' '.join(self._emit_statement(stmt) for stmt in body)
+        else:
+            body_str = "nil"
+        
+        return f"(defun {name} ({param_names})\n  {body_str})"
+    
+    def _write_file(self, path: str, content: str):
+        """Write content to file and track in manifest."""
+        full_path = self.config.target_dir / path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        full_path.write_text(content, encoding='utf-8', newline='\n')
+        
+        self.generated_files.append({
+            'path': str(path),
+            'sha256': compute_sha256(content),
+            'size': len(content.encode('utf-8'))
+        })
+    
+    def _generate_manifest(self, ir: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate manifest for emitted files."""
+        return {
+            'schema': f'stunir.target.{self.DIALECT}.v1',
+            'epoch': self.epoch,
+            'module': ir.get('module', 'unknown'),
+            'dialect': self.DIALECT,
+            'files': self.generated_files,
+            'manifest_hash': compute_sha256(canonical_json(self.generated_files))
+        }
