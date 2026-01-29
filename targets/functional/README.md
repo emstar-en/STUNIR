@@ -1,6 +1,6 @@
 # STUNIR Functional Language Emitters
 
-This module provides code emitters for functional programming languages, specifically Haskell and OCaml.
+This module provides code emitters for functional programming languages, including Haskell, OCaml, and F#.
 
 ## Overview
 
@@ -24,6 +24,18 @@ Generates idiomatic OCaml code including:
 - Functors
 - Imperative features (`ref`, mutable fields)
 
+### F# Emitter
+
+Generates idiomatic F# code including:
+- Discriminated unions (sum types)
+- Record types
+- Function definitions with pattern matching
+- Computation expressions (`async`, `seq`, `query`)
+- Units of measure
+- Active patterns
+- .NET interoperability (classes, interfaces)
+- Module definitions
+
 ## Module Structure
 
 ```
@@ -32,6 +44,7 @@ targets/functional/
 ├── base.py              # Shared base class and utilities
 ├── haskell_emitter.py   # Haskell code generator
 ├── ocaml_emitter.py     # OCaml code generator
+├── fsharp_emitter.py    # F# code generator
 └── README.md            # This file
 ```
 
@@ -151,19 +164,96 @@ type person = {
 let identity x = x
 ```
 
+### F# Emitter
+
+```python
+from targets.functional import FSharpEmitter
+from ir.functional import (
+    Module, DataType, DataConstructor, TypeParameter, TypeVar, TypeCon,
+    RecordType, RecordField, FunctionDef, FunctionClause, VarPattern,
+    VarExpr, BinaryOpExpr, ComputationExpr, ComputationLet, ComputationReturn,
+    MeasureDeclaration
+)
+
+# Create a module with F# features
+module = Module(
+    name='Example',
+    imports=[Import(module='System')],
+    type_definitions=[
+        # Discriminated union
+        DataType(
+            name='Result',
+            type_params=[TypeParameter(name='a'), TypeParameter(name='e')],
+            constructors=[
+                DataConstructor(name='Ok', fields=[TypeVar(name='a')]),
+                DataConstructor(name='Error', fields=[TypeVar(name='e')])
+            ]
+        ),
+        # Record type
+        RecordType(
+            name='Person',
+            fields=[
+                RecordField(name='Name', field_type=TypeCon(name='string')),
+                RecordField(name='Age', field_type=TypeCon(name='int'))
+            ]
+        ),
+        # Unit of measure
+        MeasureDeclaration(name='m')
+    ],
+    functions=[
+        FunctionDef(
+            name='add',
+            clauses=[FunctionClause(
+                patterns=[VarPattern(name='x'), VarPattern(name='y')],
+                body=BinaryOpExpr(op='+', left=VarExpr(name='x'), right=VarExpr(name='y'))
+            )]
+        )
+    ]
+)
+
+# Generate F# code
+emitter = FSharpEmitter()
+code = emitter.emit_module(module)
+print(code)
+```
+
+**Output:**
+```fsharp
+module Example
+
+open System
+
+type Result<'a, 'e> =
+    | Ok of 'a
+    | Error of 'e
+
+type Person =
+    {
+        Name: string
+        Age: int
+    }
+
+[<Measure>] type m
+
+let add x y = (x + y)
+```
+
 ## Feature Comparison
 
-| Feature | Haskell | OCaml |
-|---------|---------|-------|
-| Data types | `data`, `newtype`, `type` | `type` (variants, records) |
-| Pattern matching | ✓ | ✓ |
-| Type classes | ✓ | (via modules) |
-| Monads/do notation | ✓ | (manual) |
-| Modules | (basic) | ✓ (signatures, functors) |
-| Lazy evaluation | ✓ | ✗ (strict by default) |
-| Imperative features | ✗ | ✓ (ref, mutable) |
-| List comprehensions | ✓ | ✗ |
-| Guards | ✓ | `when` clause |
+| Feature | Haskell | OCaml | F# |
+|---------|---------|-------|-----|
+| Data types | `data`, `newtype`, `type` | `type` (variants, records) | `type` (DU, records) |
+| Pattern matching | ✓ | ✓ | ✓ |
+| Type classes | ✓ | (via modules) | (via interfaces) |
+| Monads/do notation | ✓ | (manual) | Computation expressions |
+| Modules | (basic) | ✓ (signatures, functors) | ✓ (with namespaces) |
+| Lazy evaluation | ✓ | ✗ (strict by default) | `lazy` keyword |
+| Imperative features | ✗ | ✓ (ref, mutable) | ✓ (full .NET interop) |
+| List comprehensions | ✓ | ✗ | Sequence expressions |
+| Guards | ✓ | `when` clause | `when` clause |
+| Units of measure | ✗ | ✗ | ✓ |
+| Active patterns | ✗ | ✗ | ✓ |
+| .NET interop | ✗ | ✗ | ✓ |
 
 ## Haskell-Specific Features
 
@@ -327,7 +417,166 @@ deref_code = emitter.emit_deref('counter')
 | `+.` | `+.` | Float addition |
 | `^` | `^` | String concatenation |
 
+## F#-Specific Features
+
+### Computation Expressions
+
+```python
+from ir.functional import (
+    ComputationExpr, ComputationLet, ComputationReturn,
+    ComputationYield, ComputationFor, VarPattern, VarExpr, AppExpr
+)
+
+# Async computation expression
+async_expr = ComputationExpr(
+    builder='async',
+    body=[
+        ComputationLet(
+            pattern=VarPattern(name='data'),
+            value=AppExpr(func=VarExpr(name='fetchAsync'), arg=None),
+            is_bang=True  # let!
+        ),
+        ComputationReturn(
+            value=VarExpr(name='data'),
+            is_bang=False
+        )
+    ]
+)
+```
+
+**Output:**
+```fsharp
+async {
+    let! data = (fetchAsync)
+    return data
+}
+```
+
+### Units of Measure
+
+```python
+from ir.functional import (
+    MeasureDeclaration, MeasureType, MeasureUnit, MeasureDiv, TypeCon
+)
+
+# Declare units
+emitter._emit_measure_declaration(MeasureDeclaration(name='m'))  # [<Measure>] type m
+emitter._emit_measure_declaration(MeasureDeclaration(name='s'))  # [<Measure>] type s
+
+# Velocity type: float<m/s>
+velocity_type = MeasureType(
+    base_type=TypeCon(name='float'),
+    measure=MeasureDiv(
+        numerator=MeasureUnit(name='m'),
+        denominator=MeasureUnit(name='s')
+    )
+)
+```
+
+**Output:**
+```fsharp
+[<Measure>] type m
+[<Measure>] type s
+float<m / s>
+```
+
+### Active Patterns
+
+```python
+from ir.functional import ActivePattern, IfExpr, BinaryOpExpr, VarExpr, LiteralExpr
+
+# Total active pattern
+even_odd = ActivePattern(
+    cases=['Even', 'Odd'],
+    is_partial=False,
+    params=['n'],
+    body=IfExpr(
+        condition=BinaryOpExpr(
+            op='=',
+            left=BinaryOpExpr(op='%', left=VarExpr(name='n'), right=LiteralExpr(value=2, literal_type='int')),
+            right=LiteralExpr(value=0, literal_type='int')
+        ),
+        then_branch=VarExpr(name='Even'),
+        else_branch=VarExpr(name='Odd')
+    )
+)
+```
+
+**Output:**
+```fsharp
+let (|Even|Odd|) n = if ((n % 2) = 0) then Even else Odd
+```
+
+### .NET Interoperability
+
+```python
+from ir.functional import ClassDef, ClassField, ClassMethod, InterfaceDef, InterfaceMember, Attribute
+
+# Class definition
+counter_class = ClassDef(
+    name='Counter',
+    attributes=[Attribute(name='Serializable')],
+    members=[
+        ClassField(
+            name='count',
+            field_type=TypeCon(name='int'),
+            is_mutable=True,
+            default_value=LiteralExpr(value=0, literal_type='int')
+        ),
+        ClassMethod(
+            name='Increment',
+            params=[],
+            body=BinaryOpExpr(op='+', left=VarExpr(name='count'), right=LiteralExpr(value=1, literal_type='int'))
+        )
+    ]
+)
+```
+
+**Output:**
+```fsharp
+[<Serializable>]
+type Counter() =
+    let mutable count = 0
+    member this.Increment() = (count + 1)
+```
+
+### F# Types
+
+| IR Type | F# Type |
+|---------|---------|
+| `int` | `int` |
+| `i32` | `int` |
+| `i64` | `int64` |
+| `float` | `float` |
+| `f64` | `float` |
+| `bool` | `bool` |
+| `string` | `string` |
+| `char` | `char` |
+| `unit` | `unit` |
+| `list` | `list` (postfix) |
+| `option` | `option` (postfix) |
+| `seq` | `seq` (postfix) |
+
+### F# Operators
+
+| IR Op | F# Op | Description |
+|-------|-------|-------------|
+| `+` | `+` | Addition |
+| `-` | `-` | Subtraction |
+| `*` | `*` | Multiplication |
+| `/` | `/` | Division |
+| `%` | `%` | Modulo |
+| `==` | `=` | Equality |
+| `!=` | `<>` | Inequality |
+| `@` | `@` | List concatenation |
+| `::` | `::` | Cons |
+| `\|>` | `\|>` | Forward pipe |
+| `<\|` | `<\|` | Backward pipe |
+| `>>` | `>>` | Forward composition |
+| `<<` | `<<` | Backward composition |
+
 ## See Also
 
 - [Functional IR](../../ir/functional/README.md) - IR constructs for functional programming
-- [Phase 8A HLI](../../../stunir_implementation_framework/phase8/HLI_FUNCTIONAL_LANGUAGES.md) - Design document
+- [Phase 8A HLI](../../../stunir_implementation_framework/phase8/HLI_FUNCTIONAL_LANGUAGES.md) - Haskell/OCaml design document
+- [Phase 8B HLI](../../../stunir_implementation_framework/phase8/HLI_FSHARP.md) - F# design document

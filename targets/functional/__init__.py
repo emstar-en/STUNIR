@@ -2,14 +2,15 @@
 """STUNIR Functional Language Emitters Package.
 
 This package provides code emitters for functional programming languages,
-including Haskell and OCaml.
+including Haskell, OCaml, and F#.
 
 Supported Languages:
     - Haskell: Pure functional, lazy evaluation, type classes, monads
     - OCaml: Multi-paradigm, strict evaluation, modules, functors
+    - F#: .NET functional, computation expressions, units of measure
 
 Usage:
-    from targets.functional import HaskellEmitter, OCamlEmitter
+    from targets.functional import HaskellEmitter, OCamlEmitter, FSharpEmitter
     from ir.functional import Module, FunctionDef
     
     # Emit Haskell code
@@ -19,6 +20,10 @@ Usage:
     # Emit OCaml code
     ocaml_emitter = OCamlEmitter()
     ocaml_code = ocaml_emitter.emit_module(module)
+    
+    # Emit F# code
+    fsharp_emitter = FSharpEmitter()
+    fsharp_code = fsharp_emitter.emit_module(module)
 """
 
 from targets.functional.base import (
@@ -30,6 +35,7 @@ from targets.functional.base import (
 
 from targets.functional.haskell_emitter import HaskellEmitter
 from targets.functional.ocaml_emitter import OCamlEmitter
+from targets.functional.fsharp_emitter import FSharpEmitter
 
 __all__ = [
     # Base
@@ -40,4 +46,5 @@ __all__ = [
     # Emitters
     'HaskellEmitter',
     'OCamlEmitter',
+    'FSharpEmitter',
 ]
