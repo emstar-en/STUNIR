@@ -9,6 +9,7 @@ Supported targets:
 - YAP Prolog (yap): High-performance with tabling (memoization) support
 - XSB Prolog (xsb): Advanced tabling with incremental evaluation, WFS
 - Datalog (datalog): Declarative subset with stratified negation
+- ECLiPSe (eclipse): Constraint optimization with IC/FD libraries
 - SICStus Prolog (sicstus): Future
 
 Part of Phase 5C-5D: Logic Programming Targets.
@@ -51,6 +52,19 @@ from .datalog import (
     StratificationError,
     StratificationResult,
 )
+from .eclipse import (
+    ECLiPSeEmitter,
+    ECLiPSeConfig,
+    ECLiPSeTypeMapper,
+    ECLIPSE_TYPES,
+    IC_OPERATORS,
+    FD_OPERATORS,
+    ECLIPSE_GLOBALS,
+    ECLIPSE_OPTIMIZATION,
+    ECLIPSE_SEARCH,
+    ECLIPSE_SELECT_METHODS,
+    ECLIPSE_CHOICE_METHODS,
+)
 
 __all__ = [
     # SWI-Prolog
@@ -88,4 +102,16 @@ __all__ = [
     'DatalogRestrictionError',
     'StratificationError',
     'StratificationResult',
+    # ECLiPSe
+    'ECLiPSeEmitter',
+    'ECLiPSeConfig',
+    'ECLiPSeTypeMapper',
+    'ECLIPSE_TYPES',
+    'IC_OPERATORS',
+    'FD_OPERATORS',
+    'ECLIPSE_GLOBALS',
+    'ECLIPSE_OPTIMIZATION',
+    'ECLIPSE_SEARCH',
+    'ECLIPSE_SELECT_METHODS',
+    'ECLIPSE_CHOICE_METHODS',
 ]
