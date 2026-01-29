@@ -7,10 +7,11 @@ Supported targets:
 - SWI-Prolog (swi_prolog): Full-featured, widely-used implementation
 - GNU Prolog (gnu_prolog): Constraint Logic Programming with CLP(FD), CLP(B)
 - YAP Prolog (yap): High-performance with tabling (memoization) support
+- XSB Prolog (xsb): Advanced tabling with incremental evaluation, WFS
 - Datalog (datalog): Declarative subset with stratified negation
 - SICStus Prolog (sicstus): Future
 
-Part of Phase 5C: Logic Programming Targets.
+Part of Phase 5C-5D: Logic Programming Targets.
 """
 
 from .swi_prolog import SWIPrologEmitter, SWIPrologConfig
@@ -29,6 +30,15 @@ from .yap import (
     YAPPrologTypeMapper,
     YAP_PROLOG_TYPES,
     TABLING_MODES,
+)
+from .xsb import (
+    XSBPrologEmitter,
+    XSBPrologConfig,
+    XSBPrologTypeMapper,
+    XSB_PROLOG_TYPES,
+    XSB_TABLING_MODES,
+    XSB_LATTICE_OPS,
+    TablingMode,
 )
 from .datalog import (
     DatalogEmitter,
@@ -60,6 +70,14 @@ __all__ = [
     'YAPPrologTypeMapper',
     'YAP_PROLOG_TYPES',
     'TABLING_MODES',
+    # XSB Prolog
+    'XSBPrologEmitter',
+    'XSBPrologConfig',
+    'XSBPrologTypeMapper',
+    'XSB_PROLOG_TYPES',
+    'XSB_TABLING_MODES',
+    'XSB_LATTICE_OPS',
+    'TablingMode',
     # Datalog
     'DatalogEmitter',
     'DatalogConfig',
