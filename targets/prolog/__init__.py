@@ -7,6 +7,7 @@ Supported targets:
 - SWI-Prolog (swi_prolog): Full-featured, widely-used implementation
 - GNU Prolog (gnu_prolog): Constraint Logic Programming with CLP(FD), CLP(B)
 - YAP Prolog (yap): High-performance with tabling (memoization) support
+- Datalog (datalog): Declarative subset with stratified negation
 - SICStus Prolog (sicstus): Future
 
 Part of Phase 5C: Logic Programming Targets.
@@ -29,6 +30,17 @@ from .yap import (
     YAP_PROLOG_TYPES,
     TABLING_MODES,
 )
+from .datalog import (
+    DatalogEmitter,
+    DatalogConfig,
+    DatalogTypeMapper,
+    DATALOG_TYPES,
+    DATALOG_RESERVED,
+    ValidationLevel,
+    DatalogRestrictionError,
+    StratificationError,
+    StratificationResult,
+)
 
 __all__ = [
     # SWI-Prolog
@@ -48,4 +60,14 @@ __all__ = [
     'YAPPrologTypeMapper',
     'YAP_PROLOG_TYPES',
     'TABLING_MODES',
+    # Datalog
+    'DatalogEmitter',
+    'DatalogConfig',
+    'DatalogTypeMapper',
+    'DATALOG_TYPES',
+    'DATALOG_RESERVED',
+    'ValidationLevel',
+    'DatalogRestrictionError',
+    'StratificationError',
+    'StratificationResult',
 ]
