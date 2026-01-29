@@ -33,9 +33,15 @@ try:
 except ImportError:
     assembly = None
 
+try:
+    from . import grammar
+except ImportError:
+    grammar = None
+
 __all__ = [
     'lisp',
     'prolog',
     'polyglot',
     'assembly',
+    'grammar',
 ]
