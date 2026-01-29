@@ -1,3 +1,0 @@
-{
-  "ir_canonicalization.machine.json": "IR canonicalization is not dCBOR/UN: build pipeline emits build/ir.json stubs instead of asm/ir/*.dcbor (Haskell must be canonical)"
-}

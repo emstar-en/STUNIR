@@ -1,4 +1,10 @@
 # STUNIR - MADE BY AI FOR AI
+
+<!-- CI/CD Status Badges -->
+[![CI](https://github.com/emstar-en/STUNIR/actions/workflows/ci.yml/badge.svg)](https://github.com/emstar-en/STUNIR/actions/workflows/ci.yml)
+[![Security](https://github.com/emstar-en/STUNIR/actions/workflows/security.yml/badge.svg)](https://github.com/emstar-en/STUNIR/actions/workflows/security.yml)
+[![Docs](https://github.com/emstar-en/STUNIR/actions/workflows/docs.yml/badge.svg)](https://github.com/emstar-en/STUNIR/actions/workflows/docs.yml)
+
 ##  Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
@@ -374,3 +380,44 @@ This README is part of the harness contract. When updating it:
 * do not silently delete naming/rationale/mechanics sections
 * prefer additive edits or explicit deprecations
 * if content is superseded, mark it as such rather than removing it
+
+
+
+## Testing
+
+STUNIR includes a comprehensive testing framework to ensure correctness, determinism, and security.
+
+### Quick Test Commands
+
+```bash
+# Run Python tests
+pytest tests/ -v
+
+# Run Rust tests
+cd tools/native/rust/stunir-native && cargo test
+
+# Run integration tests
+pytest tests/integration/ -v
+
+# Run security tests
+pytest tests/security/ -v
+```
+
+### Test Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Testing Strategy](docs/TESTING_STRATEGY.md) | Overall testing approach and coverage goals |
+| [Rust Testing Guide](tools/native/rust/stunir-native/TESTING.md) | Rust test framework and conventions |
+| [Integration Tests](tests/integration/README.md) | End-to-end integration test guide |
+| [CI/CD Workflows](.github/workflows/README.md) | GitHub Actions workflow documentation |
+
+### CI/CD Pipeline
+
+STUNIR uses GitHub Actions for continuous integration:
+
+- **CI Workflow:** Multi-platform tests (Ubuntu, macOS) for Python, Rust, and Haskell
+- **Security Workflow:** Automated security scans and vulnerability detection
+- **Docs Workflow:** Documentation verification and link checking
+
+See `.github/workflows/` for workflow definitions.

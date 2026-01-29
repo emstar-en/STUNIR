@@ -1,15 +1,46 @@
 cabal-version: 3.10
 name: pack-attestation
-version: 0.1.0.0
+version: 0.2.0.0
+synopsis: STUNIR Pack Attestation with Ed25519 signatures
+description: Secure attestation tool using Ed25519 digital signatures (RFC 8032)
 
 library
-  exposed-modules: Attestation
+  exposed-modules: 
   hs-source-dirs: src
-  build-depends: base, cborg, cryptonite, bytestring
+  build-depends: 
+    base >= 4.17 && < 5,
+    cborg >= 0.2,
+    cryptonite >= 0.30,
+    bytestring >= 0.11,
+    base16-bytestring >= 1.0,
+    memory >= 0.18,
+    directory >= 1.3,
+    time >= 1.12
   default-language: GHC2021
 
 executable pack-attestation
   main-is: Attestation.hs
-  build-depends: base, cborg, cryptonite, bytestring
-  ghc-options: -threaded -Wall -static
+  build-depends: 
+    base >= 4.17 && < 5,
+    cborg >= 0.2,
+    cryptonite >= 0.30,
+    bytestring >= 0.11,
+    base16-bytestring >= 1.0,
+    memory >= 0.18,
+    directory >= 1.3,
+    time >= 1.12
+  ghc-options: -threaded -Wall -Wcompat -Wno-unused-do-bind
+  default-language: GHC2021
+
+test-suite attestation-tests
+  type: exitcode-stdio-1.0
+  main-is: AttestationTest.hs
+  hs-source-dirs: test
+  build-depends:
+    base >= 4.17 && < 5,
+    pack-attestation,
+    cryptonite >= 0.30,
+    bytestring >= 0.11,
+    tasty,
+    tasty-hunit
   default-language: GHC2021

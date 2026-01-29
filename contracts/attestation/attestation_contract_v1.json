@@ -1,0 +1,77 @@
+{
+  "schema": "stunir.contract.attestation.v1",
+  "contract_id": "stunir-attestation-v1",
+  "stage_type": "attestation",
+  "description": "Contract for STUNIR build attestation generation and verification",
+  "attestation_format": {
+    "primary": "dsse",
+    "envelope_type": "application/vnd.stunir.attestation+json",
+    "fallback": "in-toto"
+  },
+  "required_fields": {
+    "subject": {
+      "type": "array",
+      "items": {
+        "required": ["name", "digest"],
+        "properties": {
+          "name": {"type": "string"},
+          "digest": {
+            "type": "object",
+            "required": ["sha256"]
+          }
+        }
+      }
+    },
+    "predicate_type": {
+      "type": "string",
+      "pattern": "^https://stunir\\.io/predicate/"
+    },
+    "predicate": {
+      "type": "object",
+      "required": ["build_epoch", "ir_manifest_digest"]
+    }
+  },
+  "signature_requirements": {
+    "algorithms": [
+      {"name": "ed25519", "preferred": true},
+      {"name": "ecdsa-p256", "preferred": false},
+      {"name": "rsa-pss-sha256", "preferred": false}
+    ],
+    "minimum_signatures": 1,
+    "keyless_supported": true
+  },
+  "binding_rules": {
+    "ir_manifest_bound": true,
+    "receipt_bound": true,
+    "source_bound": {
+      "required": false,
+      "recommended": true
+    }
+  },
+  "output_formats": [
+    {
+      "name": "dsse_json",
+      "extension": ".attestation.json",
+      "encoding": "base64url"
+    },
+    {
+      "name": "dsse_dcbor",
+      "extension": ".attestation.dcbor",
+      "encoding": "dcbor"
+    }
+  ],
+  "verification_modes": [
+    {
+      "name": "signature_only",
+      "verifies": ["signature"]
+    },
+    {
+      "name": "full",
+      "verifies": ["signature", "subject_digests", "predicate_schema"]
+    }
+  ],
+  "references": {
+    "dsse_spec": "https://github.com/secure-systems-lab/dsse",
+    "in_toto_spec": "https://in-toto.io/"
+  }
+}

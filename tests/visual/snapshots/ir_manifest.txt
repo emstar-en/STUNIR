@@ -1,0 +1,1 @@
+{"entries":[{"artifact_type":"ir","format":"dcbor","hash":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","name":"module_a.dcbor","path":"asm/ir/module_a.dcbor","size":1024}],"manifest_epoch":1706400000,"manifest_hash":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","manifest_schema":"stunir.manifest.ir.v1"}

@@ -1,0 +1,37 @@
+-- STUNIR Cabal Project Configuration
+-- Optimized build settings for Haskell components
+
+packages:
+  tools/native/haskell/stunir-native
+
+-- Build options
+with-compiler: ghc-9.4
+jobs: $ncpus
+
+-- Optimization settings
+optimization: 2
+split-sections: True
+executable-stripping: True
+library-stripping: True
+
+-- Development flags
+flags: +dev
+
+-- Dependency solving
+max-backjumps: 10000
+strong-flags: True
+allow-newer: False
+
+-- Build cache
+store-dir: .cabal-store
+
+-- Nix-style local builds
+write-ghc-environment-files: never
+
+program-options
+  ghc-options: -threaded -rtsopts "-with-rtsopts=-N" -O2
+
+-- Package-specific options
+package stunir-native
+  ghc-options: -Wall -Wextra -Werror=incomplete-patterns
+  flags: +optimize

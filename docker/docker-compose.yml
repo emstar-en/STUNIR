@@ -1,0 +1,73 @@
+# STUNIR Docker Compose Configuration
+# Issue: pipeline/docker/1019
+#
+# Orchestrates STUNIR pipeline execution with different profiles.
+
+version: '3.8'
+
+services:
+  # Native Haskell profile (primary)
+  stunir-native:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.haskell
+    container_name: stunir-native
+    volumes:
+      - ../specs:/stunir/specs:ro
+      - ../outputs:/stunir/outputs
+      - ../receipts:/stunir/receipts
+    environment:
+      - STUNIR_PROFILE=native
+    command: ["./scripts/build.sh", "--profile", "native"]
+
+  # Python profile (fallback)
+  stunir-python:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python
+    container_name: stunir-python
+    volumes:
+      - ../specs:/stunir/specs:ro
+      - ../outputs:/stunir/outputs
+      - ../receipts:/stunir/receipts
+    environment:
+      - STUNIR_PROFILE=python
+    command: ["./scripts/build.sh", "--profile", "python"]
+
+  # Full multi-profile build
+  stunir-full:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.full
+    container_name: stunir-full
+    volumes:
+      - ../specs:/stunir/specs:ro
+      - ../outputs:/stunir/outputs
+      - ../receipts:/stunir/receipts
+      - ../asm:/stunir/asm
+    environment:
+      - STUNIR_PROFILE=native
+    command: ["./scripts/full_pipeline_v1.sh"]
+
+  # Verification service
+  stunir-verify:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python
+    container_name: stunir-verify
+    volumes:
+      - ../receipts:/stunir/receipts:ro
+      - ../asm:/stunir/asm:ro
+    environment:
+      - STUNIR_PROFILE=python
+    command: ["python3", "tools/verify_build.py", "--strict"]
+    depends_on:
+      - stunir-full
+
+volumes:
+  stunir-outputs:
+  stunir-receipts:
+
+networks:
+  default:
+    name: stunir-network

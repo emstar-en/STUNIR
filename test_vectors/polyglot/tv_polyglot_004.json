@@ -1,0 +1,55 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify IR types map correctly to all targets",
+  "expected_hash": "afff0718ea19af72442a7f2a103cef387a505b0a85b5b7ff4cc129f357cc4cec",
+  "expected_output": {
+    "all_types_mapped": true,
+    "c89_mappings": {
+      "bool": "int",
+      "f32": "float",
+      "f64": "double",
+      "i32": "int",
+      "i64": "long",
+      "string": "char*"
+    },
+    "c99_mappings": {
+      "bool": "bool",
+      "f32": "float",
+      "f64": "double",
+      "i32": "int32_t",
+      "i64": "int64_t",
+      "string": "char*"
+    },
+    "rust_mappings": {
+      "bool": "bool",
+      "f32": "f32",
+      "f64": "f64",
+      "i32": "i32",
+      "i64": "i64",
+      "string": "String"
+    }
+  },
+  "id": "tv_polyglot_004",
+  "input": {
+    "ir_types": [
+      "i32",
+      "i64",
+      "f32",
+      "f64",
+      "bool",
+      "string"
+    ],
+    "targets": [
+      "rust",
+      "c89",
+      "c99"
+    ]
+  },
+  "name": "Cross-Language Type Mapping",
+  "schema": "stunir.test_vector.polyglot.v1",
+  "tags": [
+    "unit",
+    "types",
+    "polyglot"
+  ]
+}

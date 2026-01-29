@@ -1,0 +1,28 @@
+# STUNIR Conformance Tests - Stack Configuration
+# For Haskell-native testing in Python-averse environments
+
+resolver: lts-22.6  # GHC 9.6.3
+
+packages:
+  - .
+
+extra-deps: []
+
+flags: {}
+
+extra-package-dbs: []
+
+# Build options
+build:
+  library-profiling: false
+  executable-profiling: false
+  copy-bins: true
+  prefetch: true
+  keep-going: false
+  test: true
+  bench: false
+
+# Nix integration (optional)
+nix:
+  enable: false
+  packages: [zlib]

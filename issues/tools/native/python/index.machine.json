@@ -1,4 +1,0 @@
-{
-  "python_native.machine.json": "Issue python_native [Deps: native/haskell]",
-  "tools_native.machine.json": "Issue tools_native [Deps: native/haskell]"
-}

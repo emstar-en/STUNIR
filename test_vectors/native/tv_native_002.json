@@ -1,0 +1,29 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify stunir-native gen-provenance produces valid C header",
+  "expected_hash": "0b274610636717f95f5675f16a2507e62ef9b32bb766b8107d8d1fda237f8b62",
+  "expected_output": {
+    "has_epoch_macro": true,
+    "has_module_list": true,
+    "has_spec_hash_macro": true,
+    "header_generated": true
+  },
+  "id": "tv_native_002",
+  "input": {
+    "command": "gen-provenance",
+    "modules": [
+      "core",
+      "util"
+    ],
+    "spec_hash": "abc123def456",
+    "tool": "stunir-native"
+  },
+  "name": "Haskell Provenance Generation",
+  "schema": "stunir.test_vector.native.v1",
+  "tags": [
+    "unit",
+    "haskell",
+    "provenance",
+    "native"
+  ]
+}

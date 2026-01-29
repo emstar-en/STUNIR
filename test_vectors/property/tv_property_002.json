@@ -1,0 +1,39 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify hash of sorted data equals hash of unsorted then sorted",
+  "expected_hash": "2ce3b8ca1062f59db002584c39595048f04fe548cda9081c55411212c1127bc2",
+  "expected_output": {
+    "all_hashes_equal": true,
+    "deterministic": true,
+    "property_holds": true
+  },
+  "id": "tv_property_002",
+  "input": {
+    "data_variants": [
+      {
+        "a": 1,
+        "b": 2,
+        "c": 3
+      },
+      {
+        "a": 1,
+        "b": 2,
+        "c": 3
+      },
+      {
+        "a": 1,
+        "b": 2,
+        "c": 3
+      }
+    ],
+    "operation": "canonical_hash",
+    "property": "commutativity"
+  },
+  "name": "Hash Order Independence",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "commutativity",
+    "hash"
+  ]
+}

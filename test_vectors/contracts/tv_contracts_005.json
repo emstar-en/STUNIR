@@ -1,0 +1,30 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify contract stages are properly ordered",
+  "expected_hash": "8092424c12a34e588dcbd36672d74dfe3b8edb82c2ae9278bf0bcd9f2830af72",
+  "expected_output": {
+    "error": "Stages must be ordered: build before test",
+    "stage_order_valid": false,
+    "valid": false
+  },
+  "id": "tv_contracts_005",
+  "input": {
+    "contract": {
+      "epoch": 1735500000,
+      "id": "contract_order_001",
+      "profile": "profile3",
+      "schema": "stunir.contract.profile3.v1",
+      "stages": [
+        "test",
+        "build"
+      ]
+    }
+  },
+  "name": "Contract Stage Ordering",
+  "schema": "stunir.test_vector.contracts.v1",
+  "tags": [
+    "unit",
+    "ordering",
+    "contracts"
+  ]
+}

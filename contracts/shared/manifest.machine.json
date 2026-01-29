@@ -1,0 +1,9 @@
+{
+  "schema": "stunir.manifest.v1",
+  "directory": "contracts/shared",
+  "files": [
+    "pipeline_stage_base.schema.json",
+    "verifier_base.schema.json"
+  ],
+  "status": "complete"
+}

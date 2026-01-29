@@ -1,0 +1,38 @@
+{
+  "category": "contracts",
+  "count": 5,
+  "entries": [
+    {
+      "file": "tv_contracts_001.json",
+      "hash": "8e1c35c2d0c2865badbf4f865b6d293c5d6af4a2c34bedccdacb06358e68d009",
+      "id": "tv_contracts_001",
+      "name": "Profile 2 Contract Structure"
+    },
+    {
+      "file": "tv_contracts_002.json",
+      "hash": "6841200be10049a20ee6408ac90f2c149b40cf8a29bc7e2bd4ac7e6e978a459b",
+      "id": "tv_contracts_002",
+      "name": "Profile 3 Contract Structure"
+    },
+    {
+      "file": "tv_contracts_003.json",
+      "hash": "3dfe2bb6db718b223cd145056c5c7b8a85ff8f4957ff26121b2c441e5690f87b",
+      "id": "tv_contracts_003",
+      "name": "Profile 4 Contract Structure"
+    },
+    {
+      "file": "tv_contracts_004.json",
+      "hash": "dabae880dd10888fe190a1f45e2947abd502ed75eb0b4a064063bbe712294049",
+      "id": "tv_contracts_004",
+      "name": "Invalid Profile Contract"
+    },
+    {
+      "file": "tv_contracts_005.json",
+      "hash": "4736e824636edef768eec7a7a4bb6133e13bca4909f7c722519767a4bc048f00",
+      "id": "tv_contracts_005",
+      "name": "Contract Stage Ordering"
+    }
+  ],
+  "epoch": 1735500000,
+  "schema": "stunir.test_vectors.contracts.manifest.v1"
+}

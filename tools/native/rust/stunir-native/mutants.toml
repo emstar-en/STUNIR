@@ -1,0 +1,30 @@
+# STUNIR Rust Mutation Testing Configuration
+# For use with cargo-mutants
+
+# Timeout per mutant (seconds)
+timeout_multiplier = 2.0
+minimum_timeout = 30
+
+# Modules to mutate (prioritize critical paths)
+[examine_globs]
+globs = [
+    "src/lib.rs",
+    "src/ir/*.rs",
+    "src/manifest/*.rs",
+    "src/hash/*.rs",
+]
+
+# Skip test utilities
+[skip_globs]
+globs = [
+    "tests/**/*",
+    "benches/**/*",
+    "examples/**/*",
+]
+
+# Skip functions that are hard to mutate meaningfully
+[[skip_functions]]
+function = "fmt"
+
+[[skip_functions]]
+function = "default"

@@ -1,0 +1,55 @@
+{
+  "schema": "stunir.contract.profile3.v1",
+  "contract_id": "stunir-profile3-shell-only-v1",
+  "profile_name": "profile3",
+  "stage_type": "verification",
+  "description": "Minimal verification profile using only shell tools (POSIX)",
+  "verification_mode": "shell_only",
+  "tools_required": [
+    "sha256sum",
+    "sort",
+    "diff",
+    "cat",
+    "grep",
+    "awk"
+  ],
+  "constraints": {
+    "no_python": true,
+    "no_custom_binaries": true,
+    "posix_only": true,
+    "network_allowed": false
+  },
+  "verifier_scripts": {
+    "minimal": "scripts/verify_minimal.sh",
+    "strict": "scripts/verify_strict.sh",
+    "library": "scripts/profile3_lib.sh"
+  },
+  "verification_targets": {
+    "root_attestation": {
+      "file": "root_attestation.txt",
+      "required": true
+    },
+    "ir_manifest": {
+      "file": "receipts/ir_manifest.json",
+      "required": false
+    },
+    "object_store": {
+      "directory": "objects/sha256/",
+      "required": true
+    }
+  },
+  "success_criteria": {
+    "all_hashes_match": true,
+    "exactly_one_ir_record": true,
+    "no_missing_objects": true
+  },
+  "failure_semantics": {
+    "hash_mismatch": "hard_fail",
+    "missing_object": "hard_fail",
+    "malformed_attestation": "hard_fail"
+  },
+  "references": {
+    "verification_profiles": "docs/verification_profiles.md",
+    "shell_verifier_schema": "contracts/profile3_shell_only_verifier_v1.json"
+  }
+}

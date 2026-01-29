@@ -1,0 +1,9 @@
+{
+  "schema": "stunir.manifest.v1",
+  "directory": "contracts/profile3",
+  "files": [
+    "profile3_contract_v1.json",
+    "profile3_pipeline.schema.json"
+  ],
+  "status": "complete"
+}

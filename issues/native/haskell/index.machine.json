@@ -1,4 +1,0 @@
-{
-  "manifest_generation.machine.json": "Implement Deterministic IR Bundle Manifest Generation",
-  "source_scanning.machine.json": "Implement Gitignore-Aware Source Code Scanning"
-}

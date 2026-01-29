@@ -1,0 +1,26 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify receipt epoch is valid Unix timestamp",
+  "expected_hash": "02226dfc25ed90c09bd249f6c5d3276145986d9c2d2fcab7991df1d2ebcbf444",
+  "expected_output": {
+    "epoch_range_valid": true,
+    "epoch_valid": true,
+    "valid": true
+  },
+  "id": "tv_receipts_005",
+  "input": {
+    "receipt": {
+      "artifact_hash": "abc123",
+      "epoch": 1735500000,
+      "id": "receipt_005",
+      "schema": "stunir.receipt.v1"
+    }
+  },
+  "name": "Receipt Epoch Validation",
+  "schema": "stunir.test_vector.receipts.v1",
+  "tags": [
+    "unit",
+    "timestamp",
+    "receipts"
+  ]
+}

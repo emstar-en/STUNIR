@@ -1,4 +1,0 @@
-{
-  "manifests_ir.machine.json": "Complete manifests \u2192 ir pipeline stage",
-  "strict_verify.machine.json": "Strict verify requires receipts/ir_manifest.json to match asm/ir/*.dcbor set; build.sh writes an empty stub"
-}

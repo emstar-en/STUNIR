@@ -1,0 +1,14 @@
+{
+  "schema": "stunir.module.v1",
+  "name": "${name}",
+  "version": "${version:1.0.0}",
+  "imports": "${imports:[]}",
+  "exports": "${exports:[]}",
+  "types": "${types:[]}",
+  "functions": "${functions:[]}",
+  "constants": "${constants:[]}",
+  "metadata": {
+    "description": "${description:}",
+    "author": "${author:}"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "stunir.manifest.v1",
+  "directory": "contracts/validation",
+  "files": [
+    "validation_contract_v1.json",
+    "validation_rules.schema.json"
+  ],
+  "status": "complete"
+}

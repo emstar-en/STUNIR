@@ -1,0 +1,31 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify handling of special characters in JSON keys",
+  "expected_hash": "5e7c99368e4f1a0b3862a0716f044dc7e31ab768eadefa5693140dd5790c597d",
+  "expected_output": {
+    "canonical_output": true,
+    "keys_preserved": true,
+    "serialized": true
+  },
+  "id": "tv_edge_cases_007",
+  "input": {
+    "operation": "serialize",
+    "spec": {
+      "id": "spec-with-dashes",
+      "meta": {
+        "key.with.dots": "value1",
+        "key/with/slashes": "value3",
+        "key:with:colons": "value2"
+      },
+      "profile": "profile3",
+      "schema": "stunir.spec.v1"
+    }
+  },
+  "name": "Special Characters in Keys",
+  "schema": "stunir.test_vector.edge_cases.v1",
+  "tags": [
+    "edge_case",
+    "special_chars",
+    "serialization"
+  ]
+}

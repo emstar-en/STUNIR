@@ -1,0 +1,36 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify Profile 4 contract with attestation",
+  "expected_hash": "4c43972d367ee7cf4ae6d99c524469a68b319f0d8b7d69968f41fab08a8394d3",
+  "expected_output": {
+    "has_attestation": true,
+    "profile_valid": true,
+    "valid": true
+  },
+  "id": "tv_contracts_003",
+  "input": {
+    "contract": {
+      "attestation": {
+        "type": "deterministic",
+        "verifier": "internal"
+      },
+      "epoch": 1735500000,
+      "id": "contract_p4_001",
+      "profile": "profile4",
+      "schema": "stunir.contract.profile4.v1",
+      "stages": [
+        "build",
+        "test",
+        "attest"
+      ]
+    }
+  },
+  "name": "Profile 4 Contract Structure",
+  "schema": "stunir.test_vector.contracts.v1",
+  "tags": [
+    "unit",
+    "profile4",
+    "contracts",
+    "attestation"
+  ]
+}

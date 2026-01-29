@@ -1,0 +1,9 @@
+{
+  "schema": "stunir.manifest.v1",
+  "directory": "contracts/runtime",
+  "files": [
+    "runtime_contract_v1.json",
+    "runtime_pipeline.schema.json"
+  ],
+  "status": "complete"
+}

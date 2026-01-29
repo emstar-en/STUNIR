@@ -1,0 +1,53 @@
+# STUNIR Cargo Configuration
+# Optimized build settings for Rust components
+
+[build]
+# Use parallel linking
+jobs = 4
+
+# Incremental compilation for faster rebuilds
+incremental = true
+
+[profile.dev]
+# Development profile - fast compile, some optimization
+opt-level = 0
+debug = true
+incremental = true
+codegen-units = 256
+lto = false
+
+[profile.release]
+# Release profile - maximum optimization
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.test]
+# Test profile - balance speed and debugging
+opt-level = 1
+debug = true
+
+[profile.bench]
+# Benchmark profile - same as release
+inherits = "release"
+lto = "fat"
+
+# Custom profile for CI builds
+[profile.ci]
+inherits = "release"
+lto = "thin"
+debug = false
+incremental = false
+codegen-units = 4
+
+[registries.crates-io]
+protocol = "sparse"
+
+[net]
+retry = 3
+git-fetch-with-cli = true
+
+[env]
+RUSTFLAGS = "-C target-cpu=native"

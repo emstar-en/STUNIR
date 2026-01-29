@@ -1,0 +1,52 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "example-types",
+  "name": "Spec with Types Example",
+  "version": "1.0.0",
+  "profile": "profile4",
+  "stages": [
+    "STANDARDIZATION",
+    "UNIQUE_NORMALS",
+    "IR",
+    "BINARY",
+    "RECEIPT"
+  ],
+  "targets": ["rust", "haskell"],
+  "module": {
+    "name": "typed_module",
+    "types": [
+      {
+        "name": "Point",
+        "kind": "struct",
+        "fields": [
+          {"name": "x", "type": "f64"},
+          {"name": "y", "type": "f64"}
+        ]
+      },
+      {
+        "name": "Color",
+        "kind": "enum",
+        "variants": ["Red", "Green", "Blue", "Custom"]
+      },
+      {
+        "name": "Vector3",
+        "kind": "struct",
+        "fields": [
+          {"name": "x", "type": "f64"},
+          {"name": "y", "type": "f64"},
+          {"name": "z", "type": "f64"}
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "distance",
+        "params": [
+          {"name": "p1", "type": "Point"},
+          {"name": "p2", "type": "Point"}
+        ],
+        "returns": "f64"
+      }
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "schema": "stunir.contract.profile4.v1",
+  "contract_id": "stunir-profile4-strict-shell-v1",
+  "profile_name": "profile4",
+  "extends": "stunir.contract.profile3.v1",
+  "stage_type": "verification",
+  "description": "Extended Profile 3 with strict integrity checking",
+  "verification_mode": "shell_strict",
+  "tools_required": [
+    "sha256sum",
+    "sort",
+    "diff",
+    "cat",
+    "grep",
+    "awk",
+    "find"
+  ],
+  "constraints": {
+    "no_python": true,
+    "no_custom_binaries": true,
+    "posix_only": true,
+    "network_allowed": false
+  },
+  "additional_constraints": {
+    "strict_manifest_binding": true,
+    "pack_manifest_required": true,
+    "sorted_determinism": true,
+    "no_extra_files_allowed": true
+  },
+  "verifier_scripts": {
+    "primary": "scripts/verify_profile4.sh",
+    "fallback": "scripts/verify_strict.sh"
+  },
+  "verification_targets": {
+    "root_attestation": {
+      "file": "root_attestation.txt",
+      "required": true,
+      "must_bind_manifest": true
+    },
+    "pack_manifest": {
+      "file": "pack_manifest.tsv",
+      "required": true,
+      "must_be_sorted": true
+    },
+    "ir_manifest": {
+      "file": "receipts/ir_manifest.json",
+      "required": true
+    },
+    "object_store": {
+      "directory": "objects/sha256/",
+      "required": true
+    }
+  },
+  "success_criteria": {
+    "all_hashes_match": true,
+    "manifest_bound_in_attestation": true,
+    "manifest_sorted_correctly": true,
+    "no_extra_pack_files": true,
+    "ir_manifest_valid": true
+  },
+  "failure_semantics": {
+    "missing_manifest": "hard_fail",
+    "hash_mismatch": "hard_fail",
+    "extra_files": "hard_fail",
+    "unsorted_manifest": "hard_fail",
+    "unbound_manifest": "hard_fail"
+  },
+  "references": {
+    "base_profile": "contracts/profile3/profile3_contract_v1.json",
+    "pack_manifest_spec": "docs/root/stunir_pack_manifest_v1.md"
+  }
+}

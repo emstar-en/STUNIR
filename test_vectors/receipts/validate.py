@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""STUNIR Receipts Test Vector Validator.
+
+Validates receipts test vectors for integrity and correctness.
+Part of Issue #1036: Complete test_vectors → receipts pipeline stage.
+"""
+
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from base import BaseTestVectorValidator, validate_schema
+from typing import Dict, List, Tuple
+
+
+class ReceiptsTestVectorValidator(BaseTestVectorValidator):
+    """Validator for receipts test vectors."""
+    
+    REQUIRED_FIELDS = ['schema', 'id', 'name', 'input', 'expected_output']
+    
+    def _validate_vector(self, vector: Dict) -> Tuple[bool, str]:
+        """Validate a receipts test vector."""
+        # Check required fields
+        is_valid, missing = validate_schema(vector, self.REQUIRED_FIELDS)
+        if not is_valid:
+            return False, f"Missing required fields: {missing}"
+        
+        # Check schema prefix
+        schema = vector.get('schema', '')
+        if not schema.startswith('stunir.test_vector.receipts.'):
+            return False, f"Invalid schema: {schema}"
+        
+        # Check input has receipt data
+        test_input = vector.get('input', {})
+        if 'receipt' not in test_input and 'receipts' not in test_input:
+            return False, "Input must contain 'receipt' or 'receipts' field"
+        
+        return True, "Validation passed"
+
+
+def main():
+    """Validate receipts test vectors."""
+    import argparse
+    parser = argparse.ArgumentParser(description='Validate receipts test vectors')
+    parser.add_argument('--dir', '-d', default=None, help='Test vectors directory')
+    args = parser.parse_args()
+    
+    validator = ReceiptsTestVectorValidator('receipts', args.dir)
+    passed, failed, results = validator.validate_all()
+    
+    print(f"Receipts Test Vectors Validation", file=sys.stderr)
+    print(f"  Passed: {passed}", file=sys.stderr)
+    print(f"  Failed: {failed}", file=sys.stderr)
+    
+    for result in results:
+        status = '✓' if result['valid'] else '✗'
+        print(f"  {status} {result['id']}: {result['validation']}", file=sys.stderr)
+    
+    return 0 if failed == 0 else 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())
