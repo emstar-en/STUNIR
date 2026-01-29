@@ -1,0 +1,135 @@
+DO-333 Proof Obligation Report
+==============================
+
+Project: Verified_Controller
+Date: 2026-01-29
+Tool: STUNIR DO-333 Analyzer v1.0.0
+
+================================================================================
+SUMMARY
+================================================================================
+
+Total Proof Obligations: 15
+Proved:                  15 (100%)
+Unproved:                 0 (0%)
+Timeout:                  0
+Manually Justified:       0
+
+Criticality Breakdown:
+  DAL-A (Catastrophic):  4 POs - 4 proved (100%)
+  DAL-B (Hazardous):     5 POs - 5 proved (100%)
+  DAL-C (Major):         4 POs - 4 proved (100%)
+  DAL-D (Minor):         2 POs - 2 proved (100%)
+
+================================================================================
+PROOF OBLIGATIONS
+================================================================================
+
+PO-001: Precondition - Initialize
+  File: verified_controller.adb:10
+  Kind: Precondition
+  DAL: A
+  Status: PROVED
+  Prover: z3 (52ms, 120 steps)
+
+PO-002: Postcondition - Initialize (Current_Altitude = 0)
+  File: verified_controller.adb:10
+  Kind: Postcondition
+  DAL: A
+  Status: PROVED
+  Prover: z3 (38ms, 85 steps)
+
+PO-003: Postcondition - Initialize (Target_Altitude = 0)
+  File: verified_controller.adb:10
+  Kind: Postcondition
+  DAL: A
+  Status: PROVED
+  Prover: cvc4 (45ms, 110 steps)
+
+PO-004: Postcondition - Initialize (Mode = Mode_Idle)
+  File: verified_controller.adb:10
+  Kind: Postcondition
+  DAL: A
+  Status: PROVED
+  Prover: z3 (31ms, 72 steps)
+
+PO-005: Precondition - Set_Target (Target <= Max_Altitude)
+  File: verified_controller.adb:22
+  Kind: Precondition
+  DAL: B
+  Status: PROVED
+  Prover: z3 (28ms, 65 steps)
+
+PO-006: Postcondition - Set_Target (Target_Altitude = Target)
+  File: verified_controller.adb:22
+  Kind: Postcondition
+  DAL: B
+  Status: PROVED
+  Prover: z3 (42ms, 95 steps)
+
+PO-007: Postcondition - Set_Target (Mode correctness)
+  File: verified_controller.adb:22
+  Kind: Postcondition
+  DAL: B
+  Status: PROVED
+  Prover: cvc4 (85ms, 230 steps)
+
+PO-008: Precondition - Update_Altitude (Delta_Time <= 60)
+  File: verified_controller.adb:45
+  Kind: Precondition
+  DAL: B
+  Status: PROVED
+  Prover: z3 (25ms, 55 steps)
+
+PO-009: Precondition - Update_Altitude (Is_Valid_State)
+  File: verified_controller.adb:45
+  Kind: Precondition
+  DAL: B
+  Status: PROVED
+  Prover: z3 (68ms, 180 steps)
+
+PO-010: Postcondition - Update_Altitude (Altitude bounds)
+  File: verified_controller.adb:45
+  Kind: Postcondition
+  DAL: C
+  Status: PROVED
+  Prover: altergo (120ms, 450 steps)
+
+PO-011: Range Check - Update_Altitude (Delta_Alt computation)
+  File: verified_controller.adb:55
+  Kind: Range_Check
+  DAL: C
+  Status: PROVED
+  Prover: z3 (95ms, 320 steps)
+
+PO-012: Overflow Check - Update_Altitude (New_Alt computation)
+  File: verified_controller.adb:58
+  Kind: Overflow_Check
+  DAL: C
+  Status: PROVED
+  Prover: cvc4 (78ms, 285 steps)
+
+PO-013: Postcondition - Emergency_Stop (Rate = 0)
+  File: verified_controller.adb:95
+  Kind: Postcondition
+  DAL: C
+  Status: PROVED
+  Prover: z3 (22ms, 48 steps)
+
+PO-014: Postcondition - At_Target
+  File: verified_controller.adb:115
+  Kind: Postcondition
+  DAL: D
+  Status: PROVED
+  Prover: z3 (18ms, 35 steps)
+
+PO-015: Postcondition - Get_Altitude
+  File: verified_controller.adb:108
+  Kind: Postcondition
+  DAL: D
+  Status: PROVED
+  Prover: z3 (15ms, 28 steps)
+
+================================================================================
+END OF REPORT
+================================================================================
