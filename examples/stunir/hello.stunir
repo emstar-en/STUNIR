@@ -1,0 +1,28 @@
+// Hello World in STUNIR
+// A simple STUNIR program demonstrating basic syntax
+
+module hello;
+
+// Import standard library (if available)
+// import std.io;
+
+// Define a simple greeting function
+function greet(name: string): string {
+    return "Hello, " + name + "!";
+}
+
+// Main entry point
+function main(): i32 {
+    let greeting = greet("World");
+    // print(greeting);
+    return 0;
+}
+
+// Type alias example
+type Message = string;
+
+// Function with optional parameter
+function greet_with_prefix(name: string, prefix: string): string {
+    let full_name = prefix + " " + name;
+    return greet(full_name);
+}
