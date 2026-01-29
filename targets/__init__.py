@@ -59,6 +59,16 @@ try:
 except ImportError:
     constraints = None
 
+try:
+    from . import planning
+except ImportError:
+    planning = None
+
+try:
+    from . import asp
+except ImportError:
+    asp = None
+
 __all__ = [
     'lisp',
     'prolog',
@@ -69,4 +79,6 @@ __all__ = [
     'lexer',
     'expert_systems',
     'constraints',
+    'planning',
+    'asp',
 ]
