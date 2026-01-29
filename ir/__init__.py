@@ -29,9 +29,15 @@ try:
 except ImportError:
     rules = None
 
+try:
+    from . import constraints
+except ImportError:
+    constraints = None
+
 __all__ = [
     'grammar',
     'parser',
     'lexer',
     'rules',
+    'constraints',
 ]
