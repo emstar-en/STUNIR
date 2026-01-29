@@ -1,0 +1,161 @@
+// Arithmetic Expression Compiler in STUNIR
+// Demonstrates IR definitions, type variants, and code generation
+
+module arithmetic;
+
+// =========================================
+// IR Node Definitions
+// =========================================
+
+// Number literal expression
+ir NumberExpr {
+    value: i32;
+}
+
+// Binary operation expression
+ir BinaryExpr {
+    op: string;  // "+", "-", "*", "/"
+    child left: Expr;
+    child right: Expr;
+    
+    op evaluate(): i32;
+}
+
+// Unary operation expression
+ir UnaryExpr {
+    op: string;  // "-", "+"
+    child operand: Expr;
+}
+
+// Variable reference
+ir VarExpr {
+    name: string;
+}
+
+// =========================================
+// Expression Type (Sum Type)
+// =========================================
+
+type Expr {
+    | Number(NumberExpr)
+    | Binary(BinaryExpr)
+    | Unary(UnaryExpr)
+    | Var(VarExpr)
+}
+
+// =========================================
+// Evaluator
+// =========================================
+
+function evaluate(expr: Expr): i32 {
+    match expr {
+        Number(n) => n.value,
+        Binary(b) => {
+            let left_val = evaluate(b.left);
+            let right_val = evaluate(b.right);
+            
+            match b.op {
+                "+" => left_val + right_val,
+                "-" => left_val - right_val,
+                "*" => left_val * right_val,
+                "/" => {
+                    if right_val == 0 {
+                        return 0;  // Error handling
+                    }
+                    return left_val / right_val;
+                }
+            }
+        },
+        Unary(u) => {
+            let val = evaluate(u.operand);
+            if u.op == "-" {
+                return -val;
+            }
+            return val;
+        },
+        Var(v) => 0  // Would need environment lookup
+    }
+}
+
+// =========================================
+// Code Generation Target: C
+// =========================================
+
+target C {
+    extension: ".c";
+    indent: "    ";
+    
+    emit NumberExpr(node: NumberExpr) {
+        emit node.value;
+    }
+    
+    emit BinaryExpr(node: BinaryExpr) {
+        emit "(";
+        emit node.left;
+        emit " ";
+        emit node.op;
+        emit " ";
+        emit node.right;
+        emit ")";
+    }
+    
+    emit UnaryExpr(node: UnaryExpr) {
+        emit "(";
+        emit node.op;
+        emit node.operand;
+        emit ")";
+    }
+    
+    emit VarExpr(node: VarExpr) {
+        emit node.name;
+    }
+}
+
+// =========================================
+// Code Generation Target: Python
+// =========================================
+
+target Python {
+    extension: ".py";
+    indent: "    ";
+    
+    emit NumberExpr(node: NumberExpr) {
+        emit node.value;
+    }
+    
+    emit BinaryExpr(node: BinaryExpr) {
+        emit "(";
+        emit node.left;
+        emit " " + node.op + " ";
+        emit node.right;
+        emit ")";
+    }
+}
+
+// =========================================
+// Tests
+// =========================================
+
+function test_simple_add(): i32 {
+    // 2 + 3 = 5
+    let expr = Binary({
+        op: "+",
+        left: Number({value: 2}),
+        right: Number({value: 3})
+    });
+    return evaluate(expr);
+}
+
+function test_complex_expr(): i32 {
+    // 2 + 3 * 4 = 14
+    let expr = Binary({
+        op: "+",
+        left: Number({value: 2}),
+        right: Binary({
+            op: "*",
+            left: Number({value: 3}),
+            right: Number({value: 4})
+        })
+    });
+    return evaluate(expr);
+}

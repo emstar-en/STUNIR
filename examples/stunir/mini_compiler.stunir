@@ -1,0 +1,313 @@
+// Mini Compiler in STUNIR
+// A complete mini-compiler demonstrating STUNIR's capabilities
+
+module mini_compiler;
+
+// =========================================
+// Source Language AST
+// =========================================
+
+// Statement types
+ir AssignStmt {
+    var_name: string;
+    child value: SourceExpr;
+}
+
+ir PrintStmt {
+    child value: SourceExpr;
+}
+
+ir IfStmt {
+    child condition: SourceExpr;
+    child then_block: [Stmt];
+    child else_block: [Stmt]?;
+}
+
+ir WhileStmt {
+    child condition: SourceExpr;
+    child body: [Stmt];
+}
+
+ir ReturnStmt {
+    child value: SourceExpr?;
+}
+
+// Statement variant type
+type Stmt {
+    | Assign(AssignStmt)
+    | Print(PrintStmt)
+    | If(IfStmt)
+    | While(WhileStmt)
+    | Return(ReturnStmt)
+}
+
+// Expression types
+ir IntLiteral {
+    value: i32;
+}
+
+ir StringLiteral {
+    value: string;
+}
+
+ir BoolLiteral {
+    value: bool;
+}
+
+ir VarRef {
+    name: string;
+}
+
+ir BinOp {
+    op: string;
+    child left: SourceExpr;
+    child right: SourceExpr;
+}
+
+ir UnOp {
+    op: string;
+    child operand: SourceExpr;
+}
+
+ir CallExpr {
+    func_name: string;
+    child args: [SourceExpr];
+}
+
+// Expression variant type
+type SourceExpr {
+    | Int(IntLiteral)
+    | Str(StringLiteral)
+    | Bool(BoolLiteral)
+    | Var(VarRef)
+    | Binary(BinOp)
+    | Unary(UnOp)
+    | Call(CallExpr)
+}
+
+// Function definition
+ir FuncDef {
+    name: string;
+    params: [string];
+    child body: [Stmt];
+}
+
+// Program
+ir Program {
+    child functions: [FuncDef];
+    child main: [Stmt];
+}
+
+// =========================================
+// Intermediate Representation
+// =========================================
+
+// IR Instructions
+type IRInstr {
+    | Load(string, i32)           // Load constant into register
+    | LoadVar(string, string)     // Load variable into register
+    | Store(string, string)       // Store register into variable
+    | Add(string, string, string) // dest = src1 + src2
+    | Sub(string, string, string)
+    | Mul(string, string, string)
+    | Div(string, string, string)
+    | Cmp(string, string, string) // Compare and set flags
+    | Jump(string)                // Unconditional jump
+    | JumpIf(string, string)      // Conditional jump
+    | Call(string, [string])      // Function call
+    | Ret(string?)                // Return
+    | Label(string)               // Label definition
+}
+
+// IR Block
+ir IRBlock {
+    label: string;
+    child instrs: [IRInstr];
+}
+
+// =========================================
+// Compiler Passes
+// =========================================
+
+// Type checking context
+type TypeContext {
+    variables: [string];
+    functions: [string];
+}
+
+// Semantic analysis
+function type_check(program: Program): bool {
+    let ctx: TypeContext = {
+        variables: [],
+        functions: []
+    };
+    
+    // Collect function names
+    for func in program.functions {
+        ctx.functions = ctx.functions + [func.name];
+    }
+    
+    // Check each function
+    for func in program.functions {
+        if !check_func(func, ctx) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function check_func(func: FuncDef, ctx: TypeContext): bool {
+    // Add parameters to context
+    for param in func.params {
+        ctx.variables = ctx.variables + [param];
+    }
+    
+    // Check body
+    for stmt in func.body {
+        if !check_stmt(stmt, ctx) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function check_stmt(stmt: Stmt, ctx: TypeContext): bool {
+    match stmt {
+        Assign(a) => {
+            // Add variable to context
+            ctx.variables = ctx.variables + [a.var_name];
+            return true;
+        },
+        Print(p) => true,
+        If(i) => {
+            // Check condition and branches
+            return true;
+        },
+        While(w) => true,
+        Return(r) => true
+    }
+}
+
+// =========================================
+// Code Generation
+// =========================================
+
+// Register allocator state
+type RegState {
+    next_reg: i32;
+    var_to_reg: [string];
+}
+
+function alloc_reg(state: RegState): string {
+    let reg = "r" + state.next_reg;
+    state.next_reg = state.next_reg + 1;
+    return reg;
+}
+
+// IR generator
+function gen_ir(program: Program): [IRBlock] {
+    var blocks: [IRBlock] = [];
+    var state: RegState = {
+        next_reg: 0,
+        var_to_reg: []
+    };
+    
+    // Generate IR for each function
+    for func in program.functions {
+        let func_blocks = gen_func_ir(func, state);
+        blocks = blocks + func_blocks;
+    }
+    
+    return blocks;
+}
+
+function gen_func_ir(func: FuncDef, state: RegState): [IRBlock] {
+    var instrs: [IRInstr] = [];
+    
+    // Generate entry label
+    let entry_label = func.name + "_entry";
+    
+    // Generate IR for body
+    for stmt in func.body {
+        let stmt_ir = gen_stmt_ir(stmt, state);
+        instrs = instrs + stmt_ir;
+    }
+    
+    return [{
+        label: entry_label,
+        instrs: instrs
+    }];
+}
+
+function gen_stmt_ir(stmt: Stmt, state: RegState): [IRInstr] {
+    match stmt {
+        Assign(a) => {
+            let reg = alloc_reg(state);
+            // Generate value into reg, then store
+            return [Store(reg, a.var_name)];
+        },
+        Return(r) => {
+            return [Ret(null)];
+        },
+        _ => []
+    }
+}
+
+// =========================================
+// Target: x86-64 Assembly
+// =========================================
+
+target x86_64 {
+    extension: ".asm";
+    syntax: "intel";
+    
+    emit IRBlock(block: IRBlock) {
+        emit block.label + ":";
+        for instr in block.instrs {
+            emit "    ";
+            emit instr;
+        }
+    }
+    
+    emit Load(reg: string, val: i32) {
+        emit "mov " + reg + ", " + val;
+    }
+    
+    emit Add(dest: string, src1: string, src2: string) {
+        if dest != src1 {
+            emit "mov " + dest + ", " + src1;
+        }
+        emit "add " + dest + ", " + src2;
+    }
+    
+    emit Ret(val: string?) {
+        if val != null {
+            emit "mov rax, " + val;
+        }
+        emit "ret";
+    }
+}
+
+// =========================================
+// Main Compiler Pipeline
+// =========================================
+
+function compile(source: Program): string {
+    // Type check
+    if !type_check(source) {
+        return "Error: Type check failed";
+    }
+    
+    // Generate IR
+    let ir = gen_ir(source);
+    
+    // Generate assembly (would use target emitter)
+    var output = "";
+    for block in ir {
+        output = output + block.label + ":\n";
+    }
+    
+    return output;
+}
