@@ -1,0 +1,361 @@
+{
+  "$id": "stunir.logic_ir.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "STUNIR Logic IR Extensions",
+  "description": "JSON Schema for logic programming constructs in STUNIR IR",
+  
+  "definitions": {
+    "term": {
+      "description": "A logic term (variable, atom, compound, list, etc.)",
+      "oneOf": [
+        {"$ref": "#/definitions/variable"},
+        {"$ref": "#/definitions/atom_term"},
+        {"$ref": "#/definitions/compound_term"},
+        {"$ref": "#/definitions/list_term"},
+        {"$ref": "#/definitions/anonymous"},
+        {"$ref": "#/definitions/string_term"},
+        {"type": "number"},
+        {"type": "string"}
+      ]
+    },
+    
+    "variable": {
+      "description": "Logic variable (starts with uppercase or _)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "variable"},
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z_][a-zA-Z0-9_]*$"
+        }
+      },
+      "required": ["kind", "name"],
+      "additionalProperties": false
+    },
+    
+    "atom_term": {
+      "description": "Prolog atom (symbolic constant)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "atom"},
+        "value": {"type": "string"}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    
+    "compound_term": {
+      "description": "Compound term: functor(arg1, arg2, ...)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "compound"},
+        "functor": {"type": "string"},
+        "args": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/term"}
+        }
+      },
+      "required": ["kind", "functor", "args"],
+      "additionalProperties": false
+    },
+    
+    "list_term": {
+      "description": "Prolog list [H|T] or [a,b,c]",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "list_term"},
+        "elements": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/term"}
+        },
+        "tail": {"$ref": "#/definitions/term"}
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    
+    "anonymous": {
+      "description": "Anonymous variable (_)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "anonymous"}
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    
+    "string_term": {
+      "description": "String literal",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "string_term"},
+        "value": {"type": "string"}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
+    },
+    
+    "goal": {
+      "description": "A goal to be proven",
+      "oneOf": [
+        {"$ref": "#/definitions/compound_term"},
+        {"$ref": "#/definitions/cut"},
+        {"$ref": "#/definitions/negation"},
+        {"$ref": "#/definitions/unification_goal"},
+        {"$ref": "#/definitions/if_then_else"},
+        {"$ref": "#/definitions/conjunction"},
+        {"$ref": "#/definitions/disjunction"}
+      ]
+    },
+    
+    "cut": {
+      "description": "Cut operator (!)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "cut"}
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    
+    "negation": {
+      "description": "Negation as failure (\\+)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "negation"},
+        "goal": {"$ref": "#/definitions/goal"}
+      },
+      "required": ["kind", "goal"],
+      "additionalProperties": false
+    },
+    
+    "unification_goal": {
+      "description": "Unification goal (X = Y)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "unification"},
+        "left": {"$ref": "#/definitions/term"},
+        "right": {"$ref": "#/definitions/term"}
+      },
+      "required": ["kind", "left", "right"],
+      "additionalProperties": false
+    },
+    
+    "if_then_else": {
+      "description": "If-then-else (Cond -> Then ; Else)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "if_then_else"},
+        "condition": {"$ref": "#/definitions/goal"},
+        "then": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"}
+        },
+        "else": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"}
+        }
+      },
+      "required": ["kind", "condition", "then", "else"],
+      "additionalProperties": false
+    },
+    
+    "conjunction": {
+      "description": "Conjunction of goals (G1, G2)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "conjunction"},
+        "goals": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"},
+          "minItems": 2
+        }
+      },
+      "required": ["kind", "goals"],
+      "additionalProperties": false
+    },
+    
+    "disjunction": {
+      "description": "Disjunction of goals (G1 ; G2)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "disjunction"},
+        "goals": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"},
+          "minItems": 2
+        }
+      },
+      "required": ["kind", "goals"],
+      "additionalProperties": false
+    },
+    
+    "fact": {
+      "description": "Fact definition (predicate without body)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "fact"},
+        "predicate": {"type": "string"},
+        "args": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/term"}
+        }
+      },
+      "required": ["kind", "predicate", "args"],
+      "additionalProperties": false
+    },
+    
+    "rule": {
+      "description": "Rule definition (head :- body)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "rule"},
+        "head": {"$ref": "#/definitions/compound_term"},
+        "body": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"}
+        }
+      },
+      "required": ["kind", "head", "body"],
+      "additionalProperties": false
+    },
+    
+    "query": {
+      "description": "Query (?- goals)",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "query"},
+        "goals": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"}
+        }
+      },
+      "required": ["kind", "goals"],
+      "additionalProperties": false
+    },
+    
+    "dynamic_declaration": {
+      "description": "Dynamic predicate declaration",
+      "type": "object",
+      "properties": {
+        "predicate": {"type": "string"},
+        "arity": {"type": "integer", "minimum": 0}
+      },
+      "required": ["predicate", "arity"],
+      "additionalProperties": false
+    },
+    
+    "export_declaration": {
+      "description": "Exported predicate declaration",
+      "type": "object",
+      "properties": {
+        "predicate": {"type": "string"},
+        "arity": {"type": "integer", "minimum": 0}
+      },
+      "required": ["predicate", "arity"],
+      "additionalProperties": false
+    },
+    
+    "dcg_terminal": {
+      "description": "DCG terminal [word]",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "terminal"},
+        "terminals": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["kind", "terminals"],
+      "additionalProperties": false
+    },
+    
+    "dcg_nonterminal": {
+      "description": "DCG nonterminal",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "nonterminal"},
+        "term": {"$ref": "#/definitions/compound_term"}
+      },
+      "required": ["kind", "term"],
+      "additionalProperties": false
+    },
+    
+    "dcg_pushback": {
+      "description": "DCG pushback {goals}",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "pushback"},
+        "goals": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/goal"}
+        }
+      },
+      "required": ["kind", "goals"],
+      "additionalProperties": false
+    },
+    
+    "dcg_body_item": {
+      "description": "DCG body item",
+      "oneOf": [
+        {"$ref": "#/definitions/dcg_terminal"},
+        {"$ref": "#/definitions/dcg_nonterminal"},
+        {"$ref": "#/definitions/dcg_pushback"},
+        {"$ref": "#/definitions/compound_term"}
+      ]
+    },
+    
+    "dcg_rule": {
+      "description": "DCG rule (head --> body)",
+      "type": "object",
+      "properties": {
+        "head": {"$ref": "#/definitions/compound_term"},
+        "body": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/dcg_body_item"}
+        }
+      },
+      "required": ["head", "body"],
+      "additionalProperties": false
+    }
+  },
+  
+  "type": "object",
+  "properties": {
+    "module": {
+      "description": "Module name",
+      "type": "string"
+    },
+    "exports": {
+      "description": "Exported predicates",
+      "type": "array",
+      "items": {"$ref": "#/definitions/export_declaration"}
+    },
+    "clauses": {
+      "description": "Predicate clauses (facts and rules)",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/definitions/fact"},
+          {"$ref": "#/definitions/rule"}
+        ]
+      }
+    },
+    "queries": {
+      "description": "Queries to execute",
+      "type": "array",
+      "items": {"$ref": "#/definitions/query"}
+    },
+    "dynamic": {
+      "description": "Dynamic predicate declarations",
+      "type": "array",
+      "items": {"$ref": "#/definitions/dynamic_declaration"}
+    },
+    "dcg_rules": {
+      "description": "DCG rules",
+      "type": "array",
+      "items": {"$ref": "#/definitions/dcg_rule"}
+    }
+  },
+  "required": ["module"]
+}
