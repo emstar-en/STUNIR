@@ -205,14 +205,13 @@ class EnhancementPipeline:
         return self._memory_analyzer
     
     def _get_optimizer(self) -> Optional[Any]:
-        """Lazily load the optimizer."""
+        """Lazily load the optimizer (pass manager)."""
         if self._optimizer is None:
             try:
-                from tools.optimize import create_optimizer, OptimizationLevel
-                level = getattr(OptimizationLevel, self.config.optimization_level, OptimizationLevel.O2)
-                self._optimizer = create_optimizer(level)
+                from tools.optimize import create_pass_manager
+                self._optimizer = create_pass_manager(self.config.optimization_level)
             except ImportError as e:
-                logger.warning(f"Failed to import Optimizer: {e}")
+                logger.warning(f"Failed to import optimizer: {e}")
                 return None
         return self._optimizer
     
@@ -629,29 +628,19 @@ class EnhancementPipeline:
             return result
         
         try:
-            optimizer = self._get_optimizer()
-            if optimizer is None:
-                result.status = EnhancementStatus.SKIPPED
-                result.error = "Optimizer not available"
-                result.optimized_ir = ir_data  # Pass through original
-                logger.warning("Optimization skipped: optimizer not available")
-                return result
+            # Use the new pass manager
+            from tools.optimize import create_pass_manager
+            pass_manager = create_pass_manager(level)
             
             logger.debug(f"Running optimization at level {level}...")
             
-            # Run optimizer
-            if hasattr(optimizer, 'optimize'):
-                optimized_ir, stats = optimizer.optimize(ir_data)
-                result.optimized_ir = optimized_ir
-                result.stats = stats
-                
-                # Collect passes applied
-                if hasattr(optimizer, 'passes_run'):
-                    result.passes_applied = optimizer.passes_run
-                elif hasattr(optimizer, 'passes'):
-                    result.passes_applied = [p.name for p in optimizer.passes]
-            else:
-                result.optimized_ir = ir_data
+            # Run optimization passes
+            optimized_ir, stats = pass_manager.optimize(ir_data)
+            result.optimized_ir = optimized_ir
+            result.stats = stats
+            
+            # Collect passes applied
+            result.passes_applied = pass_manager.passes_run
             
             # Generate optimization hints
             result.optimization_hints = self._generate_optimization_hints(
