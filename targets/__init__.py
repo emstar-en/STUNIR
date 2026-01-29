@@ -10,6 +10,7 @@ Available target families:
 - assembly: Low-level assembly targets (x86, ARM)
 - wasm: WebAssembly targets
 - gpu: GPU compute targets (CUDA, OpenCL)
+- expert_systems: Expert system emitters (CLIPS, Jess)
 """
 
 # Import available target families
@@ -48,6 +49,11 @@ try:
 except ImportError:
     lexer = None
 
+try:
+    from . import expert_systems
+except ImportError:
+    expert_systems = None
+
 __all__ = [
     'lisp',
     'prolog',
@@ -56,4 +62,5 @@ __all__ = [
     'grammar',
     'parser',
     'lexer',
+    'expert_systems',
 ]

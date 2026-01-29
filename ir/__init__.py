@@ -5,6 +5,7 @@ Provides intermediate representation modules for various language families:
 - grammar: Grammar IR for BNF/EBNF grammars
 - parser: Parser generator for LR/LALR/LL parsers
 - lexer: Lexer generator with DFA construction
+- rules: Rule-based IR for expert systems (CLIPS/Jess)
 """
 
 # Import available IR modules
@@ -23,8 +24,14 @@ try:
 except ImportError:
     lexer = None
 
+try:
+    from . import rules
+except ImportError:
+    rules = None
+
 __all__ = [
     'grammar',
     'parser',
     'lexer',
+    'rules',
 ]
