@@ -54,6 +54,11 @@ try:
 except ImportError:
     expert_systems = None
 
+try:
+    from . import constraints
+except ImportError:
+    constraints = None
+
 __all__ = [
     'lisp',
     'prolog',
@@ -63,4 +68,5 @@ __all__ = [
     'parser',
     'lexer',
     'expert_systems',
+    'constraints',
 ]
