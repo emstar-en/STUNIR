@@ -34,10 +34,22 @@ try:
 except ImportError:
     constraints = None
 
+try:
+    from . import planning
+except ImportError:
+    planning = None
+
+try:
+    from . import asp
+except ImportError:
+    asp = None
+
 __all__ = [
     'grammar',
     'parser',
     'lexer',
     'rules',
     'constraints',
+    'planning',
+    'asp',
 ]
