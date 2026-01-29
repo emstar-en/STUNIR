@@ -1280,6 +1280,212 @@ More control over optimization with options:
 | `indomain_max` | Try maximum value first |
 | `indomain_split` | Binary domain splitting |
 
+### Mercury (`mercury`)
+
+Mercury is a pure declarative logic/functional programming language designed for reliable software with compile-time type checking. Unlike traditional Prolog, Mercury requires **mandatory type, mode, and determinism declarations**.
+
+**Features:**
+- Strong static typing with type inference
+- Mode declarations (in, out, in_out, di, uo)
+- Determinism declarations (det, semidet, multi, nondet)
+- Module system with interface/implementation sections
+- Functions (in addition to predicates)
+- Purity tracking (pure, semipure, impure)
+- Compile-time type checking
+- Higher-order predicates and functions
+
+**Key Differences from Traditional Prolog:**
+
+| Feature | Prolog | Mercury |
+|---------|--------|---------|
+| Type declarations | Optional | **Mandatory** |
+| Mode declarations | None | **Mandatory** |
+| Determinism | Implicit | **Mandatory** |
+| Dynamic predicates | `assert/retract` | **Not supported** |
+| Cut operator | `!` | Limited |
+| Module system | Varies | Strict interface/impl |
+| Type checking | Runtime | **Compile-time** |
+| Purity | Not tracked | pure/semipure/impure |
+
+## Mercury Usage
+
+```python
+from targets.prolog.mercury import MercuryEmitter, MercuryConfig
+
+# Create emitter with config
+config = MercuryConfig(
+    module_prefix="my",
+    emit_comments=True,
+    infer_determinism=True
+)
+emitter = MercuryEmitter(config)
+
+# Define IR
+ir = {
+    "module": "math",
+    "types": [
+        {
+            "name": "result",
+            "kind": "enum",
+            "constructors": ["ok", "error"]
+        }
+    ],
+    "predicates": [{
+        "name": "add",
+        "clauses": [{
+            "kind": "rule",
+            "head": {"kind": "compound", "functor": "add", "args": [
+                {"kind": "variable", "name": "X"},
+                {"kind": "variable", "name": "Y"},
+                {"kind": "variable", "name": "Z"}
+            ]},
+            "body": [{
+                "kind": "unification",
+                "left": {"kind": "variable", "name": "Z"},
+                "right": {"kind": "compound", "functor": "+", "args": [
+                    {"kind": "variable", "name": "X"},
+                    {"kind": "variable", "name": "Y"}
+                ]}
+            }]
+        }]
+    }],
+    "functions": [{
+        "name": "double",
+        "params": [{"name": "X", "type": "i32"}],
+        "return_type": "i32",
+        "body": {"kind": "binary_op", "op": "*",
+                 "left": {"kind": "var", "name": "X"},
+                 "right": {"kind": "literal", "value": 2}}
+    }]
+}
+
+# Generate code
+result = emitter.emit(ir)
+print(result.code)
+```
+
+### Mercury Output
+
+```mercury
+%--------------------------------------------------------------------------%
+% STUNIR Generated Mercury Module
+% Module: math
+% Generated: 2026-01-29 12:00:00
+%--------------------------------------------------------------------------%
+
+:- module my_math.
+
+:- interface.
+
+:- type result ---> ok ; error.
+
+:- pred add(int::in, int::in, int::out) is det.
+
+:- func double(int) = int is det.
+
+:- implementation.
+
+:- import_module int.
+
+% add/3
+add(X, Y, Z) :-
+    Z = X + Y.
+
+double(X) = X * 2.
+
+:- end_module my_math.
+```
+
+### Mercury Configuration Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `module_prefix` | `"stunir"` | Prefix for module names |
+| `emit_interface` | `True` | Emit `:- interface.` section |
+| `emit_implementation` | `True` | Emit `:- implementation.` section |
+| `emit_comments` | `True` | Emit documentation comments |
+| `emit_type_declarations` | `True` | Emit `:- type` declarations |
+| `emit_pred_declarations` | `True` | Emit `:- pred` declarations |
+| `emit_func_declarations` | `True` | Emit `:- func` declarations |
+| `emit_determinism` | `True` | Emit determinism annotations |
+| `infer_types` | `True` | Auto-infer types from IR |
+| `infer_modes` | `True` | Auto-infer modes |
+| `infer_determinism` | `True` | Auto-infer determinism |
+| `default_determinism` | `"det"` | Default if cannot infer |
+| `emit_end_module` | `True` | Emit `:- end_module` |
+
+## Mercury Type System
+
+### Type Declarations
+
+```mercury
+% Enumeration type
+:- type color ---> red ; green ; blue.
+
+% Parametric type
+:- type maybe(T) ---> yes(T) ; no.
+
+% Record type
+:- type point ---> point(x :: int, y :: int).
+```
+
+### Type Mapping (IR → Mercury)
+
+| IR Type | Mercury Type |
+|---------|--------------|
+| `i32`, `i64` | `int` |
+| `f32`, `f64` | `float` |
+| `bool` | `bool` |
+| `string` | `string` |
+| `char` | `char` |
+| `list(T)` | `list(T)` |
+| `void` | `{}` (unit) |
+| `any` | `univ` |
+
+## Mercury Mode System
+
+Modes describe argument instantiation:
+
+| Mode | Symbol | Description |
+|------|--------|-------------|
+| Input | `in` | Must be ground on call |
+| Output | `out` | Free on call, ground on success |
+| In/Out | `in_out` | Ground, may be more ground |
+| Unique input | `ui` | Unique, destroyed by call |
+| Unique output | `uo` | Created uniquely |
+| Dead input | `di` | Dead after call |
+
+### Mode Declaration Syntax
+
+```mercury
+:- pred append(list(T), list(T), list(T)).
+:- mode append(in, in, out) is det.
+:- mode append(out, out, in) is multi.
+```
+
+## Mercury Determinism
+
+| Determinism | Solutions | Can Fail? | Use Case |
+|-------------|-----------|-----------|----------|
+| `det` | Exactly 1 | No | Most functions |
+| `semidet` | 0 or 1 | Yes | Lookup, search |
+| `multi` | ≥1 | No | Generators |
+| `nondet` | ≥0 | Yes | Backtracking |
+| `failure` | 0 | Always | Error paths |
+| `erroneous` | N/A | Never returns | Exceptions |
+| `cc_multi` | ≥1, committed | No | First solution |
+| `cc_nondet` | ≥0, committed | Yes | First if exists |
+
+### Determinism Declaration Syntax
+
+```mercury
+:- pred lookup(key, map, value).
+:- mode lookup(in, in, out) is semidet.  % May fail
+
+:- pred member(T, list(T)).
+:- mode member(out, in) is nondet.  % Multiple solutions
+```
+
 ## Future Targets
 
 - SICStus Prolog
@@ -1312,13 +1518,17 @@ python -m pytest tests/codegen/test_datalog_generator.py -v
 # ECLiPSe emitter tests
 python -m pytest tests/codegen/test_eclipse_generator.py -v
 
+# Mercury emitter tests
+python -m pytest tests/codegen/test_mercury_generator.py -v
+
 # All Prolog tests
-python -m pytest tests/codegen/test_*prolog*.py tests/codegen/test_yap*.py tests/codegen/test_xsb*.py tests/codegen/test_datalog*.py tests/codegen/test_eclipse*.py tests/ir/test_logic_ir.py -v
+python -m pytest tests/codegen/test_*prolog*.py tests/codegen/test_yap*.py tests/codegen/test_xsb*.py tests/codegen/test_datalog*.py tests/codegen/test_eclipse*.py tests/codegen/test_mercury*.py tests/ir/test_logic_ir.py -v
 ```
 
 ## See Also
 
 - [SWI-Prolog Documentation](https://www.swi-prolog.org/pldoc/)
 - [GNU Prolog Manual](http://www.gprolog.org/manual/gprolog.html)
+- [Mercury Language Reference](https://mercurylang.org/documentation/)
 - [Logic IR Schema](../../schemas/logic_ir.json)
 - [Logic IR Implementation](../../tools/ir/logic_ir.py)

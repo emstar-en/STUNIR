@@ -10,6 +10,7 @@ Supported targets:
 - XSB Prolog (xsb): Advanced tabling with incremental evaluation, WFS
 - Datalog (datalog): Declarative subset with stratified negation
 - ECLiPSe (eclipse): Constraint optimization with IC/FD libraries
+- Mercury (mercury): Functional logic with types/modes/determinism
 - SICStus Prolog (sicstus): Future
 
 Part of Phase 5C-5D: Logic Programming Targets.
@@ -65,6 +66,18 @@ from .eclipse import (
     ECLIPSE_SELECT_METHODS,
     ECLIPSE_CHOICE_METHODS,
 )
+from .mercury import (
+    MercuryEmitter,
+    MercuryConfig,
+    MercuryTypeMapper,
+    MercuryMode,
+    Determinism,
+    Purity,
+    MERCURY_TYPES,
+    MODE_MAPPING,
+    MERCURY_IMPORTS,
+    MERCURY_RESERVED,
+)
 
 __all__ = [
     # SWI-Prolog
@@ -114,4 +127,15 @@ __all__ = [
     'ECLIPSE_SEARCH',
     'ECLIPSE_SELECT_METHODS',
     'ECLIPSE_CHOICE_METHODS',
+    # Mercury
+    'MercuryEmitter',
+    'MercuryConfig',
+    'MercuryTypeMapper',
+    'MercuryMode',
+    'Determinism',
+    'Purity',
+    'MERCURY_TYPES',
+    'MODE_MAPPING',
+    'MERCURY_IMPORTS',
+    'MERCURY_RESERVED',
 ]
