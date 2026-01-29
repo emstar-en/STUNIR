@@ -38,10 +38,22 @@ try:
 except ImportError:
     grammar = None
 
+try:
+    from . import parser
+except ImportError:
+    parser = None
+
+try:
+    from . import lexer
+except ImportError:
+    lexer = None
+
 __all__ = [
     'lisp',
     'prolog',
     'polyglot',
     'assembly',
     'grammar',
+    'parser',
+    'lexer',
 ]
