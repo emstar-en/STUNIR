@@ -215,6 +215,18 @@ class ProductionRule:
     def __repr__(self) -> str:
         """Return detailed representation for debugging."""
         return f"ProductionRule({self.head.name!r}, {self.body!r})"
+    
+    def __eq__(self, other: object) -> bool:
+        """Check equality with another production rule."""
+        if not isinstance(other, ProductionRule):
+            return False
+        return (self.head == other.head and 
+                self.body == other.body and
+                self.label == other.label)
+    
+    def __hash__(self) -> int:
+        """Return hash value for use in sets and dicts."""
+        return hash((self.head, self.body, self.label))
 
 
 def _element_to_str(elem: BodyElement) -> str:
