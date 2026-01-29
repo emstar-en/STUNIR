@@ -78,6 +78,18 @@ from .mercury import (
     MERCURY_IMPORTS,
     MERCURY_RESERVED,
 )
+from .tau_prolog import (
+    TauPrologEmitter,
+    TauPrologConfig,
+    TauPrologEmitterResult,
+    TauPrologTypeMapper,
+    TAU_PROLOG_TYPES,
+    JS_TO_PROLOG_TYPES,
+    TAU_LIBRARIES,
+    DOM_PREDICATES,
+    JS_PREDICATES,
+    LISTS_PREDICATES,
+)
 
 __all__ = [
     # SWI-Prolog
@@ -138,4 +150,15 @@ __all__ = [
     'MODE_MAPPING',
     'MERCURY_IMPORTS',
     'MERCURY_RESERVED',
+    # Tau Prolog
+    'TauPrologEmitter',
+    'TauPrologConfig',
+    'TauPrologEmitterResult',
+    'TauPrologTypeMapper',
+    'TAU_PROLOG_TYPES',
+    'JS_TO_PROLOG_TYPES',
+    'TAU_LIBRARIES',
+    'DOM_PREDICATES',
+    'JS_PREDICATES',
+    'LISTS_PREDICATES',
 ]
