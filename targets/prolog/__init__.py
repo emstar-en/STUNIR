@@ -6,6 +6,7 @@ Provides code generators for Prolog-family logic programming languages.
 Supported targets:
 - SWI-Prolog (swi_prolog): Full-featured, widely-used implementation
 - GNU Prolog (gnu_prolog): Constraint Logic Programming with CLP(FD), CLP(B)
+- YAP Prolog (yap): High-performance with tabling (memoization) support
 - SICStus Prolog (sicstus): Future
 
 Part of Phase 5C: Logic Programming Targets.
@@ -21,6 +22,13 @@ from .gnu_prolog import (
     CLPB_OPERATORS,
     CLPFD_PREDICATES,
 )
+from .yap import (
+    YAPPrologEmitter,
+    YAPPrologConfig,
+    YAPPrologTypeMapper,
+    YAP_PROLOG_TYPES,
+    TABLING_MODES,
+)
 
 __all__ = [
     # SWI-Prolog
@@ -34,4 +42,10 @@ __all__ = [
     'CLPFD_OPERATORS',
     'CLPB_OPERATORS',
     'CLPFD_PREDICATES',
+    # YAP Prolog
+    'YAPPrologEmitter',
+    'YAPPrologConfig',
+    'YAPPrologTypeMapper',
+    'YAP_PROLOG_TYPES',
+    'TABLING_MODES',
 ]
