@@ -1,0 +1,38 @@
+{
+  "schema": "stunir.validation.rules.v1",
+  "version": "1.0.0",
+  "description": "STUNIR input validation rules",
+  "rules": {
+    "required_fields": ["schema", "id", "name"],
+    "schema_pattern": "^stunir\\.(spec|input|module)\\.v[0-9]+$",
+    "id_pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+    "version_pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+    "valid_profiles": ["profile1", "profile2", "profile3", "profile4"],
+    "valid_stages": ["STANDARDIZATION", "UNIQUE_NORMALS", "IR", "BINARY", "RECEIPT"],
+    "max_name_length": 256,
+    "max_description_length": 4096,
+    "max_functions": 1000,
+    "max_types": 500,
+    "max_imports": 100,
+    "max_exports": 500,
+    "max_nesting_depth": 10
+  },
+  "type_constraints": {
+    "function": {
+      "required": ["name"],
+      "optional": ["params", "returns", "body", "doc", "attributes"]
+    },
+    "type": {
+      "required": ["name", "kind"],
+      "optional": ["fields", "variants", "doc"]
+    },
+    "param": {
+      "required": ["name", "type"],
+      "optional": ["default", "doc"]
+    }
+  },
+  "severity_overrides": {
+    "MISSING_DESCRIPTION": "warning",
+    "DEPRECATED_PROFILE": "warning"
+  }
+}

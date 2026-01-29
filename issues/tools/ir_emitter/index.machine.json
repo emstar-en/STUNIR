@@ -1,4 +1,0 @@
-{
-  "ir_haskell.machine.json": "Issue ir_haskell [Deps: native/haskell]",
-  "tools_ir.machine.json": "Issue tools_ir [Deps: native/haskell]"
-}

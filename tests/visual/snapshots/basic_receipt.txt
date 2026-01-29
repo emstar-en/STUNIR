@@ -1,0 +1,1 @@
+{"artifacts":[{"hash":"def456def456def456def456def456def456def456def456def456def456defg","name":"main.o"}],"hash":"abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abcd","module":"example","receipt_schema":"stunir.receipt.v1","timestamp":1706400000}

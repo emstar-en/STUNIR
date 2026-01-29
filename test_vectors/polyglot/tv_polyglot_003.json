@@ -1,0 +1,35 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify IR-to-C99 target code generation",
+  "expected_hash": "2d05264479472e7246c09003df298d60cf59d8c61517a986552dd8fa9141d498",
+  "expected_output": {
+    "c99_features_used": true,
+    "has_stdbool": true,
+    "has_stdint": true,
+    "target_generated": true
+  },
+  "id": "tv_polyglot_003",
+  "input": {
+    "ir": {
+      "functions": [
+        {
+          "name": "compute",
+          "params": [
+            "i64"
+          ],
+          "returns": "bool"
+        }
+      ],
+      "module": "test_module",
+      "schema": "stunir.ir.v1"
+    },
+    "target": "c99"
+  },
+  "name": "C99 Target Generation",
+  "schema": "stunir.test_vector.polyglot.v1",
+  "tags": [
+    "unit",
+    "c99",
+    "polyglot"
+  ]
+}

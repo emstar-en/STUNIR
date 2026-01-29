@@ -1,0 +1,42 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "example-functions",
+  "name": "Spec with Functions Example",
+  "version": "1.0.0",
+  "profile": "profile3",
+  "stages": [
+    "STANDARDIZATION",
+    "UNIQUE_NORMALS",
+    "IR",
+    "BINARY",
+    "RECEIPT"
+  ],
+  "targets": ["rust", "c99"],
+  "module": {
+    "name": "math_utils",
+    "functions": [
+      {
+        "name": "add",
+        "params": [
+          {"name": "a", "type": "i32"},
+          {"name": "b", "type": "i32"}
+        ],
+        "returns": "i32",
+        "body": [
+          {"op": "return", "value": {"op": "add", "left": "a", "right": "b"}}
+        ]
+      },
+      {
+        "name": "multiply",
+        "params": [
+          {"name": "x", "type": "i32"},
+          {"name": "y", "type": "i32"}
+        ],
+        "returns": "i32",
+        "body": [
+          {"op": "return", "value": {"op": "mul", "left": "x", "right": "y"}}
+        ]
+      }
+    ]
+  }
+}

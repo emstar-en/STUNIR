@@ -1,0 +1,36 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify IR-to-C89 target code generation",
+  "expected_hash": "48005b380a76b48bbcc014e9bd4093505f80c1f5c8a190a848eb508780313637",
+  "expected_output": {
+    "ansi_compliant": true,
+    "has_header": true,
+    "has_source": true,
+    "target_generated": true
+  },
+  "id": "tv_polyglot_002",
+  "input": {
+    "ir": {
+      "functions": [
+        {
+          "name": "multiply",
+          "params": [
+            "f64",
+            "f64"
+          ],
+          "returns": "f64"
+        }
+      ],
+      "module": "test_module",
+      "schema": "stunir.ir.v1"
+    },
+    "target": "c89"
+  },
+  "name": "C89 Target Generation",
+  "schema": "stunir.test_vector.polyglot.v1",
+  "tags": [
+    "unit",
+    "c89",
+    "polyglot"
+  ]
+}

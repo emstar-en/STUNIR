@@ -1,0 +1,25 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify Rust native tool compiles successfully",
+  "expected_hash": "0eb8fa850bf2f13287e54068a93f46bdf3444ed448c737c17a9c50a2dee454f6",
+  "expected_output": {
+    "binary_produced": true,
+    "compile_success": true,
+    "deterministic_hash": true
+  },
+  "id": "tv_native_003",
+  "input": {
+    "command": "build",
+    "profile": "release",
+    "target": "x86_64-unknown-linux-gnu",
+    "tool": "stunir-rust"
+  },
+  "name": "Rust Tool Compilation",
+  "schema": "stunir.test_vector.native.v1",
+  "tags": [
+    "integration",
+    "rust",
+    "build",
+    "native"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify detection of missing artifact_hash field",
+  "expected_hash": "cf1e1f0583f889c6afe1517986f5f928c3e40b9817ceda23f01f134cff1b501e",
+  "expected_output": {
+    "missing_fields": [
+      "artifact_hash"
+    ],
+    "schema_compliant": false,
+    "valid": false
+  },
+  "id": "tv_receipts_002",
+  "input": {
+    "receipt": {
+      "epoch": 1735500000,
+      "id": "receipt_002",
+      "schema": "stunir.receipt.v1"
+    }
+  },
+  "name": "Receipt Missing Hash",
+  "schema": "stunir.test_vector.receipts.v1",
+  "tags": [
+    "unit",
+    "validation",
+    "receipts"
+  ]
+}

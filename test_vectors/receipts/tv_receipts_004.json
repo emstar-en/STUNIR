@@ -1,0 +1,30 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify receipts manifest is properly generated",
+  "expected_hash": "73995999ad58c0b248cf733ea693629c2a81e37c8e3257db7975de3775754202",
+  "expected_output": {
+    "deterministic": true,
+    "entry_count": 2,
+    "manifest_generated": true
+  },
+  "id": "tv_receipts_004",
+  "input": {
+    "receipts": [
+      {
+        "hash": "hash1",
+        "id": "r1"
+      },
+      {
+        "hash": "hash2",
+        "id": "r2"
+      }
+    ]
+  },
+  "name": "Receipt Manifest Generation",
+  "schema": "stunir.test_vector.receipts.v1",
+  "tags": [
+    "unit",
+    "manifest",
+    "receipts"
+  ]
+}

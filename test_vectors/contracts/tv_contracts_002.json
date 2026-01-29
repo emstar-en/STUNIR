@@ -1,0 +1,30 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify Profile 3 contract with test stage",
+  "expected_hash": "87e588a7f4114193c7e726ef9e336abbe0d711bf9701f80b5d3b8546707df795",
+  "expected_output": {
+    "has_test_stage": true,
+    "profile_valid": true,
+    "valid": true
+  },
+  "id": "tv_contracts_002",
+  "input": {
+    "contract": {
+      "epoch": 1735500000,
+      "id": "contract_p3_001",
+      "profile": "profile3",
+      "schema": "stunir.contract.profile3.v1",
+      "stages": [
+        "build",
+        "test"
+      ]
+    }
+  },
+  "name": "Profile 3 Contract Structure",
+  "schema": "stunir.test_vector.contracts.v1",
+  "tags": [
+    "unit",
+    "profile3",
+    "contracts"
+  ]
+}

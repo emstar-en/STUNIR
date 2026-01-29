@@ -2,6 +2,22 @@
 name = "stunir-native"
 version = "0.1.0"
 edition = "2021"
+description = "STUNIR Native Rust Toolchain"
+license = "MIT"
+authors = ["STUNIR Team"]
+repository = "https://github.com/stunir/stunir"
+documentation = "https://stunir.readthedocs.io"
+keywords = ["ir", "determinism", "verification", "compiler"]
+categories = ["development-tools", "command-line-utilities"]
+rust-version = "1.70"
+
+[lib]
+name = "stunir_native"
+path = "src/lib.rs"
+
+[[bin]]
+name = "stunir-native"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -10,3 +26,111 @@ serde_json = { version = "1.0", features = ["preserve_order"] }
 sha2 = "0.10"
 hex = "0.4"
 anyhow = "1.0"
+thiserror = "1.0"
+
+[dev-dependencies]
+tempfile = "3.10"
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+rand = "0.8"
+
+# =============================================================================
+# Lints Configuration (Clippy)
+# =============================================================================
+
+[lints.rust]
+# Deny unsafe code unless explicitly allowed with justification
+unsafe_code = "deny"
+# Deny missing documentation on public items
+missing_docs = "warn"
+# Ensure all public types implement Debug
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+# Enable all pedantic lints as warnings
+pedantic = { level = "warn", priority = -1 }
+# Enable nursery lints (experimental but useful)
+nursery = { level = "warn", priority = -1 }
+# Specific denials for common issues
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+# Allow some pedantic lints that are too noisy
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+must_use_candidate = "allow"
+# Security-related lints
+suspicious = { level = "deny", priority = -1 }
+# Performance lints
+perf = { level = "warn", priority = -1 }
+
+# =============================================================================
+# Profiles
+# =============================================================================
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.test]
+opt-level = 1
+debug = true
+
+[profile.coverage]
+inherits = "test"
+opt-level = 0
+debug = true
+
+# =============================================================================
+# Benchmarks
+# =============================================================================
+
+[[bench]]
+name = "crypto_bench"
+harness = false
+
+[[bench]]
+name = "canonical_bench"
+harness = false
+
+# =============================================================================
+# Tests
+# =============================================================================
+
+[[test]]
+name = "crypto_test"
+path = "tests/crypto_test.rs"
+
+[[test]]
+name = "ir_test"
+path = "tests/ir_test.rs"
+
+[[test]]
+name = "receipt_test"
+path = "tests/receipt_test.rs"
+
+[[test]]
+name = "canonical_test"
+path = "tests/canonical_test.rs"
+
+[[test]]
+name = "serialization_test"
+path = "tests/serialization_test.rs"
+
+[[test]]
+name = "integration_test"
+path = "tests/integration_test.rs"
+
+[[test]]
+name = "property_test"
+path = "tests/property_test.rs"

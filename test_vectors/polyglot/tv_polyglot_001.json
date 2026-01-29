@@ -1,0 +1,36 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify IR-to-Rust target code generation",
+  "expected_hash": "c8d0199f6cf0fa2a59b144c96762097079c2da4bb469efc55c0dd94a21e53deb",
+  "expected_output": {
+    "has_cargo_toml": true,
+    "has_lib_rs": true,
+    "target_generated": true,
+    "type_mapping_valid": true
+  },
+  "id": "tv_polyglot_001",
+  "input": {
+    "ir": {
+      "functions": [
+        {
+          "name": "add",
+          "params": [
+            "i32",
+            "i32"
+          ],
+          "returns": "i32"
+        }
+      ],
+      "module": "test_module",
+      "schema": "stunir.ir.v1"
+    },
+    "target": "rust"
+  },
+  "name": "Rust Target Generation",
+  "schema": "stunir.test_vector.polyglot.v1",
+  "tags": [
+    "unit",
+    "rust",
+    "polyglot"
+  ]
+}

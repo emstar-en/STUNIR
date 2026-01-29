@@ -1,0 +1,15 @@
+{
+  "schema": "stunir.function.v1",
+  "name": "${name}",
+  "signature": {
+    "params": "${params:[]}",
+    "returns": "${returns:void}"
+  },
+  "body": "${body:[]}",
+  "attributes": {
+    "pure": "${pure:true}",
+    "inline": "${inline:false}",
+    "exported": "${exported:true}"
+  },
+  "documentation": "${doc:}"
+}

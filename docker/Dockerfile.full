@@ -1,0 +1,57 @@
+# STUNIR Full Multi-Profile Dockerfile
+# Issue: pipeline/docker/1019
+#
+# Multi-stage build supporting all three profiles:
+# - haskell (native)
+# - python
+# - shell
+
+# ============================================
+# Stage 1: Haskell Native Builder
+# ============================================
+FROM haskell:9.4.8 AS haskell-builder
+
+WORKDIR /build
+COPY tools/native/haskell /build/native
+COPY tools/ir_canonicalizer /build/ir_canonicalizer
+
+RUN cd /build/native/stunir-native && cabal update && cabal build
+RUN cd /build/ir_canonicalizer && cabal build 2>/dev/null || true
+
+# ============================================
+# Stage 2: Python Base
+# ============================================
+FROM python:3.11-slim AS python-base
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# ============================================
+# Stage 3: Full Runtime
+# ============================================
+FROM python-base AS full
+
+LABEL maintainer="STUNIR Team"
+LABEL description="STUNIR Full Multi-Profile Build"
+LABEL version="1.0.0"
+
+WORKDIR /stunir
+
+# Copy Haskell binaries from builder
+COPY --from=haskell-builder /build/native/stunir-native/dist-newstyle /stunir/tools/native/haskell/stunir-native/dist-newstyle
+
+# Copy full source
+COPY . .
+
+# Make scripts executable
+RUN chmod +x scripts/*.sh scripts/lib/*.sh 2>/dev/null || true
+
+# Environment
+ENV STUNIR_PROFILE=native
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/stunir/tools/native/haskell/stunir-native/dist-newstyle/build:$PATH"
+
+# Default to native profile with fallback
+CMD ["./scripts/build.sh", "--profile", "native"]

@@ -1,0 +1,27 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify proper handling of Unicode characters",
+  "expected_hash": "5bd95c21b042a02c4e3273dadc8b62b354435904749e1d2e48ec5ed97fa19edc",
+  "expected_output": {
+    "encoding": "utf-8",
+    "serialized": true,
+    "unicode_preserved": true
+  },
+  "id": "tv_edge_cases_004",
+  "input": {
+    "operation": "serialize",
+    "spec": {
+      "description": "Élève café naïve résumé",
+      "id": "spec_中文_日本語_한국語_001",
+      "profile": "profile3",
+      "schema": "stunir.spec.v1"
+    }
+  },
+  "name": "Unicode Character Handling",
+  "schema": "stunir.test_vector.edge_cases.v1",
+  "tags": [
+    "edge_case",
+    "unicode",
+    "i18n"
+  ]
+}

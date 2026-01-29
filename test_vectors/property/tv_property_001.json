@@ -1,0 +1,28 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify canonicalize(canonicalize(x)) == canonicalize(x)",
+  "expected_hash": "d814f4b432e71380443abe2a25694ba7feabe84e953ca323076e64b5979b7d31",
+  "expected_output": {
+    "all_outputs_equal": true,
+    "canonical_form": "{\"a\":1,\"m\":2,\"z\":3}",
+    "property_holds": true
+  },
+  "id": "tv_property_001",
+  "input": {
+    "data": {
+      "a": 1,
+      "m": 2,
+      "z": 3
+    },
+    "iterations": 3,
+    "operation": "canonicalize",
+    "property": "idempotence"
+  },
+  "name": "Canonicalization Idempotence",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "idempotence",
+    "canonicalization"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "example-minimal",
+  "name": "Minimal Spec Example",
+  "version": "1.0.0",
+  "profile": "profile3",
+  "stages": [
+    "STANDARDIZATION",
+    "UNIQUE_NORMALS",
+    "IR",
+    "BINARY",
+    "RECEIPT"
+  ],
+  "targets": ["rust"]
+}

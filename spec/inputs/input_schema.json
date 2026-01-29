@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "stunir.input.v1",
+  "title": "STUNIR Input Schema",
+  "description": "Schema for STUNIR pipeline input specifications",
+  "type": "object",
+  "required": ["schema", "id", "name"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "pattern": "^stunir\\.(spec|input)\\.v[0-9]+$",
+      "description": "Schema version identifier"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+      "description": "Unique identifier for the spec"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable name"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "default": "1.0.0",
+      "description": "Semantic version"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description"
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["profile1", "profile2", "profile3", "profile4"],
+      "default": "profile3",
+      "description": "STUNIR profile level"
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["STANDARDIZATION", "UNIQUE_NORMALS", "IR", "BINARY", "RECEIPT"]
+      },
+      "description": "Pipeline stages to execute"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Target languages/platforms"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "version": {"type": "string"}
+        },
+        "required": ["name"]
+      },
+      "description": "External dependencies"
+    },
+    "module": {
+      "$ref": "#/$defs/module"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata"
+    }
+  },
+  "$defs": {
+    "module": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string"},
+        "imports": {"type": "array"},
+        "exports": {"type": "array"},
+        "types": {"type": "array"},
+        "functions": {"type": "array"},
+        "constants": {"type": "array"}
+      }
+    },
+    "function": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string"},
+        "params": {"type": "array"},
+        "returns": {"type": "string"},
+        "body": {"type": "array"},
+        "doc": {"type": "string"}
+      }
+    },
+    "type": {
+      "type": "object",
+      "required": ["name", "kind"],
+      "properties": {
+        "name": {"type": "string"},
+        "kind": {"type": "string", "enum": ["struct", "enum", "alias"]},
+        "fields": {"type": "array"},
+        "variants": {"type": "array"}
+      }
+    }
+  }
+}

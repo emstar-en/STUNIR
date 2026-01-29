@@ -1,0 +1,49 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify merge(merge(A, B), C) == merge(A, merge(B, C))",
+  "expected_hash": "b5e976ab648a3d3112be11622342ace8180a336047326008e5305b5955d29fb9",
+  "expected_output": {
+    "hashes_equal": true,
+    "left_assoc_hash": true,
+    "property_holds": true,
+    "right_assoc_hash": true
+  },
+  "id": "tv_property_007",
+  "input": {
+    "manifests": [
+      {
+        "entries": [
+          {
+            "hash": "h1",
+            "id": "a"
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "hash": "h2",
+            "id": "b"
+          }
+        ]
+      },
+      {
+        "entries": [
+          {
+            "hash": "h3",
+            "id": "c"
+          }
+        ]
+      }
+    ],
+    "operation": "manifest_merge",
+    "property": "associativity"
+  },
+  "name": "Manifest Merge Associativity",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "associativity",
+    "merge"
+  ]
+}

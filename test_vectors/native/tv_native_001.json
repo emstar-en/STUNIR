@@ -1,0 +1,35 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify stunir-native gen-ir-manifest produces valid output",
+  "expected_hash": "0944faf088361b57f107b4338425e7bdce1cf3d70229321001d762fa372257a6",
+  "expected_output": {
+    "deterministic": true,
+    "entry_count": 2,
+    "manifest_generated": true,
+    "schema": "stunir.manifest.ir.v1"
+  },
+  "id": "tv_native_001",
+  "input": {
+    "command": "gen-ir-manifest",
+    "files": [
+      {
+        "name": "module_a.dcbor",
+        "size": 256
+      },
+      {
+        "name": "module_b.dcbor",
+        "size": 512
+      }
+    ],
+    "ir_dir": "asm/ir",
+    "tool": "stunir-native"
+  },
+  "name": "Haskell Manifest Generation",
+  "schema": "stunir.test_vector.native.v1",
+  "tags": [
+    "unit",
+    "haskell",
+    "manifest",
+    "native"
+  ]
+}

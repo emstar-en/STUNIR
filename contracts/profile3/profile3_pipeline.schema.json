@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.profile3.pipeline.v1.schema.json",
+  "title": "STUNIR Profile 3 Pipeline Stage Schema",
+  "description": "Schema for Profile 3 shell-only verification pipeline stage",
+  "type": "object",
+  "required": ["stage_id", "profile_contract", "verifier_script"],
+  "properties": {
+    "stage_id": {
+      "const": "profile3_verification"
+    },
+    "profile_contract": {
+      "type": "string",
+      "const": "stunir.contract.profile3.v1"
+    },
+    "input_artifacts": {
+      "type": "object",
+      "required": ["root_attestation", "objects"],
+      "properties": {
+        "root_attestation": {
+          "type": "string",
+          "description": "Path to root_attestation.txt"
+        },
+        "objects": {
+          "type": "string",
+          "description": "Path to objects/sha256/ directory"
+        },
+        "ir_manifest": {
+          "type": "string",
+          "description": "Optional path to IR manifest"
+        }
+      }
+    },
+    "verifier_script": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["minimal", "strict"],
+      "default": "minimal"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "exit_code": {"type": "integer"},
+        "verified_count": {"type": "integer"},
+        "failed_count": {"type": "integer"}
+      }
+    }
+  }
+}

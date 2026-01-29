@@ -1,0 +1,28 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify handling of null values in spec",
+  "expected_hash": "6b8642b7210f6b806083e69cf772b48140d9f037c721b084593c5643843154f0",
+  "expected_output": {
+    "error": "Required field 'id' is null",
+    "null_fields": [
+      "id"
+    ],
+    "valid": false
+  },
+  "id": "tv_edge_cases_002",
+  "input": {
+    "operation": "validate",
+    "spec": {
+      "id": null,
+      "profile": "profile3",
+      "schema": "stunir.spec.v1"
+    }
+  },
+  "name": "Null Value Handling",
+  "schema": "stunir.test_vector.edge_cases.v1",
+  "tags": [
+    "edge_case",
+    "null",
+    "validation"
+  ]
+}

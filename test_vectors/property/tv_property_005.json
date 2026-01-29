@@ -1,0 +1,39 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify if A depends on B, and B depends on C, then A indirectly depends on C",
+  "expected_hash": "91191aec06210733cc653622b182daff7cd1692a123b76287668b770f11fb23b",
+  "expected_output": {
+    "property_holds": true,
+    "transitive_closure": {
+      "A": [
+        "B",
+        "C"
+      ],
+      "B": [
+        "C"
+      ],
+      "C": []
+    }
+  },
+  "id": "tv_property_005",
+  "input": {
+    "graph": {
+      "A": [
+        "B"
+      ],
+      "B": [
+        "C"
+      ],
+      "C": []
+    },
+    "property": "transitivity",
+    "relation": "depends_on"
+  },
+  "name": "Dependency Transitivity",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "transitivity",
+    "dependency"
+  ]
+}

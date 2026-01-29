@@ -1,0 +1,36 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify full pipeline produces identical output for identical input",
+  "expected_hash": "d89326c64bc749bd17b82f5409aae7b9984eb8cd29f5178179b0d69bcb935266",
+  "expected_output": {
+    "all_outputs_identical": true,
+    "hash_stable_across_runs": true,
+    "no_timestamp_variance": true,
+    "property_holds": true
+  },
+  "id": "tv_property_006",
+  "input": {
+    "pipeline_stages": [
+      "parse",
+      "transform",
+      "emit",
+      "manifest"
+    ],
+    "property": "determinism",
+    "runs": 5,
+    "seed": 42,
+    "spec": {
+      "id": "determinism_spec",
+      "profile": "profile3",
+      "schema": "stunir.spec.v1"
+    }
+  },
+  "name": "Pipeline Determinism",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "determinism",
+    "critical",
+    "pipeline"
+  ]
+}

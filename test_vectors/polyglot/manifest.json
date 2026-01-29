@@ -1,0 +1,38 @@
+{
+  "category": "polyglot",
+  "count": 5,
+  "entries": [
+    {
+      "file": "tv_polyglot_001.json",
+      "hash": "4c2887cd3205f9c7f7154477435f46bf65f59db7f24cc4bccbc7c57ababc924c",
+      "id": "tv_polyglot_001",
+      "name": "Rust Target Generation"
+    },
+    {
+      "file": "tv_polyglot_002.json",
+      "hash": "89eb5e4db670c0f8ad7f5c0434cb52651abc07d16cc569b4337b32dd2e9cbfba",
+      "id": "tv_polyglot_002",
+      "name": "C89 Target Generation"
+    },
+    {
+      "file": "tv_polyglot_003.json",
+      "hash": "4ef0ed9274a19d8ba8cd621a01b0a28fcc66807e33b95f5ff0778e65a3a4de52",
+      "id": "tv_polyglot_003",
+      "name": "C99 Target Generation"
+    },
+    {
+      "file": "tv_polyglot_004.json",
+      "hash": "9639dd8278bef7ddd177ef2c169ea754acdb8cd857b3810bec11a265b250371e",
+      "id": "tv_polyglot_004",
+      "name": "Cross-Language Type Mapping"
+    },
+    {
+      "file": "tv_polyglot_005.json",
+      "hash": "7595bda2e4fd0bac2e09c9d457852fc429c04720cfc6d4b13c4cf896adb80ddc",
+      "id": "tv_polyglot_005",
+      "name": "Polyglot Determinism"
+    }
+  ],
+  "epoch": 1735500000,
+  "schema": "stunir.test_vectors.polyglot.manifest.v1"
+}

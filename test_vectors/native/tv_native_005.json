@@ -1,0 +1,24 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify native tools produce deterministic output",
+  "expected_hash": "c6a4c674781fc38ab1469e572f0d0ca4b1f28dbdcdc737f9ae5360478d9129b4",
+  "expected_output": {
+    "deterministic": true,
+    "hashes_match": true,
+    "outputs_identical": true
+  },
+  "id": "tv_native_005",
+  "input": {
+    "command": "gen-ir-manifest",
+    "ir_dir": "asm/ir",
+    "runs": 2,
+    "tool": "stunir-native"
+  },
+  "name": "Native Tool Determinism",
+  "schema": "stunir.test_vector.native.v1",
+  "tags": [
+    "determinism",
+    "native",
+    "critical"
+  ]
+}

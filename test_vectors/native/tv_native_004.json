@@ -1,0 +1,25 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify native tools report correct version",
+  "expected_hash": "cf96e99097424c4d94d40a90aa6f3e9e400603676338e96ca31ce169131be5b1",
+  "expected_output": {
+    "all_respond": true,
+    "schema_version_present": true,
+    "version_format_valid": true
+  },
+  "id": "tv_native_004",
+  "input": {
+    "command": "--version",
+    "tools": [
+      "stunir-native",
+      "stunir-rust"
+    ]
+  },
+  "name": "Native Tool Version Check",
+  "schema": "stunir.test_vector.native.v1",
+  "tags": [
+    "unit",
+    "version",
+    "native"
+  ]
+}

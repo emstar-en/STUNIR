@@ -1,0 +1,28 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify receipt hash matches artifact content",
+  "expected_hash": "90f272844f53521a3179d4d781f5932dca460083c3b1469908c2de507390d1a9",
+  "expected_output": {
+    "hash_match": true,
+    "hash_verified": true,
+    "valid": true
+  },
+  "id": "tv_receipts_003",
+  "input": {
+    "artifact_content": "Hello, STUNIR!",
+    "receipt": {
+      "artifact_hash": "3323fc632c7dec9be16b060841abe0e98d45056d38f735cad89cf1a6d0e6c30d",
+      "epoch": 1735500000,
+      "id": "receipt_003",
+      "schema": "stunir.receipt.v1"
+    }
+  },
+  "name": "Receipt Hash Verification",
+  "schema": "stunir.test_vector.receipts.v1",
+  "tags": [
+    "unit",
+    "hash",
+    "integrity",
+    "receipts"
+  ]
+}

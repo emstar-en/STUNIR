@@ -1,0 +1,50 @@
+{
+  "category": "edge_cases",
+  "count": 7,
+  "entries": [
+    {
+      "file": "tv_edge_cases_001.json",
+      "hash": "8da27cb9cbd4c7da71b6aac441a1a5f3cf30b1936a1b4a52c816639e398e59c6",
+      "id": "tv_edge_cases_001",
+      "name": "Empty Spec Input"
+    },
+    {
+      "file": "tv_edge_cases_002.json",
+      "hash": "32eda7d8633e4fe08f7b221deb28dc6ef162ed3f25503f8158592bccbaec0035",
+      "id": "tv_edge_cases_002",
+      "name": "Null Value Handling"
+    },
+    {
+      "file": "tv_edge_cases_003.json",
+      "hash": "e0f3acfe358d80f33fb999f8525c1814349b091e95e681c0ced373219c6de7a9",
+      "id": "tv_edge_cases_003",
+      "name": "Maximum Field Length"
+    },
+    {
+      "file": "tv_edge_cases_004.json",
+      "hash": "aa0f2b582962b8f72b1ba72091b63e023b5ce7a4326f5a62f52c429d49be111e",
+      "id": "tv_edge_cases_004",
+      "name": "Unicode Character Handling"
+    },
+    {
+      "file": "tv_edge_cases_005.json",
+      "hash": "d2593e6ea53335415f9f31517dd9edb916e81d57b3efe526ceae5ec753a6dc4a",
+      "id": "tv_edge_cases_005",
+      "name": "Circular Reference Detection"
+    },
+    {
+      "file": "tv_edge_cases_006.json",
+      "hash": "8d2aa6f9b6475df232aca89114178e4411065ca6f7b2dd9b6eff4cde6ef21092",
+      "id": "tv_edge_cases_006",
+      "name": "Deep Nesting Handling"
+    },
+    {
+      "file": "tv_edge_cases_007.json",
+      "hash": "8fc86ef6be5c8fdab532464133972de93203320e8a9052b4c7a4976fdc7f9ab0",
+      "id": "tv_edge_cases_007",
+      "name": "Special Characters in Keys"
+    }
+  ],
+  "epoch": 1735500000,
+  "schema": "stunir.test_vectors.edge_cases.manifest.v1"
+}

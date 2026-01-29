@@ -1,0 +1,96 @@
+# STUNIR Python Code Coverage Configuration
+# Coverage.py configuration for comprehensive code coverage reporting
+
+[run]
+# Source directories to measure
+source = 
+    tools
+    manifests
+    targets
+    spec
+
+# Directories and files to exclude
+omit = 
+    */tests/*
+    */__pycache__/*
+    */test_*
+    */_test.py
+    */conftest.py
+    */setup.py
+    */venv/*
+    */.tox/*
+    */migrations/*
+
+# Branch coverage
+branch = True
+
+# Parallel execution support
+parallel = True
+
+# Data file location
+data_file = .coverage
+
+# Dynamic context (adds function names to coverage data)
+dynamic_context = test_function
+
+[paths]
+# Path mappings for combined reports
+source =
+    tools/
+    manifests/
+    targets/
+
+[report]
+# Reporting options
+exclude_lines =
+    # Standard exclusions
+    pragma: no cover
+    def __repr__
+    def __str__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
+    @abstractmethod
+    @abc.abstractmethod
+    
+# Exclude files from report
+omit =
+    */tests/*
+    */__init__.py
+
+# Fail under coverage threshold (80% target)
+fail_under = 80
+
+# Show missing line numbers
+show_missing = True
+
+# Skip empty files
+skip_empty = True
+
+# Sort by name
+sort = Name
+
+# Precision for percentages
+precision = 2
+
+[html]
+# HTML report directory
+directory = coverage_html_report
+
+# Title for HTML report
+title = STUNIR Python Coverage Report
+
+# Show contexts in HTML report
+show_contexts = True
+
+[xml]
+# XML report output (for CI integration)
+output = coverage.xml
+
+[json]
+# JSON report output
+output = coverage.json
+pretty_print = True
+show_contexts = True

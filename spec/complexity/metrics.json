@@ -1,0 +1,54 @@
+{
+  "schema": "stunir.complexity.metrics.v1",
+  "version": "1.0.0",
+  "description": "Complexity analysis metrics configuration",
+  "weights": {
+    "function_count": 1.0,
+    "type_count": 1.5,
+    "cyclomatic_complexity": 2.0,
+    "nesting_depth": 1.5,
+    "import_count": 0.5,
+    "param_count": 0.3,
+    "field_count": 0.4
+  },
+  "thresholds": {
+    "low_complexity": 10,
+    "medium_complexity": 25,
+    "high_complexity": 50,
+    "critical_complexity": 100,
+    "max_nesting_depth": 10,
+    "max_cyclomatic_complexity": 50,
+    "min_maintainability": 20
+  },
+  "maintainability": {
+    "base_score": 100,
+    "cyclomatic_penalty": 2,
+    "nesting_penalty": 3,
+    "function_threshold": 10,
+    "type_threshold": 5,
+    "function_penalty": 5,
+    "type_penalty": 5
+  },
+  "categories": {
+    "trivial": {
+      "max_complexity": 5,
+      "description": "Simple spec with minimal logic"
+    },
+    "simple": {
+      "max_complexity": 15,
+      "description": "Straightforward spec with basic structures"
+    },
+    "moderate": {
+      "max_complexity": 30,
+      "description": "Medium complexity with multiple types/functions"
+    },
+    "complex": {
+      "max_complexity": 60,
+      "description": "High complexity requiring careful review"
+    },
+    "critical": {
+      "max_complexity": 999999,
+      "description": "Very high complexity, consider refactoring"
+    }
+  }
+}
