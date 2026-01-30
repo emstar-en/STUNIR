@@ -1,0 +1,154 @@
+# Verification Cases and Procedures
+
+**Document ID:** VCP-{{TOOL_NAME}}
+**Version:** {{TOOL_VERSION}}
+**Standard:** DO-330
+**Date:** {{QUALIFICATION_DATE}}
+**Schema:** {{SCHEMA_VERSION}}
+
+---
+
+## 1. Test Case Template
+
+### Test Case ID: TC-{{TEST_ID}}
+
+**TOR Reference:** {{TOR_REFERENCE}}
+**Test Objective:** {{TEST_OBJECTIVE}}
+**Verification Method:** {{VERIFICATION_METHOD}}
+
+#### Preconditions
+{{PRECONDITIONS}}
+
+#### Test Inputs
+```
+{{TEST_INPUTS}}
+```
+
+#### Test Procedure
+{{TEST_PROCEDURE}}
+
+#### Expected Results
+{{EXPECTED_RESULTS}}
+
+#### Pass/Fail Criteria
+{{PASS_FAIL_CRITERIA}}
+
+---
+
+## 2. Test Results Template
+
+### Test Case: TC-{{TEST_ID}}
+
+**Execution Date:** {{EXECUTION_DATE}}
+**Executed By:** {{EXECUTOR}}
+**Environment:** {{TEST_ENVIRONMENT}}
+
+#### Actual Results
+{{ACTUAL_RESULTS}}
+
+#### Verdict
+- [ ] PASS
+- [ ] FAIL
+- [ ] BLOCKED
+- [ ] SKIPPED
+
+#### Evidence
+{{TEST_EVIDENCE}}
+
+#### Notes
+{{TEST_NOTES}}
+
+---
+
+## 3. Standard Test Cases
+
+### TC-001: Determinism Test
+**TOR Reference:** TOR-FUNC-001
+**Objective:** Verify deterministic output generation
+
+**Procedure:**
+1. Execute tool with test input A
+2. Record output hash
+3. Execute tool with same input A
+4. Record output hash
+5. Compare hashes
+
+**Expected:** Hashes are identical
+
+---
+
+### TC-002: Schema Validation Test
+**TOR Reference:** TOR-FUNC-002
+**Objective:** Verify output conforms to schema
+
+**Procedure:**
+1. Execute tool with valid input
+2. Capture output
+3. Validate output against schema
+
+**Expected:** Output passes schema validation
+
+---
+
+### TC-003: Error Reporting Test
+**TOR Reference:** TOR-FUNC-003
+**Objective:** Verify error reporting
+
+**Procedure:**
+1. Execute tool with invalid input
+2. Capture stderr
+3. Verify error message is present and clear
+
+**Expected:** Clear error message on stderr, non-zero exit code
+
+---
+
+### TC-010: Environment Test
+**TOR Reference:** TOR-ENV-001
+**Objective:** Verify tool operates on target OS
+
+**Procedure:**
+1. Deploy tool on Linux x86_64
+2. Execute basic operation
+3. Verify successful completion
+
+**Expected:** Tool executes successfully
+
+---
+
+### TC-020: Input Validation Test
+**TOR Reference:** TOR-IF-001
+**Objective:** Verify input validation
+
+**Procedure:**
+1. Provide input conforming to schema
+2. Execute tool
+3. Verify acceptance
+
+**Expected:** Tool accepts valid input
+
+---
+
+### TC-030: Memory Safety Test
+**TOR Reference:** TOR-CON-002
+**Objective:** Verify memory safety
+
+**Procedure:**
+1. Run SPARK proofs on tool code
+2. Verify all VCs are proven
+3. Alternatively, run static analysis
+
+**Expected:** All memory safety VCs proven or no issues found
+
+---
+
+## 4. Test Matrix
+
+| TC ID | TOR ID | Status | Date | Tester |
+|-------|--------|--------|------|--------|
+| TC-001 | TOR-FUNC-001 | {{TC001_STATUS}} | {{TC001_DATE}} | {{TC001_TESTER}} |
+| TC-002 | TOR-FUNC-002 | {{TC002_STATUS}} | {{TC002_DATE}} | {{TC002_TESTER}} |
+| TC-003 | TOR-FUNC-003 | {{TC003_STATUS}} | {{TC003_DATE}} | {{TC003_TESTER}} |
+| TC-010 | TOR-ENV-001 | {{TC010_STATUS}} | {{TC010_DATE}} | {{TC010_TESTER}} |
+| TC-020 | TOR-IF-001 | {{TC020_STATUS}} | {{TC020_DATE}} | {{TC020_TESTER}} |
+| TC-030 | TOR-CON-002 | {{TC030_STATUS}} | {{TC030_DATE}} | {{TC030_TESTER}} |

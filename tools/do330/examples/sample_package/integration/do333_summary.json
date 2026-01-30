@@ -1,0 +1,13 @@
+{
+  "$schema": "stunir.do330.do333_integration.v1",
+  "tool": "verify_build",
+  "version": "1.0.0",
+  "generated_date": "2026-01-29",
+  "available": true,
+  "total_vcs": 472,
+  "proven_vcs": 472,
+  "unproven_vcs": 0,
+  "proof_coverage": 100.0,
+  "prover_used": "z3,cvc5,altergo",
+  "data_valid": true
+}

@@ -1,0 +1,135 @@
+# Tool Accomplishment Summary (TAS)
+
+**Document ID:** TAS-{{TOOL_NAME}}
+**Version:** {{TOOL_VERSION}}
+**Standard:** DO-330
+**Date:** {{QUALIFICATION_DATE}}
+**Author:** {{AUTHOR}}
+**Schema:** {{SCHEMA_VERSION}}
+
+---
+
+## 1. Qualification Summary
+
+### 1.1 Tool Identification
+- **Tool Name:** {{TOOL_NAME}}
+- **Tool Version:** {{TOOL_VERSION}}
+- **Classification:** {{TOOL_CLASSIFICATION}}
+- **TQL Level:** {{TQL_LEVEL}}
+- **DAL Level:** {{DAL_LEVEL}}
+
+### 1.2 Qualification Status
+- **Status:** {{QUALIFICATION_STATUS}}
+- **Qualification Date:** {{QUALIFICATION_DATE}}
+- **Baseline ID:** {{BASELINE_ID}}
+
+### 1.3 Summary Statement
+{{SUMMARY_STATEMENT}}
+
+## 2. TOR Compliance Status
+
+### 2.1 Requirements Verification Summary
+
+| Category | Total | Verified | Not Verified | N/A |
+|----------|-------|----------|--------------|-----|
+| Functional | {{FUNC_TOTAL}} | {{FUNC_VERIFIED}} | {{FUNC_UNVERIFIED}} | {{FUNC_NA}} |
+| Environmental | {{ENV_TOTAL}} | {{ENV_VERIFIED}} | {{ENV_UNVERIFIED}} | {{ENV_NA}} |
+| Interface | {{IF_TOTAL}} | {{IF_VERIFIED}} | {{IF_UNVERIFIED}} | {{IF_NA}} |
+| Constraint | {{CON_TOTAL}} | {{CON_VERIFIED}} | {{CON_UNVERIFIED}} | {{CON_NA}} |
+| **Total** | {{TOTAL_REQ}} | {{TOTAL_VERIFIED}} | {{TOTAL_UNVERIFIED}} | {{TOTAL_NA}} |
+
+### 2.2 Detailed TOR Status
+
+| TOR ID | Description | Status | Evidence |
+|--------|-------------|--------|----------|
+{{TOR_STATUS_TABLE}}
+
+## 3. Verification Results
+
+### 3.1 Test Execution Summary
+
+| Metric | Value |
+|--------|-------|
+| Total Tests | {{TOTAL_TESTS}} |
+| Passed | {{PASSED_TESTS}} |
+| Failed | {{FAILED_TESTS}} |
+| Blocked | {{BLOCKED_TESTS}} |
+| Skipped | {{SKIPPED_TESTS}} |
+| Pass Rate | {{PASS_RATE}}% |
+
+### 3.2 Coverage Results
+
+| Coverage Type | Required | Achieved | Status |
+|---------------|----------|----------|--------|
+| Statement | {{REQ_STMT_COV}}% | {{ACT_STMT_COV}}% | {{STMT_STATUS}} |
+| Branch/Decision | {{REQ_BRANCH_COV}}% | {{ACT_BRANCH_COV}}% | {{BRANCH_STATUS}} |
+| MC/DC | {{REQ_MCDC_COV}}% | {{ACT_MCDC_COV}}% | {{MCDC_STATUS}} |
+
+### 3.3 SPARK Proof Results (if applicable)
+
+| Metric | Value |
+|--------|-------|
+| Total VCs | {{TOTAL_VCS}} |
+| Proven VCs | {{PROVEN_VCS}} |
+| Unproven VCs | {{UNPROVEN_VCS}} |
+| Proof Rate | {{PROOF_RATE}}% |
+
+## 4. Integration Data
+
+### 4.1 DO-331 Model-Based Integration
+{{DO331_INTEGRATION_SUMMARY}}
+
+### 4.2 DO-332 OOP Integration
+{{DO332_INTEGRATION_SUMMARY}}
+
+### 4.3 DO-333 Formal Methods Integration
+{{DO333_INTEGRATION_SUMMARY}}
+
+## 5. Configuration Status
+
+### 5.1 Configuration Items
+
+| CI ID | Type | Version | Hash |
+|-------|------|---------|------|
+{{CONFIG_ITEMS_TABLE}}
+
+### 5.2 Baseline Information
+- **Baseline ID:** {{BASELINE_ID}}
+- **Baseline Date:** {{BASELINE_DATE}}
+- **Git Commit:** {{GIT_COMMIT}}
+
+## 6. Problem Reports
+
+### 6.1 Problem Report Summary
+
+| Status | Count |
+|--------|-------|
+| Open | {{PR_OPEN}} |
+| Closed | {{PR_CLOSED}} |
+| Deferred | {{PR_DEFERRED}} |
+| **Total** | {{PR_TOTAL}} |
+
+### 6.2 Open Problem Reports
+{{OPEN_PR_TABLE}}
+
+## 7. Deviations and Waivers
+
+{{DEVIATIONS_TABLE}}
+
+## 8. Open Items
+
+{{OPEN_ITEMS}}
+
+## 9. Conclusion
+
+{{CONCLUSION_STATEMENT}}
+
+---
+
+**Approval:**
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Author | {{AUTHOR}} | | {{QUALIFICATION_DATE}} |
+| QA | | | |
+| Project Manager | | | |

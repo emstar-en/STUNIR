@@ -1,0 +1,62 @@
+{
+  "$schema": "stunir.do330.package.v1",
+  "package_id": "PKG-verify_build-001",
+  "tool_name": "verify_build",
+  "tool_version": "1.0.0",
+  "tql_level": "TQL-4",
+  "dal_level": "DAL-A",
+  "qualification_date": "2026-01-29",
+  "generated_by": "STUNIR DO-330 Generator v1.0.0",
+  "contents": [
+    {
+      "artifact": "TOR",
+      "file": "TOR.md",
+      "description": "Tool Operational Requirements"
+    },
+    {
+      "artifact": "TQP",
+      "file": "TQP.md",
+      "description": "Tool Qualification Plan"
+    },
+    {
+      "artifact": "TAS",
+      "file": "TAS.md",
+      "description": "Tool Accomplishment Summary"
+    },
+    {
+      "artifact": "Traceability",
+      "file": "traceability/tor_to_test.json",
+      "description": "TOR to Test Case Traceability"
+    },
+    {
+      "artifact": "DO-330 Objectives",
+      "file": "traceability/do330_objectives.json",
+      "description": "DO-330 Objectives Mapping"
+    },
+    {
+      "artifact": "Configuration Index",
+      "file": "configuration/config_index.json",
+      "description": "Configuration Items"
+    },
+    {
+      "artifact": "DO-331 Integration",
+      "file": "integration/do331_summary.json",
+      "description": "DO-331 Model-Based Integration"
+    },
+    {
+      "artifact": "DO-332 Integration",
+      "file": "integration/do332_summary.json",
+      "description": "DO-332 OOP Integration"
+    },
+    {
+      "artifact": "DO-333 Integration",
+      "file": "integration/do333_summary.json",
+      "description": "DO-333 Formal Methods Integration"
+    }
+  ],
+  "validation": {
+    "status": "VALID",
+    "errors": 0,
+    "warnings": 0
+  }
+}
