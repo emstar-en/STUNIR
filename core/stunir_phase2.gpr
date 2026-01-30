@@ -1,16 +1,13 @@
---  STUNIR Core SPARK Library
+--  STUNIR Phase 2 SPARK Library
+--  Build System & Configuration
 --  GNAT Project File
---  Part of Phase 1 SPARK Migration
 
-project Stunir_Core is
+with "stunir_core";
 
-   --  Source directories (Phase 1 + Phase 2)
+project Stunir_Phase2 is
+
+   --  Source directories
    for Source_Dirs use (
-      "type_system",
-      "ir_transform",
-      "semantic_checker",
-      "ir_validator",
-      "common",
       "build_system",
       "config_manager",
       "dependency_resolver",
@@ -20,18 +17,18 @@ project Stunir_Core is
    );
 
    --  Object and library directories
-   for Object_Dir use "obj";
+   for Object_Dir use "obj/phase2";
    for Library_Dir use "lib";
-   for Library_Name use "stunir_core";
+   for Library_Name use "stunir_phase2";
    for Library_Kind use "static";
 
-   --  Ada 2022 with SPARK support
+   --  Ada 2012 with SPARK support
    for Languages use ("Ada");
 
    --  Compiler settings
    package Compiler is
       for Default_Switches ("Ada") use (
-         "-gnat2012",        --  Ada 2012 standard (for compatibility)
+         "-gnat2012",        --  Ada 2012 standard
          "-gnata",           --  Enable assertions
          "-gnatwa",          --  All warnings
          "-gnatVa",          --  All validity checks
@@ -57,4 +54,4 @@ project Stunir_Core is
       );
    end Prove;
 
-end Stunir_Core;
+end Stunir_Phase2;

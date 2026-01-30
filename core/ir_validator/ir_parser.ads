@@ -109,19 +109,19 @@ package IR_Parser is
    function Is_Valid_Schema (S : Schema_Name) return Boolean;
    function Is_Valid_Module_Name (N : Bounded_Name) return Boolean;
 
-   --  Required fields for stunir.ir.v1
-   V1_Required_Schema : constant Schema_Name := Make_Schema ("stunir.ir.v1");
+   --  Required schema string for stunir.ir.v1
+   V1_Schema_String : constant String := "stunir.ir.v1";
 
    --  Add error to result
    procedure Add_Error (
-      Result  : in Out Parse_Result;
+      Result  : in out Parse_Result;
       Message : Bounded_Name)
      with
        Pre => Result.Error_Count < Max_Errors;
 
    --  Add warning to result
    procedure Add_Warning (
-      Result  : in Out Parse_Result;
+      Result  : in out Parse_Result;
       Message : Bounded_Name)
      with
        Pre => Result.Warning_Count < Max_Errors;
@@ -131,7 +131,7 @@ package IR_Parser is
 
    --  Validate IR structure (simplified - actual JSON parsing not SPARK-safe)
    procedure Validate_Structure (
-      Result      : in Out Parse_Result;
+      Result      : in out Parse_Result;
       Has_Schema  : Boolean;
       Has_Module  : Boolean;
       Has_Functions : Boolean;
@@ -139,7 +139,7 @@ package IR_Parser is
 
    --  Add a function to the result
    procedure Add_Function (
-      Result    : in Out Parse_Result;
+      Result    : in out Parse_Result;
       Name      : Bounded_Name;
       Has_Body  : Boolean := False;
       Params    : Natural := 0)

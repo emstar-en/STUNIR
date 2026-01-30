@@ -43,12 +43,12 @@ package Stunir_Hashes is
 
    --  Update SHA-256 with data (simplified - single byte at a time)
    procedure SHA256_Update (
-      State : in Out SHA256_State;
+      State : in out SHA256_State;
       Byte  : Character);
 
    --  Finalize SHA-256 and get hash
    procedure SHA256_Final (
-      State : in Out SHA256_State;
+      State : in out SHA256_State;
       Hash  : out Hash_Hex);
 
    --  Simple hash of a string (convenience function)

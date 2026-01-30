@@ -11,7 +11,7 @@ package body IR_Basic_Blocks is
    --  Add_Successor: Add a successor block
    -------------------------------------------------------------------------
    procedure Add_Successor (
-      B       : in Out Basic_Block;
+      B       : in out Basic_Block;
       Succ_Id : Block_Id)
    is
    begin
@@ -30,7 +30,7 @@ package body IR_Basic_Blocks is
    --  Add_Predecessor: Add a predecessor block
    -------------------------------------------------------------------------
    procedure Add_Predecessor (
-      B       : in Out Basic_Block;
+      B       : in out Basic_Block;
       Pred_Id : Block_Id)
    is
    begin
@@ -81,7 +81,7 @@ package body IR_Basic_Blocks is
    --  Set_Dominator: Set or clear a dominator bit
    -------------------------------------------------------------------------
    procedure Set_Dominator (
-      B       : in Out Basic_Block;
+      B       : in out Basic_Block;
       Dom_Id  : Block_Id;
       Value   : Boolean := True)
    is
@@ -106,7 +106,7 @@ package body IR_Basic_Blocks is
    -------------------------------------------------------------------------
    --  Clear_Dominators: Clear all dominator bits
    -------------------------------------------------------------------------
-   procedure Clear_Dominators (B : in Out Basic_Block) is
+   procedure Clear_Dominators (B : in out Basic_Block) is
    begin
       B.Dominators := (others => False);
    end Clear_Dominators;
@@ -116,7 +116,7 @@ package body IR_Basic_Blocks is
    -------------------------------------------------------------------------
    procedure Copy_Dominators (
       Source : Basic_Block;
-      Target : in Out Basic_Block)
+      Target : in out Basic_Block)
    is
    begin
       Target.Dominators := Source.Dominators;
@@ -126,7 +126,7 @@ package body IR_Basic_Blocks is
    --  Intersect_Dominators: Compute intersection of dominator sets
    -------------------------------------------------------------------------
    procedure Intersect_Dominators (
-      B     : in Out Basic_Block;
+      B     : in out Basic_Block;
       Other : Basic_Block)
    is
    begin

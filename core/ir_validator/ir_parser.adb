@@ -112,7 +112,7 @@ package body IR_Parser is
    --  Add_Error: Add an error message
    -------------------------------------------------------------------------
    procedure Add_Error (
-      Result  : in Out Parse_Result;
+      Result  : in out Parse_Result;
       Message : Bounded_Name)
    is
    begin
@@ -128,7 +128,7 @@ package body IR_Parser is
    --  Add_Warning: Add a warning message
    -------------------------------------------------------------------------
    procedure Add_Warning (
-      Result  : in Out Parse_Result;
+      Result  : in out Parse_Result;
       Message : Bounded_Name)
    is
    begin
@@ -165,7 +165,7 @@ package body IR_Parser is
    --  Validate_Structure: Validate IR structure
    -------------------------------------------------------------------------
    procedure Validate_Structure (
-      Result      : in Out Parse_Result;
+      Result      : in out Parse_Result;
       Has_Schema  : Boolean;
       Has_Module  : Boolean;
       Has_Functions : Boolean;
@@ -219,7 +219,7 @@ package body IR_Parser is
    --  Add_Function: Add a function to the result
    -------------------------------------------------------------------------
    procedure Add_Function (
-      Result    : in Out Parse_Result;
+      Result    : in out Parse_Result;
       Name      : Bounded_Name;
       Has_Body  : Boolean := False;
       Params    : Natural := 0)

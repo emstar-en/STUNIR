@@ -91,18 +91,18 @@ package IR_Control_Flow is
        Pre => Block_Exists (CFG, From_Id) and Block_Exists (CFG, To_Id);
 
    --  CFG construction operations
-   procedure Create_Entry (CFG : in Out Control_Flow_Graph; Id : out Block_Id)
+   procedure Create_Entry (CFG : in out Control_Flow_Graph; Id : out Block_Id)
      with
        Pre  => CFG.Block_Count < Max_Blocks - 1,
        Post => Id /= No_Block and CFG.Entry_Block = Id;
 
-   procedure Create_Exit (CFG : in Out Control_Flow_Graph; Id : out Block_Id)
+   procedure Create_Exit (CFG : in out Control_Flow_Graph; Id : out Block_Id)
      with
        Pre  => CFG.Block_Count < Max_Blocks - 1,
        Post => Id /= No_Block and CFG.Exit_Block = Id;
 
    procedure Create_Block (
-      CFG        : in Out Control_Flow_Graph;
+      CFG        : in out Control_Flow_Graph;
       Kind       : Block_Type := Normal_Block;
       Id         : out Block_Id)
      with
@@ -110,7 +110,7 @@ package IR_Control_Flow is
        Post => Id /= No_Block and Block_Exists (CFG, Id);
 
    procedure Add_Edge (
-      CFG     : in Out Control_Flow_Graph;
+      CFG     : in out Control_Flow_Graph;
       From_Id : Block_Id;
       To_Id   : Block_Id)
      with
@@ -119,7 +119,7 @@ package IR_Control_Flow is
        Post => Has_Edge (CFG, From_Id, To_Id);
 
    --  Dominator analysis
-   procedure Compute_Dominators (CFG : in Out Control_Flow_Graph)
+   procedure Compute_Dominators (CFG : in out Control_Flow_Graph)
      with
        Pre => Is_Valid (CFG);
 
@@ -131,7 +131,7 @@ package IR_Control_Flow is
        Pre => Block_Exists (CFG, A) and Block_Exists (CFG, B);
 
    --  Loop detection
-   procedure Detect_Loops (CFG : in Out Control_Flow_Graph)
+   procedure Detect_Loops (CFG : in out Control_Flow_Graph)
      with
        Pre => Is_Valid (CFG);
 
@@ -143,7 +143,7 @@ package IR_Control_Flow is
        Pre => Index <= CFG.Loop_Count;
 
    --  Branch detection
-   procedure Detect_Branches (CFG : in Out Control_Flow_Graph)
+   procedure Detect_Branches (CFG : in out Control_Flow_Graph)
      with
        Pre => Is_Valid (CFG);
 
@@ -159,7 +159,7 @@ package IR_Control_Flow is
      (CFG.Block_Count);
 
    --  Loop depth calculation
-   procedure Compute_Loop_Depths (CFG : in Out Control_Flow_Graph)
+   procedure Compute_Loop_Depths (CFG : in out Control_Flow_Graph)
      with
        Pre => Is_Valid (CFG);
 

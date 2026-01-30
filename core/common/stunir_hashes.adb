@@ -72,7 +72,7 @@ package body Stunir_Hashes is
    --  Real implementation would use proper SHA-256 algorithm.
    -------------------------------------------------------------------------
    procedure SHA256_Update (
-      State : in Out SHA256_State;
+      State : in out SHA256_State;
       Byte  : Character)
    is
    begin
@@ -89,7 +89,7 @@ package body Stunir_Hashes is
    --  Real implementation would complete the SHA-256 algorithm.
    -------------------------------------------------------------------------
    procedure SHA256_Final (
-      State : in Out SHA256_State;
+      State : in out SHA256_State;
       Hash  : out Hash_Hex)
    is
       Value : Natural := State.Accumulator;

@@ -60,7 +60,7 @@ package body IR_Validator is
    --  Set_Schema: Set schema information
    -------------------------------------------------------------------------
    procedure Set_Schema (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Schema : Schema_Name)
    is
    begin
@@ -72,7 +72,7 @@ package body IR_Validator is
    --  Set_Module: Set module name
    -------------------------------------------------------------------------
    procedure Set_Module (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Name   : Bounded_Name)
    is
    begin
@@ -83,7 +83,7 @@ package body IR_Validator is
    --  Set_Epoch: Set epoch value
    -------------------------------------------------------------------------
    procedure Set_Epoch (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Epoch  : Natural)
    is
    begin
@@ -95,7 +95,7 @@ package body IR_Validator is
    --  Add_Validated_Function: Add a validated function
    -------------------------------------------------------------------------
    procedure Add_Validated_Function (
-      Result   : in Out Validation_Result;
+      Result   : in out Validation_Result;
       Name     : Bounded_Name;
       Has_Body : Boolean := False;
       Params   : Natural := 0)
@@ -109,7 +109,7 @@ package body IR_Validator is
    --  Set_Content_Hash: Set the content hash
    -------------------------------------------------------------------------
    procedure Set_Content_Hash (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Hash   : Hash_String)
    is
    begin
@@ -119,7 +119,7 @@ package body IR_Validator is
    -------------------------------------------------------------------------
    --  Finalize_Validation: Run all validation checks
    -------------------------------------------------------------------------
-   procedure Finalize_Validation (Result : in Out Validation_Result) is
+   procedure Finalize_Validation (Result : in out Validation_Result) is
       Has_Schema    : Boolean;
       Has_Module    : Boolean;
       Has_Functions : Boolean;

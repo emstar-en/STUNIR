@@ -25,8 +25,8 @@ package Stunir_Type_Registry is
       Is_Used : Boolean := False;
    end record;
 
-   --  Type Registry
-   type Type_Registry is limited private;
+   --  Type Registry (non-limited for SPARK 'Old support)
+   type Type_Registry is private;
 
    --  Initialize a new registry with built-in types
    procedure Initialize (Reg : out Type_Registry)
