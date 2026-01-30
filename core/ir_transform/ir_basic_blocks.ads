@@ -103,7 +103,7 @@ package IR_Basic_Blocks is
        Post => B.Successor_Count = B.Successor_Count'Old + 1;
 
    procedure Add_Predecessor (
-      B       : in Out Basic_Block;
+      B       : in out Basic_Block;
       Pred_Id : Block_Id)
      with
        Pre  => B.Predecessor_Count < Max_Predecessors and Pred_Id /= No_Block,
@@ -120,7 +120,7 @@ package IR_Basic_Blocks is
 
    --  Dominator operations
    procedure Set_Dominator (
-      B       : in Out Basic_Block;
+      B       : in out Basic_Block;
       Dom_Id  : Block_Id;
       Value   : Boolean := True)
      with
@@ -130,14 +130,14 @@ package IR_Basic_Blocks is
       B      : Basic_Block;
       Dom_Id : Block_Id) return Boolean;
 
-   procedure Clear_Dominators (B : in Out Basic_Block);
+   procedure Clear_Dominators (B : in out Basic_Block);
 
    procedure Copy_Dominators (
       Source : Basic_Block;
-      Target : in Out Basic_Block);
+      Target : in out Basic_Block);
 
    procedure Intersect_Dominators (
-      B     : in Out Basic_Block;
+      B     : in out Basic_Block;
       Other : Basic_Block);
 
 end IR_Basic_Blocks;

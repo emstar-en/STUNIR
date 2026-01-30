@@ -141,28 +141,28 @@ package Semantic_Analysis is
 
    --  Register variable assignment
    procedure Register_Assignment (
-      Detector : in Out Dead_Code_Detector;
+      Detector : in out Dead_Code_Detector;
       Name     : Bounded_Name)
      with
        Pre => Name.Length > 0;
 
    --  Register variable usage
    procedure Register_Usage (
-      Detector : in Out Dead_Code_Detector;
+      Detector : in out Dead_Code_Detector;
       Name     : Bounded_Name)
      with
        Pre => Name.Length > 0;
 
    --  Register function call
    procedure Register_Call (
-      Detector : in Out Dead_Code_Detector;
+      Detector : in out Dead_Code_Detector;
       Name     : Bounded_Name)
      with
        Pre => Name.Length > 0;
 
    --  Register function definition
    procedure Register_Function (
-      Detector : in Out Dead_Code_Detector;
+      Detector : in out Dead_Code_Detector;
       Name     : Bounded_Name)
      with
        Pre => Name.Length > 0;
@@ -186,7 +186,7 @@ package Semantic_Analysis is
 
    --  Add unreachable code result
    procedure Add_Unreachable (
-      Detector : in Out Unreachable_Code_Detector;
+      Detector : in out Unreachable_Code_Detector;
       Line     : Natural;
       Severity : Warning_Severity := Warning)
      with
@@ -235,7 +235,7 @@ package Semantic_Analysis is
 
    --  Add an issue
    procedure Add_Issue (
-      Checker  : in Out Semantic_Checker;
+      Checker  : in out Semantic_Checker;
       Kind     : Analysis_Error_Kind;
       Severity : Warning_Severity;
       Name     : Bounded_Name;

@@ -19,7 +19,7 @@ package body IR_Control_Flow is
    -------------------------------------------------------------------------
    --  Create_Entry: Create the entry block
    -------------------------------------------------------------------------
-   procedure Create_Entry (CFG : in Out Control_Flow_Graph; Id : out Block_Id) is
+   procedure Create_Entry (CFG : in out Control_Flow_Graph; Id : out Block_Id) is
    begin
       Id := CFG.Next_Block_Id;
       CFG.Blocks (Id) := (
@@ -43,7 +43,7 @@ package body IR_Control_Flow is
    -------------------------------------------------------------------------
    --  Create_Exit: Create the exit block
    -------------------------------------------------------------------------
-   procedure Create_Exit (CFG : in Out Control_Flow_Graph; Id : out Block_Id) is
+   procedure Create_Exit (CFG : in out Control_Flow_Graph; Id : out Block_Id) is
    begin
       Id := CFG.Next_Block_Id;
       CFG.Blocks (Id) := (
@@ -68,7 +68,7 @@ package body IR_Control_Flow is
    --  Create_Block: Create a new basic block
    -------------------------------------------------------------------------
    procedure Create_Block (
-      CFG        : in Out Control_Flow_Graph;
+      CFG        : in out Control_Flow_Graph;
       Kind       : Block_Type := Normal_Block;
       Id         : out Block_Id)
    is
@@ -95,7 +95,7 @@ package body IR_Control_Flow is
    --  Add_Edge: Add an edge between two blocks
    -------------------------------------------------------------------------
    procedure Add_Edge (
-      CFG     : in Out Control_Flow_Graph;
+      CFG     : in out Control_Flow_Graph;
       From_Id : Block_Id;
       To_Id   : Block_Id)
    is
@@ -107,7 +107,7 @@ package body IR_Control_Flow is
    -------------------------------------------------------------------------
    --  Compute_Dominators: Iterative dominator computation
    -------------------------------------------------------------------------
-   procedure Compute_Dominators (CFG : in Out Control_Flow_Graph) is
+   procedure Compute_Dominators (CFG : in out Control_Flow_Graph) is
       Changed : Boolean;
       Iteration : Natural := 0;
       Max_Iterations : constant Natural := Natural (CFG.Block_Count) * Natural (CFG.Block_Count);
@@ -221,7 +221,7 @@ package body IR_Control_Flow is
    -------------------------------------------------------------------------
    --  Detect_Loops: Find natural loops in the CFG
    -------------------------------------------------------------------------
-   procedure Detect_Loops (CFG : in Out Control_Flow_Graph) is
+   procedure Detect_Loops (CFG : in out Control_Flow_Graph) is
    begin
       --  Ensure dominators are computed
       Compute_Dominators (CFG);
@@ -272,7 +272,7 @@ package body IR_Control_Flow is
    -------------------------------------------------------------------------
    --  Detect_Branches: Find conditional branches in the CFG
    -------------------------------------------------------------------------
-   procedure Detect_Branches (CFG : in Out Control_Flow_Graph) is
+   procedure Detect_Branches (CFG : in out Control_Flow_Graph) is
    begin
       CFG.Branch_Count := 0;
 
@@ -309,7 +309,7 @@ package body IR_Control_Flow is
    -------------------------------------------------------------------------
    --  Compute_Loop_Depths: Calculate nesting depth for all blocks
    -------------------------------------------------------------------------
-   procedure Compute_Loop_Depths (CFG : in Out Control_Flow_Graph) is
+   procedure Compute_Loop_Depths (CFG : in out Control_Flow_Graph) is
    begin
       --  Reset all depths
       for Id in 1 .. CFG.Next_Block_Id - 1 loop

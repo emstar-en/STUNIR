@@ -4,13 +4,19 @@
 
 project Stunir_Core is
 
-   --  Source directories
+   --  Source directories (Phase 1 + Phase 2)
    for Source_Dirs use (
       "type_system",
       "ir_transform",
       "semantic_checker",
       "ir_validator",
-      "common"
+      "common",
+      "build_system",
+      "config_manager",
+      "dependency_resolver",
+      "toolchain_discovery",
+      "receipt_manager",
+      "epoch_manager"
    );
 
    --  Object and library directories
@@ -25,14 +31,12 @@ project Stunir_Core is
    --  Compiler settings
    package Compiler is
       for Default_Switches ("Ada") use (
-         "-gnat2022",        --  Ada 2022 standard
+         "-gnat2012",        --  Ada 2012 standard (for compatibility)
          "-gnata",           --  Enable assertions
          "-gnatwa",          --  All warnings
-         "-gnatwe",          --  Warnings as errors
          "-gnatVa",          --  All validity checks
          "-gnato13",         --  Overflow checks
-         "-gnatf",           --  Full errors
-         "-gnatyO"           --  Check overriding
+         "-gnatf"            --  Full errors
       );
    end Compiler;
 

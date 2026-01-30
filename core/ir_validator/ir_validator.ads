@@ -47,22 +47,22 @@ package IR_Validator is
 
    --  Set schema information
    procedure Set_Schema (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Schema : Schema_Name);
 
    --  Set module name
    procedure Set_Module (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Name   : Bounded_Name);
 
    --  Set epoch
    procedure Set_Epoch (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Epoch  : Natural);
 
    --  Add a validated function
    procedure Add_Validated_Function (
-      Result   : in Out Validation_Result;
+      Result   : in out Validation_Result;
       Name     : Bounded_Name;
       Has_Body : Boolean := False;
       Params   : Natural := 0)
@@ -71,11 +71,11 @@ package IR_Validator is
 
    --  Compute content hash (simulated - actual hash needs external call)
    procedure Set_Content_Hash (
-      Result : in Out Validation_Result;
+      Result : in out Validation_Result;
       Hash   : Hash_String);
 
    --  Finalize validation (run all checks)
-   procedure Finalize_Validation (Result : in Out Validation_Result);
+   procedure Finalize_Validation (Result : in out Validation_Result);
 
    --  Query functions
    function Is_Valid (Result : Validation_Result) return Boolean is
