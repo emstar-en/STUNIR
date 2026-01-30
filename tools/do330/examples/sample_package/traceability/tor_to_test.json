@@ -1,0 +1,85 @@
+{
+  "$schema": "stunir.do330.traceability.v1",
+  "tool": "verify_build",
+  "version": "1.0.0",
+  "generated_date": "2026-01-29",
+  "traces": [
+    {
+      "tor_id": "TOR-FUNC-001",
+      "tor_description": "Deterministic Output",
+      "test_cases": ["TC-001"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-FUNC-002",
+      "tor_description": "Valid Output Format",
+      "test_cases": ["TC-002"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-FUNC-003",
+      "tor_description": "Error Reporting",
+      "test_cases": ["TC-003"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-FUNC-004",
+      "tor_description": "Hash Verification",
+      "test_cases": ["TC-004"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-FUNC-005",
+      "tor_description": "Manifest Validation",
+      "test_cases": ["TC-005"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-ENV-001",
+      "tor_description": "Operating System",
+      "test_cases": ["TC-010"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-ENV-002",
+      "tor_description": "Dependencies",
+      "test_cases": ["TC-011"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-IF-001",
+      "tor_description": "Input Format",
+      "test_cases": ["TC-020"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-IF-002",
+      "tor_description": "Output Format",
+      "test_cases": ["TC-021"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-CON-001",
+      "tor_description": "Determinism",
+      "test_cases": ["TC-030"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-CON-002",
+      "tor_description": "No False Positives",
+      "test_cases": ["TC-031"],
+      "verification_status": "verified"
+    },
+    {
+      "tor_id": "TOR-CON-003",
+      "tor_description": "No False Negatives",
+      "test_cases": ["TC-032"],
+      "verification_status": "verified"
+    }
+  ],
+  "coverage_summary": {
+    "total_tors": 12,
+    "verified_tors": 12,
+    "coverage_percentage": 100
+  }
+}

@@ -1,0 +1,103 @@
+# Tool Operational Requirements (TOR)
+
+**Document ID:** TOR-{{TOOL_NAME}}
+**Version:** {{TOOL_VERSION}}
+**TQL Level:** {{TQL_LEVEL}}
+**DAL Level:** {{DAL_LEVEL}}
+**Date:** {{QUALIFICATION_DATE}}
+**Author:** {{AUTHOR}}
+**Schema:** {{SCHEMA_VERSION}}
+
+---
+
+## 1. Tool Identification
+
+- **Tool Name:** {{TOOL_NAME}}
+- **Tool Version:** {{TOOL_VERSION}}
+- **Classification:** {{TOOL_CLASSIFICATION}}
+- **TQL Target:** {{TQL_LEVEL}}
+
+## 2. Functional Requirements
+
+### TOR-FUNC-001: Deterministic Output
+- **Description:** The tool shall produce byte-identical outputs for identical inputs.
+- **Verification Method:** Test
+- **Derived From:** DO-178C Objective A-1
+
+### TOR-FUNC-002: Valid Output Format
+- **Description:** The tool shall generate output conforming to defined schemas.
+- **Verification Method:** Test
+- **Derived From:** User Requirement
+
+### TOR-FUNC-003: Error Reporting
+- **Description:** The tool shall report all errors with clear diagnostic messages.
+- **Verification Method:** Test
+- **Derived From:** User Requirement
+
+### TOR-FUNC-004: Input Validation
+- **Description:** The tool shall validate all inputs before processing.
+- **Verification Method:** Test
+- **Derived From:** DO-178C Objective A-2
+
+{{ADDITIONAL_REQUIREMENTS}}
+
+## 3. Environmental Requirements
+
+### TOR-ENV-001: Operating System
+- **Requirement:** Tool shall operate on Linux x86_64.
+- **Verification:** Installation test
+
+### TOR-ENV-002: Compiler/Runtime
+- **Requirement:** Tool requires GNAT 2024+ or Python 3.9+.
+- **Verification:** Dependency check script
+
+### TOR-ENV-003: Dependencies
+- **Requirement:** Tool dependencies listed in manifest.
+- **Verification:** Manifest verification
+
+## 4. Interface Requirements
+
+### TOR-IF-001: Input Format
+- **Requirement:** Tool accepts input per defined schema.
+- **Verification:** Schema validation test
+
+### TOR-IF-002: Output Format
+- **Requirement:** Tool produces output per defined schema.
+- **Verification:** Output validation test
+
+### TOR-IF-003: Command Line Interface
+- **Requirement:** Tool accepts standard CLI arguments.
+- **Verification:** CLI test suite
+
+## 5. Constraints
+
+### TOR-CON-001: Determinism
+- **Requirement:** Same inputs produce byte-identical outputs.
+- **Verification:** Determinism test suite
+
+### TOR-CON-002: Memory Safety
+- **Requirement:** No buffer overflows or memory leaks.
+- **Verification:** SPARK proofs / Static analysis
+
+## 6. Traceability
+
+| TOR ID | Verification | DO-330 Objective | Status |
+|--------|--------------|------------------|--------|
+| TOR-FUNC-001 | TC-001 | T-1 | {{STATUS_FUNC_001}} |
+| TOR-FUNC-002 | TC-002 | T-1 | {{STATUS_FUNC_002}} |
+| TOR-FUNC-003 | TC-003 | T-1 | {{STATUS_FUNC_003}} |
+| TOR-FUNC-004 | TC-004 | T-1 | {{STATUS_FUNC_004}} |
+| TOR-ENV-001 | TC-010 | T-1 | {{STATUS_ENV_001}} |
+| TOR-ENV-002 | TC-011 | T-1 | {{STATUS_ENV_002}} |
+| TOR-IF-001 | TC-020 | T-1 | {{STATUS_IF_001}} |
+| TOR-IF-002 | TC-021 | T-1 | {{STATUS_IF_002}} |
+| TOR-CON-001 | TC-030 | T-1 | {{STATUS_CON_001}} |
+| TOR-CON-002 | TC-031 | T-1 | {{STATUS_CON_002}} |
+
+---
+
+**Document History:**
+
+| Version | Date | Author | Changes |
+|---------|------|--------|----------|
+| 1.0 | {{QUALIFICATION_DATE}} | {{AUTHOR}} | Initial release |

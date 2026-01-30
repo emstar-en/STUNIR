@@ -1,0 +1,135 @@
+# Tool Qualification Plan (TQP)
+
+**Document ID:** TQP-{{TOOL_NAME}}
+**Version:** {{TOOL_VERSION}}
+**Standard:** DO-330
+**Date:** {{QUALIFICATION_DATE}}
+**Author:** {{AUTHOR}}
+**Schema:** {{SCHEMA_VERSION}}
+
+---
+
+## 1. Purpose and Scope
+
+### 1.1 Purpose
+This Tool Qualification Plan defines the activities required to qualify {{TOOL_NAME}} to {{TQL_LEVEL}} per DO-330 (Software Tool Qualification Considerations).
+
+### 1.2 Scope
+This plan covers:
+- Tool classification and TQL determination
+- Qualification activities and verification methods
+- Configuration management requirements
+- Quality assurance activities
+- Schedule and milestones
+
+### 1.3 Applicable Documents
+- DO-330: Software Tool Qualification Considerations
+- DO-178C: Software Considerations in Airborne Systems
+- DO-278A: Software Considerations in CNS/ATM Systems
+
+## 2. Tool Description
+
+### 2.1 Tool Identification
+- **Tool Name:** {{TOOL_NAME}}
+- **Tool Version:** {{TOOL_VERSION}}
+- **Tool Type:** {{TOOL_TYPE}}
+- **Classification:** {{TOOL_CLASSIFICATION}}
+
+### 2.2 Tool Function
+{{TOOL_DESCRIPTION}}
+
+### 2.3 Tool Classification Rationale
+- **Criteria:** {{TOOL_CRITERIA}}
+- **TQL Level:** {{TQL_LEVEL}}
+- **DAL of Software:** {{DAL_LEVEL}}
+- **Rationale:** Tool output is independently verifiable, enabling {{TQL_LEVEL}} classification.
+
+## 3. Qualification Activities
+
+### 3.1 Requirements Definition
+1. Define Tool Operational Requirements (TOR)
+2. Review and approve TOR
+3. Establish requirements baseline
+
+### 3.2 Verification Activities
+1. Develop test cases for each TOR
+2. Review and approve test cases
+3. Execute tests and record results
+4. Achieve required coverage per TQL
+
+### 3.3 Configuration Management
+1. Establish configuration identification
+2. Implement change control procedures
+3. Maintain configuration index
+
+### 3.4 Quality Assurance
+1. Conduct plan reviews
+2. Perform process audits
+3. Execute product audits
+4. Complete compliance assessment
+
+## 4. Verification Methods
+
+| TQL Level | Requirements Coverage | Structural Coverage |
+|-----------|----------------------|--------------------|
+| TQL-1 | 100% TOR verified | MC/DC + 100% Statement |
+| TQL-2 | 100% TOR verified | Decision + 100% Statement |
+| TQL-3 | 100% TOR verified | 100% Statement |
+| TQL-4 | 100% TOR verified | N/A |
+| TQL-5 | N/A | N/A |
+
+**Target for {{TOOL_NAME}}:** {{TQL_LEVEL}} - {{TQL_COVERAGE_REQUIREMENT}}
+
+## 5. Qualification Data
+
+### 5.1 Required Data Items for {{TQL_LEVEL}}
+
+{{TQL_DATA_REQUIREMENTS}}
+
+### 5.2 Data Item Locations
+
+| Data Item | Location | Status |
+|-----------|----------|--------|
+| TQP | docs/do330/{{TOOL_NAME}}/TQP.md | This document |
+| TOR | docs/do330/{{TOOL_NAME}}/TOR.md | {{TOR_STATUS}} |
+| Test Cases | docs/do330/{{TOOL_NAME}}/test_cases/ | {{TC_STATUS}} |
+| Test Results | docs/do330/{{TOOL_NAME}}/test_results/ | {{TR_STATUS}} |
+| TAS | docs/do330/{{TOOL_NAME}}/TAS.md | {{TAS_STATUS}} |
+| Config Index | docs/do330/{{TOOL_NAME}}/config_index.json | {{CI_STATUS}} |
+
+## 6. Schedule
+
+| Activity | Start | End | Status |
+|----------|-------|-----|--------|
+| TQP Development | {{START_DATE}} | {{TQP_END}} | {{TQP_STATUS}} |
+| TOR Development | {{TOR_START}} | {{TOR_END}} | {{TOR_STATUS}} |
+| Test Development | {{TC_START}} | {{TC_END}} | {{TC_STATUS}} |
+| Test Execution | {{TE_START}} | {{TE_END}} | {{TE_STATUS}} |
+| TAS Completion | {{TAS_START}} | {{TAS_END}} | {{TAS_STATUS}} |
+
+## 7. Responsibilities
+
+| Role | Responsibility | Assigned To |
+|------|---------------|-------------|
+| Tool Developer | Develop and maintain tool | {{DEVELOPER}} |
+| Verification Engineer | Develop and execute tests | {{VERIFIER}} |
+| QA Engineer | Perform audits and reviews | {{QA}} |
+| CM Engineer | Maintain configuration | {{CM}} |
+
+## 8. Problem Reporting
+
+Problem reports shall be:
+1. Documented with unique identifier
+2. Analyzed for impact on qualification
+3. Resolved or accepted with rationale
+4. Tracked to closure
+
+---
+
+**Approval:**
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Author | {{AUTHOR}} | | {{QUALIFICATION_DATE}} |
+| Reviewer | | | |
+| Approver | | | |
