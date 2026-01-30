@@ -1,0 +1,56 @@
+--  STUNIR Core SPARK Library
+--  GNAT Project File
+--  Part of Phase 1 SPARK Migration
+
+project Stunir_Core is
+
+   --  Source directories
+   for Source_Dirs use (
+      "type_system",
+      "ir_transform",
+      "semantic_checker",
+      "ir_validator",
+      "common"
+   );
+
+   --  Object and library directories
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+   for Library_Name use "stunir_core";
+   for Library_Kind use "static";
+
+   --  Ada 2022 with SPARK support
+   for Languages use ("Ada");
+
+   --  Compiler settings
+   package Compiler is
+      for Default_Switches ("Ada") use (
+         "-gnat2022",        --  Ada 2022 standard
+         "-gnata",           --  Enable assertions
+         "-gnatwa",          --  All warnings
+         "-gnatwe",          --  Warnings as errors
+         "-gnatVa",          --  All validity checks
+         "-gnato13",         --  Overflow checks
+         "-gnatf",           --  Full errors
+         "-gnatyO"           --  Check overriding
+      );
+   end Compiler;
+
+   --  Binder settings
+   package Binder is
+      for Default_Switches ("Ada") use (
+         "-E"                --  Store tracebacks in exceptions
+      );
+   end Binder;
+
+   --  SPARK Prove settings
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "--level=2",        --  Medium proof effort
+         "--timeout=60",     --  60 seconds per VC
+         "--prover=all",     --  Use all available provers
+         "--warnings=error"  --  Treat warnings as errors
+      );
+   end Prove;
+
+end Stunir_Core;
