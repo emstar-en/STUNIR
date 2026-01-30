@@ -1,0 +1,110 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "mini_os",
+  "description": "A minimal operating system kernel for testing STUNIR code generation",
+  "types": [
+    {
+      "name": "MemoryRegion",
+      "fields": [
+        { "name": "base", "type": "u64" },
+        { "name": "size", "type": "u64" },
+        { "name": "flags", "type": "u32" }
+      ]
+    },
+    {
+      "name": "ProcessState",
+      "fields": [
+        { "name": "pid", "type": "u32" },
+        { "name": "state", "type": "u8" },
+        { "name": "priority", "type": "u8" }
+      ]
+    }
+  ],
+  "constants": [
+    { "name": "PAGE_SIZE", "type": "u32", "value": "4096" },
+    { "name": "MAX_PROCESSES", "type": "u32", "value": "64" },
+    { "name": "STATE_READY", "type": "u8", "value": "0" },
+    { "name": "STATE_RUNNING", "type": "u8", "value": "1" },
+    { "name": "STATE_BLOCKED", "type": "u8", "value": "2" }
+  ],
+  "functions": [
+    {
+      "name": "kernel_init",
+      "params": [],
+      "returns": "i32",
+      "description": "Initialize the kernel subsystems",
+      "body": [
+        { "type": "var_decl", "var_name": "status", "var_type": "i32", "init": "0" },
+        { "type": "comment", "text": "Initialize memory management" },
+        { "type": "call", "func": "init_memory_manager", "args": [] },
+        { "type": "comment", "text": "Initialize scheduler" },
+        { "type": "call", "func": "init_scheduler", "args": [] },
+        { "type": "return", "value": "status" }
+      ]
+    },
+    {
+      "name": "init_memory_manager",
+      "params": [],
+      "returns": "void",
+      "description": "Initialize the memory manager",
+      "body": [
+        { "type": "var_decl", "var_name": "heap_base", "var_type": "u64", "init": "0x100000" },
+        { "type": "var_decl", "var_name": "heap_size", "var_type": "u64", "init": "0x1000000" },
+        { "type": "return", "value": null }
+      ]
+    },
+    {
+      "name": "init_scheduler",
+      "params": [],
+      "returns": "void",
+      "description": "Initialize the process scheduler",
+      "body": [
+        { "type": "var_decl", "var_name": "current_pid", "var_type": "u32", "init": "0" },
+        { "type": "return", "value": null }
+      ]
+    },
+    {
+      "name": "alloc_page",
+      "params": [],
+      "returns": "u64",
+      "description": "Allocate a single memory page",
+      "body": [
+        { "type": "var_decl", "var_name": "page_addr", "var_type": "u64", "init": "0" },
+        { "type": "return", "value": "page_addr" }
+      ]
+    },
+    {
+      "name": "free_page",
+      "params": [
+        { "name": "addr", "type": "u64" }
+      ],
+      "returns": "void",
+      "description": "Free a previously allocated page",
+      "body": [
+        { "type": "return", "value": null }
+      ]
+    },
+    {
+      "name": "create_process",
+      "params": [
+        { "name": "priority", "type": "u8" }
+      ],
+      "returns": "u32",
+      "description": "Create a new process and return its PID",
+      "body": [
+        { "type": "var_decl", "var_name": "new_pid", "var_type": "u32", "init": "0" },
+        { "type": "return", "value": "new_pid" }
+      ]
+    },
+    {
+      "name": "schedule",
+      "params": [],
+      "returns": "u32",
+      "description": "Run the scheduler and return the next process PID",
+      "body": [
+        { "type": "var_decl", "var_name": "next_pid", "var_type": "u32", "init": "0" },
+        { "type": "return", "value": "next_pid" }
+      ]
+    }
+  ]
+}

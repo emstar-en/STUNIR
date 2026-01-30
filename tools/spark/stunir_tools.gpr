@@ -1,0 +1,51 @@
+-------------------------------------------------------------------------------
+--  STUNIR Tools - Ada SPARK GNAT Project File
+--  PRIMARY IMPLEMENTATION (Ada SPARK is the default language for STUNIR tools)
+--
+--  Build with: gprbuild -P stunir_tools.gpr
+--  Prove with: gnatprove -P stunir_tools.gpr
+--
+--  Copyright (c) 2026 STUNIR Project
+--  License: MIT
+-------------------------------------------------------------------------------
+
+project STUNIR_Tools is
+
+   for Source_Dirs use ("src", "../../core/common");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+
+   for Main use ("stunir_spec_to_ir_main.adb", "stunir_ir_to_code_main.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnat2012",      -- Ada 2012
+         "-gnatwa",        -- All warnings
+         "-gnatVa",        -- All validity checks
+         "-gnatf",         -- Full errors
+         "-gnato",         -- Overflow checking
+         "-fstack-check", -- Stack checking
+         "-g");           -- Debug info
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-E");  -- Exception traceback
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("Ada") use ("-g");  -- Debug info
+   end Linker;
+
+   package Prove is
+      for Proof_Switches ("Ada") use
+        ("--level=2",           -- Medium proof level
+         "--timeout=60",        -- 60 second timeout per VC
+         "--steps=10000",       -- Max proof steps
+         "--memlimit=2000");    -- Memory limit in MB
+   end Prove;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-s", "-j0");  -- Recompile if needed, parallel
+   end Builder;
+
+end STUNIR_Tools;

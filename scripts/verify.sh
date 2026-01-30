@@ -1,18 +1,35 @@
 #!/bin/bash
 # STUNIR Receipt Verifier
+# PRIMARY: Ada SPARK tools are the DEFAULT implementation
+#
 # Usage: ./verify.sh <receipt_file> [base_dir]
+#
+# Override via: STUNIR_PROFILE=spark|python
 
 set -e
 
 RECEIPT_FILE="$1"
 BASE_DIR="${2:-.}"
+PROFILE="${STUNIR_PROFILE:-auto}"
+
+# Tool paths
+SPARK_VERIFIER="tools/spark/bin/stunir_verifier_main"
+
+log() { echo "[Verify] $1"; }
+warn() { echo "[Verify][WARN] $1"; }
 
 if [ -z "$RECEIPT_FILE" ]; then
+    echo "STUNIR Receipt Verifier"
+    echo "PRIMARY: Ada SPARK implementation"
+    echo ""
     echo "Usage: $0 <receipt_file> [base_dir]"
+    echo ""
+    echo "Environment:"
+    echo "  STUNIR_PROFILE=spark|python  Override runtime detection"
     exit 1
 fi
 
-# --- Helper: Polyglot SHA-256 (Same as receipt.sh) ---
+# --- Helper: Polyglot SHA-256 ---
 calc_hash() {
     local file="$1"
     if command -v sha256sum >/dev/null 2>&1; then
@@ -27,29 +44,63 @@ calc_hash() {
     fi
 }
 
-echo "[Verify] Reading receipt: $RECEIPT_FILE"
+# --- Detect Runtime ---
+detect_runtime() {
+    if [ "$PROFILE" = "spark" ]; then
+        echo "spark"
+        return
+    elif [ "$PROFILE" = "python" ]; then
+        echo "python"
+        return
+    fi
+
+    # Auto-detection: SPARK (Ada) -> Python (reference)
+    if [ -x "$SPARK_VERIFIER" ]; then
+        echo "spark"
+    elif command -v python3 >/dev/null 2>&1; then
+        warn "Falling back to Python reference implementation"
+        echo "python"
+    else
+        echo "shell"
+    fi
+}
+
+RUNTIME=$(detect_runtime)
+log "Verifier runtime: $RUNTIME"
+
+case "$RUNTIME" in
+    spark)
+        # PRIMARY: Ada SPARK verifier
+        log "Using Ada SPARK Verifier (PRIMARY implementation)"
+        if [ -x "$SPARK_VERIFIER" ]; then
+            "$SPARK_VERIFIER" --receipt "$RECEIPT_FILE" --base-dir "$BASE_DIR"
+            exit $?
+        else
+            warn "SPARK verifier not built, falling back to shell verification"
+        fi
+        ;;
+        
+    python)
+        # REFERENCE: Python verifier
+        warn "=============================================="
+        warn "USING PYTHON REFERENCE IMPLEMENTATION"
+        warn "This is NOT recommended for production use."
+        warn "For production, use Ada SPARK: STUNIR_PROFILE=spark"
+        warn "=============================================="
+        ;;
+esac
+
+# Shell fallback verification (works with any runtime)
+log "Reading receipt: $RECEIPT_FILE"
 
 # 1. Extract the "outputs" block
-# We use a polyglot strategy to get the JSON content of "outputs"
 if command -v jq >/dev/null 2>&1; then
-    # Easy mode
     OUTPUTS_RAW=$(jq -r '.outputs | to_entries | .[] | "\(.key)|\(.value)"' "$RECEIPT_FILE")
 elif command -v python3 >/dev/null 2>&1; then
-    # Python mode
     OUTPUTS_RAW=$(python3 -c "import sys, json; d=json.load(sys.stdin)['outputs']; [print(f'{k}|{v}') for k,v in d.items()]" < "$RECEIPT_FILE")
 else
-    # Shell mode (The "Desperate" Parser)
-    # Relies on Canonical JSON format: {"key":"value","key2":"value2"}
-    # 1. Extract everything between "outputs":{ and the closing }
-    # 2. Split by comma
-    # 3. Clean up quotes
-    echo "[Verify] Warning: Using Shell-Native JSON parser (relies on canonical format)"
-    
-    # Extract the outputs object content. 
-    # This sed is specific to the canonical format produced by json_canon.sh
+    warn "Using Shell-Native JSON parser (relies on canonical format)"
     RAW_CONTENT=$(cat "$RECEIPT_FILE" | sed -n 's/.*"outputs":{\([^}]*\)}.*/\1/p')
-    
-    # Split "file":"hash","file2":"hash2" into lines
     OUTPUTS_RAW=$(echo "$RAW_CONTENT" | sed 's/,"/\n"/g' | sed 's/"//g' | sed 's/:/|/')
 fi
 
@@ -57,12 +108,10 @@ fi
 FAILURES=0
 TOTAL=0
 
-# Set Internal Field Separator to newline to handle the loop correctly
 IFS=$'\n'
 for entry in $OUTPUTS_RAW; do
     [ -z "$entry" ] && continue
     
-    # Split "filename|hash"
     FILE_PATH=$(echo "$entry" | cut -d'|' -f1)
     EXPECTED_HASH=$(echo "$entry" | cut -d'|' -f2)
     
@@ -90,9 +139,9 @@ unset IFS
 
 echo "---------------------------------------------------"
 if [ "$FAILURES" -eq 0 ]; then
-    echo "[Verify] PASSED. All $TOTAL files match the receipt."
+    log "PASSED. All $TOTAL files match the receipt."
     exit 0
 else
-    echo "[Verify] FAILED. Found $FAILURES errors."
+    log "FAILED. Found $FAILURES errors."
     exit 1
 fi

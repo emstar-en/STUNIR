@@ -1,5 +1,29 @@
 #!/usr/bin/env python3
-"""STUNIR IR to Code Emitter (tools/ir_to_code.py)
+"""
+===============================================================================
+STUNIR IR to Code Emitter - Python REFERENCE Implementation
+===============================================================================
+
+WARNING: This is a REFERENCE IMPLEMENTATION for readability purposes only.
+         DO NOT use this file for production, verification, or safety-critical
+         applications.
+
+PRIMARY IMPLEMENTATION: Ada SPARK
+    Location: tools/spark/bin/stunir_ir_to_code_main
+    Build:    cd tools/spark && gprbuild -P stunir_tools.gpr
+
+This Python version exists to:
+1. Provide a readable reference for understanding the algorithm
+2. Serve as a fallback when Ada SPARK tools are not available
+3. Enable quick prototyping and testing
+
+For all production use cases, use the Ada SPARK implementation which provides:
+- Formal verification guarantees
+- Deterministic execution
+- DO-178C compliance support
+- Absence of runtime errors (proven via SPARK)
+
+===============================================================================
 
 This tool reads a STUNIR Canonical IR (JSON) and a template pack directory,
 and generates deterministic source code for a target language.
@@ -526,8 +550,7 @@ def main() -> None:
     out_filename = str(ir_data.get('module_name', 'output')) + ext
     out_path = os.path.join(args.out, out_filename)
 
-    with open(out_path, 'w', encoding='utf-8', newline='
-') as f:
+    with open(out_path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(rendered_code)
 
     print(f'Generated: {out_path}')
@@ -545,11 +568,9 @@ def main() -> None:
             }
         }
         receipt_path = os.path.join(args.out, 'stunir.emit.v1.json')
-        with open(receipt_path, 'w', encoding='utf-8', newline='
-') as f:
+        with open(receipt_path, 'w', encoding='utf-8', newline='\n') as f:
             json.dump(receipt, f, indent=2, sort_keys=True)
-            f.write('
-')
+            f.write('\n')
         print(f'Receipt: {receipt_path}')
 
 if __name__ == '__main__':

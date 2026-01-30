@@ -1,4 +1,16 @@
 ### STUNIR Pack Entry Point (v0)
+
+## ⚠️ IMPORTANT: Ada SPARK is the Primary Implementation Language
+
+**All STUNIR tools default to Ada SPARK implementations.** Python files are reference implementations only and should NOT be used for production, verification, or safety-critical applications.
+
+| Tool | Primary (Ada SPARK) | Reference (Python) |
+|------|---------------------|-------------------|
+| Spec to IR | `tools/spark/bin/stunir_spec_to_ir_main` | `tools/spec_to_ir.py` |
+| IR to Code | `tools/spark/bin/stunir_ir_to_code_main` | `tools/ir_to_code.py` |
+
+---
+
 This file is the **first thing** a tool or model SHOULD read when consuming a STUNIR bundle as a STUNIR pack.
 
 #### 1) What to look for
@@ -64,35 +76,47 @@ When working interactively:
 - Ask the user what they want to produce (IR only, code, runtime outputs) and where to put materialized files.
 - Treat any requested filesystem destinations as untrusted input.
 - Prefer emitting/retaining attestation artifacts as the portable audit record.
+- **Always use Ada SPARK tools** for deterministic operations; Python is for reference only.
 
 #### 8) Repository navigation index (non-normative)
 This section is for humans and AI agents browsing the *repository* (not required for pack validation).
 
+##### Tool Implementation Priority
+
+**PRIMARY (Ada SPARK):**
+- `tools/spark/README.md` - Ada SPARK tools documentation
+- `tools/spark/bin/stunir_spec_to_ir_main` - Spec to IR converter
+- `tools/spark/bin/stunir_ir_to_code_main` - IR to Code emitter
+
+**REFERENCE ONLY (Python):**
+- `tools/spec_to_ir.py` - Reference implementation (DO NOT use for production)
+- `tools/ir_to_code.py` - Reference implementation (DO NOT use for production)
+
 ##### Canonical reading order
 Read these in order:
-- `ENTRYPOINT.md`
-- `docs/verification.md`
-- `docs/toolchain_contracts.md`
-- `docs/receipt_storage_policy.md`
-- `contracts/target_requirements.json`
-- `schemas/stunir_receipt_predicate_v1.schema.json`
-- `schemas/stunir_statement_wrapper_v1.schema.json`
-- `tools/verify_build.py`
-- `tools/spec_to_ir.py`
-- `tools/spec_to_ir_files.py`
-- `scripts/build.sh`
-- `scripts/verify.sh`
-- `spec/stunir_machine_plan.json`
-- `asm/spec_ir.txt`
+1. `ENTRYPOINT.md` (this file)
+2. `tools/spark/README.md` (Ada SPARK tools - PRIMARY)
+3. `docs/verification.md`
+4. `docs/toolchain_contracts.md`
+5. `docs/receipt_storage_policy.md`
+6. `contracts/target_requirements.json`
+7. `schemas/stunir_receipt_predicate_v1.schema.json`
+8. `schemas/stunir_statement_wrapper_v1.schema.json`
+9. `scripts/build.sh` (uses Ada SPARK by default)
+10. `scripts/verify.sh`
+11. `spec/stunir_machine_plan.json`
+12. `asm/spec_ir.txt`
 
 ##### Repo map (what lives where)
+- `tools/spark/`: **PRIMARY** Ada SPARK tool implementations
+- `tools/`: Reference Python tools (for readability only)
 - `docs/`: narrative docs (verification, toolchain contracts, receipt policy)
 - `schemas/`: JSON schemas for statements/receipts
 - `contracts/`: toolchain contracts (identity + determinism probes)
-- `tools/`: implementation utilities
-- `scripts/`: build/verify entrypoints
+- `scripts/`: build/verify entrypoints (default to Ada SPARK)
 - `spec/`: spec deltas / patch sets + machine plan JSON
 - `asm/`: materialization artifacts (includes IR summary)
+- `core/`: Ada SPARK core library implementations
 - `build/`, `receipts/`: build outputs (often not committed by default)
 
 ##### Anti-loop rules
