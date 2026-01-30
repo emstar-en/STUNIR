@@ -16,13 +16,13 @@ with Ada.Strings.Bounded;
 package STUNIR_Spec_To_IR is
 
    --  Maximum path length
-   Max_Path_Length : constant := 4096;
+   Max_Path_Length : constant := 512;
 
    --  Maximum hash length (SHA-256 hex = 64 chars)
    Max_Hash_Length : constant := 64;
 
    --  Maximum manifest entries
-   Max_Manifest_Entries : constant := 10000;
+   Max_Manifest_Entries : constant := 500;
 
    --  Bounded string types
    package Path_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length

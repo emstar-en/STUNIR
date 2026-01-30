@@ -152,8 +152,8 @@ package body STUNIR_Spec_To_IR is
          Get_Next_Entry (Search, Dir_Ent);
 
          declare
-            Full_Name : constant String := Full_Name (Dir_Ent);
-            File_Path : constant Path_String := Path_Strings.To_Bounded_String (Full_Name);
+            Entry_Full_Name : constant String := Full_Name (Dir_Ent);
+            File_Path : constant Path_String := Path_Strings.To_Bounded_String (Entry_Full_Name);
             Entry_Val : Manifest_Entry;
             Entry_OK  : Boolean;
          begin
@@ -252,7 +252,7 @@ package body STUNIR_Spec_To_IR is
       Output_Path : Path_String;
       Success     : out Boolean)
    is
-      Out_File : File_Type;
+      Output_File : File_Type;
       Out_Name : constant String := Path_Strings.To_String (Output_Path);
       Out_Dir  : constant String := Containing_Directory (Out_Name);
    begin
@@ -263,32 +263,32 @@ package body STUNIR_Spec_To_IR is
          Create_Directory (Out_Dir);
       end if;
 
-      Create (Out_File, Out_File, Out_Name);
+      Create (Output_File, Out_File, Out_Name);
 
       --  Write canonical JSON (sorted keys, minimal separators)
-      Put (Out_File, "[");
+      Put (Output_File, "[");
 
       for I in 1 .. Manifest.Count loop
          if I > 1 then
-            Put (Out_File, ",");
+            Put (Output_File, ",");
          end if;
-         Put (Out_File, "{""path":""" &
+         Put (Output_File, "{""path"":""" &
               Path_Strings.To_String (Manifest.Entries (I).Path) &
-              """,""sha256":""" &
+              """,""sha256"":""" &
               Hash_Strings.To_String (Manifest.Entries (I).SHA256) &
-              """,""size":" &
+              """,""size"":" &
               Natural'Image (Manifest.Entries (I).Size) &
               "}");
       end loop;
 
-      Put_Line (Out_File, "]");
-      Close (Out_File);
+      Put_Line (Output_File, "]");
+      Close (Output_File);
       Success := True;
 
    exception
       when others =>
-         if Is_Open (Out_File) then
-            Close (Out_File);
+         if Is_Open (Output_File) then
+            Close (Output_File);
          end if;
          Success := False;
    end Write_Manifest;
@@ -331,10 +331,10 @@ package body STUNIR_Spec_To_IR is
 
       case Result.Status is
          when Success =>
-            Set_Exit_Status (Success);
+            Set_Exit_Status (Ada.Command_Line.Success);
          when others =>
             Put_Line ("[ERROR] Conversion failed with status: " & Conversion_Status'Image (Result.Status));
-            Set_Exit_Status (Failure);
+            Set_Exit_Status (Ada.Command_Line.Failure);
       end case;
    end Run_Spec_To_IR;
 

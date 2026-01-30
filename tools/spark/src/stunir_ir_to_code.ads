@@ -24,12 +24,12 @@ package STUNIR_IR_To_Code is
    Tool_ID : constant String := "stunir_ir_to_code_spark";
 
    --  Maximum sizes
-   Max_Path_Length    : constant := 4096;
-   Max_Name_Length    : constant := 256;
-   Max_Template_Size  : constant := 65536;
-   Max_Output_Size    : constant := 1048576;
-   Max_Functions      : constant := 1000;
-   Max_Types          : constant := 500;
+   Max_Path_Length    : constant := 512;
+   Max_Name_Length    : constant := 128;
+   Max_Template_Size  : constant := 16384;
+   Max_Output_Size    : constant := 65536;
+   Max_Functions      : constant := 100;
+   Max_Types          : constant := 50;
 
    --  Bounded string types
    package Path_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
@@ -74,12 +74,15 @@ package STUNIR_IR_To_Code is
       Is_Public   : Boolean := True;
    end record;
 
+   --  Array of function definitions
+   type Function_Array is array (1 .. Max_Functions) of Function_Definition;
+
    --  IR module record
    type IR_Module is record
       Schema       : Name_String;
       Module_Name  : Name_String;
       Description  : Path_String;
-      Functions    : array (1 .. Max_Functions) of Function_Definition;
+      Functions    : Function_Array;
       Func_Count   : Natural := 0;
    end record;
 

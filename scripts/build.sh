@@ -2,23 +2,58 @@
 # STUNIR Polyglot Build Entrypoint
 # PRIMARY: Ada SPARK tools are the DEFAULT implementation
 # 
-# Auto-detection priority: SPARK -> Native (Rust) -> Python (reference) -> Shell
+# Auto-detection priority: 
+#   1. Precompiled SPARK binaries (no compiler needed)
+#   2. Built SPARK binaries (requires GNAT)
+#   3. Native (Rust)
+#   4. Python (reference only)
+#   5. Shell (minimal)
 #
 # Override via: STUNIR_PROFILE=spark|native|python|shell
+# Force precompiled: STUNIR_USE_PRECOMPILED=1
 
 set -u
 
 # --- Configuration ---
 # Allow override via env var: STUNIR_PROFILE=spark|native|python|shell
 PROFILE="${STUNIR_PROFILE:-auto}"
+USE_PRECOMPILED="${STUNIR_USE_PRECOMPILED:-auto}"
 SPEC_ROOT="spec"
 OUT_IR="asm/spec_ir.json"
 OUT_PY="asm/output.py"
 LOCK_FILE="local_toolchain.lock.json"
 
-# Tool paths
-SPARK_SPEC_TO_IR="tools/spark/bin/stunir_spec_to_ir_main"
-SPARK_IR_TO_CODE="tools/spark/bin/stunir_ir_to_code_main"
+# Detect platform for precompiled binaries
+detect_platform() {
+    case "$(uname -s)" in
+        Linux)  echo "linux" ;;
+        Darwin) echo "macos" ;;
+        *)      echo "unknown" ;;
+    esac
+}
+
+detect_arch() {
+    case "$(uname -m)" in
+        x86_64|amd64) echo "x86_64" ;;
+        aarch64|arm64) echo "arm64" ;;
+        *)             echo "unknown" ;;
+    esac
+}
+
+PLATFORM="$(detect_platform)"
+ARCH="$(detect_arch)"
+PRECOMPILED_DIR="precompiled/${PLATFORM}-${ARCH}/spark/bin"
+
+# Tool paths - prefer precompiled, fall back to built
+if [ -x "$PRECOMPILED_DIR/stunir_spec_to_ir_main" ] && [ "$USE_PRECOMPILED" != "0" ]; then
+    SPARK_SPEC_TO_IR="$PRECOMPILED_DIR/stunir_spec_to_ir_main"
+    SPARK_IR_TO_CODE="$PRECOMPILED_DIR/stunir_ir_to_code_main"
+    USING_PRECOMPILED=1
+else
+    SPARK_SPEC_TO_IR="tools/spark/bin/stunir_spec_to_ir_main"
+    SPARK_IR_TO_CODE="tools/spark/bin/stunir_ir_to_code_main"
+    USING_PRECOMPILED=0
+fi
 NATIVE_BIN="tools/native/rust/stunir-native/target/release/stunir-native"
 
 log() { echo "[STUNIR] $1"; }
@@ -48,17 +83,20 @@ detect_runtime() {
         return
     fi
 
-    # Auto-detection priority: SPARK -> Native -> Python -> Shell
+    # Auto-detection priority: Precompiled SPARK -> Built SPARK -> Native -> Python -> Shell
     # SPARK (Ada) is the PRIMARY and PREFERRED runtime
     if [ -x "$SPARK_SPEC_TO_IR" ] && [ -x "$SPARK_IR_TO_CODE" ]; then
+        if [ "$USING_PRECOMPILED" = "1" ]; then
+            echo "[STUNIR] Using precompiled SPARK binaries (no GNAT compiler needed)" >&2
+        fi
         echo "spark"
     elif [ -x "$NATIVE_BIN" ]; then
         echo "native"
     elif command -v python3 >/dev/null 2>&1; then
-        warn "Falling back to Python reference implementation (not recommended for production)"
+        echo "[STUNIR][WARN] Falling back to Python reference implementation (not recommended for production)" >&2
         echo "python"
     else
-        warn "Falling back to Shell (minimal functionality)"
+        echo "[STUNIR][WARN] Falling back to Shell (minimal functionality)" >&2
         echo "shell"
     fi
 }
@@ -237,6 +275,11 @@ log "=============================================="
 log "Build Summary"
 log "=============================================="
 log "Runtime: $RUNTIME"
+if [ "$RUNTIME" = "spark" ] && [ "$USING_PRECOMPILED" = "1" ]; then
+    log "Binary Source: Precompiled (no GNAT compiler required)"
+elif [ "$RUNTIME" = "spark" ]; then
+    log "Binary Source: Built from source"
+fi
 log "Spec Root: $SPEC_ROOT"
 log "Output IR: $OUT_IR"
 if [ "$RUNTIME" != "spark" ]; then
