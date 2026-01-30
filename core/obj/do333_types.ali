@@ -1,0 +1,152 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+
+RN
+RV NO_FLOATING_POINT
+RV NO_SECONDARY_STACK
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV NO_IMPLICIT_LOOPS
+RV NO_ELABORATION_CODE
+
+U do333_types%b		do333_types.adb		ff572035 NE OO PK
+Z system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+
+U do333_types%s		do333_types.ads		da5d3c82 EE OO PK
+Z system.fat_flt%s	s-fatflt.ads		s-fatflt.ali
+
+D do333_types.ads	20260130013123 da5d3c82 do333_types%s
+D do333_types.adb	20260130013123 250a1cb7 do333_types%b
+D system.ads		20220819080952 a2da961d system%s
+D s-fatflt.ads		20220819080952 11beb392 system.fat_flt%s
+D s-fatgen.ads		20220819080952 d28c6cfe system.fat_gen%s
+D s-parame.ads		20220819080952 d494a4a6 system.parameters%s
+D s-secsta.ads		20220819080952 62cd9202 system.secondary_stack%s
+D s-stoele.ads		20220819080952 6d8e1ff4 system.storage_elements%s
+G a e
+G c Z s s [verification_conditionIP do333_types 80 9 none]
+G c Z s s [proof_obligationIP do333_types 118 9 none]
+G c Z s s [Tvc_arrayBIP do333_types 112 4 none]
+G c Z s s [Tpo_arrayBIP do333_types 146 4 none]
+G c Z s s [do333_resultIP do333_types 158 9 none]
+G c Z s b [status_message do333_types 222 13 none]
+G c Z s b [proof_status_name do333_types 223 13 none]
+G c Z s b [vc_kind_name do333_types 224 13 none]
+X 1 do333_types.ads
+14K9*DO333_Types 226l5 226e16 2|7b14 54l5 54t16
+20N4*Max_VC_Name_Length 31r49 32r49
+21N4*Max_Source_Path_Length 35r53 36r53
+22N4*Max_VC_Count 110r44 111r48
+23N4*Max_PO_Count 144r44 145r48
+24N4*Max_Message_Length 39r49 40r49
+25N4*Max_Prover_Name_Length 43r53 44r53
+31I12*VC_Name_Index{positive} 33r38
+32I12*VC_Name_Length{natural} 82r20 120r20
+33A12*VC_Name_String{string}<integer> 81r20 119r20
+35I12*Source_Path_Index{positive} 37r42
+36I12*Source_Path_Length{natural} 84r20 122r20
+37A12*Source_Path_String{string}<integer> 83r20 121r20
+39I12*Message_Index{positive} 41r38
+40I12*Message_Length{natural} 126r20
+41A12*Message_String{string}<integer> 125r20
+43I12*Prover_Name_Index{positive} 45r42
+44I12*Prover_Name_Length{natural} 91r20 178r22
+45A12*Prover_Name_String{string}<integer> 90r20 177r22
+51E9*Proof_Status 58e5 88r20 127r20 223r41 2|23r41
+52n7*Proven{51E9} 2|26r15
+53n7*Unproven{51E9} 2|27r15
+54n7*Timeout{51E9} 2|28r15
+55n7*Error{51E9} 2|29r15
+56n7*Skipped{51E9} 2|30r15
+57n7*Not_Attempted{51E9} 103r21 140r22 2|31r15
+60E9*VC_Kind 74e5 87r20 224r34 2|35r34
+61n7*Precondition{60E9} 2|38r15
+62n7*Postcondition{60E9} 2|39r15
+63n7*Assert{60E9} 102r21 2|40r15
+64n7*Loop_Invariant{60E9} 2|41r15
+65n7*Loop_Variant{60E9} 2|42r15
+66n7*Range_Check{60E9} 2|43r15
+67n7*Overflow_Check{60E9} 2|44r15
+68n7*Division_Check{60E9} 2|45r15
+69n7*Index_Check{60E9} 2|46r15
+70n7*Discriminant_Check{60E9} 2|47r15
+71n7*Type_Invariant{60E9} 2|48r15
+72n7*Contract_Case{60E9} 2|49r15
+73n7*Subprogram_Variant{60E9} 2|50r15
+80R9*Verification_Condition 93e14 95r23 112r41
+81a7*Name{33A12} 96m7
+82i7*Name_Len{32I12} 97m7
+83a7*Source{37A12} 98m7
+84i7*Source_Len{36I12} 99m7
+85i7*Line{positive} 100m7
+86i7*Column{positive} 101m7
+87e7*Kind{60E9} 102m7
+88e7*Status{51E9} 103m7
+89i7*Time_MS{natural} 104m7
+90a7*Prover{45A12} 105m7
+91i7*Prover_Len{44I12} 106m7
+92b7*Is_Valid{boolean} 107m7
+95r4*Null_VC{80R9} 186r34
+110I12*VC_Index{positive} 112r28
+111I12*VC_Count_Type{natural} 123r20 124r21 161r22 162r22 163r22 164r22 165r22
+112A9*VC_Array(80R9)<integer> 160r22
+118R9*Proof_Obligation 129e14 131r23 146r41
+119a7*Name{33A12} 132m7
+120i7*Name_Len{32I12} 133m7
+121a7*Source{37A12} 134m7
+122i7*Source_Len{36I12} 135m7
+123i7*VC_Count{111I12} 136m7
+124i7*Proven_Count{111I12} 137m7
+125a7*Message{41A12} 138m7
+126i7*Message_Len{40I12} 139m7
+127e7*Status{51E9} 140m7
+128b7*Is_Valid{boolean} 141m7
+131r4*Null_PO{118R9} 192r34
+144I12*PO_Index{positive} 146r28
+145I12*PO_Count_Type{natural} 169r22 170r22
+146A9*PO_Array(118R9)<integer> 168r22
+152F12*Percentage_Type{float} 173r22
+158R9*DO333_Result 183e14 185r33
+160a7*VCs{112A9} 186m7
+161i7*VC_Total{111I12} 187m7
+162i7*VC_Proven{111I12} 188m7
+163i7*VC_Unproven{111I12} 189m7
+164i7*VC_Timeout{111I12} 190m7
+165i7*VC_Error{111I12} 191m7
+168a7*POs{146A9} 192m7
+169i7*PO_Total{145I12} 193m7
+170i7*PO_Proven{145I12} 194m7
+173f7*Proof_Rate{152F12} 195m7
+174i7*Total_Time_MS{natural} 196m7
+177a7*Prover_Name{45A12} 197m7
+178i7*Prover_Len{44I12} 198m7
+181b7*Success{boolean} 199m7
+182b7*All_Proven{boolean} 200m7
+185r4*Null_DO333_Result{158R9}
+207E9*DO333_Status 216e5 222r38 2|9r38
+208n7*Success{207E9} 2|12r15
+209n7*Prover_Not_Found{207E9} 2|13r15
+210n7*Parse_Error{207E9} 2|14r15
+211n7*Proof_Failed{207E9} 2|15r15
+212n7*Timeout_Exceeded{207E9} 2|16r15
+213n7*Resource_Exhausted{207E9} 2|17r15
+214n7*Configuration_Error{207E9} 2|18r15
+215n7*IO_Error{207E9} 2|19r15
+222V13*Status_Message{string} 222>29 2|9b13 21l8 21t22
+222e29 Status{207E9} 2|9b29 11r12
+223V13*Proof_Status_Name{string} 223>32 2|23b13 33l8 33t25
+223e32 Status{51E9} 2|23b32 25r12
+224V13*VC_Kind_Name{string} 224>27 2|35b13 52l8 52t20
+224e27 Kind{60E9} 2|35b27 37r12
+

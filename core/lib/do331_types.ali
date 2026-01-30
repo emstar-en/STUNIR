@@ -1,0 +1,151 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+
+RN
+RV NO_FLOATING_POINT
+RV NO_SECONDARY_STACK
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV NO_IMPLICIT_LOOPS
+RV NO_ELABORATION_CODE
+
+U do331_types%b		do331_types.adb		cd8c2bca NE OO PK
+Z system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+
+U do331_types%s		do331_types.ads		3d1c34e2 EE OO PK
+Z system.fat_flt%s	s-fatflt.ads		s-fatflt.ali
+
+D do331_types.ads	20260130013444 3d1c34e2 do331_types%s
+D do331_types.adb	20260130013454 f0901f28 do331_types%b
+D system.ads		20220819080952 a2da961d system%s
+D s-fatflt.ads		20220819080952 11beb392 system.fat_flt%s
+D s-fatgen.ads		20220819080952 d28c6cfe system.fat_gen%s
+D s-parame.ads		20220819080952 d494a4a6 system.parameters%s
+D s-secsta.ads		20220819080952 62cd9202 system.secondary_stack%s
+D s-stoele.ads		20220819080952 6d8e1ff4 system.storage_elements%s
+G a e
+G c Z s s [coverage_itemIP do331_types 48 9 none]
+G c Z s s [trace_linkIP do331_types 66 9 none]
+G c Z s s [model_itemIP do331_types 84 9 none]
+G c Z s s [Tmodel_arrayBIP do331_types 106 4 none]
+G c Z s s [Tcoverage_arrayBIP do331_types 114 4 none]
+G c Z s s [Ttrace_arrayBIP do331_types 110 4 none]
+G c Z s s [do331_resultIP do331_types 116 9 none]
+G c Z s b [status_message do331_types 147 13 none]
+G c Z s b [dal_name do331_types 148 13 none]
+G c Z s b [model_kind_name do331_types 149 13 none]
+X 1 do331_types.ads
+7K9*DO331_Types 151l5 151e16 2|7b14 47l5 47t16
+9N4*Max_Model_Name_Length 29r52 30r52
+10N4*Max_Model_Path_Length 33r52 34r52
+11N4*Max_Model_Count 104r47 105r46
+12N4*Max_Trace_Links 108r47 109r46
+13N4*Max_Coverage_Items 112r50 113r49
+14N4*Max_Element_ID_Length 37r52 38r52
+16E9*DAL_Level 16e57 124r24 148r31 2|22r31
+16n23*DAL_A{16E9} 2|25r15
+16n30*DAL_B{16E9} 2|26r15
+16n37*DAL_C{16E9} 2|27r15
+16n44*DAL_D{16E9} 2|28r15
+16n51*DAL_E{16E9} 137r25 2|29r15
+18E9*Model_Kind 27e5 89r23 149r37 2|33r37
+19n7*Block_Model{18E9} 99r24 2|36r15
+20n7*Activity_Model{18E9} 2|37r15
+21n7*StateMachine_Model{18E9} 2|38r15
+22n7*Sequence_Model{18E9} 2|39r15
+23n7*Requirement_Model{18E9} 2|40r15
+24n7*Package_Model{18E9} 2|41r15
+25n7*Class_Model{18E9} 2|42r15
+26n7*Interface_Model{18E9} 2|43r15
+29I12*Model_Name_Index{positive} 31r41
+30I12*Model_Name_Length{natural} 86r23
+31A12*Model_Name_String{string}<integer> 85r23
+33I12*Model_Path_Index{positive} 35r41
+34I12*Model_Path_Length{natural} 88r23
+35A12*Model_Path_String{string}<integer> 87r23
+37I12*Element_ID_Index{positive} 39r41
+38I12*Element_ID_Length{natural} 50r21 68r21 70r21
+39A12*Element_ID_String{string}<integer> 49r21 67r21 69r21
+41F12*Percentage_Type{float} 121r24
+43E9*Coverage_Kind 46e5 51r21
+44n7*Statement_Coverage{43E9} 59r22
+44n27*Branch_Coverage{43E9}
+44n44*MCDC_Coverage{43E9}
+45n7*State_Coverage{43E9}
+45n23*Transition_Coverage{43E9}
+45n44*Path_Coverage{43E9}
+48R9*Coverage_Item 54e14 56r34 114r53
+49a7*Element_ID{39A12} 57m7
+50i7*Element_Len{38I12} 58m7
+51e7*Kind{43E9} 59m7
+52b7*Covered{boolean} 60m7
+53i7*Hit_Count{natural} 61m7
+56r4*Null_Coverage_Item{48R9} 132r36
+64E9*Trace_Direction 64e62 71r21
+64n29*Forward{64E9} 80r21
+64n38*Backward{64E9}
+64n48*Bidirectional{64E9}
+66R9*Trace_Link 73e14 75r31 110r47
+67a7*Source_ID{39A12} 76m7
+68i7*Source_Len{38I12} 77m7
+69a7*Target_ID{39A12} 78m7
+70i7*Target_Len{38I12} 79m7
+71e7*Direction{64E9} 80m7
+72b7*Is_Valid{boolean} 81m7
+75r4*Null_Trace_Link{66R9} 135r36
+84R9*Model_Item 92e14 94r31 106r47
+85a7*Name{31A12} 95m7
+86i7*Name_Len{30I12} 96m7
+87a7*Path{35A12} 97m7
+88i7*Path_Len{34I12} 98m7
+89e7*Kind{18E9} 99m7
+90i7*Element_Count{natural} 100m7
+91b7*Is_Valid{boolean} 101m7
+94r4*Null_Model_Item{84R9} 130r36
+104I12*Model_Index{positive} 106r31
+105I12*Model_Count{natural} 118r24
+106A9*Model_Array(84R9)<integer> 117r24
+108I12*Trace_Index{positive} 110r31
+109I12*Trace_Count{natural} 123r24
+110A9*Trace_Array(66R9)<integer> 122r24
+112I12*Coverage_Index{positive} 114r34
+113I12*Coverage_Count{natural} 120r24
+114A9*Coverage_Array(48R9)<integer> 119r24
+116R9*DO331_Result 127e14 129r33
+117a7*Models{106A9} 130m7
+118i7*Model_Total{105I12} 131m7
+119a7*Coverage_Items{114A9} 132m7
+120i7*Coverage_Total{113I12} 133m7
+121f7*Coverage_Pct{41F12} 134m7
+122a7*Trace_Links{110A9} 135m7
+123i7*Trace_Total{109I12} 136m7
+124e7*DAL{16E9} 137m7
+125b7*Success{boolean} 138m7
+126b7*Is_Complete{boolean} 139m7
+129r4*Null_DO331_Result{116R9}
+142E9*DO331_Status 145e5 147r38 2|9r38
+143n7*Success{142E9} 2|12r15
+143n16*Model_Not_Found{142E9} 2|13r15
+143n33*Invalid_Model{142E9} 2|14r15
+143n48*Transform_Failed{142E9} 2|15r15
+144n7*Coverage_Incomplete{142E9} 2|16r15
+144n28*Trace_Missing{142E9} 2|17r15
+144n43*IO_Error{142E9} 2|18r15
+147V13*Status_Message{string} 147>29 2|9b13 20l8 20t22
+147e29 Status{142E9} 2|9b29 11r12
+148V13*DAL_Name{string} 148>23 2|22b13 31l8 31t16
+148e23 Level{16E9} 2|22b23 24r12
+149V13*Model_Kind_Name{string} 149>30 2|33b13 45l8 45t23
+149e30 Kind{18E9} 2|33b30 35r12
+

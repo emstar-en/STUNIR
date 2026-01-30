@@ -1,0 +1,51 @@
+--  STUNIR Phase 4 SPARK Project File
+--  Tool Integration Components
+--  Copyright (C) 2026 STUNIR Project
+--  SPDX-License-Identifier: Apache-2.0
+
+project STUNIR_Phase4 is
+
+   for Source_Dirs use (
+      "report_generator",
+      "tool_interface",
+      "do331_integration",
+      "do332_integration",
+      "do333_integration",
+      "compliance_package"
+   );
+
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+   for Library_Name use "stunir_phase4";
+   for Library_Kind use "static";
+
+   package Compiler is
+      for Default_Switches ("Ada") use (
+         "-gnat2012",
+         "-gnatwa",
+         "-gnatVa",
+         "-gnato",
+         "-fstack-check",
+         "-g",
+         "-O2"
+      );
+   end Compiler;
+
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "--level=2",
+         "--timeout=60",
+         "--memlimit=2000",
+         "--warnings=continue"
+      );
+   end Prove;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-j0", "-g");
+   end Builder;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-E");
+   end Binder;
+
+end STUNIR_Phase4;
