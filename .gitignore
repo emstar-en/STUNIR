@@ -15,3 +15,7 @@ __pycache__/
 
 # System
 .DS_Store
+tools/spark/bin/
+tools/spark/obj/
+targets/spark/bin/
+targets/spark/obj/
