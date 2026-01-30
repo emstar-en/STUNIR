@@ -1,0 +1,11 @@
+{
+  "inputs": {
+    "ir_sha256": "f87f6ff8320ff7d941e212dcc8272e050ac98048d94ee763069cd7ab4b3bdbb0",
+    "template_sha256": "c0ccf596ce3a4aad506abe10c21bcdb438d30b1de172c5a10f33b75e5ad83d8e"
+  },
+  "outputs": {
+    "output.c": "cf9e4c61f1dfdfb76acd2df129f03b789800da113a6118c998633b201b893612"
+  },
+  "tool": "stunir_ir_to_code",
+  "version": "0.2.0"
+}

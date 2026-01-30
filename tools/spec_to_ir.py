@@ -1,4 +1,30 @@
 #!/usr/bin/env python3
+"""
+===============================================================================
+STUNIR Spec to IR Converter - Python REFERENCE Implementation
+===============================================================================
+
+WARNING: This is a REFERENCE IMPLEMENTATION for readability purposes only.
+         DO NOT use this file for production, verification, or safety-critical
+         applications.
+
+PRIMARY IMPLEMENTATION: Ada SPARK
+    Location: tools/spark/bin/stunir_spec_to_ir_main
+    Build:    cd tools/spark && gprbuild -P stunir_tools.gpr
+
+This Python version exists to:
+1. Provide a readable reference for understanding the algorithm
+2. Serve as a fallback when Ada SPARK tools are not available
+3. Enable quick prototyping and testing
+
+For all production use cases, use the Ada SPARK implementation which provides:
+- Formal verification guarantees
+- Deterministic execution
+- DO-178C compliance support
+- Absence of runtime errors (proven via SPARK)
+
+===============================================================================
+"""
 import argparse
 import hashlib
 import json

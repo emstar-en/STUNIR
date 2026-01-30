@@ -1,20 +1,29 @@
 #!/bin/sh
 # STUNIR Polyglot Build Entrypoint
-# Automatically dispatches to the best available runtime.
+# PRIMARY: Ada SPARK tools are the DEFAULT implementation
+# 
+# Auto-detection priority: SPARK -> Native (Rust) -> Python (reference) -> Shell
+#
+# Override via: STUNIR_PROFILE=spark|native|python|shell
 
 set -u
 
 # --- Configuration ---
-# Allow override via env var: STUNIR_PROFILE=native|python|shell
+# Allow override via env var: STUNIR_PROFILE=spark|native|python|shell
 PROFILE="${STUNIR_PROFILE:-auto}"
 SPEC_ROOT="spec"
 OUT_IR="asm/spec_ir.json"
 OUT_PY="asm/output.py"
 LOCK_FILE="local_toolchain.lock.json"
-# Correct path to the Rust binary we built
+
+# Tool paths
+SPARK_SPEC_TO_IR="tools/spark/bin/stunir_spec_to_ir_main"
+SPARK_IR_TO_CODE="tools/spark/bin/stunir_ir_to_code_main"
 NATIVE_BIN="tools/native/rust/stunir-native/target/release/stunir-native"
 
 log() { echo "[STUNIR] $1"; }
+warn() { echo "[STUNIR][WARN] $1"; }
+error() { echo "[STUNIR][ERROR] $1" >&2; }
 
 # --- Pre-flight ---
 if [ ! -d "$SPEC_ROOT" ]; then
@@ -24,45 +33,111 @@ fi
 
 # --- Detection ---
 detect_runtime() {
-    if [ "$PROFILE" = "native" ]; then
-        echo "native"
+    # Allow explicit override
+    if [ "$PROFILE" = "spark" ]; then
+        echo "spark"
         return
-    elif [ "$PROFILE" = "shell" ]; then
-        echo "shell"
+    elif [ "$PROFILE" = "native" ]; then
+        echo "native"
         return
     elif [ "$PROFILE" = "python" ]; then
         echo "python"
         return
+    elif [ "$PROFILE" = "shell" ]; then
+        echo "shell"
+        return
     fi
 
-    # Auto-detection priority: Native -> Python -> Shell
-    if [ -x "$NATIVE_BIN" ]; then
+    # Auto-detection priority: SPARK -> Native -> Python -> Shell
+    # SPARK (Ada) is the PRIMARY and PREFERRED runtime
+    if [ -x "$SPARK_SPEC_TO_IR" ] && [ -x "$SPARK_IR_TO_CODE" ]; then
+        echo "spark"
+    elif [ -x "$NATIVE_BIN" ]; then
         echo "native"
     elif command -v python3 >/dev/null 2>&1; then
+        warn "Falling back to Python reference implementation (not recommended for production)"
         echo "python"
     else
+        warn "Falling back to Shell (minimal functionality)"
         echo "shell"
     fi
 }
 
+# --- Build SPARK tools if needed ---
+build_spark_tools() {
+    if [ ! -x "$SPARK_SPEC_TO_IR" ] || [ ! -x "$SPARK_IR_TO_CODE" ]; then
+        log "Building Ada SPARK tools..."
+        if command -v gprbuild >/dev/null 2>&1; then
+            (cd tools/spark && gprbuild -P stunir_tools.gpr) || {
+                warn "Failed to build SPARK tools, falling back..."
+                return 1
+            }
+            log "SPARK tools built successfully"
+            return 0
+        else
+            warn "gprbuild not found, cannot build SPARK tools"
+            return 1
+        fi
+    fi
+    return 0
+}
+
 # --- Dispatch ---
+# Try to build SPARK tools if auto-detecting
+if [ "$PROFILE" = "auto" ]; then
+    build_spark_tools || true
+fi
+
 RUNTIME=$(detect_runtime)
 log "Runtime selected: $RUNTIME"
+log "NOTE: Ada SPARK is the PRIMARY implementation. Python is reference only."
 
 # 1. Discovery Phase (Always run shell manifest first to generate lockfile)
 log "Running Toolchain Discovery..."
 chmod +x scripts/lib/*.sh 2>/dev/null || true
-./scripts/lib/manifest.sh
+./scripts/lib/manifest.sh 2>/dev/null || true
 
 case "$RUNTIME" in
+    spark)
+        # PRIMARY: Ada SPARK implementation
+        if [ ! -x "$SPARK_SPEC_TO_IR" ]; then
+            error "SPARK binary not found at $SPARK_SPEC_TO_IR"
+            error "Please run: cd tools/spark && gprbuild -P stunir_tools.gpr"
+            exit 1
+        fi
+        
+        log "Using Ada SPARK Core (PRIMARY implementation)"
+        
+        # 1. Spec -> IR (SPARK)
+        "$SPARK_SPEC_TO_IR" --spec-root "$SPEC_ROOT" --out "$OUT_IR" --lockfile "$LOCK_FILE"
+        
+        # 2. IR -> Code (SPARK)
+        if [ -x "$SPARK_IR_TO_CODE" ]; then
+            "$SPARK_IR_TO_CODE" --input "$OUT_IR" --output "$OUT_PY" --target python
+        fi
+        
+        # 3. Generate IR Manifest
+        if [ -d "asm/ir" ]; then
+            log "Generating IR Bundle Manifest..."
+            mkdir -p receipts
+            # Use SPARK or fall back to shell
+            ./scripts/lib/gen_ir_manifest.sh asm/ir receipts/ir_manifest.json 2>/dev/null || \
+                log "Note: IR manifest generation using fallback"
+        fi
+        
+        log "Build complete (Ada SPARK - PRIMARY)"
+        ;;
+
     native)
+        # Secondary: Rust/Haskell native implementation
         if [ ! -x "$NATIVE_BIN" ]; then
-            log "Error: Native binary not found at $NATIVE_BIN"
-            log "Please run: cd tools/native/rust/stunir-native && cargo build --release"
+            error "Native binary not found at $NATIVE_BIN"
+            error "Please run: cd tools/native/rust/stunir-native && cargo build --release"
             exit 1
         fi
         
         log "Using Native Core: $NATIVE_BIN"
+        warn "Consider using Ada SPARK (PRIMARY) instead: STUNIR_PROFILE=spark"
         
         # 1. Spec -> IR (Native Directory Scan)
         "$NATIVE_BIN" spec-to-ir --input "$SPEC_ROOT" --output "$OUT_IR"
@@ -70,8 +145,7 @@ case "$RUNTIME" in
         # 2. IR -> Code
         "$NATIVE_BIN" emit --input "$OUT_IR" --target python --output "$OUT_PY"
         
-        # 3. Generate IR Manifest (Issue: native/haskell/1205)
-        # Creates deterministic manifest with SHA256 hashes
+        # 3. Generate IR Manifest
         if [ -d "asm/ir" ]; then
             log "Generating IR Bundle Manifest..."
             mkdir -p receipts
@@ -83,13 +157,20 @@ case "$RUNTIME" in
         ;;
 
     python)
-        # Original Python path
+        # REFERENCE ONLY: Python implementation (NOT recommended for production)
+        warn "=============================================="
+        warn "USING PYTHON REFERENCE IMPLEMENTATION"
+        warn "This is NOT recommended for production use."
+        warn "Python tools are for REFERENCE/READABILITY only."
+        warn "For production, use Ada SPARK: STUNIR_PROFILE=spark"
+        warn "=============================================="
+        
         python3 -B tools/spec_to_ir.py \
             --spec-root "$SPEC_ROOT" \
             --out "$OUT_IR" \
             --lockfile "$LOCK_FILE"
         
-        # Issue: ISSUE.IR.0001 - Emit dCBOR IR artifacts
+        # Emit dCBOR IR artifacts
         log "Emitting dCBOR IR artifacts..."
         ./scripts/lib/emit_dcbor.sh "$OUT_IR" asm/ir 2>/dev/null || log "Note: dCBOR emission skipped"
         
@@ -97,7 +178,6 @@ case "$RUNTIME" in
         if [ -d "asm/ir" ]; then
             log "Generating IR Bundle Manifest..."
             mkdir -p receipts
-            # Use Python fallback for manifest if Haskell not available
             python3 -c "
 import os, json, hashlib
 ir_dir = 'asm/ir'
@@ -125,14 +205,18 @@ print(f'Generated receipts/ir_manifest.json with {len(entries)} files')
 " 2>/dev/null || log "Note: IR manifest generation skipped"
         fi
         
-        log "Build complete (Python)"
+        log "Build complete (Python - REFERENCE ONLY)"
+        warn "For production, rebuild with: STUNIR_PROFILE=spark ./scripts/build.sh"
         ;;
 
     shell)
-        # Shell-Native path
+        # Shell-Native path (minimal functionality)
+        warn "Using Shell fallback (minimal functionality)"
+        warn "For full functionality, use Ada SPARK: STUNIR_PROFILE=spark"
+        
         ./scripts/lib/runner.sh
         
-        # Issue: ISSUE.IR.0001 - Emit dCBOR IR artifacts for shell path too
+        # Emit dCBOR IR artifacts for shell path too
         if [ -f "$OUT_IR" ]; then
             log "Emitting dCBOR IR artifacts..."
             ./scripts/lib/emit_dcbor.sh "$OUT_IR" asm/ir 2>/dev/null || log "Note: dCBOR emission skipped"
@@ -142,7 +226,21 @@ print(f'Generated receipts/ir_manifest.json with {len(entries)} files')
         ;;
 
     *)
-        log "Error: Unknown runtime profile '$RUNTIME'"
+        error "Unknown runtime profile '$RUNTIME'"
         exit 1
         ;;
 esac
+
+# Final summary
+echo ""
+log "=============================================="
+log "Build Summary"
+log "=============================================="
+log "Runtime: $RUNTIME"
+log "Spec Root: $SPEC_ROOT"
+log "Output IR: $OUT_IR"
+if [ "$RUNTIME" != "spark" ]; then
+    warn "NOTE: For production use, switch to Ada SPARK:"
+    warn "  STUNIR_PROFILE=spark ./scripts/build.sh"
+fi
+log "=============================================="

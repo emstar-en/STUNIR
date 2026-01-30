@@ -1,4 +1,21 @@
 # STUNIR - MADE BY AI FOR AI
+
+## ⚠️ CRITICAL: Ada SPARK is the Primary Implementation Language
+
+**STUNIR uses Ada SPARK as its DEFAULT and PRIMARY implementation language for all tools.**
+
+| Tool | Primary (Ada SPARK) | Reference Only (Python) |
+|------|---------------------|------------------------|
+| Spec to IR | `tools/spark/bin/stunir_spec_to_ir_main` | `tools/spec_to_ir.py` |
+| IR to Code | `tools/spark/bin/stunir_ir_to_code_main` | `tools/ir_to_code.py` |
+| Build Script | `scripts/build.sh` (defaults to SPARK) | Fallback only |
+
+Python files exist **only** as reference implementations for readability. For all production use, verification, deterministic builds, and safety-critical applications, **always use Ada SPARK tools**.
+
+See [`tools/spark/README.md`](tools/spark/README.md) for building and using Ada SPARK tools.
+
+---
+
 ##  Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
