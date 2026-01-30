@@ -1,0 +1,51 @@
+# STUNIR Phase 4 Makefile
+# Tool Integration Components
+# Copyright (C) 2026 STUNIR Project
+# SPDX-License-Identifier: Apache-2.0
+
+.PHONY: all build test prove clean
+
+GPRBUILD ?= gprbuild
+GNATPROVE ?= gnatprove
+
+all: build
+
+build:
+	@echo "Building Phase 4 components..."
+	$(GPRBUILD) -P stunir_phase4.gpr -j0
+	@echo "Phase 4 build complete."
+
+test: build
+	@echo "Building tests..."
+	mkdir -p tests/obj tests/bin
+	$(GPRBUILD) -P tests/test_phase4.gpr -j0
+	@echo "Running tests..."
+	tests/bin/test_phase4
+
+prove:
+	@echo "Running SPARK proofs..."
+	$(GNATPROVE) -P stunir_phase4.gpr --level=2 --timeout=60
+	@echo "SPARK proofs complete."
+
+clean:
+	@echo "Cleaning Phase 4..."
+	rm -rf obj lib tests/obj tests/bin
+	@echo "Clean complete."
+
+status:
+	@echo "Phase 4 SPARK Migration Status"
+	@echo "=============================="
+	@echo "Components:"
+	@echo "  - Report Generator: Complete"
+	@echo "  - Tool Interface: Complete"
+	@echo "  - DO-331 Integration: Complete"
+	@echo "  - DO-332 Integration: Complete"
+	@echo "  - DO-333 Integration: Complete"
+	@echo "  - Compliance Package: Complete"
+	@echo ""
+	@find report_generator -name "*.ads" -o -name "*.adb" | wc -l | xargs -I {} echo "  Report Generator files: {}"
+	@find tool_interface -name "*.ads" -o -name "*.adb" | wc -l | xargs -I {} echo "  Tool Interface files: {}"
+	@find do331_integration -name "*.ads" -o -name "*.adb" | wc -l | xargs -I {} echo "  DO-331 files: {}"
+	@find do332_integration -name "*.ads" -o -name "*.adb" | wc -l | xargs -I {} echo "  DO-332 files: {}"
+	@find do333_integration -name "*.ads" -o -name "*.adb" | wc -l | xargs -I {} echo "  DO-333 files: {}"
+	@find compliance_package -name "*.ads" -o -name "*.adb" | wc -l | xargs -I {} echo "  Compliance Package files: {}"

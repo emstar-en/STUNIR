@@ -1,0 +1,140 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P ZX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+
+U artifact_collector%b	artifact_collector.adb	28860843 NE OO PK
+
+U artifact_collector%s	artifact_collector.ads	e54eb59c EE NE OO PK
+W package_types%s	package_types.adb	package_types.ali
+
+D artifact_collector.ads  20260130013138 3b053529 artifact_collector%s
+D artifact_collector.adb  20260130013156 13833d6a artifact_collector%b
+D package_types.ads	20260130013122 de4b80b5 package_types%s
+D system.ads		20220819080952 a2da961d system%s
+G a e
+G c Z s s [collector_configIP artifact_collector 13 9 none]
+G c Z s b [initialize_config artifact_collector 32 14 none]
+G c Z s b [collect_all_artifacts artifact_collector 40 14 none]
+G c Z s b [collect_source_artifacts artifact_collector 47 14 none]
+G c Z s b [collect_test_artifacts artifact_collector 54 14 none]
+G c Z s b [collect_proof_artifacts artifact_collector 61 14 none]
+G c Z s b [add_artifact artifact_collector 68 14 none]
+G c Z s b [verify_artifact artifact_collector 84 13 none]
+G c Z s b [verify_all_artifacts artifact_collector 87 13 none]
+G c Z s b [compute_file_hash artifact_collector 90 14 none]
+X 1 artifact_collector.ads
+10K9*Artifact_Collector 97l5 97e23 2|7b14 153l5 153t23
+13R9*Collector_Config 20e14 22r37 33r23 41r16 48r16 55r16 62r16 2|27r23 41r16
+. 58r16 68r16 78r16
+14a7*Base_Dir{3|45A12} 23m7 2|34m37
+15i7*Base_Dir_Len{3|44I12} 24m7 44r23 51r23 58r23 65r23 2|35m14
+16a7*Output_Dir{3|45A12} 25m7 2|36m39
+17i7*Output_Len{3|44I12} 26m7 2|37m14
+18b7*Compute_Hash{boolean} 27m7
+19b7*Verify_Files{boolean} 28m7
+22r4*Null_Collector_Config{13R9} 2|33r17
+32U14*Initialize_Config 33<7 34>7 35>7 2|26b14 38l8 38t25
+33r7 Config{13R9} 2|27b7 33m7 34m30 34r30 35m7 36m32 36r32 37m7
+34a7 Base_Dir{string} 36r16 36r40 2|28b7 34r20
+35a7 Output_Dir{string} 37r16 37r42 2|29b7 36r20
+40U14*Collect_All_Artifacts 41>7 42=7 43<7 2|40b14 55l8 55t29
+41r7 Config{13R9} 44r16 2|41b7 46r33 50r31 54r32
+42r7 Comp_Pkg{3|174R9} 2|42b7 46m41 50m39 54m40
+43e7 Status{3|221E9} 2|43b7 46m51 47r10 50m49 51r10 54m50
+47U14*Collect_Source_Artifacts 48>7 49=7 50<7 2|46s7 57b14 65l8 65t32
+48r7 Config{13R9} 51r16 2|58b7 62r28
+49r7 Comp_Pkg{3|174R9} 2|59b7 62r36
+50e7 Status{3|221E9} 2|60b7 64m7
+54U14*Collect_Test_Artifacts 55>7 56=7 57<7 2|50s7 67b14 75l8 75t30
+55r7 Config{13R9} 58r16 2|68b7 72r28
+56r7 Comp_Pkg{3|174R9} 2|69b7 72r36
+57e7 Status{3|221E9} 2|70b7 74m7
+61U14*Collect_Proof_Artifacts 62>7 63=7 64<7 2|54s7 77b14 85l8 85t31
+62r7 Config{13R9} 65r16 2|78b7 82r28
+63r7 Comp_Pkg{3|174R9} 2|79b7 82r36
+64e7 Status{3|221E9} 2|80b7 84m7
+68U14*Add_Artifact 69=7 70>7 71>7 72>7 73>7 74>7 75<7 2|87b14 113l8 113t20
+69r7 Comp_Pkg{3|174R9} 79r16 81r19 81r45 2|88b7 110m7 110r34 111m7 111r27
+70a7 Name{string} 76r16 76r36 2|89b7 99r20
+71a7 Path{string} 77r16 77r36 2|90b7 101r20
+72e7 Kind{3|59E9} 2|91b7 107r17
+73a7 Hash{string} 78r16 2|92b7 103r10 104r23
+74i7 Size{natural} 2|93b7 108r23
+75e7 Status{3|221E9} 80r21 2|94b7 112m7
+84V13*Verify_Artifact{boolean} 84>30 2|115b13 118l8 118t23 125s17
+84r30 Artifact{3|73R9} 2|115b30 117r14 117r36
+87V13*Verify_All_Artifacts{boolean} 87>35 2|120b13 130l8 130t28
+87r35 Comp_Pkg{3|174R9} 2|120b35 123r21 124r38 125r34
+90U14*Compute_File_Hash 91>7 92<7 93<7 94<7 2|132b14 151l8 151t25
+91a7 Path{string} 95r16 95r36 2|133b7 138r28
+92a7 Hash{3|49A12} 2|134b7 143m35 147m10
+93i7 Length{3|48I12} 2|135b7 143m41 144m10 148m10
+94e7 Status{3|221E9} 2|136b7 145m10 149m10
+X 2 artifact_collector.adb
+9U14 Copy_String 9b14 10>7 11<7 12<7 24l8 24t19 34s7 36s7 99s7 101s7 104s10
+. 143s10
+10a7 Source{string} 13r33 16r17 17r21 18r38 19r43 19r51 21r16
+11a7 Target{string} 13r16 19m10 19r18 21r37 22m10 22r18
+12i7 Length{natural} 16m7
+17i11 I{integer} 18r33 19r33 19r66
+21i11 I{integer} 22r33
+31i7 Base_Len{natural} 34m47 35r43
+31i17 Out_Len{natural} 36m51 37r41
+96r7 A{3|73R9} 99m26 99r26 100m7 101m26 101r26 102m7 104m29 104r29 105m10
+. 107m7 108m7 109m7 111r55
+97i7 Name_Len{natural} 99m34 100r48
+97i17 Path_Len{natural} 101m34 102r48
+97i27 Hash_Len{natural} 104m37 105r51
+123i11 I{integer} 124r33 125r54
+139a7 Dummy_Hash{string} 142r10 143r23 144r47
+X 3 package_types.ads
+14K9*Package_Types 1|8w6 8r25 2|100r21 102r21 105r24 144r20 3|242e18
+20N4*Max_Name_Length 1|76r51
+21N4*Max_Path_Length 1|36r59 37r63 77r51 95r51
+22N4*Max_Hash_Length 1|78r31 2|142r31
+23N4*Max_Artifacts 1|79r42
+40I12*Name_Length{natural} 2|100r35
+41A12*Name_String{string}<integer>
+44I12*Path_Length{natural} 1|15r22 17r22 2|35r30 37r28 102r35
+45A12*Path_String{string}<integer> 1|14r22 16r22
+48I12*Hash_Length{natural} 1|93r20 2|105r38 135r20 144r34
+49A12*Hash_String{string}<integer> 1|92r20 2|134r20
+59E9*Artifact_Kind 1|72r18 2|91r18 3|71e5
+73R9*Artifact_Entry 1|84r41 2|96r11 115r41 3|83e14
+74a7*Name{41A12} 2|99m28
+75i7*Name_Len{40I12} 2|100m9
+76a7*Path{45A12} 2|101m28
+77i7*Path_Len{44I12} 2|102m9 117r45
+78a7*Hash{49A12} 2|104m31
+79i7*Hash_Len{48I12} 2|105m12
+80e7*Kind{59E9} 2|107m9
+81i7*Size_Bytes{natural} 2|108m9
+82b7*Is_Valid{boolean} 2|109m9 117r23
+85r4*Null_Artifact_Entry{73R9} 2|96r29
+98I12*Artifact_Count{natural}
+99A9*Artifact_Array(73R9)<integer>
+174R9*Compliance_Package 1|42r25 49r25 56r25 63r25 69r25 87r46 2|42r25 59r25
+. 69r25 79r25 88r25 120r46 3|198e14
+184a7*Artifacts{99A9} 2|111m16 125r43
+185i7*Artifact_Total{98I12} 1|79r25 81r28 81r54 2|110m16 110r43 111r36 123r30
+. 124r47
+221E9*Package_Status 1|43r20 50r20 57r20 64r20 75r22 94r20 2|43r20 60r20
+. 70r20 80r20 94r22 136r20 3|230e5
+222n7*Success{221E9} 1|80r30 2|47r20 51r20 64r17 74r17 84r17 112r17 145r20
+229n7*IO_Error{221E9} 2|149r20
+

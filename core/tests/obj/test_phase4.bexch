@@ -1,0 +1,21 @@
+[GENERATED OBJECT FILE]
+b__test_phase4.o
+[PROJECT FILES]
+/home/ubuntu/stunir_repo/core/tests/test_phase4.gpr
+20260130013040 1688247c74dd18af74f3326a404f7b96
+/home/ubuntu/stunir_repo/core/stunir_phase4.gpr
+20260130013251 b9cb19930b23a3e738d36a456498b426
+[BOUND OBJECT FILES]
+/home/ubuntu/stunir_repo/core/tests/obj/test_phase4.o
+[GENERATED SOURCE FILES]
+b__test_phase4.ads
+b__test_phase4.adb
+b__test_phase4.ali
+[RESULTING OPTIONS]
+-L/home/ubuntu/stunir_repo/core/tests/obj/
+-L/home/ubuntu/stunir_repo/core/tests/obj/
+-L/home/ubuntu/stunir_repo/core/lib/
+-L/usr/lib/gcc/x86_64-linux-gnu/12/adalib/
+-shared
+-lgnat-12
+-ldl

@@ -1,0 +1,182 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P ZX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+
+U do332_interface%b	do332_interface.adb	414c971f NE OO PK
+
+U do332_interface%s	do332_interface.ads	a467c225 EE NE OO PK
+W do332_types%s		do332_types.adb		do332_types.ali
+
+D do332_interface.ads	20260130013122 5820e77d do332_interface%s
+D do332_interface.adb	20260130013122 196c7062 do332_interface%b
+D do332_types.ads	20260130013504 fc472558 do332_types%s
+D system.ads		20220819080952 a2da961d system%s
+G a e
+G c Z s s [analysis_configIP do332_interface 39 9 none]
+G c Z s b [initialize_config do332_interface 66 14 none]
+G c Z s b [analyze_oop do332_interface 76 14 none]
+G c Z s b [analyze_hierarchy do332_interface 84 14 none]
+G c Z s b [verify_polymorphism do332_interface 91 14 none]
+G c Z s b [calculate_coupling do332_interface 96 14 none]
+G c Z s b [add_class do332_interface 105 14 none]
+G c Z s b [add_polymorphic_call do332_interface 118 14 none]
+G c Z s b [check_depth_limits do332_interface 134 13 none]
+G c Z s b [check_coupling_limits do332_interface 139 13 none]
+G c Z s b [all_polymorphism_safe do332_interface 144 13 none]
+G c Z s b [finalize_result do332_interface 152 14 none]
+X 1 do332_interface.ads
+16K9*DO332_Interface 157l5 157e20 2|7b14 265l5 265t20
+22N4*Max_IR_Path_Length 31r46 32r46 71r58
+23N4*Max_Output_Path_Length 72r66
+24N4*Default_Max_Depth 55r24 70r32 2|38r32
+25N4*Default_Max_Coupling 56r24
+31I12*Path_Index{positive} 33r35
+32I12*Path_Length{natural} 41r24 43r24 2|45r29 48r28
+33A12*Path_String{string}<integer> 40r24 42r24
+39R9*Analysis_Config 48e14 50r36 67r25 77r16 85r16 2|35r25 58r16 95r16
+40a7*IR_Path{33A12} 51m7 2|44m35
+41i7*IR_Path_Len{32I12} 52m7 80r24 88r24 2|45m14
+42a7*Output_Path{33A12} 53m7 2|47m39
+43i7*Output_Len{32I12} 54m7 2|48m14
+44i7*Max_Depth{natural} 55m7 73r24 2|50m14 85r38
+45i7*Max_Coupling{natural} 56m7 2|85r56
+46b7*Check_Virtual{boolean} 57m7 2|71r17
+47b7*Check_Coupling{boolean} 58m7 2|78r17
+50r4*Null_Analysis_Config{39R9} 2|42r17
+66U14*Initialize_Config 67<7 68>7 69>7 70>7 2|34b14 51l8 51t25
+67r7 Config{39R9} 73r17 2|35b7 42m7 44m28 44r28 45m7 47m32 47r32 48m7 50m7
+68a7 IR_Path{string} 71r17 71r40 2|36b7 44r19
+69a7 Output_Path{string} 72r17 72r44 2|37b7 47r19
+70i7 Max_Depth{natural} 73r36 2|38b7 50r27
+76U14*Analyze_OOP 77>7 78<7 79<7 2|57b14 88l8 88t19
+77r7 Config{39R9} 80r17 2|58b7 66r25 71r10 78r10 85r31 85r49
+78r7 Result{3|171R9} 81r43 2|59b7 63m7 66m33 72m30 79m29 85m23 86m7
+79e7 Status{3|208E9} 81r21 2|60b7 66m41 67r10 72m38 73r13 79m37 80r13 87m7
+84U14*Analyze_Hierarchy 85>7 86=7 87<7 2|66s7 94b14 104l8 104t25
+85r7 Config{39R9} 88r17 2|95b7 99r28
+86r7 Result{3|171R9} 2|96b7 102m7
+87e7 Status{3|208E9} 2|97b7 103m7
+91U14*Verify_Polymorphism 92=7 93<7 2|72s10 110b14 123l8 123t27
+92r7 Result{3|171R9} 2|111b7 116r21 117r38 118m10 121m7 121r55
+93e7 Status{3|208E9} 2|112b7 122m7
+96U14*Calculate_Coupling 97=7 98<7 2|79s10 129b14 142l8 142t26
+97r7 Result{3|171R9} 2|130b7 135m7 136m7 137m7 138m7 138r29 139m7 139r29
+. 140m7
+98e7 Status{3|208E9} 2|131b7 141m7
+105U14*Add_Class 106=7 107>7 108>7 109>7 110>7 111<7 2|148b14 179l8 179t17
+106r7 Result{3|171R9} 114r17 115r43 115r64 2|149b7 171m7 171r29 172m7 172r22
+. 174r18 175m10
+107a7 Name{string} 112r17 112r37 2|150b7 159r19
+108a7 Parent{string} 113r17 2|151b7 162r10 163r22
+109e7 Inheritance{3|38E9} 2|152b7 167r24
+110i7 Depth{natural} 2|153b7 168r18 174r10 175r30
+111e7 Status{3|208E9} 115r21 2|154b7 178m7
+118U14*Add_Polymorphic_Call 119=7 120>7 121>7 122>7 123<7 2|185b14 207l8
+. 207t28
+119r7 Result{3|171R9} 126r17 127r43 127r63 2|186b7 204m7 204r28 205m7 205r25
+120a7 Caller_Class{string} 124r17 124r45 2|187b7 195r19
+121a7 Target_Method{string} 125r17 125r46 2|188b7 198r19
+122b7 Is_Safe{boolean} 2|189b7 201r20
+123e7 Status{3|208E9} 127r21 2|190b7 206m7
+134V13*Check_Depth_Limits{boolean} 135>7 136>7 2|213b13 219l8 219t26 260s32
+135r7 Result{3|171R9} 2|214b7 218r14
+136i7 Max_Depth{natural} 2|215b7 218r34
+139V13*Check_Coupling_Limits{boolean} 140>7 141>7 2|225b13 231l8 231t29 262s29
+140r7 Result{3|171R9} 2|226b7 230r14
+141i7 Max_Coupling{natural} 2|227b7 230r36
+144V13*All_Polymorphism_Safe{boolean} 145>7 2|121s33 237b13 248l8 248t29
+. 261s33
+145r7 Result{3|171R9} 2|238b7 241r21 242r38 243r17
+152U14*Finalize_Result 153=7 154>7 155>7 2|85s7 254b14 263l8 263t23
+153r7 Result{3|171R9} 2|255b7 260m7 260r51 261m7 261r55 262m7 262r51
+154i7 Max_Depth{natural} 2|256b7 260r59
+155i7 Max_Coupling{natural} 2|257b7 262r59
+X 2 do332_interface.adb
+13U14 Copy_String 13b14 14>7 15<7 16<7 28l8 28t19 44s7 47s7 159s7 163s10
+. 195s7 198s7
+14a7 Source{string} 17r33 20r17 21r21 22r38 23r42 23r49 25r16
+15a7 Target{string} 17r16 23m10 23r17 25r37 26m10 26r17
+16i7 Length{natural} 20m7
+21i11 I{integer} 22r33 23r32 23r64
+25i11 I{integer} 26r32
+40i7 IR_Len{natural} 44m44 45r41
+40i15 Out_Len{natural} 47m52 48r40
+116i11 I{integer} 117r33 118r28
+156r7 C{3|87R9} 159m25 159r25 160m7 163m30 163r30 164m10 167m7 168m7 169m7
+. 172r45
+157i7 Name_Len{natural} 159m33 160r39
+157i17 Parent_Len{natural} 163m45 164r44
+192r7 P{3|123R9} 195m33 195r33 196m7 198m34 198r34 199m7 201m7 202m7 205r47
+193i7 Caller_Len{natural} 195m49 196r41
+193i19 Target_Len{natural} 198m51 199r41
+241i11 I{integer} 242r33 243r35
+X 3 do332_types.ads
+14K9*DO332_Types 1|14w6 14r23 3|227e16
+20N4*Max_Class_Name_Length 1|112r52 113r34 124r68 125r70
+21N4*Max_Class_Count 1|114r38
+24N4*Max_Polymorphic_Calls 1|126r37
+31I12*Class_Name_Length{natural} 2|160r21 164r26 196r23 199r23
+32A12*Class_Name_String{string}<integer>
+38E9*Inheritance_Kind 1|109r21 2|152r21 3|43e5
+87R9*Class_Entry 2|156r11 3|99e14
+88a7*Name{32A12} 2|159m27
+89i7*Name_Len{31I12} 2|160m9
+90a7*Parent_Name{32A12} 2|163m32
+91i7*Parent_Len{31I12} 2|164m12
+92e7*Inheritance{38E9} 2|167m9
+93i7*Depth{natural} 2|168m9
+98b7*Is_Valid{boolean} 2|169m9
+101r4*Null_Class_Entry{87R9} 2|156r26
+116I12*Class_Count{natural}
+117A9*Class_Array(87R9)<integer>
+123R9*Polymorphic_Call 2|192r11 3|130e14
+124a7*Caller_Class{32A12} 2|195m35
+125i7*Caller_Len{31I12} 2|196m9
+126a7*Target_Method{32A12} 2|198m36
+127i7*Target_Len{31I12} 2|199m9
+128b7*Is_Safe{boolean} 2|201m9 243r38
+129b7*Is_Verified{boolean} 2|118m31 202m9
+132r4*Null_Polymorphic_Call{123R9} 2|192r31
+142I12*Poly_Call_Count{natural}
+143A9*Poly_Call_Array(123R9)<integer>
+150i7*CBO{natural} 2|135m22 230r29
+151i7*RFC{natural} 2|136m22
+152i7*WMC{natural} 2|137m22
+153i7*DIT{natural} 2|138m22
+154i7*NOC{natural} 2|139m22
+155i7*LCOM{natural} 2|140m22
+171R9*DO332_Result 1|78r20 86r23 92r23 97r23 106r28 119r29 135r19 140r21
+. 145r16 153r27 2|59r20 96r23 111r23 130r23 149r28 186r29 214r19 226r21 238r16
+. 255r27 3|189e14
+173a7*Classes{117A9} 2|172m14
+174i7*Class_Total{116I12} 1|114r24 115r50 115r71 2|139r36 171m14 171r36 172r29
+177a7*Poly_Calls{143A9} 2|118m17 205m14 243r24
+178i7*Poly_Total{142I12} 1|126r24 127r50 127r70 2|116r28 117r45 204m14 204r35
+. 205r32 241r28 242r45
+181r7*Metrics{149R9} 2|135m14 136m14 137m14 138m14 139m14 140m14 230r21
+182i7*Max_Depth{natural} 2|102m14 138r36 174r25 175m17 218r21
+185b7*Inheritance_OK{boolean} 2|260m14
+186b7*Polymorphism_OK{boolean} 2|121m14 261m14
+187b7*Coupling_OK{boolean} 2|262m14
+188b7*Success{boolean} 1|81r50 2|86m14
+191r4*Null_DO332_Result{171R9} 2|63r17
+208E9*DO332_Status 1|79r20 87r20 93r20 98r20 111r25 123r26 2|60r20 97r20
+. 112r20 131r20 154r25 190r26 3|217e5
+209n7*Success{208E9} 1|81r30 115r30 127r30 2|67r20 73r23 80r23 87r17 103r17
+. 122r17 141r17 178r17 206r17
+

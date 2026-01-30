@@ -1,0 +1,183 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_SECONDARY_STACK
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV NO_IMPLICIT_LOOPS
+RV NO_ELABORATION_CODE
+
+U external_tool%b	external_tool.adb	583bc2de NE OO PK
+Z system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+
+U external_tool%s	external_tool.ads	0a79f34a EE OO PK
+
+D external_tool.ads	20260130013345 0a79f34a external_tool%s
+D external_tool.adb	20260130013410 52423194 external_tool%b
+D system.ads		20220819080952 a2da961d system%s
+D s-parame.ads		20220819080952 d494a4a6 system.parameters%s
+D s-secsta.ads		20220819080952 62cd9202 system.secondary_stack%s
+D s-stoele.ads		20220819080952 6d8e1ff4 system.storage_elements%s
+G a e
+G c Z s s [tool_itemIP external_tool 53 9 none]
+G c Z s s [Ttool_arrayBIP external_tool 77 4 none]
+G c Z s s [tool_registryIP external_tool 79 9 none]
+G c Z s s [argument_itemIP external_tool 91 9 none]
+G c Z s s [command_resultIP external_tool 105 9 none]
+G c Z s b [initialize_registry external_tool 125 14 none]
+G c Z s b [discover_tool external_tool 128 14 none]
+G c Z s b [register_tool external_tool 135 14 none]
+G c Z s b [find_tool external_tool 144 13 none]
+G c Z s b [execute_command external_tool 150 14 none]
+G c Z s b [get_tool_version external_tool 161 14 none]
+G c Z s b [status_message external_tool 166 13 none]
+G c Z s b [tool_exists external_tool 168 13 none]
+G c Z s b [build_arguments external_tool 171 14 none]
+G c Z s s [Targument_arrayBIP external_tool 103 4 none]
+G c Z b b [copy_to_buffer external_tool 9 14 none]
+X 1 external_tool.ads
+8K9*External_Tool 183l5 183e18 2|7b14 200l5 200t18
+10N4*Max_Tool_Name_Length 31r51 32r51 132r52 148r51
+11N4*Max_Tool_Path_Length 35r51 36r51 2|50r35
+12N4*Max_Version_Length 39r49 40r51
+13N4*Max_Output_Length 43r48 44r50
+14N4*Max_Command_Length 157r58
+15N4*Max_Arguments 101r56 102r49
+16N4*Max_Argument_Length 47r50 48r52 178r31 179r31 180r31 181r31
+17N4*Max_Tools 75r46 76r45 140r34
+18N4*Max_Timeout_MS 158r31
+20E9*Tool_Status 29e5 131r20 138r22 156r24 163r20 166r38 2|35r20 68r22 113r24
+. 132r20 143r38
+21n7*Success{20E9} 133r30 141r30 159r30 2|55r26 73r17 127r17 140r17 146r15
+22n7*Tool_Not_Found{20E9} 2|57r26 61r20 147r15
+23n7*Execution_Failed{20E9} 2|148r15
+24n7*Timeout_Exceeded{20E9} 2|149r15
+25n7*Output_Overflow{20E9} 2|150r15
+26n7*Invalid_Arguments{20E9} 2|119r20 151r15
+27n7*Permission_Denied{20E9} 2|152r15
+28n7*Unknown_Error{20E9} 2|153r15
+31I12*Tool_Name_Index{positive} 33r40
+32I12*Tool_Name_Length{natural} 55r21 2|41r24
+33A12*Tool_Name_String{string}<integer> 54r21
+35I12*Tool_Path_Index{positive} 37r40
+36I12*Tool_Path_Length{natural} 57r21 2|52r33
+37A12*Tool_Path_String{string}<integer> 56r21
+39I12*Version_Index{positive} 41r38
+40I12*Version_Len_Type{natural} 59r21 2|138r27
+41A12*Version_String{string}<integer> 58r21
+43I12*Output_Index{positive} 45r37
+44I12*Output_Len_Type{natural} 108r21 110r21
+45A12*Output_Buffer{string}<integer> 107r21 109r21
+47I12*Argument_Index{positive} 49r39
+48I12*Argument_Len_Type{natural} 93r19 2|175r39
+49A12*Argument_String{string}<integer> 92r19
+51I12*Exit_Code_Range{integer} 106r21
+53R9*Tool_Item 62e14 64r30 77r45 130r20 137r18 162r23 168r33 2|34r20 67r18
+. 84r17 131r23 157r33
+54a7*Name{33A12} 65m7 2|40m34 92r27
+55i7*Name_Len{32I12} 66m7 2|41m12 86r18
+56a7*Path{37A12} 67m7 2|51m47
+57i7*Path_Len{36I12} 68m7 2|52m21
+58a7*Version{41A12} 69m7 2|137m41
+59i7*Version_Len{40I12} 70m7 2|138m12
+60b7*Available{boolean} 71m7 133r48 140r53 164r21 169r43 2|53m21 159r19
+61b7*Verified{boolean} 72m7 2|54m21 139m12
+64r4*Null_Tool_Item{53R9} 86r33 2|39r15
+75I12*Tool_Index{positive} 77r30
+76I12*Tool_Count{natural} 81r21 146r33 2|78r33
+77A9*Tool_Array(53R9)<integer> 80r21
+79R9*Tool_Registry 83e14 85r34 125r50 136r25 145r18 2|26r50 66r25 77r18
+80a7*Tools{77A9} 86m7 2|72m16 84m44
+81i7*Count{76I12} 87m7 126r51 140r26 142r28 142r45 2|71m16 71r34 72r32 81r30
+. 82r47
+82b7*Initialized{boolean} 88m7 126r26 139r26 147r25 2|29m16
+85r4*Null_Tool_Registry{79R9} 2|28r19
+91R9*Argument_Item 94e14 96r34 103r59
+92a7*Value{49A12} 97m7 2|174m49
+93i7*Value_Len{48I12} 98m7 2|175m26
+96r4*Null_Argument_Item{91R9} 2|179r26
+101I12*Argument_Array_Index{positive} 103r34 2|170r34
+102I12*Argument_Count{natural} 153r20 173r23 2|110r20 164r23
+103A9*Argument_Array(91R9)<integer> 152r20 172r23 2|109r20 163r23
+105R9*Command_Result 113e14 115r35 155r24 2|112r24
+106i7*Exit_Code{51I12} 116m7 2|122m14
+107a7*Output{45A12} 117m7
+108i7*Output_Len{44I12} 118m7 2|123m14
+109a7*Error_Out{45A12} 119m7
+110i7*Error_Len{44I12} 120m7 2|124m14
+111b7*Timed_Out{boolean} 121m7 2|125m14
+112b7*Success{boolean} 122m7 159r50 2|126m14
+115r4*Null_Command_Result{105R9} 2|117r17
+125U14*Initialize_Registry 125<35 2|26b14 30l8 30t27
+125r35 Registry{79R9} 126r17 126r42 2|26b35 28m7 29m7
+128U14*Discover_Tool 129>7 130<7 131<7 2|32b14 63l8 63t21
+129a7 Name{string} 132r17 132r37 2|33b7 40r23 43r10 43r32 43r48 44r10 44r31
+. 44r48 47r57
+130r7 Item{53R9} 133r43 2|34b7 39m7 40m29 40r29 41m7 51m42 51r42 52m16 53m16
+. 54m16
+131e7 Status{20E9} 133r21 2|35b7 55m16 57m16 61m10
+135U14*Register_Tool 136=7 137>7 138<7 2|65b14 74l8 74t21
+136r7 Registry{79R9} 139r17 140r17 142r19 142r36 2|66b7 71m7 71r25 72m7 72r23
+137r7 Item{53R9} 140r48 2|67b7 72r42
+138e7 Status{20E9} 141r21 2|68b7 73m7
+144V13*Find_Tool{76I12} 145>7 146>7 2|76b13 105l8 105t17
+145r7 Registry{79R9} 147r16 2|77b7 81r21 82r38 84r35
+146a7 Name{string} 148r16 148r36 2|78b7 86r29 90r33 91r50 92r39 92r45
+150U14*Execute_Command 151>7 152>7 153>7 154>7 155<7 156<7 2|107b14 128l8
+. 128t23
+151a7 Command{string} 157r17 157r40 2|108b7 118r10
+152a7 Args{103A9} 2|109b7 115r28
+153i7 Arg_Count{102I12} 2|110b7 115r34
+154i7 Timeout_MS{positive} 158r17 2|111b7 115r45
+155r7 Result{105R9} 159r43 2|112b7 117m7 122m7 123m7 124m7 125m7 126m7
+156e7 Status{20E9} 159r21 2|113b7 119m10 127m7
+161U14*Get_Tool_Version 162=7 163<7 2|130b14 141l8 141t24
+162r7 Item{53R9} 164r16 2|131b7 137m36 137r36 138m7 139m7
+163e7 Status{20E9} 2|132b7 140m7
+166V13*Status_Message{string} 166>29 2|143b13 155l8 155t22
+166e29 Status{20E9} 2|143b29 145r12
+168V13*Tool_Exists{boolean} 168>26 169r17 2|157b13 160l8 160t19
+168r26 Item{53R9} 169r38 2|157b26 159r14
+171U14*Build_Arguments 172<7 173<7 174>7 175>7 176>7 177>7 2|162b14 198l8
+. 198t23
+172a7 Args{103A9} 2|163b7 174m36 174r36 175m13 179m7
+173i7 Arg_Count{102I12} 2|164b7 180m7 183m10 183r23 184r19 187m10 187r23
+. 188r19 191m10 191r23 192r19 195m10 195r23 196r19
+174a7 Arg1{string} 178r16 2|165b7 182r10 184r30
+175a7 Arg2{string} 179r16 2|166b7 186r10 188r30
+176a7 Arg3{string} 180r16 2|167b7 190r10 192r30
+177a7 Arg4{string} 181r16 2|168b7 194r10 196r30
+X 2 external_tool.adb
+9U14 Copy_To_Buffer 9b14 10>7 11<7 12<7 24l8 24t22 40s7 51s16 137s7 174s13
+10a7 Source{string} 13r33 16r17 17r21 18r38 19r43 19r51 21r16
+11a7 Target{string} 13r16 19m10 19r18 21r37 22m10 22r18
+12i7 Length{natural} 16m7
+17i11 I{integer} 18r33 19r33 19r66
+21i11 I{integer} 22r33
+37i7 Name_Len{natural} 40m40 41r42
+47a13 Path_Str=47:55{string} 50r16 51r32
+48i13 Path_Len{natural} 51m53 52r51
+81i11 I{integer} 82r33 84r51 98r29
+84r13 E{1|53R9} 86r16 92r25
+88b19 Match{boolean} 93m25 97r22
+90i23 J{integer} 91r45 92r33 92r58
+134a7 Version_Str{string} 137r23
+135i7 Ver_Len{natural} 137m50 138r45
+170U17 Set_Arg 170b17 170>26 170>56 177l11 177t18 184s10 188s10 192s10 196s10
+170i26 Index{1|101I12} 174r42 175r19
+170a56 Value{string} 173r13 174r29
+171i10 Len{natural} 174m56 175r58
+
