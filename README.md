@@ -214,7 +214,7 @@ If you see documentation or examples using Python tools, translate them to SPARK
 - `tools/ir_to_code.py` → `precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main`
 
 ## What is STUNIR?
-**STUNIR = Standardization Theorem + Unique Normals + Intermediate Reference**
+**STUNIR = Deterministic Multi-Language Code Generation**
 STUNIR is a **model-facing, deterministic generation harness** for turning a human-authored **spec** into:
 * a canonical **Intermediate Reference (IR)** (a canonical meaning object / referent; it is also an "intermediate representation" in the usual compiler sense)
 * one or more **runtime outputs** (hosted and/or compiled)
@@ -250,34 +250,58 @@ These files are for reading/understanding only, **NOT** for production use:
 If you are looking for the **pack/container** interchange format (used when shipping bundles between environments), start with:
 * `ENTRYPOINT.md`
 * `docs/root/stunir_pack_spec_v0.md`
-## Why the name matters (ST / UN / IR)
+## How STUNIR Works: Deterministic Pipeline Architecture
 STUNIR exists because "model-written code" becomes practical only when the **model is not the authority**. Models can propose plans and edits; deterministic tooling must be the sole producer of commitments.
-### ST — Standardization Theorem (operational meaning in STUNIR)
-In STUNIR, "ST" is used in the practical/engineering sense: a **standardized, deterministic sequence of steps** from inputs → IR → outputs, so the process is replayable or at least re-checkable.
+
+### Deterministic Pipeline
+STUNIR implements a **standardized, deterministic sequence of steps** from inputs → IR → outputs, ensuring the process is replayable and verifiable.
 This repo encodes that sequence explicitly (see `scripts/build.sh`).
-### UN — Unique Normals (what we use today)
-A full Church–Rosser / confluence story across the entire pipeline is valuable but expensive.
-For the current stage, STUNIR uses **Unique Normal Forms** as the efficient determinism/equivalence layer:
-* canonicalization produces a stable normal form
-* commitments/hashes bind artifacts to those normal forms
-* verification stays cheap (re-hash + compare)
-Concretely, this repo normalizes JSON into canonical bytes (sorted keys, stable separators), so "same meaning" ⇒ "same bytes" ⇒ "same sha256" (see `tools/spark/src/stunir_spec_to_ir.adb` for the primary SPARK implementation, or `tools/spec_to_ir_files.py` as a reference).
+
+### Hash Uniqueness (Current Implementation)
+**⚠️ IMPORTANT**: STUNIR currently uses hash-based manifests for determinism, NOT true semantic IR.
+
+For the current stage, STUNIR uses **hash uniqueness** as the determinism/equivalence layer:
+* Canonicalization produces stable byte-level representations
+* Commitments/hashes bind artifacts to those representations
+* Verification stays cheap (re-hash + compare)
+
+Concretely, this repo normalizes JSON into canonical bytes (sorted keys, stable separators), so "same structure" ⇒ "same bytes" ⇒ "same sha256" (see `tools/spark/src/stunir_spec_to_ir.adb` for the primary SPARK implementation).
+
+**⚠️ LIMITATION**: This is NOT true semantic equivalence. Different syntactic representations of semantically identical code will produce different hashes.
+
+### Future: Semantic IR (Planned)
+The TRUE goal of STUNIR is to implement **Semantic IR** (AST-based intermediate representation) that:
+* Preserves semantic meaning, not just syntactic structure
+* Allows different syntactic forms to normalize to the same semantic IR
+* Enables true semantic equivalence checking
+* Supports sophisticated code transformations
+
+This will be implemented in upcoming releases. See `docs/SEMANTIC_IR_SPECIFICATION.md` for the design.
+
+### Future: Church-Rosser Confluence (CRIR Project)
+Full Church–Rosser confluence properties will be implemented in the upcoming **CRIR (Church-Rosser Intermediate Reference)** utility—a separate project that will provide formal confluence guarantees across transformation pipelines.
+
+STUNIR focuses on deterministic code generation; CRIR will focus on provable confluence.
+
 ### IR — Intermediate Reference
 IR is treated as the canonical _referent_ that everything else is checked against:
 * spec → IR (canonicalization / compilation)
 * IR → outputs (generation)
 * outputs → IR (verification / reconstruction / equivalence checks, where applicable)
+
 "Reference" is intentional: the IR is what receipts bind and what verifiers check, regardless of how humans authored the spec.
 ## Origin / motivation (why this exists)
 This harness came from a practical problem:
 * A program design was already known, but hand-coding it was too slow/inefficient.
 * Writing the same output in multiple languages multiplies that cost.
+
 So the workflow became:
 1. Use NLP prompts to get a model to propose a **spec**.
 2. Deterministically compile the spec into a canonical IR.
 3. Generate one or more language outputs from the IR.
-4. Cross-check via normal forms/receipts so determinism and auditability are built in.
-The "paranoid" endgame is a more fully axiomatic Church–Rosser/confluence-grade system. STUNIR is the efficient route: **Unique Normals now**, stronger proof machinery later.
+4. Cross-check via hash-based receipts so determinism and auditability are built in.
+
+The current implementation uses hash-based determinism as an efficient foundation. The roadmap includes semantic IR and eventually formal confluence properties (via the separate CRIR project).
 ## What STUNIR is (and is not)
 ### STUNIR is
 * A repeatable way to compile **spec → IR → artifacts** under strict determinism controls.

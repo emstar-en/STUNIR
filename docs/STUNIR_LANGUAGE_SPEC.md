@@ -3,7 +3,7 @@
 **Version:** 1.0  
 **Status:** Phase 6D Implementation
 
-STUNIR (Standardization Theorem + Unique Normals + Intermediate Reference) is a domain-specific language for specifying compilers, code generators, and IR transformations.
+STUNIR (Deterministic Multi-Language Code Generation) is a domain-specific language for specifying compilers, code generators, and IR transformations.
 
 ## Table of Contents
 

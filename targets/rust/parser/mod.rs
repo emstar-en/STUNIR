@@ -6,7 +6,6 @@
 //! Timestamp: 2026-01-31T02:44:18.578352Z
 
 use crate::types::*;
-use std::fmt;
 
 /// Parser configuration
 #[derive(Debug, Clone)]
@@ -55,7 +54,7 @@ pub fn emit_function(
 /// Emit complete module
 pub fn emit_module(
     module_name: &str,
-    config: &ParserConfig,
+    _config: &ParserConfig,
 ) -> EmitterResult<String> {
     let mut code = String::new();
     

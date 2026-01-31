@@ -62,7 +62,7 @@ Rules:
 - File encoding: UTF-8
 - Newlines: LF only
 - Ordering: the file MUST be sorted lexicographically by `REL_PATH` under `LC_ALL=C`.
-  - Rationale: ordering-by-path aligns with the STUNIR “Unique Normals” rule and matches `pack_manifest.tsv` ordering.
+  - Rationale: ordering-by-path ensures deterministic output and matches `pack_manifest.tsv` ordering.
 - `REL_PATH` MUST be a **safe relative path**:
   - MUST NOT be absolute
   - MUST NOT contain `..` segments
