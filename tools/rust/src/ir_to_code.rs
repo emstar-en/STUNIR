@@ -13,10 +13,9 @@
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
-use stunir_tools::{ir::parse_ir, types::*};
+use stunir_tools::types::*;
 
 #[derive(Parser, Debug)]
 #[command(name = "stunir_ir_to_code")]
@@ -51,13 +50,9 @@ fn main() -> Result<()> {
     let ir_contents = fs::read_to_string(&args.ir_file)
         .with_context(|| format!("Failed to read IR file: {:?}", args.ir_file))?;
 
-    // Parse IR JSON
-    let ir_json: Value = serde_json::from_str(&ir_contents)
-        .context("Failed to parse IR JSON")?;
-
-    // Extract module from manifest
-    let module_json = &ir_json["module"];
-    let module = parse_ir(module_json)?;
+    // Parse IR JSON - now expects flat stunir_ir_v1 format
+    let module: IRModule = serde_json::from_str(&ir_contents)
+        .context("Failed to parse IR module")?;
 
     // Emit code based on target
     let code = emit_code(&module, &args.target)?;
