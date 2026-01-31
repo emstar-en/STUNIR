@@ -173,13 +173,36 @@ package body STUNIR_Spec_To_IR is
          Success := False;
    end Process_Directory;
 
+   --  Find first JSON file in spec directory
+   function Find_Spec_File (Spec_Dir : String) return String
+   is
+      Search  : Search_Type;
+      Dir_Ent : Directory_Entry_Type;
+   begin
+      --  Look for any .json file in the spec directory
+      Start_Search (Search, Spec_Dir, "*.json", (Directory => False, others => True));
+      
+      if More_Entries (Search) then
+         Get_Next_Entry (Search, Dir_Ent);
+         declare
+            Found_File : constant String := Full_Name (Dir_Ent);
+         begin
+            End_Search (Search);
+            return Found_File;
+         end;
+      end if;
+      
+      End_Search (Search);
+      return "";  --  No JSON files found
+   end Find_Spec_File;
+
    --  Main conversion procedure - NOW GENERATES SEMANTIC IR
    procedure Convert_Spec_To_IR
      (Config : Conversion_Config;
       Result : out Conversion_Result)
    is
       Spec_Dir    : constant String := Path_Strings.To_String (Config.Spec_Root);
-      Spec_File   : constant String := Spec_Dir & "/test_spec.json";
+      Spec_File   : constant String := Find_Spec_File (Spec_Dir);
       Module      : IR_Module;
       JSON_Output : JSON_Buffer;
       Parse_Stat  : Parse_Status;
@@ -197,12 +220,14 @@ package body STUNIR_Spec_To_IR is
          return;
       end if;
 
-      --  Step 2: Check spec file exists
-      if not Exists (Spec_File) then
-         Put_Line ("[ERROR] Spec file not found: " & Spec_File);
+      --  Step 2: Find and check spec file exists
+      if Spec_File = "" or else not Exists (Spec_File) then
+         Put_Line ("[ERROR] No JSON spec files found in: " & Spec_Dir);
          Result.Status := Error_Spec_Not_Found;
          return;
       end if;
+
+      Put_Line ("[INFO] Found spec file: " & Spec_File);
 
       --  Step 3: Read and parse spec JSON
       Put_Line ("[INFO] Parsing spec from " & Spec_File & "...");

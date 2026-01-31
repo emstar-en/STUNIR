@@ -26,8 +26,8 @@ struct Args {
     #[arg(value_name = "IR_FILE")]
     ir_file: PathBuf,
 
-    /// Target language/platform
-    #[arg(short, long, value_name = "TARGET")]
+    /// Target language/platform (default: c)
+    #[arg(short, long, value_name = "TARGET", default_value = "c")]
     target: String,
 
     /// Output code file
