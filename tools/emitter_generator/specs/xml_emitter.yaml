@@ -1,0 +1,58 @@
+# STUNIR Emitter Specification: XML
+
+category: xml
+description: "XML serialization emitter with schema support"
+
+output_types:
+  - xml
+  - xsd
+  - dtd
+
+features:
+  - validation
+  - namespaces
+  - pretty_print
+  - xpath_support
+
+extension: xml
+
+config:
+  Indent_Width: "Positive range 2 .. 8"
+  Use_Namespaces: "Boolean"
+  Validate_Schema: "Boolean"
+  Include_Declaration: "Boolean"
+
+config_defaults:
+  Indent_Width: 2
+  Use_Namespaces: true
+  Validate_Schema: true
+  Include_Declaration: true
+
+type_map:
+  i32: "xs:int"
+  i64: "xs:long"
+  f32: "xs:float"
+  f64: "xs:double"
+  bool: "xs:boolean"
+  string: "xs:string"
+
+output_format: |
+  Standard XML 1.0 format with optional XSD validation.
+  
+  Example:
+  <?xml version="1.0" encoding="UTF-8"?>
+  <module name="example">
+    <function name="test" return="xs:int"/>
+  </module>
+
+example_input:
+  module: "example"
+  functions:
+    - name: "test"
+      return_type: "i32"
+
+example_output: |
+  <?xml version="1.0" encoding="UTF-8"?>
+  <module name="example">
+    <function name="test" return="xs:int"/>
+  </module>

@@ -1,0 +1,64 @@
+# STUNIR Emitter Specification: Protocol Buffers
+
+category: protobuf
+description: "Protocol Buffers (protobuf) serialization emitter"
+
+output_types:
+  - proto3
+  - proto2
+
+features:
+  - grpc_support
+  - validation
+  - json_mapping
+
+extension: proto
+
+config:
+  Proto_Version: "Positive range 2 .. 3"
+  Generate_GRPC: "Boolean"
+  Optimize_For: "String"
+
+config_defaults:
+  Proto_Version: 3
+  Generate_GRPC: false
+  Optimize_For: "SPEED"
+
+type_map:
+  i32: "int32"
+  i64: "int64"
+  f32: "float"
+  f64: "double"
+  bool: "bool"
+  string: "string"
+
+output_format: |
+  Protocol Buffers IDL format.
+  
+  Example:
+  syntax = "proto3";
+  
+  message Config {
+    bool enabled = 1;
+    int32 value = 2;
+  }
+
+example_input:
+  module: "example"
+  types:
+    - name: "Config"
+      fields:
+        - name: "enabled"
+          type: "bool"
+        - name: "value"
+          type: "i32"
+
+example_output: |
+  syntax = "proto3";
+  
+  package example;
+  
+  message Config {
+    bool enabled = 1;
+    int32 value = 2;
+  }

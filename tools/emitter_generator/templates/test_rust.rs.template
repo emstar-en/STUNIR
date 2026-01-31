@@ -1,0 +1,39 @@
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_type_mapping() {
+        assert_eq!(map_ir_type("i32"), "int32");
+        assert_eq!(map_ir_type("i64"), "int64");
+        assert_eq!(map_ir_type("bool"), "boolean");
+    }
+
+    #[test]
+    fn test_emit_function() {
+        let result = emit_function("test_func", "a, b", "    return a + b;");
+        assert!(result.is_ok());
+        
+        let code = result.unwrap();
+        assert!(code.contains("function test_func"));
+        assert!(code.contains("return a + b"));
+    }
+
+    #[test]
+    fn test_emit_module() {
+        let config = {{CATEGORY_TITLE}}Config::default();
+        let result = emit_module("test_module", &config);
+        assert!(result.is_ok());
+        
+        let code = result.unwrap();
+        assert!(code.contains("STUNIR Generated"));
+        assert!(code.contains("test_module"));
+        assert!(code.contains("Rust Pipeline"));
+    }
+
+    #[test]
+    fn test_config_default() {
+        let config = {{CATEGORY_TITLE}}Config::default();
+        // Add specific config assertions here
+    }
+}
