@@ -1,0 +1,45 @@
+cabal-version:      2.4
+name:               stunir-emitters
+version:            1.0.0
+synopsis:           STUNIR Target Emitters - Haskell Implementation
+description:        Code emitters for all 24 STUNIR target categories
+license:            MIT
+author:             STUNIR Team
+maintainer:         team@stunir.org
+category:           Compiler
+
+library
+  exposed-modules:
+    STUNIR.Emitters.Types
+    STUNIR.Emitters.Assembly
+    STUNIR.Emitters.Polyglot
+    STUNIR.Emitters.Embedded
+    STUNIR.Emitters.GPU
+    STUNIR.Emitters.Lisp
+    STUNIR.Emitters.WASM
+    STUNIR.Emitters.Mobile
+    STUNIR.Emitters.OOP
+    STUNIR.Emitters.Bytecode
+    STUNIR.Emitters.FPGA
+    STUNIR.Emitters.Functional
+    STUNIR.Emitters.Scientific
+  
+  build-depends:
+    base >=4.14 && <5,
+    text >=1.2,
+    bytestring >=0.11,
+    containers >=0.6,
+    mtl >=2.2
+  
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wmissing-export-lists
+    -Wmissing-home-modules
+    -Wpartial-fields
+    -Wredundant-constraints
