@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.io/schemas/gdt_schema.json",
+  "title": "STUNIR GDT Specification Schema",
+  "description": "JSON Schema for Global Descriptor Table specifications",
+  "type": "object",
+  "required": ["template_name", "version", "gdt_config", "descriptors"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "template_name": {"type": "string"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "description": {"type": "string"},
+    "target_architectures": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["x86", "x86_64"]}
+    },
+    "do178c_compliance": {"type": "string"},
+    "gdt_config": {
+      "type": "object",
+      "required": ["mode", "syntax"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["x86_32", "x86_64"]},
+        "syntax": {"type": "string", "enum": ["intel", "att"]},
+        "base_address": {"type": "string"},
+        "max_entries": {"type": "integer", "minimum": 1, "maximum": 8192}
+      }
+    },
+    "descriptors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "selector"],
+        "properties": {
+          "name": {"type": "string"},
+          "selector": {"type": "string"},
+          "base": {"type": "string"},
+          "limit": {"type": "string"},
+          "access": {"type": "string"},
+          "flags": {"type": "string"},
+          "description": {"type": "string"},
+          "type": {"type": "string", "enum": ["code_data", "system"]},
+          "access_bits": {
+            "type": "object",
+            "properties": {
+              "present": {"type": "boolean"},
+              "dpl": {"type": "integer", "minimum": 0, "maximum": 3},
+              "descriptor_type": {"type": "string"},
+              "executable": {"type": "boolean"},
+              "direction_conforming": {"type": "boolean"},
+              "read_write": {"type": "boolean"},
+              "accessed": {"type": "boolean"}
+            }
+          },
+          "flag_bits": {
+            "type": "object",
+            "properties": {
+              "granularity": {"type": "string", "enum": ["1B", "4KB"]},
+              "size": {"type": "string", "enum": ["16bit", "32bit", "long_mode"]},
+              "long_mode": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "generation_options": {
+      "type": "object",
+      "properties": {
+        "emit_comments": {"type": "boolean"},
+        "emit_selector_constants": {"type": "boolean"},
+        "emit_gdtr_structure": {"type": "boolean"},
+        "output_format": {"type": "string", "enum": ["nasm", "gas", "fasm"]}
+      }
+    }
+  }
+}

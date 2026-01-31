@@ -1,0 +1,222 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "interrupts",
+  "description": "Interrupt handlers and IDT setup for STUNIR minimal OS",
+  "target": {
+    "architecture": "x86_64",
+    "format": "mixed",
+    "assembly_syntax": "nasm",
+    "c_standard": "c89"
+  },
+  "constants": [
+    {"name": "IDT_ENTRIES", "type": "u32", "value": "256"},
+    {"name": "PIC1_COMMAND", "type": "u16", "value": "0x20"},
+    {"name": "PIC1_DATA", "type": "u16", "value": "0x21"},
+    {"name": "PIC2_COMMAND", "type": "u16", "value": "0xA0"},
+    {"name": "PIC2_DATA", "type": "u16", "value": "0xA1"},
+    {"name": "PIC_EOI", "type": "u8", "value": "0x20"},
+    {"name": "ICW1_INIT", "type": "u8", "value": "0x10"},
+    {"name": "ICW1_ICW4", "type": "u8", "value": "0x01"},
+    {"name": "ICW4_8086", "type": "u8", "value": "0x01"},
+    {"name": "IRQ_BASE", "type": "u8", "value": "32"}
+  ],
+  "types": [
+    {
+      "name": "idt_entry",
+      "kind": "struct",
+      "packed": true,
+      "fields": [
+        {"name": "offset_low", "type": "u16"},
+        {"name": "selector", "type": "u16"},
+        {"name": "ist", "type": "u8"},
+        {"name": "type_attr", "type": "u8"},
+        {"name": "offset_mid", "type": "u16"},
+        {"name": "offset_high", "type": "u32"},
+        {"name": "zero", "type": "u32"}
+      ]
+    },
+    {
+      "name": "idt_ptr",
+      "kind": "struct",
+      "packed": true,
+      "fields": [
+        {"name": "limit", "type": "u16"},
+        {"name": "base", "type": "u64"}
+      ]
+    },
+    {
+      "name": "interrupt_frame",
+      "kind": "struct",
+      "fields": [
+        {"name": "rip", "type": "u64"},
+        {"name": "cs", "type": "u64"},
+        {"name": "rflags", "type": "u64"},
+        {"name": "rsp", "type": "u64"},
+        {"name": "ss", "type": "u64"}
+      ]
+    }
+  ],
+  "globals": [
+    {"name": "idt", "type": "idt_entry[IDT_ENTRIES]"},
+    {"name": "idtp", "type": "idt_ptr"}
+  ],
+  "functions": [
+    {
+      "name": "pic_remap",
+      "description": "Remap the PIC to avoid conflicts with CPU exceptions",
+      "params": [
+        {"name": "offset1", "type": "u8"},
+        {"name": "offset2", "type": "u8"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "a1", "var_type": "u8"},
+        {"type": "var_decl", "var_name": "a2", "var_type": "u8"},
+        {"type": "comment", "text": "Save masks"},
+        {"type": "call", "func": "inb", "args": ["PIC1_DATA"], "assign_to": "a1"},
+        {"type": "call", "func": "inb", "args": ["PIC2_DATA"], "assign_to": "a2"},
+        {"type": "comment", "text": "Start init sequence"},
+        {"type": "call", "func": "outb", "args": ["PIC1_COMMAND", "ICW1_INIT | ICW1_ICW4"]},
+        {"type": "call", "func": "outb", "args": ["PIC2_COMMAND", "ICW1_INIT | ICW1_ICW4"]},
+        {"type": "comment", "text": "Set vector offsets"},
+        {"type": "call", "func": "outb", "args": ["PIC1_DATA", "offset1"]},
+        {"type": "call", "func": "outb", "args": ["PIC2_DATA", "offset2"]},
+        {"type": "comment", "text": "Set cascade"},
+        {"type": "call", "func": "outb", "args": ["PIC1_DATA", "4"]},
+        {"type": "call", "func": "outb", "args": ["PIC2_DATA", "2"]},
+        {"type": "comment", "text": "8086 mode"},
+        {"type": "call", "func": "outb", "args": ["PIC1_DATA", "ICW4_8086"]},
+        {"type": "call", "func": "outb", "args": ["PIC2_DATA", "ICW4_8086"]},
+        {"type": "comment", "text": "Restore masks"},
+        {"type": "call", "func": "outb", "args": ["PIC1_DATA", "a1"]},
+        {"type": "call", "func": "outb", "args": ["PIC2_DATA", "a2"]}
+      ]
+    },
+    {
+      "name": "idt_set_gate",
+      "description": "Set an IDT entry",
+      "params": [
+        {"name": "num", "type": "u8"},
+        {"name": "handler", "type": "u64"},
+        {"name": "selector", "type": "u16"},
+        {"name": "flags", "type": "u8"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "assign", "target": "idt[num].offset_low", "value": "handler & 0xFFFF"},
+        {"type": "assign", "target": "idt[num].selector", "value": "selector"},
+        {"type": "assign", "target": "idt[num].ist", "value": "0"},
+        {"type": "assign", "target": "idt[num].type_attr", "value": "flags"},
+        {"type": "assign", "target": "idt[num].offset_mid", "value": "(handler >> 16) & 0xFFFF"},
+        {"type": "assign", "target": "idt[num].offset_high", "value": "(handler >> 32) & 0xFFFFFFFF"},
+        {"type": "assign", "target": "idt[num].zero", "value": "0"}
+      ]
+    },
+    {
+      "name": "idt_init",
+      "description": "Initialize IDT and install handlers",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "comment", "text": "Remap PIC"},
+        {"type": "call", "func": "pic_remap", "args": ["IRQ_BASE", "IRQ_BASE + 8"]},
+        {"type": "comment", "text": "Set up IDT pointer"},
+        {"type": "assign", "target": "idtp.limit", "value": "sizeof(idt) - 1"},
+        {"type": "assign", "target": "idtp.base", "value": "(u64)&idt"},
+        {"type": "comment", "text": "Install ISR handlers (0-31 are CPU exceptions)"},
+        {"type": "call", "func": "idt_set_gate", "args": ["0", "(u64)isr0", "0x08", "0x8E"]},
+        {"type": "call", "func": "idt_set_gate", "args": ["32", "(u64)irq0", "0x08", "0x8E"]},
+        {"type": "call", "func": "idt_set_gate", "args": ["33", "(u64)irq1", "0x08", "0x8E"]},
+        {"type": "comment", "text": "Load IDT"},
+        {"type": "asm", "code": "lidt [idtp]"}
+      ]
+    },
+    {
+      "name": "irq_handler",
+      "description": "Common IRQ handler dispatch",
+      "params": [
+        {"name": "irq_num", "type": "u32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "if", "condition": "irq_num == 0", "then": [
+          {"type": "call", "func": "timer_handler"}
+        ]},
+        {"type": "comment", "text": "Send EOI"},
+        {"type": "if", "condition": "irq_num >= 8", "then": [
+          {"type": "call", "func": "outb", "args": ["PIC2_COMMAND", "PIC_EOI"]}
+        ]},
+        {"type": "call", "func": "outb", "args": ["PIC1_COMMAND", "PIC_EOI"]}
+      ]
+    }
+  ],
+  "assembly_functions": [
+    {
+      "name": "isr0",
+      "global": true,
+      "description": "Division by zero exception",
+      "body": [
+        {"type": "cli"},
+        {"type": "push", "value": "0"},
+        {"type": "push", "value": "0"},
+        {"type": "jmp", "target": "isr_common"}
+      ]
+    },
+    {
+      "name": "irq0",
+      "global": true,
+      "description": "Timer IRQ handler stub",
+      "body": [
+        {"type": "cli"},
+        {"type": "push", "value": "0"},
+        {"type": "push", "value": "32"},
+        {"type": "jmp", "target": "irq_common"}
+      ]
+    },
+    {
+      "name": "irq1",
+      "global": true,
+      "description": "Keyboard IRQ handler stub",
+      "body": [
+        {"type": "cli"},
+        {"type": "push", "value": "0"},
+        {"type": "push", "value": "33"},
+        {"type": "jmp", "target": "irq_common"}
+      ]
+    },
+    {
+      "name": "irq_common",
+      "description": "Common IRQ stub - saves state and calls C handler",
+      "body": [
+        {"type": "comment", "text": "Save all registers"},
+        {"type": "push_all"},
+        {"type": "comment", "text": "Call C handler with IRQ number"},
+        {"type": "mov", "dest": "rdi", "src": "[rsp + 120]"},
+        {"type": "sub", "dest": "rdi", "src": "32"},
+        {"type": "call", "func": "irq_handler"},
+        {"type": "comment", "text": "Restore registers"},
+        {"type": "pop_all"},
+        {"type": "add", "dest": "rsp", "src": "16"},
+        {"type": "iretq"}
+      ]
+    },
+    {
+      "name": "isr_common",
+      "description": "Common ISR stub for CPU exceptions",
+      "body": [
+        {"type": "push_all"},
+        {"type": "mov", "dest": "rdi", "src": "[rsp + 120]"},
+        {"type": "call", "func": "exception_handler"},
+        {"type": "pop_all"},
+        {"type": "add", "dest": "rsp", "src": "16"},
+        {"type": "iretq"}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "outb", "type": "function"},
+    {"name": "inb", "type": "function"},
+    {"name": "timer_handler", "type": "function"},
+    {"name": "exception_handler", "type": "function"}
+  ]
+}

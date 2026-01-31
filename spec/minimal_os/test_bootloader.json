@@ -1,0 +1,128 @@
+{
+  "$schema": "../../schemas/stunir_spec_v1.json",
+  "spec_version": "1.0.0",
+  "name": "test_bootloader",
+  "description": "Test specification for Multiboot2 bootloader with interrupt handling",
+  "target": "x86_64",
+  "do178c_compliance": "Level A",
+  
+  "os_config": {
+    "multiboot2": {
+      "enabled": true,
+      "architecture": "i386",
+      "request_memory_map": true,
+      "request_framebuffer": false
+    },
+    "gdt": {
+      "enabled": true,
+      "mode": "x86_64"
+    },
+    "idt": {
+      "enabled": true,
+      "vector_count": 48,
+      "irq_count": 16
+    },
+    "isr_stubs": {
+      "enabled": true,
+      "save_all_registers": true
+    }
+  },
+  
+  "module": {
+    "name": "kernel",
+    "types": [
+      {
+        "name": "interrupt_frame",
+        "kind": "struct",
+        "fields": [
+          {"name": "ip", "type": "u64"},
+          {"name": "cs", "type": "u64"},
+          {"name": "flags", "type": "u64"},
+          {"name": "sp", "type": "u64"},
+          {"name": "ss", "type": "u64"}
+        ]
+      },
+      {
+        "name": "multiboot_info",
+        "kind": "struct",
+        "fields": [
+          {"name": "total_size", "type": "u32"},
+          {"name": "reserved", "type": "u32"}
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "kernel_main",
+        "params": [
+          {"name": "multiboot_magic", "type": "u32"},
+          {"name": "multiboot_info_ptr", "type": "pointer"}
+        ],
+        "return_type": "void",
+        "attributes": ["entry_point", "noreturn"],
+        "body": [
+          {"type": "call", "func": "init_gdt"},
+          {"type": "call", "func": "init_idt"},
+          {"type": "call", "func": "enable_interrupts"},
+          {"type": "loop", "kind": "infinite", "body": [
+            {"type": "call", "func": "halt"}
+          ]}
+        ]
+      },
+      {
+        "name": "interrupt_handler",
+        "params": [
+          {"name": "frame", "type": "pointer"}
+        ],
+        "return_type": "void",
+        "attributes": ["interrupt_handler"],
+        "body": [
+          {"type": "comment", "text": "Handle interrupt based on vector number"}
+        ]
+      },
+      {
+        "name": "init_gdt",
+        "params": [],
+        "return_type": "void",
+        "body": [
+          {"type": "asm", "instruction": "lgdt [gdt_ptr]"}
+        ]
+      },
+      {
+        "name": "init_idt",
+        "params": [],
+        "return_type": "void",
+        "body": [
+          {"type": "call", "func": "setup_idt"},
+          {"type": "asm", "instruction": "lidt [idt_ptr]"}
+        ]
+      },
+      {
+        "name": "enable_interrupts",
+        "params": [],
+        "return_type": "void",
+        "body": [
+          {"type": "asm", "instruction": "sti"}
+        ]
+      },
+      {
+        "name": "halt",
+        "params": [],
+        "return_type": "void",
+        "body": [
+          {"type": "asm", "instruction": "hlt"}
+        ]
+      }
+    ]
+  },
+  
+  "generation_options": {
+    "emit_multiboot2_header": true,
+    "emit_gdt": true,
+    "emit_idt_setup": true,
+    "emit_isr_stubs": true,
+    "emit_linker_script": true,
+    "output_format": "nasm",
+    "syntax": "intel"
+  }
+}

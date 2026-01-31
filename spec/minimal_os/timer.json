@@ -1,0 +1,88 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "timer_driver",
+  "description": "8254 PIT (Programmable Interval Timer) driver for STUNIR minimal OS",
+  "target": {
+    "architecture": "x86_64",
+    "format": "c",
+    "standard": "c89"
+  },
+  "constants": [
+    {"name": "PIT_CHANNEL0", "type": "u16", "value": "0x40"},
+    {"name": "PIT_CHANNEL1", "type": "u16", "value": "0x41"},
+    {"name": "PIT_CHANNEL2", "type": "u16", "value": "0x42"},
+    {"name": "PIT_COMMAND", "type": "u16", "value": "0x43"},
+    {"name": "PIT_FREQUENCY", "type": "u32", "value": "1193182"},
+    {"name": "TARGET_FREQUENCY", "type": "u32", "value": "100"},
+    {"name": "PIT_DIVISOR", "type": "u32", "value": "PIT_FREQUENCY / TARGET_FREQUENCY"}
+  ],
+  "globals": [
+    {"name": "timer_ticks", "type": "u64", "init": "0"},
+    {"name": "timer_frequency", "type": "u32", "init": "TARGET_FREQUENCY"}
+  ],
+  "functions": [
+    {
+      "name": "timer_init",
+      "description": "Initialize PIT to fire at TARGET_FREQUENCY Hz",
+      "params": [
+        {"name": "freq", "type": "u32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "divisor", "var_type": "u32", "init": "PIT_FREQUENCY / freq"},
+        {"type": "comment", "text": "Channel 0, lobyte/hibyte, rate generator"},
+        {"type": "call", "func": "outb", "args": ["PIT_COMMAND", "0x36"]},
+        {"type": "comment", "text": "Send divisor low byte"},
+        {"type": "call", "func": "outb", "args": ["PIT_CHANNEL0", "divisor & 0xFF"]},
+        {"type": "comment", "text": "Send divisor high byte"},
+        {"type": "call", "func": "outb", "args": ["PIT_CHANNEL0", "(divisor >> 8) & 0xFF"]},
+        {"type": "assign", "target": "timer_frequency", "value": "freq"},
+        {"type": "assign", "target": "timer_ticks", "value": "0"}
+      ]
+    },
+    {
+      "name": "timer_handler",
+      "description": "Timer interrupt handler - called from ISR",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "assign", "target": "timer_ticks", "value": "timer_ticks + 1"}
+      ]
+    },
+    {
+      "name": "timer_get_ticks",
+      "description": "Get current tick count",
+      "params": [],
+      "returns": "u64",
+      "body": [
+        {"type": "return", "value": "timer_ticks"}
+      ]
+    },
+    {
+      "name": "timer_sleep",
+      "description": "Sleep for specified number of milliseconds",
+      "params": [
+        {"name": "ms", "type": "u32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "target_ticks", "var_type": "u64", "init": "timer_ticks + (ms * timer_frequency / 1000)"},
+        {"type": "while", "condition": "timer_ticks < target_ticks", "body": [
+          {"type": "asm", "code": "hlt"}
+        ]}
+      ]
+    },
+    {
+      "name": "timer_get_seconds",
+      "description": "Get elapsed seconds since boot",
+      "params": [],
+      "returns": "u32",
+      "body": [
+        {"type": "return", "value": "timer_ticks / timer_frequency"}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "outb", "type": "function"}
+  ]
+}

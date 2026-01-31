@@ -1,0 +1,168 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "scheduler",
+  "description": "Cooperative round-robin scheduler for STUNIR minimal OS",
+  "target": {
+    "architecture": "x86_64",
+    "format": "c",
+    "standard": "c89"
+  },
+  "constants": [
+    {"name": "MAX_TASKS", "type": "u32", "value": "16"},
+    {"name": "TASK_STACK_SIZE", "type": "u32", "value": "8192"},
+    {"name": "TASK_STATE_READY", "type": "u32", "value": "0"},
+    {"name": "TASK_STATE_RUNNING", "type": "u32", "value": "1"},
+    {"name": "TASK_STATE_BLOCKED", "type": "u32", "value": "2"},
+    {"name": "TASK_STATE_TERMINATED", "type": "u32", "value": "3"}
+  ],
+  "types": [
+    {
+      "name": "task_context",
+      "kind": "struct",
+      "fields": [
+        {"name": "rsp", "type": "u64"},
+        {"name": "rip", "type": "u64"},
+        {"name": "rbp", "type": "u64"},
+        {"name": "rbx", "type": "u64"},
+        {"name": "r12", "type": "u64"},
+        {"name": "r13", "type": "u64"},
+        {"name": "r14", "type": "u64"},
+        {"name": "r15", "type": "u64"}
+      ]
+    },
+    {
+      "name": "task",
+      "kind": "struct",
+      "fields": [
+        {"name": "id", "type": "u32"},
+        {"name": "state", "type": "u32"},
+        {"name": "context", "type": "task_context"},
+        {"name": "stack", "type": "u8*"},
+        {"name": "entry", "type": "void(*)(void)"},
+        {"name": "name", "type": "char[32]"}
+      ]
+    }
+  ],
+  "globals": [
+    {"name": "tasks", "type": "task[MAX_TASKS]"},
+    {"name": "task_count", "type": "u32", "init": "0"},
+    {"name": "current_task", "type": "u32", "init": "0"},
+    {"name": "scheduler_running", "type": "u32", "init": "0"}
+  ],
+  "functions": [
+    {
+      "name": "scheduler_init",
+      "description": "Initialize the scheduler",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "i", "var_type": "u32"},
+        {"type": "for", "init": "i = 0", "condition": "i < MAX_TASKS", "increment": "i++", "body": [
+          {"type": "assign", "target": "tasks[i].id", "value": "i"},
+          {"type": "assign", "target": "tasks[i].state", "value": "TASK_STATE_TERMINATED"},
+          {"type": "assign", "target": "tasks[i].stack", "value": "0"},
+          {"type": "assign", "target": "tasks[i].entry", "value": "0"}
+        ]},
+        {"type": "assign", "target": "task_count", "value": "0"},
+        {"type": "assign", "target": "current_task", "value": "0"},
+        {"type": "assign", "target": "scheduler_running", "value": "0"}
+      ]
+    },
+    {
+      "name": "task_create",
+      "description": "Create a new task",
+      "params": [
+        {"name": "entry", "type": "void(*)(void)"},
+        {"name": "name", "type": "char*"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "i", "var_type": "u32"},
+        {"type": "if", "condition": "task_count >= MAX_TASKS", "then": [
+          {"type": "return", "value": "-1"}
+        ]},
+        {"type": "comment", "text": "Find free slot"},
+        {"type": "for", "init": "i = 0", "condition": "i < MAX_TASKS", "increment": "i++", "body": [
+          {"type": "if", "condition": "tasks[i].state == TASK_STATE_TERMINATED", "then": [
+            {"type": "comment", "text": "Allocate stack"},
+            {"type": "assign", "target": "tasks[i].stack", "value": "(u8*)pmm_alloc_page()"},
+            {"type": "if", "condition": "tasks[i].stack == 0", "then": [
+              {"type": "return", "value": "-1"}
+            ]},
+            {"type": "comment", "text": "Set up initial context"},
+            {"type": "assign", "target": "tasks[i].context.rsp", "value": "(u64)(tasks[i].stack + TASK_STACK_SIZE - 8)"},
+            {"type": "assign", "target": "tasks[i].context.rip", "value": "(u64)entry"},
+            {"type": "assign", "target": "tasks[i].context.rbp", "value": "0"},
+            {"type": "assign", "target": "tasks[i].entry", "value": "entry"},
+            {"type": "assign", "target": "tasks[i].state", "value": "TASK_STATE_READY"},
+            {"type": "assign", "target": "task_count", "value": "task_count + 1"},
+            {"type": "return", "value": "i"}
+          ]}
+        ]},
+        {"type": "return", "value": "-1"}
+      ]
+    },
+    {
+      "name": "schedule",
+      "description": "Select and switch to next ready task",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "next", "var_type": "u32"},
+        {"type": "var_decl", "var_name": "i", "var_type": "u32"},
+        {"type": "var_decl", "var_name": "prev", "var_type": "u32"},
+        {"type": "if", "condition": "task_count == 0", "then": [{"type": "return"}]},
+        {"type": "assign", "target": "prev", "value": "current_task"},
+        {"type": "assign", "target": "next", "value": "(current_task + 1) % MAX_TASKS"},
+        {"type": "comment", "text": "Find next ready task"},
+        {"type": "for", "init": "i = 0", "condition": "i < MAX_TASKS", "increment": "i++", "body": [
+          {"type": "if", "condition": "tasks[next].state == TASK_STATE_READY", "then": [
+            {"type": "comment", "text": "Found ready task"},
+            {"type": "if", "condition": "tasks[prev].state == TASK_STATE_RUNNING", "then": [
+              {"type": "assign", "target": "tasks[prev].state", "value": "TASK_STATE_READY"}
+            ]},
+            {"type": "assign", "target": "tasks[next].state", "value": "TASK_STATE_RUNNING"},
+            {"type": "assign", "target": "current_task", "value": "next"},
+            {"type": "call", "func": "context_switch", "args": ["&tasks[prev].context", "&tasks[next].context"]},
+            {"type": "return"}
+          ]},
+          {"type": "assign", "target": "next", "value": "(next + 1) % MAX_TASKS"}
+        ]}
+      ]
+    },
+    {
+      "name": "yield",
+      "description": "Yield CPU to next task (cooperative)",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "call", "func": "schedule"}
+      ]
+    },
+    {
+      "name": "task_exit",
+      "description": "Terminate current task",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "assign", "target": "tasks[current_task].state", "value": "TASK_STATE_TERMINATED"},
+        {"type": "assign", "target": "task_count", "value": "task_count - 1"},
+        {"type": "call", "func": "schedule"},
+        {"type": "while", "condition": "1", "body": []}
+      ]
+    },
+    {
+      "name": "get_current_task_id",
+      "description": "Get ID of currently running task",
+      "params": [],
+      "returns": "u32",
+      "body": [
+        {"type": "return", "value": "current_task"}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "pmm_alloc_page", "type": "function"},
+    {"name": "context_switch", "type": "function"}
+  ]
+}
