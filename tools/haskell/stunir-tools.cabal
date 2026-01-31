@@ -29,6 +29,35 @@ executable stunir_ir_to_code
                   , STUNIR.Hash
                   , STUNIR.IR
                   , STUNIR.Emitter
+                  , STUNIR.SemanticIR.Emitters
+                  , STUNIR.SemanticIR.Emitters.Base
+                  , STUNIR.SemanticIR.Emitters.Types
+                  , STUNIR.SemanticIR.Emitters.Visitor
+                  , STUNIR.SemanticIR.Emitters.CodeGen
+                  , STUNIR.SemanticIR.Emitters.Core.Embedded
+                  , STUNIR.SemanticIR.Emitters.Core.GPU
+                  , STUNIR.SemanticIR.Emitters.Core.WASM
+                  , STUNIR.SemanticIR.Emitters.Core.Assembly
+                  , STUNIR.SemanticIR.Emitters.Core.Polyglot
+                  , STUNIR.SemanticIR.Emitters.LanguageFamilies.Lisp
+                  , STUNIR.SemanticIR.Emitters.LanguageFamilies.Prolog
+                  , STUNIR.SemanticIR.Emitters.Specialized.Business
+                  , STUNIR.SemanticIR.Emitters.Specialized.FPGA
+                  , STUNIR.SemanticIR.Emitters.Specialized.Grammar
+                  , STUNIR.SemanticIR.Emitters.Specialized.Lexer
+                  , STUNIR.SemanticIR.Emitters.Specialized.Parser
+                  , STUNIR.SemanticIR.Emitters.Specialized.Expert
+                  , STUNIR.SemanticIR.Emitters.Specialized.Constraints
+                  , STUNIR.SemanticIR.Emitters.Specialized.Functional
+                  , STUNIR.SemanticIR.Emitters.Specialized.OOP
+                  , STUNIR.SemanticIR.Emitters.Specialized.Mobile
+                  , STUNIR.SemanticIR.Emitters.Specialized.Scientific
+                  , STUNIR.SemanticIR.Emitters.Specialized.Bytecode
+                  , STUNIR.SemanticIR.Emitters.Specialized.Systems
+                  , STUNIR.SemanticIR.Emitters.Specialized.Planning
+                  , STUNIR.SemanticIR.Emitters.Specialized.AsmIR
+                  , STUNIR.SemanticIR.Emitters.Specialized.BEAM
+                  , STUNIR.SemanticIR.Emitters.Specialized.ASP
   hs-source-dirs:   src
   build-depends:    base ^>=4.16
                   , aeson >=2.0
@@ -37,5 +66,28 @@ executable stunir_ir_to_code
                   , cryptonite >=0.30
                   , memory >=0.18
                   , containers >=0.6
+                  , mtl >=2.2
   default-language: Haskell2010
   ghc-options:      -Wall -O2 -threaded
+
+
+test-suite stunir-emitters-test
+  type:             exitcode-stdio-1.0
+  main-is:          Main.hs
+  hs-source-dirs:   test
+  other-modules:    STUNIR.SemanticIR.Emitters.BaseSpec
+                  , STUNIR.SemanticIR.Emitters.CoreSpec
+                  , STUNIR.SemanticIR.Emitters.LanguageFamiliesSpec
+                  , STUNIR.SemanticIR.Emitters.SpecializedSpec
+  build-depends:    base ^>=4.16
+                  , hspec >=2.7
+                  , QuickCheck >=2.14
+                  , text >=1.2
+                  , containers >=0.6
+                  , aeson >=2.0
+                  , bytestring >=0.11
+                  , cryptonite >=0.30
+                  , memory >=0.18
+                  , mtl >=2.2
+  default-language: Haskell2010
+  ghc-options:      -Wall -threaded -rtsopts -with-rtsopts=-N
