@@ -8,13 +8,13 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
-pub mod types;
 pub mod base;
-pub mod visitor;
 pub mod codegen;
 pub mod core;
 pub mod language_families;
 pub mod specialized;
+pub mod types;
+pub mod visitor;
 
 pub use base::{BaseEmitter, EmitterConfig, EmitterResult, EmitterStatus};
 pub use types::*;

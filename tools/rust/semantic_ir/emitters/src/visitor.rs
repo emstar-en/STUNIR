@@ -129,7 +129,8 @@ impl CodeGenVisitor {
         if line.is_empty() {
             self.code.push(String::new());
         } else {
-            self.code.push(format!("{}{}", "    ".repeat(self.indent_level), line));
+            self.code
+                .push(format!("{}{}", "    ".repeat(self.indent_level), line));
         }
     }
 

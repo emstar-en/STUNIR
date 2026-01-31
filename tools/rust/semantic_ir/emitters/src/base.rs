@@ -136,8 +136,7 @@ pub trait BaseEmitter {
 
     /// Validate IR module structure
     fn validate_ir(&self, ir_module: &IRModule) -> bool {
-        !ir_module.ir_version.is_empty()
-            && !ir_module.module_name.is_empty()
+        !ir_module.ir_version.is_empty() && !ir_module.module_name.is_empty()
     }
 
     /// Compute SHA-256 hash of file content
@@ -155,21 +154,19 @@ pub trait BaseEmitter {
         content: &str,
     ) -> Result<GeneratedFile, EmitterError> {
         let file_path = output_dir.join(relative_path);
-        
+
         // Create parent directories
         if let Some(parent) = file_path.parent() {
-            fs::create_dir_all(parent)
-                .map_err(|e| EmitterError::WriteFailed(e.to_string()))?;
+            fs::create_dir_all(parent).map_err(|e| EmitterError::WriteFailed(e.to_string()))?;
         }
-        
+
         // Write file
-        fs::write(&file_path, content)
-            .map_err(|e| EmitterError::WriteFailed(e.to_string()))?;
-        
+        fs::write(&file_path, content).map_err(|e| EmitterError::WriteFailed(e.to_string()))?;
+
         // Compute hash and size
         let hash = self.compute_file_hash(content);
         let size = content.as_bytes().len();
-        
+
         Ok(GeneratedFile {
             path: relative_path.to_string(),
             hash,
