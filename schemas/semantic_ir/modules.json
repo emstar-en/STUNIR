@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/modules_v1.json",
+  "title": "STUNIR Module Structure",
+  "description": "Module structure schemas",
+  "definitions": {
+    "Module": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name", "declarations"],
+          "properties": {
+            "kind": {"const": "module"},
+            "name": {"type": "string"},
+            "imports": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/Import"}
+            },
+            "exports": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "declarations": {
+              "type": "array",
+              "items": {"$ref": "declarations.json#/definitions/Declaration"}
+            },
+            "metadata": {"$ref": "#/definitions/ModuleMetadata"}
+          }
+        }
+      ]
+    },
+    "Import": {
+      "type": "object",
+      "required": ["module"],
+      "properties": {
+        "module": {"type": "string"},
+        "symbols": {
+          "oneOf": [
+            {"type": "array", "items": {"type": "string"}},
+            {"type": "string", "enum": ["*"]}
+          ]
+        },
+        "alias": {"type": "string"}
+      }
+    },
+    "ModuleMetadata": {
+      "type": "object",
+      "properties": {
+        "target_categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "embedded", "realtime", "safety_critical", "gpu", "wasm",
+              "native", "jit", "interpreter", "functional", "logic",
+              "constraint", "dataflow", "reactive", "quantum", "neuromorphic",
+              "biocomputing", "molecular", "optical", "reversible", "analog",
+              "stochastic", "fuzzy", "approximate", "probabilistic"
+            ]
+          }
+        },
+        "safety_level": {
+          "type": "string",
+          "enum": ["DO-178C_Level_A", "DO-178C_Level_B", "DO-178C_Level_C", "DO-178C_Level_D", "None"]
+        },
+        "optimization_level": {
+          "type": "string",
+          "enum": ["O0", "O1", "O2", "O3", "Os", "Oz"]
+        },
+        "language_standard": {"type": "string"},
+        "custom_attributes": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

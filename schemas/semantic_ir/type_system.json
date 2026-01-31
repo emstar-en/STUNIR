@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/type_system_v1.json",
+  "title": "STUNIR Type System",
+  "description": "Type system definitions for Semantic IR",
+  "definitions": {
+    "TypeReference": {
+      "oneOf": [
+        {"$ref": "#/definitions/PrimitiveType"},
+        {"$ref": "#/definitions/ArrayType"},
+        {"$ref": "#/definitions/PointerType"},
+        {"$ref": "#/definitions/StructType"},
+        {"$ref": "#/definitions/FunctionType"},
+        {"$ref": "#/definitions/TypeRef"}
+      ]
+    },
+    "PrimitiveType": {
+      "type": "object",
+      "required": ["kind", "primitive"],
+      "properties": {
+        "kind": {"const": "primitive_type"},
+        "primitive": {
+          "type": "string",
+          "enum": [
+            "void", "bool",
+            "i8", "i16", "i32", "i64",
+            "u8", "u16", "u32", "u64",
+            "f32", "f64",
+            "string", "char"
+          ]
+        }
+      }
+    },
+    "ArrayType": {
+      "type": "object",
+      "required": ["kind", "element_type", "size"],
+      "properties": {
+        "kind": {"const": "array_type"},
+        "element_type": {"$ref": "#/definitions/TypeReference"},
+        "size": {
+          "oneOf": [
+            {"type": "integer", "minimum": 0},
+            {"$ref": "expressions.json#/definitions/Expression"}
+          ]
+        }
+      }
+    },
+    "PointerType": {
+      "type": "object",
+      "required": ["kind", "pointee"],
+      "properties": {
+        "kind": {"const": "pointer_type"},
+        "pointee": {"$ref": "#/definitions/TypeReference"},
+        "mutability": {
+          "$ref": "node_types.json#/definitions/Mutability"
+        },
+        "address_space": {
+          "type": "string",
+          "enum": ["default", "global", "local", "constant", "private"]
+        }
+      }
+    },
+    "StructType": {
+      "type": "object",
+      "required": ["kind", "fields"],
+      "properties": {
+        "kind": {"const": "struct_type"},
+        "name": {"type": "string"},
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"$ref": "#/definitions/TypeReference"},
+              "offset": {"type": "integer", "minimum": 0},
+              "attributes": {"type": "object"}
+            }
+          }
+        },
+        "size": {"type": "integer", "minimum": 0},
+        "alignment": {"type": "integer", "minimum": 1},
+        "packed": {"type": "boolean", "default": false}
+      }
+    },
+    "FunctionType": {
+      "type": "object",
+      "required": ["kind", "parameters", "return_type"],
+      "properties": {
+        "kind": {"const": "function_type"},
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"$ref": "#/definitions/TypeReference"},
+              "default": {"$ref": "expressions.json#/definitions/Expression"}
+            }
+          }
+        },
+        "return_type": {"$ref": "#/definitions/TypeReference"},
+        "variadic": {"type": "boolean", "default": false}
+      }
+    },
+    "TypeRef": {
+      "type": "object",
+      "required": ["kind", "name"],
+      "properties": {
+        "kind": {"const": "type_ref"},
+        "name": {"type": "string"},
+        "binding": {"type": "string", "pattern": "^n_[a-zA-Z0-9_]+$"}
+      }
+    }
+  }
+}

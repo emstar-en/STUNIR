@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "ir_version": "1.0.0",
+  "root": {
+    "node_id": "n_mod_wasm",
+    "kind": "module",
+    "name": "wasm_example",
+    "location": {
+      "file": "wasm_example.spec",
+      "line": 1,
+      "column": 1
+    },
+    "hash": "sha256:face0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab",
+    "imports": [
+      {
+        "module": "env",
+        "symbols": ["log"],
+        "alias": null
+      }
+    ],
+    "exports": ["multiply"],
+    "declarations": [
+      {
+        "node_id": "n_func_multiply",
+        "kind": "function_decl",
+        "name": "multiply",
+        "location": {
+          "file": "wasm_example.spec",
+          "line": 10,
+          "column": 1
+        },
+        "visibility": "public",
+        "function_type": {
+          "kind": "function_type",
+          "parameters": [
+            {
+              "name": "x",
+              "type": {
+                "kind": "primitive_type",
+                "primitive": "i32"
+              }
+            },
+            {
+              "name": "y",
+              "type": {
+                "kind": "primitive_type",
+                "primitive": "i32"
+              }
+            }
+          ],
+          "return_type": {
+            "kind": "primitive_type",
+            "primitive": "i32"
+          }
+        },
+        "body": {
+          "node_id": "n_block_1",
+          "kind": "block_stmt",
+          "statements": [
+            {
+              "node_id": "n_ret_1",
+              "kind": "return_stmt",
+              "value": {
+                "node_id": "n_binop_1",
+                "kind": "binary_expr",
+                "op": "*",
+                "type": {
+                  "kind": "primitive_type",
+                  "primitive": "i32"
+                },
+                "left": "n_var_x",
+                "right": "n_var_y"
+              }
+            }
+          ]
+        },
+        "attributes": {
+          "wasm": {
+            "wasm_export": "multiply",
+            "wasm_type": "i32",
+            "simd": false,
+            "threads": false
+          }
+        },
+        "hash": "sha256:beef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+      }
+    ],
+    "metadata": {
+      "target_categories": ["wasm"],
+      "safety_level": "None"
+    }
+  },
+  "metadata": {
+    "source_file": "wasm_example.spec",
+    "generator": "STUNIR Spec-to-IR v1.0",
+    "timestamp": "2026-01-30T12:00:00Z",
+    "target_categories": ["wasm"]
+  }
+}

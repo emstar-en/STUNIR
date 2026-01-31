@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "ir_version": "1.0.0",
+  "root": {
+    "node_id": "n_mod_gpu",
+    "kind": "module",
+    "name": "vector_add",
+    "location": {
+      "file": "vector_add.spec",
+      "line": 1,
+      "column": 1
+    },
+    "hash": "sha256:cafe0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab",
+    "imports": [],
+    "exports": ["vector_add_kernel"],
+    "declarations": [
+      {
+        "node_id": "n_func_kernel",
+        "kind": "function_decl",
+        "name": "vector_add_kernel",
+        "location": {
+          "file": "vector_add.spec",
+          "line": 5,
+          "column": 1
+        },
+        "visibility": "public",
+        "function_type": {
+          "kind": "function_type",
+          "parameters": [
+            {
+              "name": "a",
+              "type": {
+                "kind": "pointer_type",
+                "pointee": {
+                  "kind": "primitive_type",
+                  "primitive": "f32"
+                },
+                "mutability": "immutable",
+                "address_space": "global"
+              }
+            },
+            {
+              "name": "b",
+              "type": {
+                "kind": "pointer_type",
+                "pointee": {
+                  "kind": "primitive_type",
+                  "primitive": "f32"
+                },
+                "mutability": "immutable",
+                "address_space": "global"
+              }
+            },
+            {
+              "name": "result",
+              "type": {
+                "kind": "pointer_type",
+                "pointee": {
+                  "kind": "primitive_type",
+                  "primitive": "f32"
+                },
+                "mutability": "mutable",
+                "address_space": "global"
+              }
+            },
+            {
+              "name": "n",
+              "type": {
+                "kind": "primitive_type",
+                "primitive": "i32"
+              }
+            }
+          ],
+          "return_type": {
+            "kind": "primitive_type",
+            "primitive": "void"
+          }
+        },
+        "attributes": {
+          "gpu": {
+            "execution_model": "kernel",
+            "workgroup_size": [256, 1, 1],
+            "shared_memory": 0,
+            "max_registers": 32
+          }
+        },
+        "hash": "sha256:dead0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+      }
+    ],
+    "metadata": {
+      "target_categories": ["gpu"],
+      "safety_level": "None"
+    }
+  },
+  "metadata": {
+    "source_file": "vector_add.spec",
+    "generator": "STUNIR Spec-to-IR v1.0",
+    "timestamp": "2026-01-30T12:00:00Z",
+    "target_categories": ["gpu"]
+  }
+}

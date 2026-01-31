@@ -1,0 +1,242 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/expressions_v1.json",
+  "title": "STUNIR Expression Nodes",
+  "description": "Expression node schemas",
+  "definitions": {
+    "Expression": {
+      "oneOf": [
+        {"$ref": "#/definitions/IntegerLiteral"},
+        {"$ref": "#/definitions/FloatLiteral"},
+        {"$ref": "#/definitions/StringLiteral"},
+        {"$ref": "#/definitions/BoolLiteral"},
+        {"$ref": "#/definitions/VarRef"},
+        {"$ref": "#/definitions/BinaryExpr"},
+        {"$ref": "#/definitions/UnaryExpr"},
+        {"$ref": "#/definitions/FunctionCall"},
+        {"$ref": "#/definitions/MemberExpr"},
+        {"$ref": "#/definitions/ArrayAccess"},
+        {"$ref": "#/definitions/CastExpr"},
+        {"$ref": "#/definitions/TernaryExpr"},
+        {"$ref": "#/definitions/ArrayInit"},
+        {"$ref": "#/definitions/StructInit"}
+      ]
+    },
+    "IntegerLiteral": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "kind": {"const": "integer_literal"},
+            "value": {"type": "integer"},
+            "radix": {"type": "integer", "enum": [2, 8, 10, 16], "default": 10}
+          }
+        }
+      ]
+    },
+    "FloatLiteral": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "kind": {"const": "float_literal"},
+            "value": {"type": "number"}
+          }
+        }
+      ]
+    },
+    "StringLiteral": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "kind": {"const": "string_literal"},
+            "value": {"type": "string"}
+          }
+        }
+      ]
+    },
+    "BoolLiteral": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "kind": {"const": "bool_literal"},
+            "value": {"type": "boolean"}
+          }
+        }
+      ]
+    },
+    "VarRef": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "kind": {"const": "var_ref"},
+            "name": {"type": "string"},
+            "binding": {"type": "string", "pattern": "^n_[a-zA-Z0-9_]+$"}
+          }
+        }
+      ]
+    },
+    "BinaryExpr": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["op", "left", "right"],
+          "properties": {
+            "kind": {"const": "binary_expr"},
+            "op": {"$ref": "node_types.json#/definitions/BinaryOperator"},
+            "left": {"$ref": "#/definitions/Expression"},
+            "right": {"$ref": "#/definitions/Expression"}
+          }
+        }
+      ]
+    },
+    "UnaryExpr": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["op", "operand"],
+          "properties": {
+            "kind": {"const": "unary_expr"},
+            "op": {"$ref": "node_types.json#/definitions/UnaryOperator"},
+            "operand": {"$ref": "#/definitions/Expression"}
+          }
+        }
+      ]
+    },
+    "FunctionCall": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["function", "arguments"],
+          "properties": {
+            "kind": {"const": "function_call"},
+            "function": {
+              "oneOf": [
+                {"type": "string"},
+                {"$ref": "#/definitions/Expression"}
+              ]
+            },
+            "arguments": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/Expression"}
+            }
+          }
+        }
+      ]
+    },
+    "MemberExpr": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["object", "member"],
+          "properties": {
+            "kind": {"const": "member_expr"},
+            "object": {"$ref": "#/definitions/Expression"},
+            "member": {"type": "string"},
+            "is_arrow": {"type": "boolean", "default": false}
+          }
+        }
+      ]
+    },
+    "ArrayAccess": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["array", "index"],
+          "properties": {
+            "kind": {"const": "array_access"},
+            "array": {"$ref": "#/definitions/Expression"},
+            "index": {"$ref": "#/definitions/Expression"}
+          }
+        }
+      ]
+    },
+    "CastExpr": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["operand", "target_type"],
+          "properties": {
+            "kind": {"const": "cast_expr"},
+            "operand": {"$ref": "#/definitions/Expression"},
+            "target_type": {"$ref": "type_system.json#/definitions/TypeReference"}
+          }
+        }
+      ]
+    },
+    "TernaryExpr": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["condition", "then_expr", "else_expr"],
+          "properties": {
+            "kind": {"const": "ternary_expr"},
+            "condition": {"$ref": "#/definitions/Expression"},
+            "then_expr": {"$ref": "#/definitions/Expression"},
+            "else_expr": {"$ref": "#/definitions/Expression"}
+          }
+        }
+      ]
+    },
+    "ArrayInit": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["elements"],
+          "properties": {
+            "kind": {"const": "array_init"},
+            "elements": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/Expression"}
+            }
+          }
+        }
+      ]
+    },
+    "StructInit": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["fields"],
+          "properties": {
+            "kind": {"const": "struct_init"},
+            "struct_type": {"type": "string"},
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "value"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "value": {"$ref": "#/definitions/Expression"}
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

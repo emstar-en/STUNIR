@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0.0",
+  "ir_version": "1.0.0",
+  "root": {
+    "node_id": "n_mod_lisp",
+    "kind": "module",
+    "name": "factorial",
+    "location": {
+      "file": "factorial.spec",
+      "line": 1,
+      "column": 1
+    },
+    "hash": "sha256:ace0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc",
+    "imports": [],
+    "exports": ["factorial"],
+    "declarations": [
+      {
+        "node_id": "n_func_factorial",
+        "kind": "function_decl",
+        "name": "factorial",
+        "location": {
+          "file": "factorial.spec",
+          "line": 5,
+          "column": 1
+        },
+        "visibility": "public",
+        "function_type": {
+          "kind": "function_type",
+          "parameters": [
+            {
+              "name": "n",
+              "type": {
+                "kind": "primitive_type",
+                "primitive": "i32"
+              }
+            }
+          ],
+          "return_type": {
+            "kind": "primitive_type",
+            "primitive": "i32"
+          }
+        },
+        "body": {
+          "node_id": "n_block_1",
+          "kind": "block_stmt",
+          "statements": [
+            {
+              "node_id": "n_ret_1",
+              "kind": "return_stmt",
+              "value": {
+                "node_id": "n_if_1",
+                "kind": "ternary_expr",
+                "type": {
+                  "kind": "primitive_type",
+                  "primitive": "i32"
+                },
+                "condition": {
+                  "node_id": "n_cmp_1",
+                  "kind": "binary_expr",
+                  "op": "<=",
+                  "type": {
+                    "kind": "primitive_type",
+                    "primitive": "bool"
+                  },
+                  "left": "n_var_n",
+                  "right": {
+                    "node_id": "n_lit_1",
+                    "kind": "integer_literal",
+                    "value": 1,
+                    "type": {
+                      "kind": "primitive_type",
+                      "primitive": "i32"
+                    }
+                  }
+                },
+                "then_expr": {
+                  "node_id": "n_lit_2",
+                  "kind": "integer_literal",
+                  "value": 1,
+                  "type": {
+                    "kind": "primitive_type",
+                    "primitive": "i32"
+                  }
+                },
+                "else_expr": {
+                  "node_id": "n_mul_1",
+                  "kind": "binary_expr",
+                  "op": "*",
+                  "type": {
+                    "kind": "primitive_type",
+                    "primitive": "i32"
+                  },
+                  "left": "n_var_n",
+                  "right": {
+                    "node_id": "n_call_1",
+                    "kind": "function_call",
+                    "function": "factorial",
+                    "arguments": [
+                      {
+                        "node_id": "n_sub_1",
+                        "kind": "binary_expr",
+                        "op": "-",
+                        "type": {
+                          "kind": "primitive_type",
+                          "primitive": "i32"
+                        },
+                        "left": "n_var_n",
+                        "right": "n_lit_2"
+                      }
+                    ],
+                    "type": {
+                      "kind": "primitive_type",
+                      "primitive": "i32"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "attributes": {
+          "functional": {
+            "pure": true,
+            "tail_recursive": true
+          }
+        },
+        "hash": "sha256:bade0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+      }
+    ],
+    "metadata": {
+      "target_categories": ["functional"],
+      "safety_level": "None"
+    }
+  },
+  "metadata": {
+    "source_file": "factorial.spec",
+    "generator": "STUNIR Spec-to-IR v1.0",
+    "timestamp": "2026-01-30T12:00:00Z",
+    "target_categories": ["functional"]
+  }
+}

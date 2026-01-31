@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "ir_version": "1.0.0",
+  "root": {
+    "node_id": "n_mod_embedded",
+    "kind": "module",
+    "name": "embedded_startup",
+    "location": {
+      "file": "embedded_startup.spec",
+      "line": 1,
+      "column": 1
+    },
+    "hash": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+    "imports": [],
+    "exports": ["startup", "isr_handler"],
+    "declarations": [
+      {
+        "node_id": "n_func_startup",
+        "kind": "function_decl",
+        "name": "startup",
+        "location": {
+          "file": "embedded_startup.spec",
+          "line": 10,
+          "column": 1
+        },
+        "visibility": "public",
+        "function_type": {
+          "kind": "function_type",
+          "parameters": [],
+          "return_type": {
+            "kind": "primitive_type",
+            "primitive": "void"
+          }
+        },
+        "attributes": {
+          "entry_point": true,
+          "stack_usage": 256,
+          "embedded": {
+            "startup_function": true,
+            "memory_section": ".text"
+          }
+        },
+        "hash": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+      },
+      {
+        "node_id": "n_func_isr",
+        "kind": "function_decl",
+        "name": "isr_handler",
+        "location": {
+          "file": "embedded_startup.spec",
+          "line": 20,
+          "column": 1
+        },
+        "visibility": "public",
+        "function_type": {
+          "kind": "function_type",
+          "parameters": [],
+          "return_type": {
+            "kind": "primitive_type",
+            "primitive": "void"
+          }
+        },
+        "attributes": {
+          "interrupt_vector": 5,
+          "stack_usage": 128,
+          "priority": 10,
+          "embedded": {
+            "interrupt_vector": 5,
+            "save_context": true,
+            "naked_function": false
+          }
+        },
+        "hash": "sha256:0fedcba98765432100fedcba98765432100fedcba98765432100fedcba987654"
+      }
+    ],
+    "metadata": {
+      "target_categories": ["embedded", "realtime", "safety_critical"],
+      "safety_level": "DO-178C_Level_A"
+    }
+  },
+  "metadata": {
+    "source_file": "embedded_startup.spec",
+    "generator": "STUNIR Spec-to-IR v1.0",
+    "timestamp": "2026-01-30T12:00:00Z",
+    "target_categories": ["embedded", "realtime", "safety_critical"]
+  }
+}
