@@ -17,9 +17,10 @@ typedef struct {{ t.name }} {
 
 {% endfor %}{% for fn in functions_render %}/* fn: {{ fn.name }} */
 {{ fn.c_ret }} {{ fn.name }}({{ fn.c_args }}) {
-  /* TODO: implement */
+{% if fn.c_body %}{{ fn.c_body }}
+{% else %}  /* TODO: implement */
 {% if fn.c_ret_void %}  return;
 {% else %}  return {{ fn.c_ret_default }};
-{% endif %}}
+{% endif %}{% endif %}}
 
 {% endfor %}

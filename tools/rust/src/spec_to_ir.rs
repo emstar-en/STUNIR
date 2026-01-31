@@ -22,13 +22,17 @@ use stunir_tools::{sha256_json, types::*};
 #[command(name = "stunir_spec_to_ir")]
 #[command(about = "Convert STUNIR specification to Intermediate Reference (IR)")]
 struct Args {
-    /// Input specification file (JSON)
-    #[arg(value_name = "SPEC_FILE")]
-    spec_file: PathBuf,
+    /// Input specification file (JSON) - for backward compatibility
+    #[arg(value_name = "SPEC_FILE", required_unless_present = "spec_root")]
+    spec_file: Option<PathBuf>,
+
+    /// Spec root directory (for multi-file processing)
+    #[arg(long = "spec-root", value_name = "SPEC_ROOT")]
+    spec_root: Option<PathBuf>,
 
     /// Output IR file (JSON)
-    #[arg(short, long, value_name = "OUTPUT")]
-    output: Option<PathBuf>,
+    #[arg(short, long = "out", value_name = "OUTPUT", required = true)]
+    output: PathBuf,
 
     /// Print version and exit
     #[arg(long)]
@@ -43,30 +47,99 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    // Read spec file
-    let spec_contents = fs::read_to_string(&args.spec_file)
-        .with_context(|| format!("Failed to read spec file: {:?}", args.spec_file))?;
+    let ir_module = if let Some(spec_root) = args.spec_root {
+        // Multi-file mode: process all JSON files in directory
+        eprintln!("[STUNIR][Rust] Processing specs from: {:?}", spec_root);
+        
+        if !spec_root.exists() {
+            anyhow::bail!("Spec root not found: {:?}", spec_root);
+        }
 
-    // Parse spec JSON
-    let spec: Value = serde_json::from_str(&spec_contents)
-        .context("Failed to parse spec JSON")?;
+        // Collect all spec files
+        let mut spec_files = Vec::new();
+        collect_spec_files(&spec_root, &mut spec_files)?;
+        spec_files.sort();
 
-    // Generate IR - now returns flat IRModule matching stunir_ir_v1 schema
-    let ir_module = generate_ir(&spec)?;
+        if spec_files.is_empty() {
+            anyhow::bail!("No spec files found in {:?}", spec_root);
+        }
+
+        eprintln!("[STUNIR][Rust] Found {} spec file(s)", spec_files.len());
+
+        // Generate merged IR from all specs
+        generate_merged_ir(&spec_files)?
+    } else if let Some(spec_file) = args.spec_file {
+        // Single-file mode (backward compatibility)
+        let spec_contents = fs::read_to_string(&spec_file)
+            .with_context(|| format!("Failed to read spec file: {:?}", spec_file))?;
+
+        let spec: Value = serde_json::from_str(&spec_contents)
+            .context("Failed to parse spec JSON")?;
+
+        generate_ir(&spec)?
+    } else {
+        anyhow::bail!("Either SPEC_FILE or --spec-root must be provided");
+    };
 
     // Output
     let output_json = serde_json::to_string_pretty(&ir_module)?;
     
-    if let Some(output_path) = args.output {
-        fs::write(&output_path, &output_json)
-            .with_context(|| format!("Failed to write output: {:?}", output_path))?;
-        eprintln!("[STUNIR][Rust] IR written to: {:?}", output_path);
-    } else {
-        println!("{}", output_json);
-    }
-
+    fs::write(&args.output, &output_json)
+        .with_context(|| format!("Failed to write output: {:?}", args.output))?;
+    eprintln!("[STUNIR][Rust] IR written to: {:?}", args.output);
     eprintln!("[STUNIR][Rust] Schema: {}", ir_module.schema);
+    
     Ok(())
+}
+
+fn collect_spec_files(dir: &PathBuf, spec_files: &mut Vec<PathBuf>) -> Result<()> {
+    if dir.is_dir() {
+        let mut entries: Vec<_> = fs::read_dir(dir)?
+            .filter_map(|e| e.ok())
+            .collect();
+        
+        // Sort for determinism
+        entries.sort_by_key(|e| e.path());
+
+        for entry in entries {
+            let path = entry.path();
+            if path.is_dir() {
+                collect_spec_files(&path, spec_files)?;
+            } else if path.extension().and_then(|s| s.to_str()) == Some("json") {
+                spec_files.push(path);
+            }
+        }
+    }
+    Ok(())
+}
+
+fn generate_merged_ir(spec_files: &[PathBuf]) -> Result<IRModule> {
+    // Process first spec file to get metadata
+    let first_spec_contents = fs::read_to_string(&spec_files[0])
+        .with_context(|| format!("Failed to read spec file: {:?}", spec_files[0]))?;
+    let first_spec: Value = serde_json::from_str(&first_spec_contents)?;
+    
+    let mut ir_module = generate_ir(&first_spec)?;
+    
+    // If there are more files, merge their functions
+    if spec_files.len() > 1 {
+        eprintln!("[STUNIR][Rust] Merging {} spec files...", spec_files.len());
+        
+        for spec_file in &spec_files[1..] {
+            let spec_contents = fs::read_to_string(spec_file)
+                .with_context(|| format!("Failed to read spec file: {:?}", spec_file))?;
+            let spec: Value = serde_json::from_str(&spec_contents)?;
+            
+            let additional_ir = generate_ir(&spec)?;
+            
+            // Merge functions
+            ir_module.functions.extend(additional_ir.functions);
+        }
+        
+        eprintln!("[STUNIR][Rust] Total functions: {}", ir_module.functions.len());
+    }
+    
+    Ok(ir_module)
 }
 
 fn generate_ir(spec: &Value) -> Result<IRModule> {

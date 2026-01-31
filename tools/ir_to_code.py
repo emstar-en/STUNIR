@@ -496,6 +496,153 @@ def wat_default_instr(wt: Optional[str]) -> str:
         return '(f64.const 0)'
     return '(i32.const 0)'
 
+
+def infer_c_type_from_value(value: str) -> str:
+    """
+    Infer C type from a value string.
+    Simple heuristic-based type inference.
+    """
+    value = str(value).strip()
+    
+    # Boolean values
+    if value in ('true', 'false'):
+        return 'bool'
+    
+    # Floating point
+    if '.' in value:
+        return 'double'
+    
+    # Negative integer
+    if value.startswith('-') and value[1:].isdigit():
+        return 'int32_t'
+    
+    # Positive integer
+    if value.isdigit():
+        num = int(value)
+        if num <= 255:
+            return 'uint8_t'  # Small positive integers
+        else:
+            return 'int32_t'
+    
+    # Default to int32_t for complex expressions
+    return 'int32_t'
+
+def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
+    """
+    Translate IR steps to C code.
+    
+    Supported step operations:
+    - assign: Variable assignment (target = value)
+    - return: Return statement
+    - call: Function call
+    - nop: No operation (comment only)
+    
+    Args:
+        steps: List of step dictionaries from IR
+        ret_type: Return type of the function
+        
+    Returns:
+        String containing C code for the function body
+    """
+    if not steps:
+        # Empty function body
+        c_ret = c_type(ret_type)
+        if c_ret == 'void':
+            return '  /* Empty function body */\n  return;'
+        else:
+            return f'  /* Empty function body */\n  return {c_default_return(ret_type)};'
+    
+    lines = []
+    local_vars = {}  # Track declared variables with their types
+    
+    for step in steps:
+        if not isinstance(step, dict):
+            continue
+            
+        op = step.get('op')
+        
+        if op == 'assign':
+            target = step.get('target', '')
+            value = step.get('value', '0')
+            
+            # Track local variable with type inference
+            if target and target not in local_vars:
+                var_type = infer_c_type_from_value(value)
+                local_vars[target] = var_type
+                lines.append(f'  {var_type} {target} = {value};')
+            else:
+                lines.append(f'  {target} = {value};')
+                
+        elif op == 'return':
+            value = step.get('value', '')
+            c_ret = c_type(ret_type)
+            
+            if value:
+                # Handle struct return types
+                if c_ret.startswith('struct '):
+                    # Check if value looks like a compound literal (TypeName{...})
+                    if '{' in str(value) and '}' in str(value):
+                        # Extract the brace-enclosed part
+                        # Pattern: TypeName{fields}
+                        import re
+                        match = re.match(r'(\w+)\{(.+)\}', str(value))
+                        if match:
+                            # Just use the brace part with proper C99 syntax
+                            fields = match.group(2)
+                            lines.append(f'  return ({c_ret}){{{fields}}};')
+                        else:
+                            # Fallback: wrap as-is
+                            lines.append(f'  return ({c_ret}){value};')
+                    else:
+                        lines.append(f'  return {value};')
+                else:
+                    lines.append(f'  return {value};')
+            else:
+                lines.append('  return;')
+                
+        elif op == 'call':
+            func = step.get('func', 'unknown')
+            args = step.get('args', [])
+            target = step.get('target')  # Optional assignment target
+            
+            # Build argument list
+            if isinstance(args, list):
+                args_str = ', '.join(str(a) for a in args)
+            else:
+                args_str = str(args)
+                
+            call_expr = f'{func}({args_str})'
+            
+            if target:
+                # Call with assignment
+                if target not in local_vars:
+                    # Default to int32_t for function return values
+                    local_vars[target] = 'int32_t'
+                    lines.append(f'  int32_t {target} = {call_expr};')
+                else:
+                    lines.append(f'  {target} = {call_expr};')
+            else:
+                # Call without assignment
+                lines.append(f'  {call_expr};')
+                
+        elif op == 'nop':
+            # No operation - just a comment
+            lines.append('  /* nop */')
+            
+        else:
+            # Unknown operation
+            lines.append(f'  /* UNKNOWN OP: {op} */')
+    
+    # If no return statement was generated, add a default one
+    if not any('return' in line for line in lines):
+        c_ret = c_type(ret_type)
+        if c_ret == 'void':
+            lines.append('  return;')
+        else:
+            lines.append(f'  return {c_default_return(ret_type)};')
+    
+    return '\n'.join(lines)
+
 def build_render_context(ir: Dict[str, Any], lang: str) -> Dict[str, Any]:
     types_in = ir.get('types') or []
     fns_in = ir.get('functions') or []
@@ -540,12 +687,18 @@ def build_render_context(ir: Dict[str, Any], lang: str) -> Dict[str, Any]:
             c_args = ', '.join(c_args_parts) if c_args_parts else 'void'
             c_ret = c_type(ret)
             c_ret_void = (c_ret == 'void')
+            
+            # Generate function body from steps
+            steps = fn.get('steps', [])
+            c_body = translate_steps_to_c(steps, ret)
+            
             functions_render.append({
                 'name': fn_name,
                 'c_args': c_args,
                 'c_ret': c_ret,
                 'c_ret_void': c_ret_void,
                 'c_ret_default': c_default_return(ret),
+                'c_body': c_body,  # Add generated body
             })
 
         elif lang == 'rust':
