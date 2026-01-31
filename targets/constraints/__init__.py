@@ -2,4 +2,8 @@
 
 from .emitter import ConstraintsEmitter
 
-__all__ = ["ConstraintsEmitter"]
+# Aliases for backward compatibility
+MiniZincEmitter = ConstraintsEmitter
+CHREmitter = ConstraintsEmitter
+
+__all__ = ["ConstraintsEmitter", "MiniZincEmitter", "CHREmitter"]

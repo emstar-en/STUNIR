@@ -2,4 +2,8 @@
 
 from .emitter import ExpertSystemsEmitter
 
-__all__ = ["ExpertSystemsEmitter"]
+# Aliases for backward compatibility
+CLIPSEmitter = ExpertSystemsEmitter
+JessEmitter = ExpertSystemsEmitter
+
+__all__ = ["ExpertSystemsEmitter", "CLIPSEmitter", "JessEmitter"]

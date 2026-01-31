@@ -2,4 +2,8 @@
 
 from .emitter import BeamEmitter
 
-__all__ = ["BeamEmitter"]
+# Aliases for backward compatibility
+ErlangEmitter = BeamEmitter
+ElixirEmitter = BeamEmitter
+
+__all__ = ["BeamEmitter", "ErlangEmitter", "ElixirEmitter"]

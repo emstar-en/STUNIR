@@ -2,4 +2,7 @@
 
 from .emitter import PlanningEmitter
 
-__all__ = ["PlanningEmitter"]
+# Alias for backward compatibility
+PDDLEmitter = PlanningEmitter
+
+__all__ = ["PlanningEmitter", "PDDLEmitter"]

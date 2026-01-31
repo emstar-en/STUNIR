@@ -43,7 +43,16 @@ import json
 import os
 import re
 import sys
+import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(levelname)s] [ir_to_code] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 VERSION = "0.2.0"
 TOOL_ID = "stunir_ir_to_code"
@@ -615,12 +624,12 @@ def main() -> None:
     try:
         ir_data = load_json(args.ir)
     except Exception as e:
-        print(f'Error loading IR: {e}', file=sys.stderr)
+        logger.error(f'Error loading IR: {e}')
         sys.exit(4)
 
     tpl_path = os.path.join(args.templates, 'module.template')
     if not os.path.exists(tpl_path):
-        print(f'Missing module.template in {args.templates}', file=sys.stderr)
+        logger.error(f'Missing module.template in {args.templates}')
         sys.exit(3)
 
     with open(tpl_path, 'r', encoding='utf-8') as f:
@@ -632,7 +641,7 @@ def main() -> None:
     try:
         rendered_code = render_template(tpl_content, context)
     except TemplateError as e:
-        print(f'Template rendering failed: {e}', file=sys.stderr)
+        logger.error(f'Template rendering failed: {e}')
         sys.exit(5)
 
     os.makedirs(args.out, exist_ok=True)
@@ -653,7 +662,7 @@ def main() -> None:
     with open(out_path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(rendered_code)
 
-    print(f'Generated: {out_path}')
+    logger.info(f'Generated: {out_path}')
 
     if args.emit_receipt:
         receipt = {
@@ -671,7 +680,7 @@ def main() -> None:
         with open(receipt_path, 'w', encoding='utf-8', newline='\n') as f:
             json.dump(receipt, f, indent=2, sort_keys=True)
             f.write('\n')
-        print(f'Receipt: {receipt_path}')
+        logger.info(f'Receipt: {receipt_path}')
 
 if __name__ == '__main__':
     main()

@@ -30,9 +30,18 @@ import hashlib
 import json
 import sys
 import os
+import logging
 from pathlib import Path
 from typing import Dict, Any, List
 from datetime import datetime
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(levelname)s] [spec_to_ir] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 # Add local tools dir to path to allow importing lib
 sys.path.insert(0, str(Path(__file__).parent))
@@ -176,7 +185,7 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
 
 def process_spec_file(spec_path: Path) -> Dict[str, Any]:
     """Process a single spec file and convert to IR."""
-    print(f"[INFO] Processing spec file: {spec_path}")
+    logger.info( Processing spec file: {spec_path})
     
     with open(spec_path, 'r', encoding='utf-8') as f:
         spec = json.load(f)
@@ -195,25 +204,25 @@ def main():
     a = ap.parse_args()
 
     # 1. Enforce Toolchain Lock
-    print(f"[INFO] Loading toolchain from {a.lockfile}...")
+    logger.info( Loading toolchain from {a.lockfile}...)
     try:
         toolchain.load(a.lockfile)
         py_path = toolchain.get_tool("python")
         if py_path:
-            print(f"[INFO] Verified Python runtime: {py_path}")
+            logger.info( Verified Python runtime: {py_path})
     except Exception as e:
-        print(f"[ERROR] Toolchain verification failed: {e}")
+        logger.error( Toolchain verification failed: {e})
         sys.exit(1)
 
     spec_root = Path(a.spec_root)
     out_path = Path(a.out)
 
     if not spec_root.exists():
-        print(f"[ERROR] Spec root not found: {spec_root}")
+        logger.error( Spec root not found: {spec_root})
         sys.exit(1)
 
     # 2. Process Specs and generate semantic IR
-    print(f"[INFO] Processing specs from {spec_root}...")
+    logger.info( Processing specs from {spec_root}...)
 
     # Collect all spec files
     spec_files = []
@@ -225,7 +234,7 @@ def main():
                 spec_files.append(Path(root) / f)
     
     if not spec_files:
-        print(f"[ERROR] No spec files found in {spec_root}")
+        logger.error( No spec files found in {spec_root})
         sys.exit(1)
     
     # Process the first spec file (or merge multiple if needed)
@@ -234,7 +243,7 @@ def main():
     
     # If there are multiple spec files, merge them
     if len(spec_files) > 1:
-        print(f"[INFO] Found {len(spec_files)} spec files, merging...")
+        logger.info( Found {len(spec_files)} spec files, merging...)
         all_functions = list(ir["functions"])
         
         for spec_file in spec_files[1:]:
@@ -250,8 +259,8 @@ def main():
         json.dump(ir, f, indent=2, sort_keys=True)
         f.write('\n')
 
-    print(f"[INFO] Generated semantic IR with {len(ir['functions'])} functions")
-    print(f"[INFO] Wrote semantic IR to {out_path}")
+    logger.info( Generated semantic IR with {len(ir['functions'])} functions)
+    logger.info( Wrote semantic IR to {out_path})
 
 
 if __name__ == "__main__":
