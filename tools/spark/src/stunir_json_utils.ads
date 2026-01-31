@@ -52,6 +52,20 @@ package STUNIR_JSON_Utils is
      Pre => JSON_Text'Length > 0 and Field_Name'Length > 0,
      Post => Extract_String_Value'Result'Length <= 1024;
 
+   --  Find array in JSON and return position of opening bracket
+   function Find_Array (JSON_Text : String; Field : String) return Natural
+   with
+     Pre => JSON_Text'Length > 0 and Field'Length > 0;
+
+   --  Extract next object from array at position
+   procedure Get_Next_Object
+     (JSON_Text : String;
+      Start_Pos : Natural;
+      Obj_Start : out Natural;
+      Obj_End   : out Natural)
+   with
+     Pre => JSON_Text'Length > 0 and Start_Pos <= JSON_Text'Last;
+
    --  Compute SHA-256 hash of JSON (deterministic)
    function Compute_JSON_Hash (JSON_Text : String) return String
    with

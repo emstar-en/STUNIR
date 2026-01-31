@@ -21,6 +21,7 @@ package body STUNIR_IR_To_Code is
    use Ada.Text_IO;
    use Ada.Directories;
    use Ada.Characters.Handling;
+   use STUNIR_JSON_Utils;
 
    --  Initialize emission configuration
    procedure Initialize_Config
@@ -137,6 +138,7 @@ package body STUNIR_IR_To_Code is
       declare
          Schema_Str : constant String := Extract_String_Value (JSON_Str (1 .. Last), "schema");
          Mod_Str    : constant String := Extract_String_Value (JSON_Str (1 .. Last), "module_name");
+         Funcs_Pos  : constant Natural := Find_Array (JSON_Str (1 .. Last), "functions");
       begin
          if Schema_Str'Length > 0 then
             Module.Schema := Name_Strings.To_Bounded_String (Schema_Str);
@@ -147,17 +149,90 @@ package body STUNIR_IR_To_Code is
             Module.Module_Name := Name_Strings.To_Bounded_String (Mod_Str);
             Put_Line ("[INFO] Module name: " & Mod_Str);
          end if;
+         
+         --  Parse functions array from IR
+         if Funcs_Pos > 0 then
+            declare
+               Func_Pos : Natural := Funcs_Pos + 1;
+               Obj_Start, Obj_End : Natural;
+            begin
+               Module.Func_Count := 0;
+               
+               while Module.Func_Count < Max_Functions loop
+                  Get_Next_Object (JSON_Str (1 .. Last), Func_Pos, Obj_Start, Obj_End);
+                  exit when Obj_Start = 0 or Obj_End = 0;
+                  
+                  declare
+                     Func_JSON : constant String := JSON_Str (Obj_Start .. Obj_End);
+                     Func_Name : constant String := Extract_String_Value (Func_JSON, "name");
+                     Func_Ret  : constant String := Extract_String_Value (Func_JSON, "return_type");
+                     Args_Pos  : constant Natural := Find_Array (Func_JSON, "args");
+                  begin
+                     if Func_Name'Length > 0 then
+                        Module.Func_Count := Module.Func_Count + 1;
+                        Module.Functions (Module.Func_Count).Name := 
+                          Name_Strings.To_Bounded_String (Func_Name);
+                        
+                        if Func_Ret'Length > 0 then
+                           Module.Functions (Module.Func_Count).Return_Type := 
+                             Name_Strings.To_Bounded_String (Func_Ret);
+                        else
+                           Module.Functions (Module.Func_Count).Return_Type := 
+                             Name_Strings.To_Bounded_String ("void");
+                        end if;
+                        
+                        Module.Functions (Module.Func_Count).Param_Count := 0;
+                        Module.Functions (Module.Func_Count).Is_Public := True;
+                        
+                        --  Parse args
+                        if Args_Pos > 0 then
+                           declare
+                              Arg_Pos : Natural := Args_Pos + 1;
+                              Arg_Start, Arg_End : Natural;
+                              Func_Idx : constant Positive := Module.Func_Count;
+                           begin
+                              while Module.Functions (Func_Idx).Param_Count < Max_Params loop
+                                 Get_Next_Object (Func_JSON, Arg_Pos, Arg_Start, Arg_End);
+                                 exit when Arg_Start = 0 or Arg_End = 0;
+                                 
+                                 declare
+                                    Arg_JSON : constant String := Func_JSON (Arg_Start .. Arg_End);
+                                    Arg_Name : constant String := Extract_String_Value (Arg_JSON, "name");
+                                    Arg_Type : constant String := Extract_String_Value (Arg_JSON, "type");
+                                 begin
+                                    if Arg_Name'Length > 0 then
+                                       Module.Functions (Func_Idx).Param_Count := 
+                                         Module.Functions (Func_Idx).Param_Count + 1;
+                                       Module.Functions (Func_Idx).Params (Module.Functions (Func_Idx).Param_Count).Name :=
+                                         Name_Strings.To_Bounded_String (Arg_Name);
+                                       if Arg_Type'Length > 0 then
+                                          Module.Functions (Func_Idx).Params (Module.Functions (Func_Idx).Param_Count).Type_Name :=
+                                            Name_Strings.To_Bounded_String (Arg_Type);
+                                       else
+                                          Module.Functions (Func_Idx).Params (Module.Functions (Func_Idx).Param_Count).Type_Name :=
+                                            Name_Strings.To_Bounded_String ("int");
+                                       end if;
+                                    end if;
+                                 end;
+                                 
+                                 Arg_Pos := Arg_End + 1;
+                              end loop;
+                           end;
+                        end if;
+                     end if;
+                  end;
+                  
+                  Func_Pos := Obj_End + 1;
+               end loop;
+            end;
+         else
+            --  No functions found, create empty module
+            Module.Func_Count := 0;
+         end if;
       end;
 
-      --  For now, create a default function for testing
-      Module.Func_Count := 1;
-      Module.Functions (1).Name := Name_Strings.To_Bounded_String ("main");
-      Module.Functions (1).Return_Type := Name_Strings.To_Bounded_String ("void");
-      Module.Functions (1).Param_Count := 0;
-      Module.Functions (1).Is_Public := True;
-
       Success := True;
-      Put_Line ("[SUCCESS] IR parsed successfully");
+      Put_Line ("[SUCCESS] IR parsed successfully with " & Natural'Image (Module.Func_Count) & " function(s)");
 
    exception
       when others =>
@@ -236,13 +311,35 @@ package body STUNIR_IR_To_Code is
       New_Line (File);
    end Emit_Rust_Function;
 
+   --  Map STUNIR IR type to C type
+   function Map_To_C_Type (IR_Type : String) return String is
+   begin
+      if IR_Type = "i8" then return "int8_t";
+      elsif IR_Type = "i16" then return "int16_t";
+      elsif IR_Type = "i32" then return "int32_t";
+      elsif IR_Type = "i64" then return "int64_t";
+      elsif IR_Type = "u8" then return "uint8_t";
+      elsif IR_Type = "u16" then return "uint16_t";
+      elsif IR_Type = "u32" then return "uint32_t";
+      elsif IR_Type = "u64" then return "uint64_t";
+      elsif IR_Type = "f32" then return "float";
+      elsif IR_Type = "f64" then return "double";
+      elsif IR_Type = "bool" then return "bool";
+      elsif IR_Type = "void" then return "void";
+      elsif IR_Type = "byte[]" then return "uint8_t*";
+      elsif IR_Type = "char*" or IR_Type = "string" then return "char*";
+      else return IR_Type;  -- Pass through unknown types
+      end if;
+   end Map_To_C_Type;
+
    --  Emit C function
    procedure Emit_C_Function
      (Func   : Function_Definition;
       File   : in out File_Type)
    is
+      C_Return_Type : constant String := Map_To_C_Type (Name_Strings.To_String (Func.Return_Type));
    begin
-      Put (File, Name_Strings.To_String (Func.Return_Type) & " ");
+      Put (File, C_Return_Type & " ");
       Put (File, Name_Strings.To_String (Func.Name) & "(");
 
       if Func.Param_Count = 0 then
@@ -252,14 +349,23 @@ package body STUNIR_IR_To_Code is
             if I > 1 then
                Put (File, ", ");
             end if;
-            Put (File, Name_Strings.To_String (Func.Params (I).Type_Name) & " ");
-            Put (File, Name_Strings.To_String (Func.Params (I).Name));
+            declare
+               C_Type : constant String := Map_To_C_Type (Name_Strings.To_String (Func.Params (I).Type_Name));
+            begin
+               Put (File, C_Type & " ");
+               Put (File, Name_Strings.To_String (Func.Params (I).Name));
+            end;
          end loop;
       end if;
 
       Put_Line (File, ") {");
       Put_Line (File, "    /* TODO: Implement */");
-      Put_Line (File, "    return 0;");
+      
+      -- Add appropriate return statement based on type
+      if C_Return_Type /= "void" then
+         Put_Line (File, "    return 0;");
+      end if;
+      
       Put_Line (File, "}");
       New_Line (File);
    end Emit_C_Function;
@@ -368,6 +474,9 @@ package body STUNIR_IR_To_Code is
                Put_Line (Output_File, " * Generated by: " & Tool_ID & " v" & Version);
                Put_Line (Output_File, " * Module: " & Name_Strings.To_String (Module.Module_Name));
                Put_Line (Output_File, " */");
+               New_Line (Output_File);
+               Put_Line (Output_File, "#include <stdint.h>");
+               Put_Line (Output_File, "#include <stdbool.h>");
 
             when others =>
                Put_Line (Output_File, "// STUNIR Generated Code");
