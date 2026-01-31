@@ -1,0 +1,34 @@
+{
+  "module": "imu_health_monitor",
+  "version": "1.0.0",
+  "certification": {
+    "standard": "DO-178C",
+    "level": "A",
+    "dal": "DAL_A",
+    "catastrophic_failure_condition": true
+  },
+  "generated_files": [
+    {
+      "path": "imu_health_monitor.h",
+      "sha256": "a5c5503fb8980c69eddfe8554fb81dcb0849f4a1e9b35b3ac99e8c2fca1c2715",
+      "size": 8797
+    },
+    {
+      "path": "imu_health_monitor.c",
+      "sha256": "50ab939de85754963a231f5c35d36e0c9d90d5073600004102b6cc2795bc240f",
+      "size": 11576
+    },
+    {
+      "path": "traceability.md",
+      "sha256": "f236653f531e9e769d359b5b507b79ec2423674f4854660a1997896b6d637a87",
+      "size": 1338
+    }
+  ],
+  "timestamp": "2026-01-31T00:10:30Z",
+  "validation": {
+    "compilation": "PASSED",
+    "misra_c_2012": "PASSED",
+    "static_analysis": "PASSED",
+    "target": "ARM Cortex-M4 (STM32F427)"
+  }
+}
