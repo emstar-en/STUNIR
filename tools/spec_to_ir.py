@@ -83,17 +83,40 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         # Full module spec with nested structure
         module_name = module_field.get("name", "unknown")
         docstring = spec.get("description", "")
+        module_dict = module_field
     else:
         # Simple string module name
         module_name = module_field
         docstring = spec.get("description", "")
+        module_dict = {}
     
-    # Build types list (empty for now, can be enhanced)
+    # Build types list from module.types or spec.types
     types = []
+    type_specs = module_dict.get("types", spec.get("types", []))
+    for type_spec in type_specs:
+        type_entry = {
+            "name": type_spec.get("name", ""),
+            "fields": []
+        }
+        if "docstring" in type_spec:
+            type_entry["docstring"] = type_spec["docstring"]
+        
+        # Convert fields
+        for field in type_spec.get("fields", []):
+            field_entry = {
+                "name": field.get("name", ""),
+                "type": convert_type(field.get("type", "void"))
+            }
+            if "optional" in field:
+                field_entry["optional"] = field["optional"]
+            type_entry["fields"].append(field_entry)
+        
+        types.append(type_entry)
     
-    # Build functions list
+    # Build functions list from module.functions or spec.functions
     functions = []
-    for func_spec in spec.get("functions", []):
+    func_specs = module_dict.get("functions", spec.get("functions", []))
+    for func_spec in func_specs:
         func_name = func_spec.get("name", "")
         
         # Convert parameters
@@ -110,17 +133,24 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         # Convert body (simplified for now)
         steps = []
         for stmt in func_spec.get("body", []):
-            steps.append({
-                "kind": stmt.get("type", "nop"),
-                "data": str(stmt)
-            })
+            step = {"op": stmt.get("op", "nop")}
+            if "target" in stmt:
+                step["target"] = stmt["target"]
+            if "value" in stmt:
+                step["value"] = stmt["value"]
+            steps.append(step)
         
-        functions.append({
+        func_entry = {
             "name": func_name,
             "args": args,
             "return_type": return_type,
-            "steps": steps
-        })
+        }
+        if "docstring" in func_spec:
+            func_entry["docstring"] = func_spec["docstring"]
+        if steps:
+            func_entry["steps"] = steps
+        
+        functions.append(func_entry)
     
     # Build semantic IR
     ir = {
