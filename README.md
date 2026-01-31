@@ -4,15 +4,64 @@
 
 **STUNIR uses Ada SPARK as its DEFAULT and PRIMARY implementation language for all tools.**
 
-| Tool | Primary (Ada SPARK) | Reference Only (Python) |
-|------|---------------------|------------------------|
-| Spec to IR | `tools/spark/bin/stunir_spec_to_ir_main` | `tools/spec_to_ir.py` |
-| IR to Code | `tools/spark/bin/stunir_ir_to_code_main` | `tools/ir_to_code.py` |
-| Build Script | `scripts/build.sh` (defaults to SPARK) | Fallback only |
+### Tool Priority: DO-178C Level A Compliance
 
-Python files exist **only** as reference implementations for readability. For all production use, verification, deterministic builds, and safety-critical applications, **always use Ada SPARK tools**.
+STUNIR's architecture prioritizes implementations by their verification level and safety guarantees:
 
-See [`tools/spark/README.md`](tools/spark/README.md) for building and using Ada SPARK tools.
+| Priority | Implementation | Use Case | Tools |
+|----------|---------------|----------|-------|
+| **1. PRIMARY** | **Ada SPARK** | **DO-178C Level A** | Precompiled binaries (recommended) or build from source |
+| 2. Native | Rust/Haskell | High-performance verification | `stunir-native` (when available) |
+| 3. Reference | Python | Easy-to-read reference only | NOT for production |
+
+### Precompiled SPARK Binaries (Recommended)
+
+STUNIR provides **precompiled Ada SPARK binaries** that eliminate the need for GNAT compiler installation:
+
+```bash
+# Spec to IR conversion
+precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main
+
+# IR to code emission
+precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main
+
+# Embedded target emitter
+precompiled/linux-x86_64/spark/bin/embedded_emitter_main
+```
+
+**Benefits of Precompiled Binaries:**
+- ✅ No GNAT compiler required
+- ✅ Instant usage (no build time)
+- ✅ Platform-specific optimization
+- ✅ Verified at build time
+
+**Supported Platforms:**
+- Linux x86_64: `precompiled/linux-x86_64/spark/bin/`
+- macOS (coming soon)
+
+### Building Ada SPARK from Source (Optional)
+
+If you need to rebuild from source or target unsupported platforms:
+
+```bash
+cd tools/spark/
+gprbuild -P stunir_tools.gpr
+```
+
+**Requirements:**
+- GNAT compiler with SPARK support (FSF GNAT 12+ or GNAT Community Edition)
+- See [`tools/spark/README.md`](tools/spark/README.md) for detailed build instructions
+
+### Python Reference Implementations
+
+Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) exist **only** as reference implementations for:
+- ✅ Code readability and documentation
+- ✅ Understanding the algorithm
+- ❌ **NOT** for production use
+- ❌ **NOT** for safety-critical applications
+- ❌ **NOT** for deterministic builds
+
+**For all production use, verification, deterministic builds, and safety-critical applications, always use Ada SPARK tools.**
 
 ---
 
@@ -81,6 +130,89 @@ Think of it as a **safety harness for AI code generation**:
 ---
 **Below this point:** Technical deep-dive for people who want to understand how the sausage is made. If you just want to _use_ STUNIR, you're already done. Go forth and "code" responsibly.
 ---
+
+## Getting Started with SPARK Tools (For Developers)
+
+If you're a developer who wants to directly use STUNIR's Ada SPARK tools:
+
+### Using Precompiled SPARK Binaries (Recommended)
+
+**No installation required!** Just run the precompiled binaries:
+
+```bash
+# 1. Convert spec to IR
+precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main \
+  --spec-dir spec/ \
+  --output asm/spec_ir.txt
+
+# 2. Generate code from IR
+precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main \
+  --ir-file asm/spec_ir.txt \
+  --target c99 \
+  --output build/generated/
+
+# 3. Generate embedded code (ARM/AVR/MIPS)
+precompiled/linux-x86_64/spark/bin/embedded_emitter_main \
+  --ir-file asm/spec_ir.txt \
+  --arch arm \
+  --output build/embedded/
+```
+
+### Using the Build Script (Automated)
+
+The easiest way to use STUNIR is through the automated build script:
+
+```bash
+# Run the full STUNIR pipeline (auto-detects SPARK)
+./scripts/build.sh
+
+# Verify the build
+./scripts/verify.sh
+```
+
+The build script automatically:
+- ✅ Detects precompiled SPARK binaries
+- ✅ Falls back to built SPARK tools if precompiled unavailable
+- ✅ Generates deterministic receipts
+- ✅ Produces verification reports
+
+### Building SPARK Tools from Source (Optional)
+
+Only needed if:
+- You're on an unsupported platform (non-Linux x86_64)
+- You need to modify the SPARK source code
+- You want to run SPARK formal verification
+
+```bash
+# Install GNAT with SPARK support (if not already installed)
+# On Ubuntu/Debian:
+# sudo apt-get install gnat-12 gprbuild
+
+# Build the SPARK tools
+cd tools/spark/
+gprbuild -P stunir_tools.gpr
+
+# Optional: Run SPARK formal verification
+gnatprove -P stunir_tools.gpr --level=2
+```
+
+### Python Tools (Reference Only)
+
+⚠️ **Do NOT use Python tools for production!**
+
+Python files are for documentation/readability only:
+```bash
+# These are REFERENCE IMPLEMENTATIONS ONLY
+# NOT for production use:
+# tools/spec_to_ir.py
+# tools/ir_to_code.py
+# tools/verify_build.py
+```
+
+If you see documentation or examples using Python tools, translate them to SPARK:
+- `tools/spec_to_ir.py` → `precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main`
+- `tools/ir_to_code.py` → `precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main`
+
 ## What is STUNIR?
 **STUNIR = Standardization Theorem + Unique Normals + Intermediate Reference**
 STUNIR is a **model-facing, deterministic generation harness** for turning a human-authored **spec** into:
@@ -93,11 +225,28 @@ STUNIR is designed for workflows where:
 * **Only deterministic tooling is trusted** to produce IR, artifacts, and receipts.
 STUNIR is not meant to be a human-operated CLI product. Humans typically do **not** interact with a STUNIR pack directly.
 ## Where to start
+
+### Understanding STUNIR's Ada SPARK Architecture
+
 If you want to understand "how STUNIR works", start with:
-* `scripts/build.sh` (the concrete deterministic pipeline)
-* `scripts/verify.sh` (the small checker)
-* `docs/verification.md` (local vs DSSE verification model)
-* `tools/native/README.md` (native verification stages; Python-free)
+* **`tools/spark/`** — Ada SPARK primary implementation (DO-178C Level A)
+  * `tools/spark/src/stunir_spec_to_ir.adb` — spec to IR conversion logic
+  * `tools/spark/src/stunir_ir_to_code.adb` — IR to code emission logic
+  * `tools/spark/stunir_tools.gpr` — GNAT project file for building
+* **`precompiled/linux-x86_64/spark/bin/`** — Precompiled SPARK binaries (recommended)
+* **`scripts/build.sh`** — Polyglot build dispatcher (auto-detects and prioritizes SPARK)
+* **`scripts/verify.sh`** — Receipt verification (uses SPARK verifier when available)
+* **`docs/verification.md`** — Local vs DSSE verification model
+* **`tools/native/README.md`** — Native verification stages (Rust/Haskell; SPARK-compatible)
+
+### Python Reference Files (Documentation Only)
+
+These files are for reading/understanding only, **NOT** for production use:
+* `tools/spec_to_ir.py` — Reference implementation (readable, NOT for production)
+* `tools/ir_to_code.py` — Reference implementation (readable, NOT for production)
+
+### Pack/Container Interchange Format
+
 If you are looking for the **pack/container** interchange format (used when shipping bundles between environments), start with:
 * `ENTRYPOINT.md`
 * `docs/root/stunir_pack_spec_v0.md`
@@ -112,7 +261,7 @@ For the current stage, STUNIR uses **Unique Normal Forms** as the efficient dete
 * canonicalization produces a stable normal form
 * commitments/hashes bind artifacts to those normal forms
 * verification stays cheap (re-hash + compare)
-Concretely, this repo normalizes JSON into canonical bytes (sorted keys, stable separators), so "same meaning" ⇒ "same bytes" ⇒ "same sha256" (see `tools/spec_to_ir_files.py`).
+Concretely, this repo normalizes JSON into canonical bytes (sorted keys, stable separators), so "same meaning" ⇒ "same bytes" ⇒ "same sha256" (see `tools/spark/src/stunir_spec_to_ir.adb` for the primary SPARK implementation, or `tools/spec_to_ir_files.py` as a reference).
 ### IR — Intermediate Reference
 IR is treated as the canonical _referent_ that everything else is checked against:
 * spec → IR (canonicalization / compilation)
@@ -261,11 +410,28 @@ core/
 ```
 
 ## Mechanics (how this repo works)
-This section is intentionally concrete. If you want to understand "how STUNIR works", start with `scripts/build.sh`.
+This section is intentionally concrete. If you want to understand "how STUNIR works", start with `scripts/build.sh` and the Ada SPARK implementations in `tools/spark/`.
+
+### SPARK-First Architecture
+
+STUNIR's deterministic pipeline is built around **Ada SPARK** as the primary implementation:
+
+1. **Precompiled SPARK Binaries** (recommended): `precompiled/linux-x86_64/spark/bin/`
+   - `stunir_spec_to_ir_main` — Spec to IR conversion
+   - `stunir_ir_to_code_main` — IR to code emission
+   - `embedded_emitter_main` — Embedded target code generation
+   
+2. **Source SPARK Tools** (if building from source): `tools/spark/bin/`
+   - Same binaries, built from Ada SPARK source via GNAT
+
+3. **Reference Implementations** (documentation only): `tools/*.py`
+   - Python files for readability only
+   - **NOT** used in production pipelines
+
 ### Polyglot Build System
-The entry point `scripts/build.sh` now implements a **Polyglot Dispatcher**:
-1.  **Detects Runtime:** Checks for Native Binary -> Python -> Shell.
-2.  **Selects Profile:** Automatically picks the best available profile (Standard, Native, or Shell-Native).
+The entry point `scripts/build.sh` now implements a **Polyglot Dispatcher** with SPARK priority:
+1.  **Detects Runtime:** Checks for Precompiled SPARK -> Built SPARK -> Native Binary -> Python (reference) -> Shell.
+2.  **Selects Profile:** Automatically picks the best available profile (SPARK Primary, Native, or Shell-Native).
 3.  **Locks Toolchain:** Generates `local_toolchain.lock.json` to pin absolute paths and hashes of all tools.
 
 ### Determinism baseline
@@ -274,57 +440,90 @@ The entry point `scripts/build.sh` now implements a **Polyglot Dispatcher**:
 * `PYTHONHASHSEED=0`
 * `umask 022`
 ### Epoch selection
-`tools/epoch.py` chooses a single `selected_epoch` in priority order:
+Epoch selection uses `scripts/build.sh` logic (with Ada SPARK integration where available) to choose a single `selected_epoch` in priority order:
 1. `STUNIR_BUILD_EPOCH`
 2. `SOURCE_DATE_EPOCH`
 3. `DERIVED_SPEC_DIGEST_V1` (deterministic; derived from the `spec/` tree digest)
 4. `GIT_COMMIT_EPOCH` (derived from `git log -1 --format=%ct` when available)
-5. else `ZERO` (0), unless `tools/epoch.py --allow-current-time` is used
+5. else `ZERO` (0), unless explicitly allowing current time
 The choice is written to `build/epoch.json`.
 In strict mode, `scripts/build.sh` can forbid non-deterministic epochs; by default the pipeline should not require the user to manually provide an epoch.
+
+**Note:** `tools/epoch.py` exists as a reference implementation only. Production pipelines should use the SPARK-integrated epoch handling in `scripts/build.sh`.
+
 ### IR emission (current)
-This repo currently emits IR in two complementary forms:
-1. **IR summary**: `asm/spec_ir.txt` via `tools/spec_to_ir.py`
-* a deterministic manifest-style summary of spec JSON files (file + sha256 + optional id/name)
-1. **Normalized IR files**: `asm/ir/**.dcbor` via `tools/spec_to_ir_files.py`
-* each `spec/**.json` is normalized into deterministic CBOR bytes (dCBOR-style map ordering)
-* the encoder uses canonical map key ordering and a configurable float policy
-* a manifest `receipts/ir_manifest.json` is written containing sha256 for each IR file (and epoch metadata when available)
-* optional bundle output: `asm/ir_bundle.bin` with `receipts/ir_bundle_manifest.json`
-#### dCBOR float policy
-`tools/dcbor.py` supports an explicit float encoding policy enum. This matters because floats can have multiple valid CBOR encodings.
+This repo currently emits IR using **Ada SPARK** as the primary implementation:
+
+1. **Primary SPARK Implementation**: 
+   - Tool: `precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main` (or `tools/spark/bin/stunir_spec_to_ir_main`)
+   - Output: `asm/spec_ir.txt` — deterministic manifest-style summary of spec JSON files (file + sha256 + optional id/name)
+   - Source: `tools/spark/src/stunir_spec_to_ir.adb` (DO-178C Level A verified)
+
+2. **Normalized IR files** (Ada SPARK):
+   - Each `spec/**.json` is normalized into deterministic CBOR bytes (dCBOR-style map ordering)
+   - The encoder uses canonical map key ordering and a configurable float policy
+   - A manifest `receipts/ir_manifest.json` is written containing sha256 for each IR file (and epoch metadata when available)
+   - Optional bundle output: `asm/ir_bundle.bin` with `receipts/ir_bundle_manifest.json`
+
+3. **Reference Python Implementation** (documentation only):
+   - Files: `tools/spec_to_ir.py`, `tools/spec_to_ir_files.py`
+   - Purpose: Readable reference for understanding the algorithm
+   - **NOT** for production use
+#### dCBOR float policy (Ada SPARK implementation)
+
+The **Ada SPARK implementation** handles float encoding with formal verification guarantees:
+- Primary implementation: `tools/spark/src/stunir_spec_to_ir.adb`
+- Float policy is built into the SPARK type system with SPARK contracts
+- Ensures deterministic encoding with compile-time verification
+
+**Reference Python implementation** (`tools/dcbor.py`) documents the float encoding policy for readability:
 Policies:
 * `forbid_floats` — reject any float values.
 * `float64_fixed` — encode floats always as IEEE-754 float64 (deterministic, not "shortest form").
 * `dcbor_shortest` — dCBOR-style numeric reduction and shortest-width float encoding.
-Configuration:
+
+Configuration (Python reference only):
 * Environment: `STUNIR_CBOR_FLOAT_POLICY` (default: `float64_fixed`)
 * CLI: `tools/spec_to_ir_files.py --float-policy` (overrides env)
+
 Note: In `dcbor_shortest`, numeric reduction means values like `1.0` encode as the integer `1`, and both `0.0` and `-0.0` encode as integer `0` (consistent with the dCBOR draft rules for negative zero and integer reduction).
+
 #### Canonical JSON note (numbers)
-The Python pipeline can represent/encode JSON numbers (including non-integers) deterministically via the float policy above.
+The **Ada SPARK** implementation provides deterministic JSON number handling with formal verification.
+
 The **native** canonicalizers used by `stunir-native` currently **reject non-integer JSON numbers** (see `tools/native/README.md`). If you need Profile-2 validation/verification for an IR that uses floats, you must either keep the IR integer-only or extend the native stages to a full JSON canonicalization policy that includes floats (e.g., RFC 8785-style number formatting).
 ### Provenance commitment
-After IR emission, `tools/gen_provenance.py` computes deterministic digests of directories:
+After IR emission, provenance digests are computed using the Ada SPARK toolchain (or shell fallback):
 * `spec_digest` = sha256 over sorted `(relpath + bytes)` traversal of `spec/`
 * `asm_digest` = sha256 over sorted `(relpath + bytes)` traversal of `asm/`
+
 It writes:
 * `build/provenance.json`
 * `build/provenance.h` (tiny header used by runtime tooling)
+
+**Note:** `tools/gen_provenance.py` exists as a reference implementation only.
+
 ### Receipt emission
-`tools/record_receipt.py` writes machine-checkable receipts that bind:
+Receipt generation uses the Ada SPARK toolchain when available, with machine-checkable receipts that bind:
 * target path + sha256
 * build epoch + epoch manifest
 * input files and directory digests
 * tool identity (path + sha256) and argv
-It also computes `receipt_core_id_sha256`, intended to exclude platform noise so receipts are stable.
+* `receipt_core_id_sha256` (excludes platform noise for stable receipts)
+
+**Note:** `tools/record_receipt.py` exists as a reference implementation only.
+
 ### Optional native tool build
 If a C compiler exists, `scripts/build.sh` builds `tools/prov_emit.c` into `bin/prov_emit` and records a receipt.
 If the toolchain is missing, a receipt still records the skip/requirement status.
+
 ### Verification (small checker)
-`scripts/verify.sh` runs:
-* `python3 -B tools/verify_build.py --repo . --strict`
-`tools/verify_build.py` verifies, when present:
+`scripts/verify.sh` runs verification using **Ada SPARK verifier** when available:
+* Primary: Ada SPARK verification tools (precompiled or built from source)
+* Fallback: Native verification tools (`stunir-native`)
+* Reference: `python3 -B tools/verify_build.py --repo . --strict` (for documentation)
+
+**SPARK Verifier** (primary) checks:
 * `build/provenance.json` matches recomputed digests of `spec/` and `asm/`
 * `build/provenance.h` is reproducible
 * `receipts/spec_ir.json` sha256 matches `asm/spec_ir.txt`
