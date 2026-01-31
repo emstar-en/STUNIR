@@ -185,7 +185,7 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
 
 def process_spec_file(spec_path: Path) -> Dict[str, Any]:
     """Process a single spec file and convert to IR."""
-    logger.info( Processing spec file: {spec_path})
+    logger.info(f"Processing spec file: {spec_path}")
     
     with open(spec_path, 'r', encoding='utf-8') as f:
         spec = json.load(f)
@@ -204,25 +204,25 @@ def main():
     a = ap.parse_args()
 
     # 1. Enforce Toolchain Lock
-    logger.info( Loading toolchain from {a.lockfile}...)
+    logger.info(f"Loading toolchain from {a.lockfile}...")
     try:
         toolchain.load(a.lockfile)
         py_path = toolchain.get_tool("python")
         if py_path:
-            logger.info( Verified Python runtime: {py_path})
+            logger.info(f"Verified Python runtime: {py_path}")
     except Exception as e:
-        logger.error( Toolchain verification failed: {e})
+        logger.error(f"Toolchain verification failed: {e}")
         sys.exit(1)
 
     spec_root = Path(a.spec_root)
     out_path = Path(a.out)
 
     if not spec_root.exists():
-        logger.error( Spec root not found: {spec_root})
+        logger.error(f"Spec root not found: {spec_root}")
         sys.exit(1)
 
     # 2. Process Specs and generate semantic IR
-    logger.info( Processing specs from {spec_root}...)
+    logger.info(f"Processing specs from {spec_root}...")
 
     # Collect all spec files
     spec_files = []
@@ -234,7 +234,7 @@ def main():
                 spec_files.append(Path(root) / f)
     
     if not spec_files:
-        logger.error( No spec files found in {spec_root})
+        logger.error(f"No spec files found in {spec_root}")
         sys.exit(1)
     
     # Process the first spec file (or merge multiple if needed)
@@ -243,7 +243,7 @@ def main():
     
     # If there are multiple spec files, merge them
     if len(spec_files) > 1:
-        logger.info( Found {len(spec_files)} spec files, merging...)
+        logger.info(f"Found {len(spec_files)} spec files, merging...")
         all_functions = list(ir["functions"])
         
         for spec_file in spec_files[1:]:
@@ -259,8 +259,8 @@ def main():
         json.dump(ir, f, indent=2, sort_keys=True)
         f.write('\n')
 
-    logger.info( Generated semantic IR with {len(ir['functions'])} functions)
-    logger.info( Wrote semantic IR to {out_path})
+    logger.info(f"Generated semantic IR with {len(ir['functions'])} functions")
+    logger.info(f"Wrote semantic IR to {out_path}")
 
 
 if __name__ == "__main__":

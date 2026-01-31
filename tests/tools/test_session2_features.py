@@ -33,19 +33,19 @@ class TestLogging:
     """Test logging framework."""
     
     def test_logger_creation(self):
-        from logging.logger import get_logger, StunirLogger
+        from stunir_logging.logger import get_logger, StunirLogger
         logger = get_logger('test')
         assert isinstance(logger, StunirLogger)
     
     def test_log_levels(self):
-        from logging.logger import LogLevel
+        from stunir_logging.logger import LogLevel
         assert LogLevel.DEBUG < LogLevel.INFO
         assert LogLevel.INFO < LogLevel.WARNING
         assert LogLevel.WARNING < LogLevel.ERROR
         assert LogLevel.ERROR < LogLevel.CRITICAL
     
     def test_json_formatter(self):
-        from logging.formatters import JsonFormatter
+        from stunir_logging.formatters import JsonFormatter
         import logging
         
         formatter = JsonFormatter()
@@ -59,7 +59,7 @@ class TestLogging:
         assert data['message'] == 'Test message'
     
     def test_colored_formatter(self):
-        from logging.formatters import ColoredFormatter
+        from stunir_logging.formatters import ColoredFormatter
         import logging
         
         formatter = ColoredFormatter(use_colors=False)
@@ -72,7 +72,7 @@ class TestLogging:
         assert 'Test' in output
     
     def test_level_filter(self):
-        from logging.filters import LevelFilter
+        from stunir_logging.filters import LevelFilter
         import logging
         
         f = LevelFilter(min_level=logging.WARNING)
@@ -88,7 +88,7 @@ class TestLogging:
         assert f.filter(record_error)
     
     def test_log_context(self):
-        from logging.context import log_context, get_current_context
+        from stunir_logging.context import log_context, get_current_context
         
         with log_context(request_id='123', user='test'):
             ctx = get_current_context()
