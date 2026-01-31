@@ -1,57 +1,72 @@
 # STUNIR Release Notes
 
-## Version 1.0.0 - January 31, 2026
+## Version 0.4.0 - January 31, 2026
 
-**Status**: 🎉 **PRODUCTION READY**  
-**Codename**: "Confluence"  
+**Status**: ⚠️ **BETA - DEVELOPMENT IN PROGRESS**  
+**Codename**: "Foundation"  
 **Release Date**: January 31, 2026
 
 ---
 
 ## Executive Summary
 
-STUNIR 1.0 marks the **first production-ready release** of the deterministic, multi-language code generation system with DO-178C Level A compliance. This release delivers on three years of development with a focus on **formal verification**, **IR confluence**, and **safety-critical certification**.
+STUNIR 0.4.0 is a **beta release** showcasing the multi-language emitter infrastructure and initial pipeline implementations. This release focuses on **establishing the foundation** for deterministic code generation with work-in-progress implementations in SPARK, Python, Rust, and Haskell.
 
 ### Key Highlights
 
-✨ **DO-178C Level A Compliance** - SPARK (Ada) implementation certified for safety-critical systems  
-✨ **Multi-Language Confluence** - SPARK, Python, and Rust pipelines produce identical semantic IR  
-✨ **24 Emitter Categories** - Support for polyglot, assembly, Lisp, and specialized domains  
-✨ **Schema Standardization** - `stunir_ir_v1` adopted across all implementations  
-✨ **Production Tooling** - Precompiled binaries, comprehensive tests, CI/CD integration
+✅ **24 Emitter Categories** - Source code for polyglot, assembly, Lisp, and specialized domains  
+⚠️ **Multi-Language Implementation** - SPARK, Python, Rust, and Haskell emitters (varying maturity levels)  
+✅ **Schema Foundation** - `stunir_ir_v1` specification defined  
+⚠️ **Pipeline Status** - Rust pipeline functional, SPARK/Python/Haskell under development  
+⚠️ **Test Coverage** - 10.24% actual coverage (type system coverage 61.12% does not reflect runtime testing)
 
 ---
 
-## What's New in 1.0
+## What's New in 0.4.0
 
 ### Major Features
 
-#### 1. Ada SPARK Pipeline (DO-178C Level A)
-The primary implementation for safety-critical applications:
-- **Formal Verification**: All SPARK tools pass Level 2 proofs (`gnatprove --level=2`)
+#### 1. Ada SPARK Pipeline (IN DEVELOPMENT)
+Ada SPARK implementation with formal verification potential:
+- **Status**: ⚠️ **BLOCKER** - Currently generates file manifests instead of semantic IR
 - **Memory Safety**: Bounded strings, checked array access, no dynamic allocation
-- **Certification**: Compliant with DO-178C Level A (avionics, medical, nuclear)
-- **Emitters**: 15 target languages including C89, C99, Rust, ARM, x86, Lisp dialects
+- **Emitters**: 24 emitter category implementations in source code
 - **Location**: `tools/spark/`
+- **Known Issues**: 
+  - `spec_to_ir` generates manifests, not stunir_ir_v1 format
+  - `ir_to_code` produces empty output files
+  - **Critical**: NAME_ERROR exception for empty path name
 
-#### 2. Python Reference Implementation
+#### 2. Python Reference Implementation (IN DEVELOPMENT)
 The development-friendly implementation:
-- **Comprehensive Coverage**: 20+ emitters across all categories
-- **Rapid Development**: Easy to extend, test, and integrate
-- **Schema Validation**: JSON Schema support for IR validation
-- **CLI Standardization**: Reference implementation for argument parsing
+- **Status**: ⚠️ **BLOCKER** - Circular import issue in `tools/logging/`
+- **Coverage**: 24 emitter implementations in source code
+- **Known Issues**:
+  - `tools/logging/` directory shadows Python stdlib `logging` module
+  - Missing template files for code generation
+  - Non-functional end-to-end pipeline
 - **Location**: `tools/spec_to_ir.py`, `tools/ir_to_code.py`
 
-#### 3. Rust Production Pipeline
-The high-performance, memory-safe implementation:
-- **Zero-Cost Abstractions**: No garbage collection, minimal runtime
+#### 3. Rust Pipeline ✅ FUNCTIONAL
+The only currently working end-to-end pipeline:
+- **Status**: ✅ Generates valid semantic IR and produces code
 - **Type Safety**: Strong type system prevents common bugs
-- **IR Standardization**: ✅ **NEW in 1.0** - Aligned with `stunir_ir_v1` schema
-- **Performance**: 5-10x faster than Python for large specs
+- **IR Standardization**: ✅ Correctly implements `stunir_ir_v1` schema
+- **Performance**: Fast compilation and execution
+- **Warnings**: 40 compiler warnings (unused imports/variables) - non-blocking
 - **Location**: `tools/rust/`
 
-#### 4. IR Schema Standardization (`stunir_ir_v1`)
-All pipelines now produce identical semantic IR:
+#### 4. Haskell Pipeline (UNTESTED)
+Functional programming implementation:
+- **Status**: ❓ **UNTESTED** - Haskell toolchain not available
+- **Coverage**: 24 emitter implementations in source code
+- **Known Issues**:
+  - Cannot test without GHC/Cabal installation
+  - Unknown if code compiles or functions
+- **Location**: `tools/haskell/`
+
+#### 5. IR Schema Standardization (`stunir_ir_v1`)
+**Status**: ⚠️ Only Rust implements the schema correctly
 
 ```json
 {
@@ -71,7 +86,13 @@ All pipelines now produce identical semantic IR:
 }
 ```
 
-**Benefits**:
+**Current State**:
+- ✅ Rust: Correctly generates `stunir_ir_v1` format
+- ❌ SPARK: Generates file manifest instead of semantic IR
+- ❌ Python: Generates file manifest instead of semantic IR
+- ❓ Haskell: Unknown (untested)
+
+**Goal** (not yet achieved):
 - Cross-language IR validation
 - Interchangeable pipeline components
 - Deterministic code generation
@@ -160,39 +181,117 @@ STUNIR 1.0 introduces **no breaking changes**. All modifications are backward-co
 
 ---
 
-## Known Issues
+## Known Issues and Limitations
 
-### Rust CLI Non-Standard Arguments
-**Severity**: Medium  
-**Impact**: Developer experience (not functional)
+⚠️ **This is a beta release with significant known issues.**
 
-**Issue**: Rust `spec_to_ir` uses positional argument instead of `--spec-root`:
-```bash
-# Current (non-standard)
-./tools/rust/target/release/stunir_spec_to_ir spec/test.json -o ir.json
+### CRITICAL BLOCKERS (Prevent Use)
 
-# Expected (standard)
-./tools/rust/target/release/stunir_spec_to_ir --spec-root spec/ --out ir.json
+#### 1. SPARK ir_to_code Crash
+**Severity**: 🔴 CRITICAL  
+**Impact**: SPARK pipeline unusable
+
+**Issue**: Ada NAME_ERROR exception when processing IR with empty path names
+```
+raised CONSTRAINT_ERROR : a-strunb.adb:145 explicit raise
 ```
 
-**Workaround**: Use current CLI syntax until v1.1 refactoring  
-**Status**: Tracked for v1.1 release  
-**Docs**: See `docs/CLI_STANDARDIZATION.md` for migration plan
+**Status**: ❌ Not fixed - SPARK pipeline cannot generate code  
+**Workaround**: Use Rust pipeline instead
 
-### Haskell Pipeline Requires Toolchain
-**Severity**: Low  
-**Impact**: Testing only (implementation complete)
+#### 2. Python Circular Import
+**Severity**: 🔴 CRITICAL  
+**Impact**: Python pipeline unusable
 
-**Issue**: Haskell tools require `cabal`, `ghc`, and `stack` to be installed.
+**Issue**: `tools/logging/` directory shadows Python stdlib `logging` module, causing circular imports
 
-**Workaround**:
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
-cabal update
-cd tools/haskell && cabal build
+**Status**: ❌ Not fixed - Python pipeline cannot run  
+**Workaround**: Use Rust pipeline instead
+
+#### 3. SPARK and Python Generate Wrong IR Format
+**Severity**: 🔴 CRITICAL  
+**Impact**: No IR confluence possible
+
+**Issue**: SPARK and Python generate file manifests instead of `stunir_ir_v1` semantic IR
+```json
+// Current (wrong):
+[{"path": "file.json", "sha256": "...", "size": 123}]
+
+// Expected:
+{"schema": "stunir_ir_v1", "module": {...}}
 ```
 
-**Status**: Documentation provided, no code changes needed
+**Status**: ❌ Not fixed - Only Rust works correctly  
+**Workaround**: Only use Rust for spec → IR → code pipeline
+
+### HIGH PRIORITY (Major Issues)
+
+#### 4. Zero Functional Pipelines Initially
+**Severity**: 🟠 HIGH  
+**Impact**: Originally no working end-to-end pipeline
+
+**Issue**: SPARK and Python pipelines broken, Haskell untested
+
+**Status**: ⚠️ Partially fixed - Rust pipeline now works  
+**Working Pipelines**: 1 of 4 (Rust only)
+
+#### 5. Test Execution Timeout
+**Severity**: 🟠 HIGH  
+**Impact**: Cannot run full test suite
+
+**Issue**: Test suite times out after 60+ seconds
+
+**Status**: ⚠️ Under investigation  
+**Workaround**: Run individual tests or skip slow tests
+
+#### 6. Haskell Pipeline Untested
+**Severity**: 🟠 HIGH  
+**Impact**: Unknown if Haskell tools work
+
+**Issue**: Haskell toolchain (GHC/Cabal) not available for testing
+
+**Status**: ❌ Not tested  
+**Workaround**: Install Haskell toolchain manually
+
+### MEDIUM PRIORITY (Quality Issues)
+
+#### 7. Test Coverage: 10.24% Actual
+**Severity**: 🟡 MEDIUM  
+**Impact**: Unknown code quality and reliability
+
+**Issue**: Actual test coverage is only 10.24%  
+**Misleading Claim**: Previous reports claimed 61.12% (type system only, not runtime tests)
+
+**Status**: ❌ Not improved  
+**Note**: This is honest reporting, not a bug
+
+#### 8. Rust Compiler Warnings
+**Severity**: 🟡 MEDIUM  
+**Impact**: Code quality concerns
+
+**Issue**: 40 unused import/variable warnings in Rust emitters
+
+**Status**: ⚠️ Non-blocking but should be cleaned up  
+**Workaround**: Warnings do not prevent compilation or execution
+
+### LOW PRIORITY (Minor Issues)
+
+#### 9. Rust CLI Non-Standard
+**Severity**: 🟢 LOW  
+**Impact**: Inconsistent CLI across languages
+
+**Issue**: Rust uses positional args instead of `--spec-root`
+
+**Status**: ✅ Works, just inconsistent  
+**Workaround**: Use current syntax
+
+#### 10. Missing Documentation for Fixes
+**Severity**: 🟢 LOW  
+**Impact**: Hard to track what needs fixing
+
+**Issue**: Some issues lack clear fix documentation
+
+**Status**: ⚠️ Week 6 aims to document all issues
 
 ---
 
@@ -546,19 +645,19 @@ To verify this release:
 ```bash
 # Verify SPARK binaries
 ./tools/spark/bin/stunir_spec_to_ir_main --version
-# Output: STUNIR Spec to IR (Ada SPARK) v1.0.0
+# Output: STUNIR Spec to IR (Ada SPARK) v0.4.0
 
 # Verify Python tools
 python3 tools/spec_to_ir.py --version
-# Output: STUNIR Spec to IR (Python) v1.0.0
+# Output: STUNIR Spec to IR (Python) v0.4.0
 
 # Verify Rust tools
 ./tools/rust/target/release/stunir_spec_to_ir --version
-# Output: STUNIR Spec to IR (Rust) v1.0.0
+# Output: STUNIR Spec to IR (Rust) v0.4.0
 
 # Run confluence tests
 python3 tests/confluence_test.py
-# Output: Confluence Achieved: ✓ YES
+# Output: ⚠️ WARNING: Only Rust pipeline functional - Confluence not achievable
 ```
 
 ---
@@ -581,7 +680,7 @@ sha256sum tools/spark/bin/stunir_ir_to_code_main
 
 ---
 
-**Release Prepared By**: STUNIR Week 3 Completion Task  
+**Release Prepared By**: STUNIR Week 6 Critical Blocker Fixes  
 **Release Date**: January 31, 2026  
-**Git Tag**: `v1.0.0`  
+**Git Tag**: `v0.4.0`  
 **Git Branch**: `devsite`
