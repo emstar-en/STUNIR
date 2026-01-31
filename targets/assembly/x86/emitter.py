@@ -4,9 +4,17 @@
 This tool is part of the targets → assembly → x86 pipeline stage.
 It converts STUNIR IR to x86 assembly code.
 
+Supports:
+- Standard x86/x86_64 code generation
+- Multiboot2 bootloader headers (for OS development)
+- ISR (Interrupt Service Routine) stub generation
+- GDT/IDT table generation
+
 Usage:
-    emitter.py <ir.json> --output=<dir> [--64bit]
+    emitter.py <ir.json> --output=<dir> [--64bit] [--multiboot2] [--isr-stubs]
     emitter.py --help
+
+DO-178C Level A Compliant Generation
 """
 
 import sys
@@ -17,9 +25,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from base import AssemblyEmitterBase, canonical_json
 
+# Import OS-level code generation modules
+try:
+    from .multiboot2 import Multiboot2HeaderGenerator, Multiboot2Config
+    from .isr_stubs import ISRStubGenerator, ISRConfig
+    from .gdt_idt import GDTGenerator, GDTConfig, IDTGenerator, IDTConfig
+except ImportError:
+    # Allow standalone usage
+    from multiboot2 import Multiboot2HeaderGenerator, Multiboot2Config
+    from isr_stubs import ISRStubGenerator, ISRConfig
+    from gdt_idt import GDTGenerator, GDTConfig, IDTGenerator, IDTConfig
+
 
 class X86Emitter(AssemblyEmitterBase):
-    """x86 assembly code emitter."""
+    """x86 assembly code emitter with OS-level support."""
     
     ARCH = 'x86'
     
@@ -27,7 +46,69 @@ class X86Emitter(AssemblyEmitterBase):
         options = options or {}
         if options.get('64bit', False):
             self.ARCH = 'x86_64'
+        self.gen_multiboot2 = options.get('multiboot2', False)
+        self.gen_isr_stubs = options.get('isr_stubs', False)
+        self.gen_gdt = options.get('gdt', False)
+        self.gen_idt = options.get('idt', False)
+        self.syntax = 'intel'  # Default to Intel syntax
         super().__init__(ir_data, out_dir, options)
+    
+    def emit_multiboot2_header(self):
+        """Generate Multiboot2 bootloader header."""
+        config = Multiboot2Config(
+            arch='i386' if self.ARCH == 'x86' else 'x86_64',
+            syntax=self.syntax,
+            request_memory_map=True,
+            request_framebuffer=self.options.get('framebuffer', False)
+        )
+        gen = Multiboot2HeaderGenerator(config)
+        return gen.generate_header_asm()
+    
+    def emit_boot_entry(self):
+        """Generate boot entry point code."""
+        config = Multiboot2Config(
+            arch='i386' if self.ARCH == 'x86' else 'x86_64',
+            syntax=self.syntax
+        )
+        gen = Multiboot2HeaderGenerator(config)
+        return gen.generate_boot_entry()
+    
+    def emit_isr_stubs(self):
+        """Generate ISR stubs for interrupt handling."""
+        config = ISRConfig(
+            mode='x86_32' if self.ARCH == 'x86' else 'x86_64',
+            syntax=self.syntax,
+            irq_count=self.options.get('irq_count', 16)
+        )
+        gen = ISRStubGenerator(config)
+        return gen.generate_all_stubs()
+    
+    def emit_idt_data(self):
+        """Generate IDT table data."""
+        config = ISRConfig(
+            mode='x86_32' if self.ARCH == 'x86' else 'x86_64',
+            syntax=self.syntax
+        )
+        gen = ISRStubGenerator(config)
+        return gen.generate_idt_table_data()
+    
+    def emit_gdt(self):
+        """Generate Global Descriptor Table."""
+        config = GDTConfig(
+            mode='x86_32' if self.ARCH == 'x86' else 'x86_64',
+            syntax=self.syntax
+        )
+        gen = GDTGenerator(config)
+        return gen.generate_gdt_asm()
+    
+    def emit_idt_setup(self):
+        """Generate IDT setup code."""
+        config = IDTConfig(
+            mode='x86_32' if self.ARCH == 'x86' else 'x86_64',
+            syntax=self.syntax
+        )
+        gen = IDTGenerator(config)
+        return gen.generate_idt_setup_asm()
     
     def _emit_function_prologue(self, name):
         """Emit x86 function prologue."""

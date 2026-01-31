@@ -1,0 +1,143 @@
+{
+  "$schema": "../schemas/gdt_schema.json",
+  "template_name": "gdt_template",
+  "version": "1.0.0",
+  "description": "Global Descriptor Table specification template for OS development",
+  "target_architectures": ["x86", "x86_64"],
+  "do178c_compliance": "Level A",
+  
+  "gdt_config": {
+    "mode": "x86_64",
+    "syntax": "intel",
+    "base_address": "0x0",
+    "max_entries": 8
+  },
+  
+  "descriptors": [
+    {
+      "name": "null",
+      "selector": "0x00",
+      "base": "0x00000000",
+      "limit": "0x00000",
+      "access": "0x00",
+      "flags": "0x0",
+      "description": "Null descriptor (required)"
+    },
+    {
+      "name": "kernel_code",
+      "selector": "0x08",
+      "base": "0x00000000",
+      "limit": "0xFFFFF",
+      "access": "0x9A",
+      "flags": "0xA",
+      "description": "64-bit kernel code segment",
+      "access_bits": {
+        "present": true,
+        "dpl": 0,
+        "descriptor_type": "code_data",
+        "executable": true,
+        "direction_conforming": false,
+        "read_write": true,
+        "accessed": false
+      },
+      "flag_bits": {
+        "granularity": "4KB",
+        "size": "long_mode",
+        "long_mode": true
+      }
+    },
+    {
+      "name": "kernel_data",
+      "selector": "0x10",
+      "base": "0x00000000",
+      "limit": "0xFFFFF",
+      "access": "0x92",
+      "flags": "0xC",
+      "description": "64-bit kernel data segment",
+      "access_bits": {
+        "present": true,
+        "dpl": 0,
+        "descriptor_type": "code_data",
+        "executable": false,
+        "direction_conforming": false,
+        "read_write": true,
+        "accessed": false
+      },
+      "flag_bits": {
+        "granularity": "4KB",
+        "size": "32bit"
+      }
+    },
+    {
+      "name": "user_code",
+      "selector": "0x18",
+      "base": "0x00000000",
+      "limit": "0xFFFFF",
+      "access": "0xFA",
+      "flags": "0xA",
+      "description": "64-bit user code segment (Ring 3)",
+      "access_bits": {
+        "present": true,
+        "dpl": 3,
+        "descriptor_type": "code_data",
+        "executable": true,
+        "direction_conforming": false,
+        "read_write": true,
+        "accessed": false
+      }
+    },
+    {
+      "name": "user_data",
+      "selector": "0x20",
+      "base": "0x00000000",
+      "limit": "0xFFFFF",
+      "access": "0xF2",
+      "flags": "0xC",
+      "description": "64-bit user data segment (Ring 3)",
+      "access_bits": {
+        "present": true,
+        "dpl": 3,
+        "descriptor_type": "code_data",
+        "executable": false,
+        "direction_conforming": false,
+        "read_write": true,
+        "accessed": false
+      }
+    },
+    {
+      "name": "tss",
+      "selector": "0x28",
+      "base": "TSS_BASE",
+      "limit": "TSS_LIMIT",
+      "access": "0x89",
+      "flags": "0x0",
+      "description": "Task State Segment",
+      "type": "system",
+      "system_type": "tss_available"
+    }
+  ],
+  
+  "access_byte_reference": {
+    "bit_7": "Present (P) - Must be 1 for valid segment",
+    "bits_6_5": "Descriptor Privilege Level (DPL) - Ring 0-3",
+    "bit_4": "Descriptor Type - 1 for code/data, 0 for system",
+    "bit_3": "Executable - 1 for code, 0 for data",
+    "bit_2": "Direction/Conforming",
+    "bit_1": "Read/Write",
+    "bit_0": "Accessed"
+  },
+  
+  "flags_reference": {
+    "bit_3": "Granularity - 0=1B, 1=4KB",
+    "bit_2": "Size - 0=16bit, 1=32bit",
+    "bit_1": "Long Mode - 1 for 64-bit code",
+    "bit_0": "Reserved"
+  },
+  
+  "generation_options": {
+    "emit_comments": true,
+    "emit_selector_constants": true,
+    "emit_gdtr_structure": true,
+    "output_format": "nasm"
+  }
+}

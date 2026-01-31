@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.io/schemas/idt_schema.json",
+  "title": "STUNIR IDT Specification Schema",
+  "description": "JSON Schema for Interrupt Descriptor Table specifications",
+  "type": "object",
+  "required": ["template_name", "version", "idt_config", "exceptions"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "template_name": {"type": "string"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "description": {"type": "string"},
+    "target_architectures": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["x86", "x86_64"]}
+    },
+    "do178c_compliance": {"type": "string"},
+    "idt_config": {
+      "type": "object",
+      "required": ["mode", "syntax", "vector_count"],
+      "properties": {
+        "mode": {"type": "string", "enum": ["x86_32", "x86_64"]},
+        "syntax": {"type": "string", "enum": ["intel", "att"]},
+        "vector_count": {"type": "integer", "minimum": 32, "maximum": 256},
+        "default_handler": {"type": "string"},
+        "kernel_code_selector": {"type": "string"}
+      }
+    },
+    "gate_types": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type_attr": {"type": "string"},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["vector", "name", "has_error_code", "handler"],
+        "properties": {
+          "vector": {"type": "integer", "minimum": 0, "maximum": 31},
+          "name": {"type": "string"},
+          "mnemonic": {"type": "string"},
+          "has_error_code": {"type": "boolean"},
+          "handler": {"type": "string"},
+          "gate_type": {"type": "string"},
+          "ist": {"type": "integer", "minimum": 0, "maximum": 7}
+        }
+      }
+    },
+    "irqs": {
+      "type": "object",
+      "properties": {
+        "base_vector": {"type": "integer"},
+        "count": {"type": "integer"},
+        "pic_remap": {"type": "boolean"},
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["irq", "vector", "name", "handler"],
+            "properties": {
+              "irq": {"type": "integer"},
+              "vector": {"type": "integer"},
+              "name": {"type": "string"},
+              "handler": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "generation_options": {
+      "type": "object",
+      "properties": {
+        "emit_isr_stubs": {"type": "boolean"},
+        "emit_common_handler": {"type": "boolean"},
+        "emit_idt_setup_function": {"type": "boolean"},
+        "emit_handler_table": {"type": "boolean"},
+        "output_format": {"type": "string", "enum": ["nasm", "gas", "fasm"]}
+      }
+    }
+  }
+}
