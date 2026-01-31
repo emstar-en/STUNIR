@@ -1,0 +1,49 @@
+{
+  "schema": "https://stunir.dev/schemas/semantic_ir_v1_schema.json",
+  "metadata": {
+    "category": "prolog",
+    "version": "1.0.0",
+    "dialect": "swi-prolog",
+    "description": "Family relationships in Prolog"
+  },
+  "facts": [
+    {
+      "predicate": "parent",
+      "args": ["john", "mary"],
+      "comment": "John is Mary's parent"
+    },
+    {
+      "predicate": "parent",
+      "args": ["john", "tom"],
+      "comment": "John is Tom's parent"
+    },
+    {
+      "predicate": "parent",
+      "args": ["mary", "ann"],
+      "comment": "Mary is Ann's parent"
+    }
+  ],
+  "rules": [
+    {
+      "head": "grandparent(X, Z)",
+      "body": "parent(X, Y), parent(Y, Z)",
+      "comment": "X is grandparent of Z if X is parent of Y and Y is parent of Z"
+    },
+    {
+      "head": "sibling(X, Y)",
+      "body": "parent(Z, X), parent(Z, Y), X \\= Y",
+      "comment": "X and Y are siblings if they share a parent and are not the same person"
+    }
+  ],
+  "queries": [
+    {
+      "query": "grandparent(john, ann)",
+      "expected": true
+    },
+    {
+      "query": "sibling(mary, tom)",
+      "expected": true
+    }
+  ],
+  "functions": []
+}

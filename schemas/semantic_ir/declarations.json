@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/declarations_v1.json",
+  "title": "STUNIR Declaration Nodes",
+  "description": "Declaration node schemas",
+  "definitions": {
+    "Declaration": {
+      "oneOf": [
+        {"$ref": "#/definitions/FunctionDecl"},
+        {"$ref": "#/definitions/TypeDecl"},
+        {"$ref": "#/definitions/ConstDecl"},
+        {"$ref": "#/definitions/VarDecl"}
+      ]
+    },
+    "FunctionDecl": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name", "function_type"],
+          "properties": {
+            "kind": {"const": "function_decl"},
+            "name": {"type": "string"},
+            "function_type": {"$ref": "type_system.json#/definitions/FunctionType"},
+            "body": {"$ref": "statements.json#/definitions/Statement"},
+            "visibility": {"$ref": "node_types.json#/definitions/Visibility"},
+            "inline": {"$ref": "node_types.json#/definitions/InlineHint"},
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "pure": {"type": "boolean"},
+                "const": {"type": "boolean"},
+                "no_return": {"type": "boolean"},
+                "stack_usage": {"type": "integer", "minimum": 0},
+                "priority": {"type": "integer"},
+                "interrupt_vector": {"type": "integer"},
+                "entry_point": {"type": "boolean"}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "TypeDecl": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name", "type_definition"],
+          "properties": {
+            "kind": {"const": "type_decl"},
+            "name": {"type": "string"},
+            "type_definition": {"$ref": "type_system.json#/definitions/TypeReference"},
+            "visibility": {"$ref": "node_types.json#/definitions/Visibility"}
+          }
+        }
+      ]
+    },
+    "ConstDecl": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name", "value"],
+          "properties": {
+            "kind": {"const": "const_decl"},
+            "name": {"type": "string"},
+            "const_type": {"$ref": "type_system.json#/definitions/TypeReference"},
+            "value": {"$ref": "expressions.json#/definitions/Expression"},
+            "visibility": {"$ref": "node_types.json#/definitions/Visibility"},
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "compile_time": {"type": "boolean", "default": true}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "VarDecl": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "kind": {"const": "var_decl"},
+            "name": {"type": "string"},
+            "var_type": {"$ref": "type_system.json#/definitions/TypeReference"},
+            "initializer": {"$ref": "expressions.json#/definitions/Expression"},
+            "visibility": {"$ref": "node_types.json#/definitions/Visibility"},
+            "storage": {"$ref": "node_types.json#/definitions/StorageClass"},
+            "mutability": {"$ref": "node_types.json#/definitions/Mutability"},
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "alignment": {"type": "integer", "minimum": 1},
+                "section": {"type": "string"},
+                "volatile": {"type": "boolean"}
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

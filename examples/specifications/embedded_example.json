@@ -1,0 +1,83 @@
+{
+  "schema": "https://stunir.dev/schemas/semantic_ir_v1_schema.json",
+  "metadata": {
+    "category": "embedded",
+    "version": "1.0.0",
+    "target_arch": "arm",
+    "memory": {
+      "ram_size": 65536,
+      "flash_size": 262144
+    },
+    "description": "Simple LED blinker for ARM Cortex-M"
+  },
+  "interrupts": [
+    {
+      "name": "Timer0_IRQ",
+      "priority": 1,
+      "handler": "timer0_handler"
+    }
+  ],
+  "peripherals": [
+    {
+      "name": "GPIO",
+      "base_address": "0x40020000"
+    },
+    {
+      "name": "TIMER0",
+      "base_address": "0x40010000"
+    }
+  ],
+  "functions": [
+    {
+      "name": "blink_led",
+      "parameters": [
+        {"name": "gpio_port", "type": "u32"},
+        {"name": "pin", "type": "u8"}
+      ],
+      "return_type": "void",
+      "body": [
+        {
+          "kind": "assignment",
+          "expressions": [
+            {"kind": "variable", "value": "state"},
+            {"kind": "literal", "value": 1}
+          ]
+        },
+        {
+          "kind": "while",
+          "expressions": [
+            {"kind": "literal", "value": true}
+          ],
+          "statements": [
+            {
+              "kind": "call",
+              "expressions": [
+                {"kind": "variable", "value": "toggle_gpio"}
+              ]
+            },
+            {
+              "kind": "call",
+              "expressions": [
+                {"kind": "variable", "value": "delay_ms"},
+                {"kind": "literal", "value": 500}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "timer0_handler",
+      "parameters": [],
+      "return_type": "void",
+      "body": [
+        {
+          "kind": "call",
+          "expressions": [
+            {"kind": "variable", "value": "clear_timer_flag"}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/statements_v1.json",
+  "title": "STUNIR Statement Nodes",
+  "description": "Statement node schemas",
+  "definitions": {
+    "Statement": {
+      "oneOf": [
+        {"$ref": "#/definitions/BlockStmt"},
+        {"$ref": "#/definitions/ExprStmt"},
+        {"$ref": "#/definitions/IfStmt"},
+        {"$ref": "#/definitions/WhileStmt"},
+        {"$ref": "#/definitions/ForStmt"},
+        {"$ref": "#/definitions/ReturnStmt"},
+        {"$ref": "#/definitions/BreakStmt"},
+        {"$ref": "#/definitions/ContinueStmt"},
+        {"$ref": "#/definitions/VarDeclStmt"},
+        {"$ref": "#/definitions/AssignStmt"}
+      ]
+    },
+    "BlockStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["statements"],
+          "properties": {
+            "kind": {"const": "block_stmt"},
+            "statements": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/Statement"}
+            },
+            "scope_id": {"type": "string"}
+          }
+        }
+      ]
+    },
+    "ExprStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["expression"],
+          "properties": {
+            "kind": {"const": "expr_stmt"},
+            "expression": {"$ref": "expressions.json#/definitions/Expression"}
+          }
+        }
+      ]
+    },
+    "IfStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["condition", "then_branch"],
+          "properties": {
+            "kind": {"const": "if_stmt"},
+            "condition": {"$ref": "expressions.json#/definitions/Expression"},
+            "then_branch": {"$ref": "#/definitions/Statement"},
+            "else_branch": {"$ref": "#/definitions/Statement"}
+          }
+        }
+      ]
+    },
+    "WhileStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["condition", "body"],
+          "properties": {
+            "kind": {"const": "while_stmt"},
+            "condition": {"$ref": "expressions.json#/definitions/Expression"},
+            "body": {"$ref": "#/definitions/Statement"},
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "loop_bound": {"type": "integer", "minimum": 0},
+                "unroll": {"type": "boolean"}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ForStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["init", "condition", "increment", "body"],
+          "properties": {
+            "kind": {"const": "for_stmt"},
+            "init": {"$ref": "#/definitions/Statement"},
+            "condition": {"$ref": "expressions.json#/definitions/Expression"},
+            "increment": {"$ref": "#/definitions/Statement"},
+            "body": {"$ref": "#/definitions/Statement"},
+            "attributes": {
+              "type": "object",
+              "properties": {
+                "loop_bound": {"type": "integer", "minimum": 0},
+                "unroll": {"type": "boolean"},
+                "vectorize": {"type": "boolean"}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ReturnStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "properties": {
+            "kind": {"const": "return_stmt"},
+            "value": {"$ref": "expressions.json#/definitions/Expression"}
+          }
+        }
+      ]
+    },
+    "BreakStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "properties": {
+            "kind": {"const": "break_stmt"}
+          }
+        }
+      ]
+    },
+    "ContinueStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "properties": {
+            "kind": {"const": "continue_stmt"}
+          }
+        }
+      ]
+    },
+    "VarDeclStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "kind": {"const": "var_decl_stmt"},
+            "name": {"type": "string"},
+            "var_type": {"$ref": "type_system.json#/definitions/TypeReference"},
+            "initializer": {"$ref": "expressions.json#/definitions/Expression"},
+            "storage": {"$ref": "node_types.json#/definitions/StorageClass"},
+            "mutability": {"$ref": "node_types.json#/definitions/Mutability"}
+          }
+        }
+      ]
+    },
+    "AssignStmt": {
+      "allOf": [
+        {"$ref": "ir_schema.json#/definitions/NodeBase"},
+        {
+          "type": "object",
+          "required": ["target", "value"],
+          "properties": {
+            "kind": {"const": "assign_stmt"},
+            "target": {"$ref": "expressions.json#/definitions/Expression"},
+            "value": {"$ref": "expressions.json#/definitions/Expression"}
+          }
+        }
+      ]
+    }
+  }
+}
