@@ -20,3 +20,8 @@ tools/spark/bin/
 tools/spark/obj/
 targets/spark/bin/
 targets/spark/obj/
+
+# Week 6 test artifacts
+test_rust_pipeline/
+test_output_spark.py
+.coverage.chatllm-*
