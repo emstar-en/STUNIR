@@ -5,7 +5,7 @@
       "args": [
         {
           "name": "buffer",
-          "type": "bytes"
+          "type": "byte[]"
         },
         {
           "name": "len",
@@ -16,16 +16,18 @@
       "return_type": "i32",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'msg_type', 'var_type': 'u8', 'init': 'buffer[0]'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "msg_type",
+          "value": "buffer[0]"
         },
         {
-          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'i32', 'init': '0'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "result",
+          "value": "0"
         },
         {
-          "data": "{'type': 'return', 'value': 'result'}",
-          "kind": "return"
+          "op": "return",
+          "value": "result"
         }
       ]
     },
@@ -44,12 +46,13 @@
       "return_type": "i32",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'status', 'var_type': 'i32', 'init': '1'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "status",
+          "value": "1"
         },
         {
-          "data": "{'type': 'return', 'value': 'status'}",
-          "kind": "return"
+          "op": "return",
+          "value": "status"
         }
       ]
     },
@@ -64,16 +67,16 @@
       "return_type": "i32",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'connection_fd', 'var_type': 'i32', 'init': '-1'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "connection_fd",
+          "value": "-1"
         },
         {
-          "data": "{'type': 'comment', 'text': 'Open serial/UDP connection'}",
-          "kind": "comment"
+          "op": "nop"
         },
         {
-          "data": "{'type': 'return', 'value': 'connection_fd'}",
-          "kind": "return"
+          "op": "return",
+          "value": "connection_fd"
         }
       ]
     },
@@ -92,16 +95,16 @@
       "return_type": "bool",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "success",
+          "value": "false"
         },
         {
-          "data": "{'type': 'comment', 'text': 'Send MAV_CMD_COMPONENT_ARM_DISARM'}",
-          "kind": "comment"
+          "op": "nop"
         },
         {
-          "data": "{'type': 'return', 'value': 'success'}",
-          "kind": "return"
+          "op": "return",
+          "value": "success"
         }
       ]
     },
@@ -120,12 +123,13 @@
       "return_type": "bool",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "success",
+          "value": "false"
         },
         {
-          "data": "{'type': 'return', 'value': 'success'}",
-          "kind": "return"
+          "op": "return",
+          "value": "success"
         }
       ]
     },
@@ -144,12 +148,13 @@
       "return_type": "bool",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'bool', 'init': 'false'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "result",
+          "value": "false"
         },
         {
-          "data": "{'type': 'return', 'value': 'result'}",
-          "kind": "return"
+          "op": "return",
+          "value": "result"
         }
       ]
     },
@@ -168,12 +173,13 @@
       "return_type": "bool",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "success",
+          "value": "false"
         },
         {
-          "data": "{'type': 'return', 'value': 'success'}",
-          "kind": "return"
+          "op": "return",
+          "value": "success"
         }
       ]
     },
@@ -188,12 +194,13 @@
       "return_type": "bool",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "success",
+          "value": "false"
         },
         {
-          "data": "{'type': 'return', 'value': 'success'}",
-          "kind": "return"
+          "op": "return",
+          "value": "success"
         }
       ]
     },
@@ -208,20 +215,23 @@
       "return_type": "Position",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'pos_lat', 'var_type': 'i32', 'init': '0'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "pos_lat",
+          "value": "0"
         },
         {
-          "data": "{'type': 'var_decl', 'var_name': 'pos_lon', 'var_type': 'i32', 'init': '0'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "pos_lon",
+          "value": "0"
         },
         {
-          "data": "{'type': 'var_decl', 'var_name': 'pos_alt', 'var_type': 'i32', 'init': '0'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "pos_alt",
+          "value": "0"
         },
         {
-          "data": "{'type': 'return', 'value': 'Position{pos_lat, pos_lon, pos_alt}'}",
-          "kind": "return"
+          "op": "return",
+          "value": "Position{pos_lat, pos_lon, pos_alt}"
         }
       ]
     },
@@ -236,12 +246,13 @@
       "return_type": "u8",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'battery_pct', 'var_type': 'u8', 'init': '100'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "battery_pct",
+          "value": "100"
         },
         {
-          "data": "{'type': 'return', 'value': 'battery_pct'}",
-          "kind": "return"
+          "op": "return",
+          "value": "battery_pct"
         }
       ]
     },
@@ -260,17 +271,18 @@
       "return_type": "i32",
       "steps": [
         {
-          "data": "{'type': 'var_decl', 'var_name': 'status', 'var_type': 'i32', 'init': '0'}",
-          "kind": "var_decl"
+          "op": "assign",
+          "target": "status",
+          "value": "0"
         },
         {
-          "data": "{'type': 'return', 'value': 'status'}",
-          "kind": "return"
+          "op": "return",
+          "value": "status"
         }
       ]
     }
   ],
-  "generated_at": "2026-01-31T22:03:01.440432Z",
+  "generated_at": "2026-01-31T22:07:18.928729Z",
   "ir_version": "v1",
   "module_name": "mavlink_handler",
   "schema": "stunir_ir_v1",

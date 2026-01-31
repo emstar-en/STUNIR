@@ -77,7 +77,7 @@ def convert_type(type_str: str) -> str:
         "f64": "f64",
         "bool": "bool",
         "string": "string",
-        "byte[]": "bytes",
+        "byte[]": "byte[]",  # Fixed: keep original type
         "void": "void",
     }
     return type_map.get(type_str, type_str)
@@ -139,22 +139,50 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         # Convert return type
         return_type = convert_type(func_spec.get("returns", "void"))
         
-        # Convert body - preserve original structure with kind/data fields
+        # Convert body to stunir_ir_v1 step format
         steps = []
         for stmt in func_spec.get("body", []):
-            # If statement has 'type' field, convert to 'kind' and preserve in 'data'
+            # Map statement types to IR operations
             if "type" in stmt:
-                step = {
-                    "kind": stmt.get("type", "nop"),
-                    "data": str(stmt)  # Preserve full statement as data (matching SPARK format)
+                stmt_type = stmt.get("type", "nop")
+                
+                # Map spec statement types to IR ops
+                op_map = {
+                    "var_decl": "assign",
+                    "assign": "assign",
+                    "return": "return",
+                    "call": "call",
+                    "comment": "nop",
+                    "if": "call",
+                    "loop": "call"
                 }
+                
+                step = {"op": op_map.get(stmt_type, "nop")}
+                
+                # Extract target from var_name or target field
+                if "var_name" in stmt:
+                    step["target"] = stmt["var_name"]
+                elif "target" in stmt:
+                    step["target"] = stmt["target"]
+                
+                # Extract value from init, value, expr, or func_name fields
+                if "init" in stmt:
+                    step["value"] = stmt["init"]
+                elif "value" in stmt:
+                    step["value"] = stmt["value"]
+                elif "expr" in stmt:
+                    step["value"] = stmt["expr"]
+                elif "func_name" in stmt:
+                    step["value"] = stmt["func_name"]
+                
             else:
-                # Fallback for simpler format
+                # Already in IR format with "op" field
                 step = {"op": stmt.get("op", "nop")}
                 if "target" in stmt:
                     step["target"] = stmt["target"]
                 if "value" in stmt:
                     step["value"] = stmt["value"]
+            
             steps.append(step)
         
         func_entry = {

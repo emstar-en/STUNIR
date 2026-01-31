@@ -310,6 +310,7 @@ def c_type(tr: TypeRef) -> str:
             'float': 'double',
             'bool': 'bool',
             'bytes': 'const uint8_t*',
+            'byte[]': 'const uint8_t*',  # Fixed: handle byte[] type
             'any': 'void*',
             'void': 'void',
             # Fixed-width integer types
