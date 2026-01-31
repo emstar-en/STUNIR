@@ -7,11 +7,11 @@ with Ada.Strings.Bounded;
 package STUNIR.Semantic_IR is
    pragma SPARK_Mode (On);
 
-   -- Bounded strings for memory safety (reduced to prevent stack overflow)
-   Max_Name_Length : constant := 64;
-   Max_Type_Length : constant := 32;
-   Max_Doc_Length  : constant := 256;
-   Max_Code_Length : constant := 512;
+   -- Bounded strings for memory safety
+   Max_Name_Length : constant := 128;
+   Max_Type_Length : constant := 64;
+   Max_Doc_Length  : constant := 1024;
+   Max_Code_Length : constant := 65536;
 
    package Name_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Name_Length);
    package Type_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Type_Length);
@@ -38,7 +38,7 @@ package STUNIR.Semantic_IR is
    end record;
 
    -- Type definition
-   Max_Fields : constant := 20;
+   Max_Fields : constant := 50;
    type Field_Array is array (Positive range <>) of IR_Field;
 
    type IR_Type_Def is record
@@ -65,8 +65,8 @@ package STUNIR.Semantic_IR is
    end record;
 
    -- Function definition
-   Max_Args       : constant := 10;
-   Max_Statements : constant := 20;
+   Max_Args       : constant := 20;
+   Max_Statements : constant := 100;
    type Arg_Array is array (Positive range <>) of IR_Arg;
    type Statement_Array is array (Positive range <>) of IR_Statement;
 
@@ -83,8 +83,8 @@ package STUNIR.Semantic_IR is
      Arg_Cnt <= Max_Args and Stmt_Cnt <= Max_Statements;
 
    -- Module (top-level IR)
-   Max_Types     : constant := 20;
-   Max_Functions : constant := 20;
+   Max_Types     : constant := 100;
+   Max_Functions : constant := 100;
    type Type_Array is array (Positive range <>) of IR_Type_Def;
    type Function_Array is array (Positive range <>) of IR_Function;
 

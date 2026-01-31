@@ -1,0 +1,36 @@
+-- STUNIR Emitter Tests GNAT Project
+-- DO-178C Level A
+-- Phase 3a: Core Category Emitters
+
+with "../../tools/spark/stunir_emitters.gpr";
+
+project Emitter_Tests is
+
+   for Source_Dirs use ("emitters");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+
+   for Main use
+     ("test_embedded.adb",
+      "test_gpu.adb",
+      "test_wasm.adb",
+      "test_assembly.adb",
+      "test_polyglot.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnatwa",
+         "-gnat2012",
+         "-g",
+         "-O2");
+   end Compiler;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-g");
+   end Builder;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-Es");
+   end Binder;
+
+end Emitter_Tests;
