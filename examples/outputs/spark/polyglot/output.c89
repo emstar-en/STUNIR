@@ -1,0 +1,26 @@
+/* STUNIR Generated C89 Code */
+/* DO-178C Level A Compliant */
+
+#include <stdio.h>
+
+typedef signed char int8_t;
+typedef short int16_t;
+typedef long int32_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned long uint32_t;
+
+typedef struct {
+    int32_t id;
+    float value;
+} DataPoint;
+
+void process_data(DataPoint* point) {
+    /* STUNIR Generated Function Body */
+}
+
+int32_t calculate_sum(int32_t a, int32_t b) {
+    /* STUNIR Generated Function Body */
+    return 0;
+}
+

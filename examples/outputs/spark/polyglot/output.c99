@@ -1,0 +1,21 @@
+/* STUNIR Generated C99 Code */
+/* DO-178C Level A Compliant */
+
+#include <stdint.h>
+#include <stdbool.h>
+
+typedef struct {
+    int32_t id;
+    float value;
+    bool active;
+} DataPoint;
+
+void process_data(DataPoint* point) {
+    /* STUNIR Generated Function Body */
+}
+
+int32_t calculate_sum(int32_t a, int32_t b) {
+    /* STUNIR Generated Function Body */
+    return 0;
+}
+
