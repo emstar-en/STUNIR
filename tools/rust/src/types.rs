@@ -1,9 +1,9 @@
-//! STUNIR type definitions
+//! STUNIR type definitions - stunir_ir_v1 schema compliant
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-/// IR data types
+/// IR data types (kept for internal use and backward compatibility)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum IRDataType {
@@ -60,18 +60,89 @@ impl IRDataType {
             IRDataType::TypeVoid => "()",
         }
     }
+
+    /// Convert to schema-compatible string
+    pub fn to_schema_string(&self) -> String {
+        match self {
+            IRDataType::TypeI8 => "i8",
+            IRDataType::TypeI16 => "i16",
+            IRDataType::TypeI32 => "i32",
+            IRDataType::TypeI64 => "i64",
+            IRDataType::TypeU8 => "u8",
+            IRDataType::TypeU16 => "u16",
+            IRDataType::TypeU32 => "u32",
+            IRDataType::TypeU64 => "u64",
+            IRDataType::TypeF32 => "f32",
+            IRDataType::TypeF64 => "f64",
+            IRDataType::TypeBool => "bool",
+            IRDataType::TypeString => "string",
+            IRDataType::TypeVoid => "void",
+        }.to_string()
+    }
 }
 
-/// IR Function definition
+/// IR Field (for type definitions) - matches stunir_ir_v1 schema
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRField {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub field_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub optional: Option<bool>,
+}
+
+/// IR Type definition - matches stunir_ir_v1 schema
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRType {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub docstring: Option<String>,
+    pub fields: Vec<IRField>,
+}
+
+/// IR Argument - matches stunir_ir_v1 schema
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRArg {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub arg_type: String,
+}
+
+/// IR Step (operation) - matches stunir_ir_v1 schema
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRStep {
+    pub op: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<serde_json::Value>,
+}
+
+/// IR Function definition - matches stunir_ir_v1 schema
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRFunction {
     pub name: String,
-    pub return_type: IRDataType,
-    pub parameters: Vec<IRParameter>,
-    pub body: Vec<IRStatement>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub docstring: Option<String>,
+    pub args: Vec<IRArg>,
+    pub return_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<Vec<IRStep>>,
 }
 
-/// IR Parameter
+/// IR Module - matches stunir_ir_v1 schema (flat structure)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRModule {
+    pub schema: String,
+    pub ir_version: String,
+    pub module_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub docstring: Option<String>,
+    pub types: Vec<IRType>,
+    pub functions: Vec<IRFunction>,
+}
+
+/// Legacy types for backward compatibility
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRParameter {
     pub name: String,
@@ -94,20 +165,4 @@ pub enum IRExpression {
     Literal { value: serde_json::Value },
     Variable { name: String },
     BinaryOp { op: String, left: Box<IRExpression>, right: Box<IRExpression> },
-}
-
-/// IR Module
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IRModule {
-    pub name: String,
-    pub version: String,
-    pub functions: Vec<IRFunction>,
-}
-
-/// IR Manifest
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IRManifest {
-    pub schema: String,
-    pub ir_hash: String,
-    pub module: IRModule,
 }

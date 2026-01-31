@@ -89,7 +89,7 @@ fn emit_c99(module: &IRModule) -> Result<String> {
     code.push_str("/*\n");
     code.push_str(" * STUNIR Generated Code\n");
     code.push_str(" * Language: C99\n");
-    code.push_str(&format!(" * Module: {}\n", module.name));
+    code.push_str(&format!(" * Module: {}\n", module.module_name));
     code.push_str(" * Generator: Rust Pipeline\n");
     code.push_str(" */\n\n");
     
@@ -97,18 +97,18 @@ fn emit_c99(module: &IRModule) -> Result<String> {
     code.push_str("#include <stdbool.h>\n\n");
 
     for func in &module.functions {
-        let return_type = func.return_type.to_c_type();
+        let return_type = map_type_to_c(&func.return_type);
         code.push_str(&format!("{}\n", return_type));
         code.push_str(&format!("{}(", func.name));
         
-        for (i, param) in func.parameters.iter().enumerate() {
+        for (i, arg) in func.args.iter().enumerate() {
             if i > 0 {
                 code.push_str(", ");
             }
-            code.push_str(&format!("{} {}", param.param_type.to_c_type(), param.name));
+            code.push_str(&format!("{} {}", map_type_to_c(&arg.arg_type), arg.name));
         }
         
-        if func.parameters.is_empty() {
+        if func.args.is_empty() {
             code.push_str("void");
         }
         
@@ -125,20 +125,20 @@ fn emit_rust(module: &IRModule) -> Result<String> {
     
     code.push_str("//! STUNIR Generated Code\n");
     code.push_str("//! Language: Rust\n");
-    code.push_str(&format!("//! Module: {}\n", module.name));
+    code.push_str(&format!("//! Module: {}\n", module.module_name));
     code.push_str("//! Generator: Rust Pipeline\n\n");
 
     for func in &module.functions {
-        let return_type = func.return_type.to_rust_type();
+        let return_type = map_type_to_rust(&func.return_type);
         code.push_str("pub fn ");
         code.push_str(&func.name);
         code.push_str("(");
         
-        for (i, param) in func.parameters.iter().enumerate() {
+        for (i, arg) in func.args.iter().enumerate() {
             if i > 0 {
                 code.push_str(", ");
             }
-            code.push_str(&format!("{}: {}", param.name, param.param_type.to_rust_type()));
+            code.push_str(&format!("{}: {}", arg.name, map_type_to_rust(&arg.arg_type)));
         }
         
         code.push_str(&format!(") -> {} {{\n", return_type));
@@ -156,18 +156,18 @@ fn emit_python(module: &IRModule) -> Result<String> {
     code.push_str("\"\"\"\n");
     code.push_str("STUNIR Generated Code\n");
     code.push_str("Language: Python\n");
-    code.push_str(&format!("Module: {}\n", module.name));
+    code.push_str(&format!("Module: {}\n", module.module_name));
     code.push_str("Generator: Rust Pipeline\n");
     code.push_str("\"\"\"\n\n");
 
     for func in &module.functions {
         code.push_str(&format!("def {}(", func.name));
         
-        for (i, param) in func.parameters.iter().enumerate() {
+        for (i, arg) in func.args.iter().enumerate() {
             if i > 0 {
                 code.push_str(", ");
             }
-            code.push_str(&param.name);
+            code.push_str(&arg.name);
         }
         
         code.push_str("):\n");
@@ -176,4 +176,44 @@ fn emit_python(module: &IRModule) -> Result<String> {
     }
 
     Ok(code)
+}
+
+/// Map IR type string to C type
+fn map_type_to_c(type_str: &str) -> &str {
+    match type_str {
+        "i8" => "int8_t",
+        "i16" => "int16_t",
+        "i32" => "int32_t",
+        "i64" => "int64_t",
+        "u8" => "uint8_t",
+        "u16" => "uint16_t",
+        "u32" => "uint32_t",
+        "u64" => "uint64_t",
+        "f32" => "float",
+        "f64" => "double",
+        "bool" => "bool",
+        "string" => "char*",
+        "void" => "void",
+        _ => "void",
+    }
+}
+
+/// Map IR type string to Rust type
+fn map_type_to_rust(type_str: &str) -> &str {
+    match type_str {
+        "i8" => "i8",
+        "i16" => "i16",
+        "i32" => "i32",
+        "i64" => "i64",
+        "u8" => "u8",
+        "u16" => "u16",
+        "u32" => "u32",
+        "u64" => "u64",
+        "f32" => "f32",
+        "f64" => "f64",
+        "bool" => "bool",
+        "string" => "String",
+        "void" => "()",
+        _ => "()",
+    }
 }

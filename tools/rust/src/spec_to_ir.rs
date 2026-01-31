@@ -51,21 +51,11 @@ fn main() -> Result<()> {
     let spec: Value = serde_json::from_str(&spec_contents)
         .context("Failed to parse spec JSON")?;
 
-    // Generate IR (simplified - real implementation would be more complex)
+    // Generate IR - now returns flat IRModule matching stunir_ir_v1 schema
     let ir_module = generate_ir(&spec)?;
 
-    // Create IR manifest
-    let module_json = serde_json::to_value(&ir_module)?;
-    let ir_hash = sha256_json(&module_json);
-
-    let manifest = json!({
-        "schema": "stunir_ir_v1",
-        "ir_hash": ir_hash,
-        "module": ir_module
-    });
-
     // Output
-    let output_json = serde_json::to_string_pretty(&manifest)?;
+    let output_json = serde_json::to_string_pretty(&ir_module)?;
     
     if let Some(output_path) = args.output {
         fs::write(&output_path, &output_json)
@@ -75,23 +65,25 @@ fn main() -> Result<()> {
         println!("{}", output_json);
     }
 
-    eprintln!("[STUNIR][Rust] IR hash: {}", ir_hash);
+    eprintln!("[STUNIR][Rust] Schema: {}", ir_module.schema);
     Ok(())
 }
 
 fn generate_ir(spec: &Value) -> Result<IRModule> {
     // Extract module metadata
-    let name = spec["name"]
+    let module_name = spec["name"]
         .as_str()
         .unwrap_or("unnamed_module")
         .to_string();
     
-    let version = spec["version"]
+    let docstring = spec["description"]
         .as_str()
-        .unwrap_or("1.0.0")
-        .to_string();
+        .map(|s| s.to_string());
 
-    // Extract functions (simplified)
+    // Extract types (simplified - for now empty)
+    let types = vec![];
+
+    // Extract functions
     let functions = if let Some(funcs) = spec["functions"].as_array() {
         funcs
             .iter()
@@ -102,8 +94,11 @@ fn generate_ir(spec: &Value) -> Result<IRModule> {
     };
 
     Ok(IRModule {
-        name,
-        version,
+        schema: "stunir_ir_v1".to_string(),
+        ir_version: "v1".to_string(),
+        module_name,
+        docstring,
+        types,
         functions,
     })
 }
@@ -114,54 +109,46 @@ fn parse_function(func: &Value) -> Result<IRFunction> {
         .context("Function missing 'name'")?        
         .to_string();
 
-    let return_type = parse_type(func["return_type"].as_str().unwrap_or("void"))?;
+    let docstring = func["description"]
+        .as_str()
+        .map(|s| s.to_string());
 
-    let parameters = if let Some(params) = func["parameters"].as_array() {
+    let return_type = func["return_type"]
+        .as_str()
+        .unwrap_or("void")
+        .to_string();
+
+    let args = if let Some(params) = func["parameters"].as_array() {
         params
             .iter()
-            .map(|p| parse_parameter(p))
+            .map(|p| parse_arg(p))
             .collect::<Result<Vec<_>>>()?        
     } else {
         vec![]
     };
 
-    // Simplified body parsing
-    let body = vec![];
+    // Simplified body parsing - for now empty steps
+    let steps = Some(vec![]);
 
     Ok(IRFunction {
         name,
+        docstring,
+        args,
         return_type,
-        parameters,
-        body,
+        steps,
     })
 }
 
-fn parse_parameter(param: &Value) -> Result<IRParameter> {
+fn parse_arg(param: &Value) -> Result<IRArg> {
     let name = param["name"]
         .as_str()
         .context("Parameter missing 'name'")?        
         .to_string();
 
-    let param_type = parse_type(param["type"].as_str().unwrap_or("i32"))?;
+    let arg_type = param["type"]
+        .as_str()
+        .unwrap_or("i32")
+        .to_string();
 
-    Ok(IRParameter { name, param_type })
-}
-
-fn parse_type(type_str: &str) -> Result<IRDataType> {
-    Ok(match type_str {
-        "i8" => IRDataType::TypeI8,
-        "i16" => IRDataType::TypeI16,
-        "i32" => IRDataType::TypeI32,
-        "i64" => IRDataType::TypeI64,
-        "u8" => IRDataType::TypeU8,
-        "u16" => IRDataType::TypeU16,
-        "u32" => IRDataType::TypeU32,
-        "u64" => IRDataType::TypeU64,
-        "f32" => IRDataType::TypeF32,
-        "f64" => IRDataType::TypeF64,
-        "bool" => IRDataType::TypeBool,
-        "string" => IRDataType::TypeString,
-        "void" => IRDataType::TypeVoid,
-        _ => IRDataType::TypeVoid,
-    })
+    Ok(IRArg { name, arg_type })
 }
