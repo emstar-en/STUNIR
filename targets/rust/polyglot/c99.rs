@@ -21,7 +21,7 @@ impl Default for C99Config {
 }
 
 /// Emit C99 header file
-pub fn emit_header(module_name: &str, config: &C99Config) -> EmitterResult<String> {
+pub fn emit_header(module_name: &str, _config: &C99Config) -> EmitterResult<String> {
     let mut code = String::new();
     let guard = format!("{}_H", module_name.to_uppercase());
     
@@ -59,7 +59,7 @@ pub fn emit_header(module_name: &str, config: &C99Config) -> EmitterResult<Strin
 }
 
 /// Emit C99 source file
-pub fn emit_source(module_name: &str, config: &C99Config) -> EmitterResult<String> {
+pub fn emit_source(module_name: &str, _config: &C99Config) -> EmitterResult<String> {
     let mut code = String::new();
     
     code.push_str("/*\n");

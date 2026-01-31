@@ -6,7 +6,6 @@
 //! Timestamp: 2026-01-31T02:35:20.939899Z
 
 use crate::types::*;
-use std::fmt;
 
 /// Json configuration
 #[derive(Debug, Clone)]
@@ -55,7 +54,7 @@ pub fn emit_function(
 /// Emit complete module
 pub fn emit_module(
     module_name: &str,
-    config: &JsonConfig,
+    _config: &JsonConfig,
 ) -> EmitterResult<String> {
     let mut code = String::new();
     

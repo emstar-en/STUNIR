@@ -6,7 +6,6 @@
 //! Timestamp: 2026-01-31T02:44:17.970486Z
 
 use crate::types::*;
-use std::fmt;
 
 /// ExpertSystems configuration
 #[derive(Debug, Clone)]
@@ -55,7 +54,7 @@ pub fn emit_function(
 /// Emit complete module
 pub fn emit_module(
     module_name: &str,
-    config: &ExpertSystemsConfig,
+    _config: &ExpertSystemsConfig,
 ) -> EmitterResult<String> {
     let mut code = String::new();
     

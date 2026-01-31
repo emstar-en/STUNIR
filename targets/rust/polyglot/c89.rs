@@ -21,7 +21,7 @@ impl Default for C89Config {
 }
 
 /// Emit C89 header file
-pub fn emit_header(module_name: &str, config: &C89Config) -> EmitterResult<String> {
+pub fn emit_header(module_name: &str, _config: &C89Config) -> EmitterResult<String> {
     let mut code = String::new();
     let guard = format!("{}_H", module_name.to_uppercase());
     

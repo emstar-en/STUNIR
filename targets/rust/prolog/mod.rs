@@ -3,7 +3,6 @@
 //! Prolog logic programming emitter with support for multiple dialects
 
 use crate::types::*;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Prolog dialect
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
