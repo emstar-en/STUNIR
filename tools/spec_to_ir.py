@@ -159,21 +159,44 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                 
                 step = {"op": op_map.get(stmt_type, "nop")}
                 
-                # Extract target from var_name or target field
-                if "var_name" in stmt:
-                    step["target"] = stmt["var_name"]
-                elif "target" in stmt:
-                    step["target"] = stmt["target"]
-                
-                # Extract value from init, value, expr, or func_name fields
-                if "init" in stmt:
-                    step["value"] = stmt["init"]
-                elif "value" in stmt:
-                    step["value"] = stmt["value"]
-                elif "expr" in stmt:
-                    step["value"] = stmt["expr"]
-                elif "func_name" in stmt:
-                    step["value"] = stmt["func_name"]
+                # Handle call operations specially
+                if stmt_type == "call":
+                    # Build function call expression: func_name(arg1, arg2, ...)
+                    called_func = stmt.get("func", "unknown")
+                    call_args = stmt.get("args", [])
+                    if isinstance(call_args, list):
+                        args_str = ", ".join(str(arg) for arg in call_args)
+                    else:
+                        args_str = str(call_args)
+                    step["value"] = f"{called_func}({args_str})"
+                    
+                    # Handle optional assignment
+                    if "assign_to" in stmt:
+                        step["target"] = stmt["assign_to"]
+                else:
+                    # Extract target from var_name or target field
+                    if "var_name" in stmt:
+                        step["target"] = stmt["var_name"]
+                    elif "target" in stmt:
+                        step["target"] = stmt["target"]
+                    
+                    # Extract value from init, value, expr, or func_name fields
+                    if "init" in stmt:
+                        step["value"] = stmt["init"]
+                    elif "value" in stmt:
+                        step["value"] = stmt["value"]
+                    elif "expr" in stmt:
+                        step["value"] = stmt["expr"]
+                    elif "func_name" in stmt:
+                        step["value"] = stmt["func_name"]
+                    
+                    # Skip assign operations without values (variable declarations without initialization)
+                    if step["op"] == "assign" and "value" not in step and "target" in step:
+                        # Convert to nop for var decl without init
+                        step["op"] = "nop"
+                        # Remove target for nop
+                        if "target" in step:
+                            del step["target"]
                 
             else:
                 # Already in IR format with "op" field

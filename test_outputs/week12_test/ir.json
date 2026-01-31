@@ -1,0 +1,248 @@
+{
+  "docstring": "Week 12 Test: Call Operations + Enhanced Expressions",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "i32"
+        },
+        {
+          "name": "b",
+          "type": "i32"
+        }
+      ],
+      "name": "add",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "return",
+          "value": "a + b"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        },
+        {
+          "name": "y",
+          "type": "i32"
+        }
+      ],
+      "name": "multiply",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "return",
+          "value": "x * y"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "buffer",
+          "type": "byte[]"
+        },
+        {
+          "name": "index",
+          "type": "i32"
+        }
+      ],
+      "name": "get_buffer_value",
+      "return_type": "u8",
+      "steps": [
+        {
+          "op": "return",
+          "value": "buffer[index]"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "msg",
+          "type": "message_t*"
+        }
+      ],
+      "name": "get_message_id",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "return",
+          "value": "msg->id"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "buffer",
+          "type": "byte[]"
+        },
+        {
+          "name": "msg",
+          "type": "message_t*"
+        }
+      ],
+      "name": "test_call_operations",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "nop"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "call",
+          "target": "sum",
+          "value": "add(10, 20)"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "call",
+          "target": "result",
+          "value": "multiply(sum, 2)"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "call",
+          "target": "byte_val",
+          "value": "get_buffer_value(buffer, 0)"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "call",
+          "target": "msg_id",
+          "value": "get_message_id(msg)"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "assign",
+          "target": "calc",
+          "value": "result + msg_id * 2"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "assign",
+          "target": "is_equal",
+          "value": "sum == 30"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "call",
+          "value": "add(1, 2)"
+        },
+        {
+          "op": "return",
+          "value": "calc"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "data",
+          "type": "byte[]"
+        },
+        {
+          "name": "size",
+          "type": "i32"
+        }
+      ],
+      "name": "test_complex_expressions",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "nop"
+        },
+        {
+          "op": "assign",
+          "target": "first",
+          "value": "data[0]"
+        },
+        {
+          "op": "assign",
+          "target": "last",
+          "value": "data[size - 1]"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "assign",
+          "target": "average",
+          "value": "(first + last) / 2"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "assign",
+          "target": "masked",
+          "value": "first & 0xFF"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "assign",
+          "target": "check",
+          "value": "average > 10 && average < 100"
+        },
+        {
+          "op": "return",
+          "value": "average"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T23:22:47.463821Z",
+  "ir_version": "v1",
+  "module_name": "call_operations_test",
+  "schema": "stunir_ir_v1",
+  "types": [
+    {
+      "fields": [
+        {
+          "name": "id",
+          "type": "i32"
+        },
+        {
+          "name": "type",
+          "type": "u8"
+        },
+        {
+          "name": "payload",
+          "type": "byte[]"
+        }
+      ],
+      "name": "message_t"
+    }
+  ]
+}

@@ -601,17 +601,10 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
                 lines.append('  return;')
                 
         elif op == 'call':
-            func = step.get('func', 'unknown')
-            args = step.get('args', [])
+            # Get the function call expression from value field
+            # Format: "function_name(arg1, arg2, ...)"
+            call_expr = step.get('value', 'unknown()')
             target = step.get('target')  # Optional assignment target
-            
-            # Build argument list
-            if isinstance(args, list):
-                args_str = ', '.join(str(a) for a in args)
-            else:
-                args_str = str(args)
-                
-            call_expr = f'{func}({args_str})'
             
             if target:
                 # Call with assignment

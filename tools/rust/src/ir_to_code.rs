@@ -331,8 +331,27 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str) -> String {
             }
             "call" => {
                 // Handle function calls
-                // For now, simple placeholder
-                lines.push("    /* call operation */".to_string());
+                // Get the function call expression from value field
+                // Format: "function_name(arg1, arg2, ...)"
+                let call_expr = match &step.value {
+                    Some(Value::String(s)) => s.as_str(),
+                    _ => "unknown()"
+                };
+                let target = step.target.as_deref();
+                
+                if let Some(target_var) = target {
+                    // Call with assignment
+                    if !local_vars.contains_key(target_var) {
+                        // Default to int32_t for function return values
+                        local_vars.insert(target_var.to_string(), "int32_t".to_string());
+                        lines.push(format!("    int32_t {} = {};", target_var, call_expr));
+                    } else {
+                        lines.push(format!("    {} = {};", target_var, call_expr));
+                    }
+                } else {
+                    // Call without assignment
+                    lines.push(format!("    {};", call_expr));
+                }
             }
             "nop" => {
                 lines.push("    /* nop */".to_string());

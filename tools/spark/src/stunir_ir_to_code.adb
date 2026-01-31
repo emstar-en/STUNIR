@@ -545,8 +545,37 @@ package body STUNIR_IR_To_Code is
                Append (NL);
                
             elsif Op = "call" then
-               --  Function call (simplified - no arg parsing yet)
-               Append ("  /* call operation: " & Value & " */");
+               --  Function call
+               --  Get the function call expression from value field
+               --  Format: "function_name(arg1, arg2, ...)"
+               if Target'Length > 0 then
+                  --  Call with assignment
+                  declare
+                     Var_Exists : Boolean := False;
+                  begin
+                     --  Check if variable already declared
+                     for J in 1 .. Var_Count loop
+                        if Name_Strings.To_String (Local_Vars (J)) = Target then
+                           Var_Exists := True;
+                           exit;
+                        end if;
+                     end loop;
+                     
+                     if not Var_Exists and Var_Count < Max_Vars then
+                        --  Declare new variable with default type int32_t
+                        Var_Count := Var_Count + 1;
+                        Local_Vars (Var_Count) := Name_Strings.To_Bounded_String (Target);
+                        Local_Types (Var_Count) := Name_Strings.To_Bounded_String ("int32_t");
+                        Append ("  int32_t " & Target & " = " & Value & ";");
+                     else
+                        --  Variable already declared, just assign
+                        Append ("  " & Target & " = " & Value & ";");
+                     end if;
+                  end;
+               else
+                  --  Call without assignment
+                  Append ("  " & Value & ";");
+               end if;
                Append (NL);
                
             elsif Op = "nop" then

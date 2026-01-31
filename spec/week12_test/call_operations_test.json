@@ -1,0 +1,132 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "call_operations_test",
+  "description": "Week 12 Test: Call Operations + Enhanced Expressions",
+  "target": {
+    "architecture": "x86",
+    "format": "c",
+    "standard": "c99"
+  },
+  "types": [
+    {
+      "name": "message_t",
+      "kind": "struct",
+      "fields": [
+        {"name": "id", "type": "i32"},
+        {"name": "type", "type": "u8"},
+        {"name": "payload", "type": "byte[]", "length": 16}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "add",
+      "description": "Simple addition function",
+      "params": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "return", "value": "a + b"}
+      ]
+    },
+    {
+      "name": "multiply",
+      "description": "Simple multiplication function",
+      "params": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "return", "value": "x * y"}
+      ]
+    },
+    {
+      "name": "get_buffer_value",
+      "description": "Get value from buffer with array indexing",
+      "params": [
+        {"name": "buffer", "type": "byte[]"},
+        {"name": "index", "type": "i32"}
+      ],
+      "returns": "u8",
+      "body": [
+        {"type": "return", "value": "buffer[index]"}
+      ]
+    },
+    {
+      "name": "get_message_id",
+      "description": "Get message ID with struct member access",
+      "params": [
+        {"name": "msg", "type": "message_t*"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "return", "value": "msg->id"}
+      ]
+    },
+    {
+      "name": "test_call_operations",
+      "description": "Test function calls with various expressions",
+      "params": [
+        {"name": "buffer", "type": "byte[]"},
+        {"name": "msg", "type": "message_t*"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "comment", "text": "Test simple function call"},
+        {"type": "var_decl", "var_name": "sum", "var_type": "i32"},
+        {"type": "call", "func": "add", "args": ["10", "20"], "assign_to": "sum"},
+        
+        {"type": "comment", "text": "Test nested function call"},
+        {"type": "var_decl", "var_name": "result", "var_type": "i32"},
+        {"type": "call", "func": "multiply", "args": ["sum", "2"], "assign_to": "result"},
+        
+        {"type": "comment", "text": "Test function call with array indexing"},
+        {"type": "var_decl", "var_name": "byte_val", "var_type": "u8"},
+        {"type": "call", "func": "get_buffer_value", "args": ["buffer", "0"], "assign_to": "byte_val"},
+        
+        {"type": "comment", "text": "Test function call with struct member access"},
+        {"type": "var_decl", "var_name": "msg_id", "var_type": "i32"},
+        {"type": "call", "func": "get_message_id", "args": ["msg"], "assign_to": "msg_id"},
+        
+        {"type": "comment", "text": "Test arithmetic expression"},
+        {"type": "var_decl", "var_name": "calc", "var_type": "i32", "init": "result + msg_id * 2"},
+        
+        {"type": "comment", "text": "Test comparison"},
+        {"type": "var_decl", "var_name": "is_equal", "var_type": "bool", "init": "sum == 30"},
+        
+        {"type": "comment", "text": "Test void function call"},
+        {"type": "call", "func": "add", "args": ["1", "2"]},
+        
+        {"type": "return", "value": "calc"}
+      ]
+    },
+    {
+      "name": "test_complex_expressions",
+      "description": "Test complex expression combinations",
+      "params": [
+        {"name": "data", "type": "byte[]"},
+        {"name": "size", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "comment", "text": "Array indexing with arithmetic"},
+        {"type": "var_decl", "var_name": "first", "var_type": "u8", "init": "data[0]"},
+        {"type": "var_decl", "var_name": "last", "var_type": "u8", "init": "data[size - 1]"},
+        
+        {"type": "comment", "text": "Arithmetic with multiple operators"},
+        {"type": "var_decl", "var_name": "average", "var_type": "i32", "init": "(first + last) / 2"},
+        
+        {"type": "comment", "text": "Bitwise operations"},
+        {"type": "var_decl", "var_name": "masked", "var_type": "u8", "init": "first & 0xFF"},
+        
+        {"type": "comment", "text": "Comparison operators"},
+        {"type": "var_decl", "var_name": "check", "var_type": "bool", "init": "average > 10 && average < 100"},
+        
+        {"type": "return", "value": "average"}
+      ]
+    }
+  ]
+}
