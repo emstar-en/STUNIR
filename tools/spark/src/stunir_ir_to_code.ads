@@ -65,6 +65,16 @@ package STUNIR_IR_To_Code is
    Max_Params : constant := 20;
    type Param_Array is array (1 .. Max_Params) of Function_Param;
 
+   --  IR Step (instruction) record
+   Max_Steps : constant := 50;
+   type IR_Step is record
+      Op     : Name_String;  -- Operation: assign, return, call, nop
+      Target : Name_String;  -- Assignment target or call result variable
+      Value  : Name_String;  -- Value expression or function name
+   end record;
+   
+   type Step_Array is array (1 .. Max_Steps) of IR_Step;
+
    --  Function definition record
    type Function_Definition is record
       Name        : Name_String;
@@ -72,6 +82,8 @@ package STUNIR_IR_To_Code is
       Param_Count : Natural := 0;
       Return_Type : Name_String;
       Is_Public   : Boolean := True;
+      Steps       : Step_Array;
+      Step_Count  : Natural := 0;
    end record;
 
    --  Array of function definitions

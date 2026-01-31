@@ -183,6 +183,7 @@ package body STUNIR_IR_To_Code is
                         
                         Module.Functions (Module.Func_Count).Param_Count := 0;
                         Module.Functions (Module.Func_Count).Is_Public := True;
+                        Module.Functions (Module.Func_Count).Step_Count := 0;
                         
                         --  Parse args
                         if Args_Pos > 0 then
@@ -218,6 +219,57 @@ package body STUNIR_IR_To_Code is
                                  Arg_Pos := Arg_End + 1;
                               end loop;
                            end;
+                        
+                        --  Parse steps (IR operations)
+                        declare
+                           Steps_Pos : constant Natural := Find_Array (Func_JSON, "steps");
+                        begin
+                           if Steps_Pos > 0 then
+                              declare
+                                 Step_Pos : Natural := Steps_Pos + 1;
+                                 Step_Start, Step_End : Natural;
+                                 Func_Idx : constant Positive := Module.Func_Count;
+                              begin
+                                 while Module.Functions (Func_Idx).Step_Count < Max_Steps loop
+                                    Get_Next_Object (Func_JSON, Step_Pos, Step_Start, Step_End);
+                                    exit when Step_Start = 0 or Step_End = 0;
+                                    
+                                    declare
+                                       Step_JSON : constant String := Func_JSON (Step_Start .. Step_End);
+                                       Step_Op   : constant String := Extract_String_Value (Step_JSON, "op");
+                                       Step_Tgt  : constant String := Extract_String_Value (Step_JSON, "target");
+                                       Step_Val  : constant String := Extract_String_Value (Step_JSON, "value");
+                                    begin
+                                       if Step_Op'Length > 0 then
+                                          Module.Functions (Func_Idx).Step_Count := 
+                                            Module.Functions (Func_Idx).Step_Count + 1;
+                                          
+                                          Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Op :=
+                                            Name_Strings.To_Bounded_String (Step_Op);
+                                          
+                                          if Step_Tgt'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Target :=
+                                               Name_Strings.To_Bounded_String (Step_Tgt);
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Target :=
+                                               Name_Strings.Null_Bounded_String;
+                                          end if;
+                                          
+                                          if Step_Val'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Value :=
+                                               Name_Strings.To_Bounded_String (Step_Val);
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Value :=
+                                               Name_Strings.Null_Bounded_String;
+                                          end if;
+                                       end if;
+                                    end;
+                                    
+                                    Step_Pos := Step_End + 1;
+                                 end loop;
+                              end;
+                           end if;
+                        end;
                         end if;
                      end if;
                   end;
@@ -332,6 +384,196 @@ package body STUNIR_IR_To_Code is
       end if;
    end Map_To_C_Type;
 
+   --  Get default return value for C type
+   function C_Default_Return (IR_Type : String) return String is
+   begin
+      if IR_Type = "void" then
+         return "";
+      elsif IR_Type = "bool" then
+         return "false";
+      elsif IR_Type = "f32" or IR_Type = "f64" or IR_Type = "float" or IR_Type = "double" then
+         return "0.0";
+      elsif IR_Type = "string" or IR_Type = "char*" or IR_Type = "byte[]" then
+         return "NULL";
+      else
+         return "0";  -- Integer types
+      end if;
+   end C_Default_Return;
+
+   --  Infer C type from value string (simple heuristic-based type inference)
+   function Infer_C_Type_From_Value (Value : String) return String is
+   begin
+      --  Boolean values
+      if Value = "true" or Value = "false" then
+         return "bool";
+      end if;
+      
+      --  Floating point (contains decimal point)
+      if (for some C of Value => C = '.') then
+         return "double";
+      end if;
+      
+      --  Check if it's a negative integer
+      if Value'Length > 0 and then Value (Value'First) = '-' then
+         --  Check remaining chars are digits
+         if (for all I in Value'First + 1 .. Value'Last => Value (I) in '0' .. '9') then
+            return "int32_t";
+         end if;
+      end if;
+      
+      --  Check if it's a positive integer
+      if (for all C of Value => C in '0' .. '9') then
+         --  Small positive integers could be uint8_t
+         declare
+            Num : Natural := 0;
+         begin
+            for C of Value loop
+               Num := Num * 10 + (Character'Pos (C) - Character'Pos ('0'));
+               exit when Num > 255;
+            end loop;
+            
+            if Num <= 255 then
+               return "uint8_t";
+            else
+               return "int32_t";
+            end if;
+         exception
+            when others =>
+               return "int32_t";
+         end;
+      end if;
+      
+      --  Default to int32_t for complex expressions
+      return "int32_t";
+   end Infer_C_Type_From_Value;
+
+   --  Translate IR steps to C code
+   function Translate_Steps_To_C 
+     (Steps      : Step_Array;
+      Step_Count : Natural;
+      Ret_Type   : String) return String
+   is
+      Max_Body_Size : constant := 8192;
+      Result        : String (1 .. Max_Body_Size);
+      Result_Len    : Natural := 0;
+      NL            : constant String (1 .. 1) := (1 => Character'Val (10));
+      
+      --  Local variable tracking (simplified - just tracks if var was declared)
+      Max_Vars      : constant := 20;
+      Local_Vars    : array (1 .. Max_Vars) of Name_String;
+      Local_Types   : array (1 .. Max_Vars) of Name_String;
+      Var_Count     : Natural := 0;
+      
+      procedure Append (S : String) is
+      begin
+         if Result_Len + S'Length <= Result'Last then
+            Result (Result_Len + 1 .. Result_Len + S'Length) := S;
+            Result_Len := Result_Len + S'Length;
+         end if;
+      end Append;
+      
+      function Is_Var_Declared (Var_Name : String) return Boolean is
+      begin
+         for I in 1 .. Var_Count loop
+            if Name_Strings.To_String (Local_Vars (I)) = Var_Name then
+               return True;
+            end if;
+         end loop;
+         return False;
+      end Is_Var_Declared;
+      
+      procedure Declare_Var (Var_Name : String; Var_Type : String) is
+      begin
+         if Var_Count < Max_Vars and not Is_Var_Declared (Var_Name) then
+            Var_Count := Var_Count + 1;
+            Local_Vars (Var_Count) := Name_Strings.To_Bounded_String (Var_Name);
+            Local_Types (Var_Count) := Name_Strings.To_Bounded_String (Var_Type);
+         end if;
+      end Declare_Var;
+      
+      Has_Return : Boolean := False;
+   begin
+      --  Handle empty function body
+      if Step_Count = 0 then
+         Append ("  /* Empty function body */");
+         Append (NL);  -- Newline
+         if Ret_Type = "void" then
+            Append ("  return;");
+         else
+            Append ("  return " & C_Default_Return (Ret_Type) & ";");
+         end if;
+         return Result (1 .. Result_Len);
+      end if;
+      
+      --  Process each step
+      for I in 1 .. Step_Count loop
+         declare
+            Step   : constant IR_Step := Steps (I);
+            Op     : constant String := Name_Strings.To_String (Step.Op);
+            Target : constant String := Name_Strings.To_String (Step.Target);
+            Value  : constant String := Name_Strings.To_String (Step.Value);
+         begin
+            if Op = "assign" then
+               --  Variable assignment
+               if Target'Length > 0 then
+                  if not Is_Var_Declared (Target) then
+                     --  First use - declare with type inference
+                     declare
+                        Var_Type : constant String := Infer_C_Type_From_Value (Value);
+                     begin
+                        Declare_Var (Target, Var_Type);
+                        Append ("  " & Var_Type & " " & Target & " = " & Value & ";");
+                        Append (NL);
+                     end;
+                  else
+                     --  Already declared - just assign
+                     Append ("  " & Target & " = " & Value & ";");
+                     Append (NL);
+                  end if;
+               end if;
+               
+            elsif Op = "return" then
+               --  Return statement
+               Has_Return := True;
+               if Value'Length > 0 then
+                  Append ("  return " & Value & ";");
+               elsif Ret_Type = "void" then
+                  Append ("  return;");
+               else
+                  Append ("  return " & C_Default_Return (Ret_Type) & ";");
+               end if;
+               Append (NL);
+               
+            elsif Op = "call" then
+               --  Function call (simplified - no arg parsing yet)
+               Append ("  /* call operation: " & Value & " */");
+               Append (NL);
+               
+            elsif Op = "nop" then
+               --  No operation
+               Append ("  /* nop */");
+               Append (NL);
+               
+            else
+               --  Unknown operation
+               Append ("  /* UNKNOWN OP: " & Op & " */");
+               Append (NL);
+            end if;
+         end;
+      end loop;
+      
+      --  Add default return if no return statement was found
+      if not Has_Return then
+         if Ret_Type = "void" then
+            Append ("  return;");
+         else
+            Append ("  return " & C_Default_Return (Ret_Type) & ";");
+         end if;
+      end if;
+      
+      return Result (1 .. Result_Len);
+   end Translate_Steps_To_C;
+
    --  Emit C function
    procedure Emit_C_Function
      (Func   : Function_Definition;
@@ -359,11 +601,23 @@ package body STUNIR_IR_To_Code is
       end if;
 
       Put_Line (File, ") {");
-      Put_Line (File, "    /* TODO: Implement */");
       
-      -- Add appropriate return statement based on type
-      if C_Return_Type /= "void" then
-         Put_Line (File, "    return 0;");
+      --  Generate function body from steps
+      if Func.Step_Count > 0 then
+         declare
+            Body_Code : constant String := Translate_Steps_To_C 
+              (Func.Steps, Func.Step_Count, Name_Strings.To_String (Func.Return_Type));
+         begin
+            Put_Line (File, Body_Code);
+         end;
+      else
+         --  No steps - emit stub
+         Put_Line (File, "    /* TODO: Implement */");
+         if C_Return_Type = "void" then
+            Put_Line (File, "    return;");
+         else
+            Put_Line (File, "    return " & C_Default_Return (Name_Strings.To_String (Func.Return_Type)) & ";");
+         end if;
       end if;
       
       Put_Line (File, "}");
