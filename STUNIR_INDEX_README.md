@@ -1,8 +1,8 @@
 # STUNIR Repository Index
 
 ## Overview
-This repository is organized to support the **STUNIR (Standardization Theorem + Unique Normals + Intermediate Reference)** architecture.
-The current structure emphasizes a **Shell Primary** workflow, where orchestration is handled by POSIX-compliant shell scripts, and Python is treated as an optional accelerator.
+This repository is organized to support the **STUNIR (Deterministic Multi-Language Code Generation)** architecture.
+The current structure emphasizes an **Ada SPARK Primary** workflow, where deterministic code generation is handled by formally verified Ada SPARK tools, with POSIX-compliant shell scripts for orchestration and Python as reference implementations only.
 
 ## 🤖 AI Agent Resources (New)
 If you are an AI model working on this repo, **START HERE**:

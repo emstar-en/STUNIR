@@ -3,7 +3,7 @@
 # Issue: ISSUE.IR.0001 - IR canonicalization fix
 #
 # Converts IR JSON to dCBOR normal form for deterministic hashing.
-# This is a foundation for Haskell-first unique normals (UN).
+# This is a foundation for hash-based determinism (will be replaced by semantic IR).
 
 set -eu
 
