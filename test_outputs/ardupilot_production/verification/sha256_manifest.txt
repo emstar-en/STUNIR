@@ -1,0 +1,17 @@
+# DO-178C Level A Verification Manifest
+# Module: imu_health_monitor
+# Standard: DO-178C DAL_A
+
+# Timestamp: 2026-01-31T00:07:21Z
+
+# Specification Files
+8a435a0be0680211effec8ee9c6acd4a34d359033125d258d6cd0cd131b9727c  spec/ardupilot_production/imu_health_monitor.json
+
+# Generated Source Files
+a5c5503fb8980c69eddfe8554fb81dcb0849f4a1e9b35b3ac99e8c2fca1c2715  generated_c/imu_health_monitor.h
+12f6638513cd838d913622fd2a823b743244edb5233aa991b2ce012a492a4bee  generated_c/imu_health_monitor.c
+f236653f531e9e769d359b5b507b79ec2423674f4854660a1997896b6d637a87  generated_c/traceability.md
+c8b644a24437f3f93d7f99aa523a579928325fe9aa8bbd45f6d816336429e33e  generated_c/manifest.json
+
+# Compiled Objects
+ff5fc1dbfef18e39f9afc2a2feb6c17811fb051ecbab39fe7d2ee744cdea2eb9  generated_c/imu_health_monitor.o
