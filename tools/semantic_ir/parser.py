@@ -144,7 +144,7 @@ class SpecParser:
         ir = self.ir_generator.generate_ir(annotated_ast)
         
         # Set generation timestamp
-        ir.metadata.generated_at = datetime.utcnow().isoformat() + "Z"
+        ir.generated_at = datetime.utcnow().isoformat() + "Z"
         
         return ir
 
@@ -160,19 +160,27 @@ class SpecParser:
         errors = []
         
         # Check schema version
-        if not ir.schema:
+        if not ir.schema or ir.schema != "stunir_ir_v1":
             errors.append(ParseError(
                 location=self._make_location("<ir>", 0, 0),
                 error_type=ErrorType.SEMANTIC,
-                message="Missing schema field in IR",
+                message=f"Invalid schema field in IR: expected 'stunir_ir_v1', got '{ir.schema}'",
             ))
         
-        # Check metadata
-        if not ir.metadata.category:
+        # Check module_name
+        if not ir.module_name:
             errors.append(ParseError(
                 location=self._make_location("<ir>", 0, 0),
                 error_type=ErrorType.SEMANTIC,
-                message="Missing category in metadata",
+                message="Missing module_name in IR",
+            ))
+        
+        # Check ir_version
+        if not ir.ir_version:
+            errors.append(ParseError(
+                location=self._make_location("<ir>", 0, 0),
+                error_type=ErrorType.SEMANTIC,
+                message="Missing ir_version in IR",
             ))
         
         # Validate functions

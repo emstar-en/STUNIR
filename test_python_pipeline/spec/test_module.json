@@ -1,0 +1,28 @@
+{
+  "module": "test_module",
+  "description": "Simple test module for Python pipeline",
+  "functions": [
+    {
+      "name": "add",
+      "params": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "i32", "init": "a + b"},
+        {"type": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "greet",
+      "params": [
+        {"name": "name", "type": "string"}
+      ],
+      "returns": "string",
+      "body": [
+        {"type": "return", "value": "\"Hello, \" + name"}
+      ]
+    }
+  ]
+}

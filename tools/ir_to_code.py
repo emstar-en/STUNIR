@@ -292,6 +292,38 @@ def named_name(tr: TypeRef) -> Optional[str]:
     return None
 
 def c_type(tr: TypeRef) -> str:
+    # Handle string types directly
+    if isinstance(tr, str):
+        # Map primitive types
+        type_map = {
+            'string': 'const char*',
+            'int': 'int64_t',
+            'float': 'double',
+            'bool': 'bool',
+            'bytes': 'const uint8_t*',
+            'any': 'void*',
+            'void': 'void',
+            # Fixed-width integer types
+            'i8': 'int8_t',
+            'i16': 'int16_t',
+            'i32': 'int32_t',
+            'i64': 'int64_t',
+            'u8': 'uint8_t',
+            'u16': 'uint16_t',
+            'u32': 'uint32_t',
+            'u64': 'uint64_t',
+            # Floating point types
+            'f32': 'float',
+            'f64': 'double',
+        }
+        
+        if tr in type_map:
+            return type_map[tr]
+        
+        # Not a builtin, treat as named type
+        return f'struct {tr}'
+    
+    # Handle dict-based type refs
     b = builtin_name(tr)
     if b == 'string':
         return 'const char*'
@@ -327,6 +359,27 @@ def c_type(tr: TypeRef) -> str:
     return 'void*'
 
 def c_default_return(tr: TypeRef) -> str:
+    # Handle string types directly
+    if isinstance(tr, str):
+        # Integer types
+        if tr in ('i8', 'i16', 'i32', 'i64', 'u8', 'u16', 'u32', 'u64', 'int'):
+            return '0'
+        # Float types
+        if tr in ('f32', 'f64', 'float'):
+            return '0.0'
+        # Bool type
+        if tr == 'bool':
+            return 'false'
+        # Pointer types
+        if tr in ('string', 'bytes', 'any'):
+            return 'NULL'
+        # Void type
+        if tr == 'void':
+            return ''
+        # Named types
+        return f'(struct {tr}){{0}}'
+    
+    # Handle dict-based type refs
     b = builtin_name(tr)
     if b == 'int':
         return '0'
@@ -335,13 +388,44 @@ def c_default_return(tr: TypeRef) -> str:
     if b == 'bool':
         return 'false'
     if b in {'string','bytes','any'}:
-        return '0'
+        return 'NULL'
     nn = named_name(tr)
     if nn:
         return f'(struct {nn}){{0}}'
     return '0'
 
 def rs_type(tr: TypeRef) -> str:
+    # Handle string types directly
+    if isinstance(tr, str):
+        type_map = {
+            'string': 'String',
+            'int': 'i64',
+            'float': 'f64',
+            'bool': 'bool',
+            'bytes': 'Vec<u8>',
+            'any': 'String',
+            'void': '()',
+            # Fixed-width integer types
+            'i8': 'i8',
+            'i16': 'i16',
+            'i32': 'i32',
+            'i64': 'i64',
+            'u8': 'u8',
+            'u16': 'u16',
+            'u32': 'u32',
+            'u64': 'u64',
+            # Floating point types
+            'f32': 'f32',
+            'f64': 'f64',
+        }
+        
+        if tr in type_map:
+            return type_map[tr]
+        
+        # Not a builtin, treat as named type
+        return tr
+    
+    # Handle dict-based type refs
     b = builtin_name(tr)
     if b == 'string':
         return 'String'
@@ -489,9 +573,25 @@ def build_render_context(ir: Dict[str, Any], lang: str) -> Dict[str, Any]:
                 'wat_body': body,
             })
 
+        elif lang == 'python':
+            py_args = ', '.join(a.get('name', '') for a in args if isinstance(a, dict))
+            functions_render.append({
+                'name': fn_name,
+                'py_args': py_args,
+                'args': args,
+            })
+        
+        elif lang == 'javascript':
+            js_args = ', '.join(a.get('name', '') for a in args if isinstance(a, dict))
+            functions_render.append({
+                'name': fn_name,
+                'js_args': js_args,
+                'args': args,
+            })
+        
         else:
             # asm or unknown: minimal
-            functions_render.append({'name': fn_name})
+            functions_render.append({'name': fn_name, 'args': args})
 
     ctx = {
         'module_name': ir.get('module_name', 'output'),

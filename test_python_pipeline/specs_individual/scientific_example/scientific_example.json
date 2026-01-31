@@ -1,0 +1,42 @@
+{
+  "module": "scientific_example",
+  "description": "Scientific computing example with matrix operations",
+  "functions": [
+    {
+      "name": "matrix_multiply",
+      "params": [
+        {"name": "a", "type": "f64"},
+        {"name": "b", "type": "f64"},
+        {"name": "n", "type": "i32"}
+      ],
+      "returns": "f64",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "f64", "init": "0.0"}
+      ]
+    },
+    {
+      "name": "vector_dot_product",
+      "params": [
+        {"name": "v1", "type": "f64"},
+        {"name": "v2", "type": "f64"},
+        {"name": "len", "type": "i32"}
+      ],
+      "returns": "f64",
+      "body": [
+        {"type": "var_decl", "var_name": "sum", "var_type": "f64", "init": "0.0"}
+      ]
+    },
+    {
+      "name": "matrix_transpose",
+      "params": [
+        {"name": "matrix", "type": "f64"},
+        {"name": "rows", "type": "i32"},
+        {"name": "cols", "type": "i32"}
+      ],
+      "returns": "f64",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "f64", "init": "0.0"}
+      ]
+    }
+  ]
+}

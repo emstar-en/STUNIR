@@ -59,22 +59,69 @@ class IRMetadata:
 
 @dataclass
 class SemanticIR:
-    """Semantic Intermediate Reference."""
-    schema: str = "https://stunir.dev/schemas/semantic_ir_v1_schema.json"
-    metadata: IRMetadata = field(default_factory=lambda: IRMetadata(
-        version="1.0.0",
-        category="unknown",
-        source_hash="",
-        generated_at="",
-    ))
+    """Semantic Intermediate Reference - STUNIR v1 Format."""
+    schema: str = "stunir_ir_v1"
+    ir_version: str = "v1"
+    module_name: str = "unknown"
+    docstring: str = ""
     types: List[IRType] = field(default_factory=list)
     functions: List[IRFunction] = field(default_factory=list)
-    constants: Dict[str, Any] = field(default_factory=dict)
-    imports: List[str] = field(default_factory=list)
+    generated_at: str = ""
+    
+    # Legacy metadata for backward compatibility
+    _metadata: Optional[IRMetadata] = field(default=None, repr=False)
+    _category: str = field(default="unknown", repr=False)
+    
+    @property
+    def metadata(self) -> IRMetadata:
+        """Get legacy metadata (for backward compatibility)."""
+        if self._metadata is None:
+            self._metadata = IRMetadata(
+                version=self.ir_version,
+                category=self._category,
+                source_hash="",
+                generated_at=self.generated_at,
+            )
+        return self._metadata
+    
+    @metadata.setter
+    def metadata(self, value: IRMetadata):
+        """Set legacy metadata (for backward compatibility)."""
+        self._metadata = value
+        self.ir_version = value.version
+        self.generated_at = value.generated_at
+        self._category = value.category
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return asdict(self)
+        """Convert to dictionary in STUNIR v1 format."""
+        # Convert to STUNIR v1 format (matching SPARK output)
+        result = {
+            "schema": self.schema,
+            "ir_version": self.ir_version,
+            "module_name": self.module_name,
+            "docstring": self.docstring,
+            "types": self.types,
+            "functions": [],
+            "generated_at": self.generated_at,
+        }
+        
+        # Convert functions to dict format
+        for func in self.functions:
+            func_dict = {
+                "name": func.name,
+                "args": [
+                    {"name": p.name, "type": p.type.name}
+                    for p in func.parameters
+                ],
+                "return_type": func.return_type.name,
+                "steps": [
+                    {"kind": stmt.kind, "data": str(stmt.operands)}
+                    for stmt in func.body
+                ],
+            }
+            result["functions"].append(func_dict)
+        
+        return result
 
     def to_json(self, pretty: bool = True) -> str:
         """Convert to JSON string."""
@@ -94,9 +141,12 @@ class IRGenerator:
         """Generate Semantic IR from annotated AST."""
         ir = SemanticIR()
         
-        # Set metadata
-        ir.metadata.category = self.category
-        ir.metadata.version = "1.0.0"
+        # Set STUNIR v1 fields
+        ir.schema = "stunir_ir_v1"
+        ir.ir_version = "v1"
+        ir.module_name = getattr(ast.ast, 'module_name', self.category)
+        ir.docstring = getattr(ast.ast, 'docstring', f"{self.category} module")
+        ir._category = self.category  # Set internal category for backward compatibility
         
         # Generate types
         for typedef in ast.ast.types:
@@ -107,22 +157,6 @@ class IRGenerator:
         for func in ast.ast.functions:
             ir_func = self.generate_function_ir(func)
             ir.functions.append(ir_func)
-        
-        # Generate constants
-        for const in ast.ast.constants:
-            ir.constants[const.name] = const.value
-        
-        # Generate imports
-        for imp in ast.ast.imports:
-            ir.imports.append(imp.module)
-        
-        # Compute metadata
-        metadata = self.compute_metadata(ir)
-        ir.metadata.complexity_metrics = metadata.get("complexity", {})
-        ir.metadata.optimization_hints = metadata.get("hints", [])
-        
-        # Compute source hash
-        ir.metadata.source_hash = self._compute_ir_hash(ir)
         
         return ir
 

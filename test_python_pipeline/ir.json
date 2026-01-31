@@ -1,0 +1,50 @@
+{
+  "docstring": "Simple test module for Python pipeline",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "i32"
+        },
+        {
+          "name": "b",
+          "type": "i32"
+        }
+      ],
+      "name": "add",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'i32', 'init': 'a + b'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'result'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "greet",
+      "return_type": "string",
+      "steps": [
+        {
+          "data": "{'type': 'return', 'value': '\"Hello, \" + name'}",
+          "kind": "return"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:05:31.834575Z",
+  "ir_version": "v1",
+  "module_name": "test_module",
+  "schema": "stunir_ir_v1",
+  "types": []
+}
