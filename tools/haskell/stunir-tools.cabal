@@ -1,0 +1,41 @@
+cabal-version:      3.0
+name:               stunir-tools
+version:            1.0.0
+license:            MIT
+author:             STUNIR Team
+maintainer:         stunir@example.com
+synopsis:           STUNIR core toolchain in Haskell
+description:        Production-ready implementation with formal correctness guarantees
+
+executable stunir_spec_to_ir
+  main-is:          SpecToIR.hs
+  other-modules:    STUNIR.Types
+                  , STUNIR.Hash
+                  , STUNIR.IR
+  hs-source-dirs:   src
+  build-depends:    base ^>=4.16
+                  , aeson >=2.0
+                  , bytestring >=0.11
+                  , text >=1.2
+                  , cryptonite >=0.30
+                  , memory >=0.18
+                  , containers >=0.6
+  default-language: Haskell2010
+  ghc-options:      -Wall -O2 -threaded
+
+executable stunir_ir_to_code
+  main-is:          IRToCode.hs
+  other-modules:    STUNIR.Types
+                  , STUNIR.Hash
+                  , STUNIR.IR
+                  , STUNIR.Emitter
+  hs-source-dirs:   src
+  build-depends:    base ^>=4.16
+                  , aeson >=2.0
+                  , bytestring >=0.11
+                  , text >=1.2
+                  , cryptonite >=0.30
+                  , memory >=0.18
+                  , containers >=0.6
+  default-language: Haskell2010
+  ghc-options:      -Wall -O2 -threaded

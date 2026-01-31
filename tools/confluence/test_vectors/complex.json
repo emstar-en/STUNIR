@@ -1,0 +1,48 @@
+{
+  "name": "complex_module",
+  "version": "2.0.0",
+  "functions": [
+    {
+      "name": "process_data",
+      "return_type": "void",
+      "parameters": [
+        {
+          "name": "input",
+          "type": "i32"
+        },
+        {
+          "name": "output",
+          "type": "i32"
+        },
+        {
+          "name": "flags",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "calculate",
+      "return_type": "f64",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "f64"
+        },
+        {
+          "name": "y",
+          "type": "f64"
+        }
+      ]
+    },
+    {
+      "name": "validate",
+      "return_type": "bool",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

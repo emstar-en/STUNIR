@@ -1,0 +1,13 @@
+[package]
+name = "stunir-emitters"
+version = "1.0.0"
+authors = ["STUNIR Team"]
+edition = "2021"
+license = "MIT"
+description = "STUNIR target emitters in Rust"
+
+[lib]
+name = "stunir_emitters"
+path = "lib.rs"
+
+[dependencies]

@@ -1,0 +1,32 @@
+[package]
+name = "stunir-tools"
+version = "1.0.0"
+authors = ["STUNIR Team"]
+edition = "2021"
+license = "MIT"
+description = "STUNIR core toolchain in Rust - Production-ready implementation"
+
+[[bin]]
+name = "stunir_spec_to_ir"
+path = "src/spec_to_ir.rs"
+
+[[bin]]
+name = "stunir_ir_to_code"
+path = "src/ir_to_code.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+hex = "0.4"
+anyhow = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
