@@ -1,6 +1,7 @@
 # STUNIR Build Artifacts
 local_toolchain.lock.json
-receipts/
+receipts/*
+!receipts/README.md
 asm/
 build/
 dist-newstyle/
