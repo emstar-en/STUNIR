@@ -287,7 +287,8 @@ package body STUNIR_IR_To_Code is
       Parse_OK   : Boolean;
       Output_File : File_Type;
       Out_Name   : constant String := Path_Strings.To_String (Config.Output_Path);
-      Out_Dir    : constant String := Containing_Directory (Out_Name);
+      Out_Dir    : String (1 .. 512);
+      Out_Dir_Len : Natural;
       Template   : Path_String;
       Templ_OK   : Boolean;
    begin
@@ -311,10 +312,38 @@ package body STUNIR_IR_To_Code is
          Put_Line ("[WARN] Using built-in templates");
       end if;
 
-      --  Step 3: Create output directory
-      if not Exists (Out_Dir) then
-         Create_Directory (Out_Dir);
+      --  Step 3: Extract and create output directory if needed
+      --  Handle empty paths or paths without directories
+      if Out_Name'Length = 0 then
+         Put_Line ("[ERROR] Output path is empty");
+         Result.Status := Error_Output_Write_Failed;
+         return;
       end if;
+      
+      --  Try to extract containing directory, with error handling
+      Out_Dir_Len := 0;
+      begin
+         declare
+            Temp_Dir : constant String := Containing_Directory (Out_Name);
+         begin
+            if Temp_Dir'Length > 0 and Temp_Dir'Length <= Out_Dir'Length then
+               Out_Dir (1 .. Temp_Dir'Length) := Temp_Dir;
+               Out_Dir_Len := Temp_Dir'Length;
+               
+               --  Create directory if it doesn't exist
+               if not Exists (Out_Dir (1 .. Out_Dir_Len)) then
+                  Put_Line ("[INFO] Creating output directory: " & Out_Dir (1 .. Out_Dir_Len));
+                  Create_Directory (Out_Dir (1 .. Out_Dir_Len));
+               end if;
+            end if;
+         end;
+      exception
+         when Ada.Directories.Name_Error | Ada.Directories.Use_Error =>
+            --  No directory component in path (e.g., just "output.py")
+            --  This is okay - use current directory
+            Put_Line ("[INFO] Output path has no directory component, using current directory");
+            Out_Dir_Len := 0;
+      end;
 
       --  Step 4: Open output file
       Create (Output_File, Out_File, Out_Name);
