@@ -1,0 +1,71 @@
+# STUNIR Emitter Specification: Constraints
+# Constraint programming languages
+
+category: constraints
+description: "Constraint satisfaction and optimization emitter"
+
+output_types:
+  - minizinc
+  - picat
+  - eclipse_clp
+  - asp
+
+features:
+  - global_constraints
+  - optimization
+  - search_strategies
+  - model_validation
+
+extension: mzn
+
+config:
+  Solver: "String"
+  Optimization_Level: "Integer"
+  Use_Globals: "Boolean"
+
+config_defaults:
+  Solver: "gecode"
+  Optimization_Level: 2
+  Use_Globals: true
+
+type_map:
+  i32: "int"
+  i64: "int"
+  bool: "bool"
+  string: "string"
+  array: "array"
+  set: "set"
+
+ir_fields:
+  required:
+    - variables
+    - constraints
+  optional:
+    - objective
+
+dependencies:
+  spark:
+    - Ada.Containers.Vectors
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - containers
+
+output_format: |
+  MiniZinc constraint model.
+
+example_output: |
+  var 1..10: x;
+  var 1..10: y;
+  constraint x + y = 10;
+  solve satisfy;
+
+architectures:
+  - any
+
+notes: |
+  - MiniZinc is the primary target
+  - Support for various solvers
+  - Global constraints library

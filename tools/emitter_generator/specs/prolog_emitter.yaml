@@ -1,0 +1,100 @@
+# STUNIR Emitter Specification: Prolog
+# Supports multiple Prolog variants
+
+category: prolog
+description: "Prolog logic programming emitter with support for multiple dialects"
+
+output_types:
+  - swi_prolog
+  - gnu_prolog
+  - yap
+  - xsb
+  - tau_prolog
+  - datalog
+  - eclipse
+  - sicstus
+
+features:
+  - module_system
+  - constraints
+  - tabling
+  - assert_retract
+
+extension: pl
+
+# Configuration options
+config:
+  Dialect: "String"
+  Use_Modules: "Boolean"
+  Use_Constraints: "Boolean"
+  Use_Tabling: "Boolean"
+
+config_defaults:
+  Dialect: "swi_prolog"
+  Use_Modules: true
+  Use_Constraints: false
+  Use_Tabling: false
+
+# Type mappings
+type_map:
+  i32: "integer"
+  i64: "integer"
+  f32: "float"
+  f64: "float"
+  bool: "boolean"
+  string: "atom"
+  array: "list"
+  struct: "compound"
+
+# IR fields required
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - rules
+    - facts
+
+# Dependencies per pipeline
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+
+output_format: |
+  Standard Prolog format with module declarations and predicates.
+  
+  Example:
+  :- module(example, [get_value/1]).
+  
+  get_value(X) :- X = 42.
+
+example_input:
+  module: "facts"
+  functions:
+    - name: "parent"
+      params:
+        - name: "parent"
+          type: "string"
+        - name: "child"
+          type: "string"
+
+example_output: |
+  :- module(facts, [parent/2]).
+  
+  parent(alice, bob).
+  parent(bob, charlie).
+
+architectures:
+  - any
+
+notes: |
+  - Support for multiple Prolog dialects
+  - Module system varies by dialect
+  - Constraints require specific dialect support
+  - Tabling for memoization (XSB, YAP)

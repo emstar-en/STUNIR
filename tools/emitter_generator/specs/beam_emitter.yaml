@@ -1,0 +1,73 @@
+# STUNIR Emitter Specification: BEAM
+# Erlang BEAM VM bytecode/source
+
+category: beam
+description: "Erlang BEAM VM emitter (Erlang, Elixir source and bytecode)"
+
+output_types:
+  - erlang
+  - elixir
+  - beam_bytecode
+
+features:
+  - pattern_matching
+  - message_passing
+  - process_model
+  - fault_tolerance
+
+extension: erl
+
+config:
+  Language: "String"
+  Include_OTP: "Boolean"
+  Generate_Bytecode: "Boolean"
+
+config_defaults:
+  Language: "erlang"
+  Include_OTP: true
+  Generate_Bytecode: false
+
+type_map:
+  i32: "integer()"
+  f64: "float()"
+  bool: "boolean()"
+  string: "binary()"
+  atom: "atom()"
+  list: "list()"
+  tuple: "tuple()"
+
+ir_fields:
+  required:
+    - module
+    - functions
+  optional:
+    - exports
+    - attributes
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+
+output_format: |
+  Erlang module format.
+
+example_output: |
+  -module(example).
+  -export([add/2]).
+  
+  add(A, B) ->
+      A + B.
+
+architectures:
+  - any
+
+notes: |
+  - Erlang is primary target
+  - Elixir support via source generation
+  - BEAM bytecode in abstract format

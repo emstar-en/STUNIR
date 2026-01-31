@@ -1,0 +1,73 @@
+# STUNIR Emitter Specification: Grammar
+# Grammar definition languages
+
+category: grammar
+description: "Grammar definition emitter (ANTLR, Yacc, PEG, EBNF)"
+
+output_types:
+  - antlr
+  - yacc
+  - bison
+  - peg
+  - ebnf
+
+features:
+  - lexer_rules
+  - parser_rules
+  - ast_generation
+  - error_recovery
+
+extension: g4
+
+config:
+  Format: "String"
+  Generate_AST: "Boolean"
+  Target_Language: "String"
+
+config_defaults:
+  Format: "antlr"
+  Generate_AST: true
+  Target_Language: "python"
+
+type_map:
+  terminal: "TOKEN"
+  nonterminal: "RULE"
+
+ir_fields:
+  required:
+    - grammar_name
+    - rules
+  optional:
+    - lexer_rules
+    - options
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+    - parsec
+
+output_format: |
+  ANTLR4 grammar format.
+
+example_output: |
+  grammar Example;
+  
+  expr: term (('+' | '-') term)*;
+  term: factor (('*' | '/') factor)*;
+  factor: NUMBER | '(' expr ')';
+  
+  NUMBER: [0-9]+;
+
+architectures:
+  - any
+
+notes: |
+  - ANTLR4 is the primary target
+  - Support for both lexer and parser rules
+  - Can generate multiple target languages

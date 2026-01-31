@@ -1,0 +1,84 @@
+# STUNIR Emitter Specification: Systems
+# Systems programming languages
+
+category: systems
+description: "Systems programming emitter (C, C++, Rust, Zig, Ada)"
+
+output_types:
+  - c
+  - cpp
+  - rust
+  - zig
+  - ada
+  - d
+
+features:
+  - memory_safety
+  - zero_cost_abstractions
+  - systems_apis
+  - ffi
+
+extension: c
+
+config:
+  Language: "String"
+  Standard: "String"
+  Use_Safe_APIs: "Boolean"
+
+config_defaults:
+  Language: "c"
+  Standard: "c11"
+  Use_Safe_APIs: true
+
+type_map:
+  i8: "int8_t"
+  i16: "int16_t"
+  i32: "int32_t"
+  i64: "int64_t"
+  u8: "uint8_t"
+  u16: "uint16_t"
+  u32: "uint32_t"
+  u64: "uint64_t"
+  f32: "float"
+  f64: "double"
+  bool: "bool"
+  string: "char*"
+
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - system_calls
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+
+output_format: |
+  Standard C/C++ format with headers and source files.
+
+example_output: |
+  #include <stdint.h>
+  
+  int32_t add(int32_t a, int32_t b) {
+      return a + b;
+  }
+
+architectures:
+  - x86
+  - x86_64
+  - arm
+  - arm64
+  - riscv
+
+notes: |
+  - Focus on modern C11/C++17 standards
+  - Memory safety annotations
+  - Cross-platform compatibility

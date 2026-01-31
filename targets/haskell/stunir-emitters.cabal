@@ -24,6 +24,18 @@ library
     STUNIR.Emitters.Functional
     STUNIR.Emitters.Scientific
     STUNIR.Emitters.Json
+    STUNIR.Emitters.Prolog
+    STUNIR.Emitters.Business
+    STUNIR.Emitters.Constraints
+    STUNIR.Emitters.ExpertSystems
+    STUNIR.Emitters.Grammar
+    STUNIR.Emitters.Lexer
+    STUNIR.Emitters.Parser
+    STUNIR.Emitters.Planning
+    STUNIR.Emitters.Systems
+    STUNIR.Emitters.AsmIr
+    STUNIR.Emitters.Beam
+    STUNIR.Emitters.Asp
   
   build-depends:
     base >=4.14 && <5,
