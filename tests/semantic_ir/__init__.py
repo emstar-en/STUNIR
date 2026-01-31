@@ -1,1 +1,1 @@
-"""STUNIR Semantic IR Tests"""
+"""Tests for Semantic IR parser."""
