@@ -1,0 +1,125 @@
+# STUNIR Emitter Specification: JSON
+# This specification defines a JSON serialization emitter
+
+category: json
+description: "JSON serialization and deserialization emitter"
+
+output_types:
+  - json
+  - json_schema
+
+features:
+  - pretty_print
+  - validation
+  - streaming
+  - minification
+
+extension: json
+
+# Configuration options
+config:
+  Indent_Width: "Positive range 2 .. 8"
+  Use_Schema: "Boolean"
+  Validate_Output: "Boolean"
+  Compact_Mode: "Boolean"
+
+config_defaults:
+  Indent_Width: 2
+  Use_Schema: false
+  Validate_Output: true
+  Compact_Mode: false
+
+# Type mappings
+type_map:
+  i32: "number"
+  i64: "number"
+  f32: "number"
+  f64: "number"
+  bool: "boolean"
+  string: "string"
+  array: "array"
+  struct: "object"
+
+# IR fields required
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+    - schema
+
+# Dependencies per pipeline
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+    - Ada.Containers.Vectors
+  python:
+    - json
+    - jsonschema
+  rust:
+    - serde_json
+    - serde
+  haskell:
+    - aeson
+    - text
+
+# Output format description
+output_format: |
+  Standard JSON format with optional schema validation.
+  
+  Example:
+  {
+    "type": "object",
+    "properties": {
+      "name": {"type": "string"},
+      "value": {"type": "number"}
+    }
+  }
+
+# Example input/output
+example_input:
+  module: "example"
+  functions:
+    - name: "get_value"
+      return_type: "i32"
+      params: []
+  types:
+    - name: "Config"
+      kind: "struct"
+      fields:
+        - name: "enabled"
+          type: "bool"
+
+example_output: |
+  {
+    "module": "example",
+    "functions": [
+      {
+        "name": "get_value",
+        "return_type": "number",
+        "params": []
+      }
+    ],
+    "types": [
+      {
+        "name": "Config",
+        "kind": "object",
+        "properties": {
+          "enabled": {"type": "boolean"}
+        }
+      }
+    ]
+  }
+
+# Applicable architectures (if relevant)
+architectures:
+  - any
+
+# Notes for implementers
+notes: |
+  - Ensure RFC 8259 compliance
+  - Support both compact and pretty-printed output
+  - Validate against JSON Schema if provided
+  - Handle Unicode properly
+  - Provide streaming API for large datasets

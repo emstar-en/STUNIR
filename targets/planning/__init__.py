@@ -1,11 +1,5 @@
-"""Planning emitters module for STUNIR.
+"""STUNIR Planning Emitter Package"""
 
-This module provides emitters for automated planning formats,
-primarily PDDL (Planning Domain Definition Language).
+from .emitter import PlanningEmitter
 
-Phase 7C: Planning Languages
-"""
-
-from .pddl_emitter import PDDLEmitter
-
-__all__ = ['PDDLEmitter']
+__all__ = ["PlanningEmitter"]

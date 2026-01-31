@@ -1,0 +1,70 @@
+# STUNIR Emitter Specification: Planning
+# AI planning languages
+
+category: planning
+description: "AI planning language emitter (PDDL, STRIPS, HTN)"
+
+output_types:
+  - pddl
+  - strips
+  - htn
+  - timeline
+
+features:
+  - action_definitions
+  - preconditions
+  - effects
+  - domain_modeling
+
+extension: pddl
+
+config:
+  PDDL_Version: "String"
+  Use_Types: "Boolean"
+  Use_Durative: "Boolean"
+
+config_defaults:
+  PDDL_Version: "2.1"
+  Use_Types: true
+  Use_Durative: false
+
+type_map:
+  object: "object"
+  location: "location"
+  agent: "agent"
+
+ir_fields:
+  required:
+    - domain
+    - actions
+  optional:
+    - problem
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+
+output_format: |
+  PDDL domain definition.
+
+example_output: |
+  (define (domain example)
+    (:requirements :strips :typing)
+    (:action move
+      :parameters (?x - object ?from ?to - location)
+      :precondition (at ?x ?from)
+      :effect (and (at ?x ?to) (not (at ?x ?from)))))
+
+architectures:
+  - any
+
+notes: |
+  - PDDL is the standard planning language
+  - Support for typed predicates
+  - Durative actions for temporal planning

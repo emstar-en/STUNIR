@@ -1,0 +1,72 @@
+# STUNIR Emitter Specification: Business
+# Business languages: COBOL, ABAP, RPG
+
+category: business
+description: "Business application language emitter (COBOL, ABAP, RPG)"
+
+output_types:
+  - cobol
+  - abap
+  - rpg
+  - basic
+
+features:
+  - fixed_format
+  - decimal_arithmetic
+  - record_layouts
+  - file_operations
+
+extension: cbl
+
+config:
+  Language: "String"
+  COBOL_Standard: "String"
+  Use_Copybooks: "Boolean"
+
+config_defaults:
+  Language: "cobol"
+  COBOL_Standard: "85"
+  Use_Copybooks: true
+
+type_map:
+  i32: "PIC S9(9) COMP"
+  i64: "PIC S9(18) COMP"
+  f32: "COMP-1"
+  f64: "COMP-2"
+  bool: "PIC 9"
+  string: "PIC X"
+
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - data_division
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+
+output_format: |
+  COBOL source with standard divisions.
+
+example_output: |
+  IDENTIFICATION DIVISION.
+  PROGRAM-ID. EXAMPLE.
+  DATA DIVISION.
+  WORKING-STORAGE SECTION.
+  01 WS-COUNT PIC 9(4) VALUE ZERO.
+
+architectures:
+  - any
+
+notes: |
+  - Support COBOL-85 and COBOL-2002
+  - Fixed format columns for COBOL
+  - ABAP uses modern syntax

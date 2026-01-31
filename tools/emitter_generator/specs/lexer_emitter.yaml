@@ -1,0 +1,80 @@
+# STUNIR Emitter Specification: Lexer
+# Lexical analyzer generators
+
+category: lexer
+description: "Lexer/tokenizer generator for multiple languages"
+
+output_types:
+  - python_lexer
+  - rust_lexer
+  - c_lexer
+  - table_driven
+
+features:
+  - regex_patterns
+  - token_types
+  - error_handling
+  - position_tracking
+
+extension: py
+
+config:
+  Target_Language: "String"
+  Use_Regex: "Boolean"
+  Track_Positions: "Boolean"
+
+config_defaults:
+  Target_Language: "python"
+  Use_Regex: true
+  Track_Positions: true
+
+type_map:
+  token: "Token"
+  position: "Position"
+
+ir_fields:
+  required:
+    - tokens
+    - patterns
+  optional:
+    - keywords
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - re
+    - typing
+  rust:
+    - regex
+  haskell:
+    - text
+    - regex-tdfa
+
+output_format: |
+  Python lexer implementation.
+
+example_output: |
+  import re
+  from typing import Iterator, Tuple
+  
+  class Token:
+      def __init__(self, type: str, value: str, pos: int):
+          self.type = type
+          self.value = value
+          self.pos = pos
+  
+  def lex(source: str) -> Iterator[Token]:
+      patterns = [
+          ('NUMBER', r'\\d+'),
+          ('PLUS', r'\\+'),
+      ]
+      # ... lexer implementation
+
+architectures:
+  - any
+
+notes: |
+  - Generate complete lexer implementations
+  - Support multiple target languages
+  - Efficient table-driven approach
