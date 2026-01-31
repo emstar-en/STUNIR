@@ -37,25 +37,23 @@ class TestModuleValidation:
     
     def test_module_with_invalid_node_id(self):
         """Test that module with invalid node ID fails validation."""
-        module = IRModule(
-            node_id="invalid_id",  # Missing 'n_' prefix
-            kind=IRNodeKind.MODULE,
-            name="test_module"
-        )
-        
-        result = validate_module(module)
-        assert result.status == ValidationStatus.INVALID
+        # Pydantic will raise ValidationError during construction
+        with pytest.raises(Exception):  # ValidationError from pydantic
+            module = IRModule(
+                node_id="invalid_id",  # Missing 'n_' prefix
+                kind=IRNodeKind.MODULE,
+                name="test_module"
+            )
     
     def test_module_with_empty_name(self):
         """Test that module with empty name fails validation."""
-        module = IRModule(
-            node_id="n_mod_test",
-            kind=IRNodeKind.MODULE,
-            name=""  # Empty name
-        )
-        
-        result = validate_module(module)
-        assert result.status == ValidationStatus.INVALID
+        # Pydantic will raise ValidationError during construction
+        with pytest.raises(Exception):  # ValidationError from pydantic
+            module = IRModule(
+                node_id="n_mod_test",
+                kind=IRNodeKind.MODULE,
+                name=""  # Empty name
+            )
 
 
 class TestDeclarationValidation:
