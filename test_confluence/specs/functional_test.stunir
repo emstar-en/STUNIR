@@ -1,0 +1,2 @@
+target: haskell
+function: add x y = x + y

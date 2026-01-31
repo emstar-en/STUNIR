@@ -1,0 +1,2 @@
+target: clingo
+rule: a :- b, not c.

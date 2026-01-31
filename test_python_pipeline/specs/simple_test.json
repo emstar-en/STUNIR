@@ -1,0 +1,39 @@
+{
+  "module": "simple_test",
+  "description": "Simple test module for Python pipeline",
+  "types": [
+    {
+      "name": "Point",
+      "fields": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "add",
+      "params": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "returns": "i32",
+      "docstring": "Add two integers",
+      "body": [
+        {"op": "return", "value": "a + b"}
+      ]
+    },
+    {
+      "name": "multiply",
+      "params": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"}
+      ],
+      "returns": "i32",
+      "docstring": "Multiply two integers",
+      "body": [
+        {"op": "return", "value": "x * y"}
+      ]
+    }
+  ]
+}

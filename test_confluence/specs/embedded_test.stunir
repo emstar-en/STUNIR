@@ -1,0 +1,3 @@
+target: arm
+platform: cortex-m4
+function: blink_led() { gpio_toggle(13); }

@@ -1,0 +1,2 @@
+target: clips
+rule: (defrule test (fact) => (assert (result)))

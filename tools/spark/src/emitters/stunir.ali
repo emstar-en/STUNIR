@@ -1,0 +1,16 @@
+V "GNAT Lib v12"
+A -gnatc
+P NO FX
+
+RN
+RV NO_ELABORATION_CODE
+
+U stunir%s		stunir.ads		87e0db1d EE OO PU PK IU
+
+D stunir.ads		20260131064959 87e0db1d stunir%s
+G a e
+X 1 stunir.ads
+5K9*STUNIR 12l5 12e11
+9a4*STUNIR_Version{string}
+10a4*DO_178C_Level{string}
+

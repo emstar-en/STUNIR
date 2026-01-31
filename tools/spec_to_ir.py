@@ -130,14 +130,22 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         # Convert return type
         return_type = convert_type(func_spec.get("returns", "void"))
         
-        # Convert body (simplified for now)
+        # Convert body - preserve original structure with kind/data fields
         steps = []
         for stmt in func_spec.get("body", []):
-            step = {"op": stmt.get("op", "nop")}
-            if "target" in stmt:
-                step["target"] = stmt["target"]
-            if "value" in stmt:
-                step["value"] = stmt["value"]
+            # If statement has 'type' field, convert to 'kind' and preserve in 'data'
+            if "type" in stmt:
+                step = {
+                    "kind": stmt.get("type", "nop"),
+                    "data": str(stmt)  # Preserve full statement as data (matching SPARK format)
+                }
+            else:
+                # Fallback for simpler format
+                step = {"op": stmt.get("op", "nop")}
+                if "target" in stmt:
+                    step["target"] = stmt["target"]
+                if "value" in stmt:
+                    step["value"] = stmt["value"]
             steps.append(step)
         
         func_entry = {

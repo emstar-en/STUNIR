@@ -1,0 +1,2 @@
+target: vhdl
+entity: counter port(clk: in std_logic);

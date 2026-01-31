@@ -1,0 +1,434 @@
+{
+  "embedded": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "gpu": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "wasm": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "assembly": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "polyglot": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "lisp": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "prolog": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "business": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "fpga": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "grammar": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "lexer": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "parser": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "expert": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "constraints": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "functional": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "oop": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "mobile": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "scientific": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "bytecode": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "systems": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "planning": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "asmIR": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "beam": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  },
+  "asp": {
+    "spark": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "python": {
+      "success": false,
+      "message": "spec_to_ir failed: "
+    },
+    "rust": {
+      "success": false,
+      "message": "ir_to_code failed: error: the following required arguments were not provided:\n  --target <TARGET>\n\nUsage: stunir_ir_to_code --target <TARGET> --output <OUTPUT> <IR_FILE>\n\nFor more information, try '--help'.\n"
+    },
+    "confluence": {
+      "achieved": false,
+      "details": "Not enough successful outputs"
+    }
+  }
+}

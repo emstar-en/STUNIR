@@ -1,0 +1,16 @@
+{
+  "schema": "stunir_spec_v1",
+  "name": "simple_module",
+  "version": "1.0.0",
+  "functions": [
+    {
+      "name": "add",
+      "params": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "return_type": "i32",
+      "body": "return a + b;"
+    }
+  ]
+}

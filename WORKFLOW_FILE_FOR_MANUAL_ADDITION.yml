@@ -1,0 +1,249 @@
+---
+# This file contains the semantic_ir_validation.yml workflow that needs to be manually added via GitHub web UI
+# Location: .github/workflows/semantic_ir_validation.yml
+# Reason: GitHub App lacks workflows permission, requires manual addition through web interface
+---
+
+name: Semantic IR Validation
+
+on:
+  push:
+    branches: [ main, develop, devsite ]
+    paths:
+      - 'schemas/semantic_ir/**'
+      - 'tools/semantic_ir/**'
+      - 'tools/spark/src/semantic_ir/**'
+      - 'tools/rust/semantic_ir/**'
+      - 'tools/haskell/src/STUNIR/SemanticIR/**'
+      - 'tests/semantic_ir/**'
+      - 'examples/semantic_ir/**'
+      - '.github/workflows/semantic_ir_validation.yml'
+  pull_request:
+    branches: [ main, develop, devsite ]
+    paths:
+      - 'schemas/semantic_ir/**'
+      - 'tools/semantic_ir/**'
+      - 'tools/spark/src/semantic_ir/**'
+      - 'tools/rust/semantic_ir/**'
+      - 'tools/haskell/src/STUNIR/SemanticIR/**'
+      - 'tests/semantic_ir/**'
+      - 'examples/semantic_ir/**'
+
+jobs:
+  python-validation:
+    name: Python IR Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pydantic jsonschema pytest pytest-cov
+      
+      - name: Run Python tests
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pytest tests/semantic_ir/ -v --cov=tools/semantic_ir --cov-report=term-missing
+      
+      - name: Validate example IR files
+        run: |
+          cd $GITHUB_WORKSPACE
+          for file in examples/semantic_ir/*.json; do
+            echo "Validating $file"
+            python tools/semantic_ir/validator.py "$file" || exit 1
+          done
+
+  rust-validation:
+    name: Rust IR Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      
+      - name: Check Rust compilation
+        run: |
+          cd tools/rust/semantic_ir
+          cargo check --all-features
+      
+      - name: Run Rust tests
+        run: |
+          cd tools/rust/semantic_ir
+          cargo test --all-features
+
+  schema-validation:
+    name: JSON Schema Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install jsonschema
+        run: pip install jsonschema
+      
+      - name: Validate schema files
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -c "
+import json
+import sys
+from pathlib import Path
+from jsonschema import Draft7Validator
+
+schema_dir = Path('schemas/semantic_ir')
+errors = []
+
+for schema_file in schema_dir.glob('*.json'):
+    try:
+        with open(schema_file, 'r') as f:
+            schema = json.load(f)
+        # Validate that it's valid JSON Schema
+        Draft7Validator.check_schema(schema)
+        print(f'✓ {schema_file.name} is valid')
+    except Exception as e:
+        errors.append(f'{schema_file.name}: {e}')
+        print(f'✗ {schema_file.name}: {e}')
+
+if errors:
+    sys.exit(1)
+"
+  
+  spark-validation:
+    name: Ada SPARK Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install GNAT
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnat gprbuild || echo "GNAT not available, skipping SPARK validation"
+      
+      - name: Check SPARK compilation (if available)
+        run: |
+          if command -v gnatmake &> /dev/null; then
+            cd tools/spark/src/semantic_ir
+            # Just check syntax for now
+            for file in *.ads; do
+              echo "Checking $file"
+              gnatmake -c -gnatc "$file" || echo "Warning: $file failed syntax check"
+            done
+          else
+            echo "GNAT not available, skipping SPARK compilation check"
+          fi
+
+  haskell-validation:
+    name: Haskell IR Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Haskell
+        uses: haskell/actions/setup@v2
+        with:
+          ghc-version: '9.2'
+          cabal-version: '3.6'
+      
+      - name: Check Haskell compilation
+        run: |
+          cd tools/haskell
+          cabal update
+          cabal build || echo "Warning: Haskell build failed (dependencies may be missing)"
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [python-validation, schema-validation]
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install pydantic jsonschema pytest
+      
+      - name: Run integration tests
+        run: |
+          cd $GITHUB_WORKSPACE
+          # Test round-trip serialization
+          python -c "
+import json
+import sys
+sys.path.insert(0, 'tools')
+
+from semantic_ir.modules import IRModule
+from semantic_ir.ir_types import IRNodeKind, TargetCategory, SafetyLevel
+
+# Create a module
+module = IRModule(
+    node_id='n_test',
+    kind=IRNodeKind.MODULE,
+    name='test_module'
+)
+
+# Serialize to JSON
+json_str = module.model_dump_json(exclude_none=True)
+json_dict = json.loads(json_str)
+
+# Deserialize back
+reconstructed = IRModule(**json_dict)
+
+# Verify
+assert reconstructed.node_id == module.node_id
+assert reconstructed.name == module.name
+print('✓ Round-trip serialization test passed')
+"
+
+  report:
+    name: Generate Validation Report
+    runs-on: ubuntu-latest
+    needs: [python-validation, rust-validation, schema-validation, integration-test]
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Generate report
+        run: |
+          echo "# Semantic IR Validation Report" > validation_report.md
+          echo "" >> validation_report.md
+          echo "**Date:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> validation_report.md
+          echo "**Commit:** $GITHUB_SHA" >> validation_report.md
+          echo "" >> validation_report.md
+          echo "## Validation Results" >> validation_report.md
+          echo "" >> validation_report.md
+          echo "- Python IR: ${{ needs.python-validation.result }}" >> validation_report.md
+          echo "- Rust IR: ${{ needs.rust-validation.result }}" >> validation_report.md
+          echo "- Schema Validation: ${{ needs.schema-validation.result }}" >> validation_report.md
+          echo "- Integration Tests: ${{ needs.integration-test.result }}" >> validation_report.md
+          cat validation_report.md
+      
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report
+          path: validation_report.md

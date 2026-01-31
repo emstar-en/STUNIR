@@ -1,0 +1,2 @@
+target: pddl
+action: move(?x ?y)

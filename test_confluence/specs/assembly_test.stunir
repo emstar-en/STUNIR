@@ -1,0 +1,2 @@
+target: x86_64
+function: add(a, b) { mov rax, a; add rax, b; ret; }

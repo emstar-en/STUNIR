@@ -1,0 +1,2 @@
+target: common-lisp
+function: (defun add (a b) (+ a b))

@@ -1,0 +1,2 @@
+target: cuda
+kernel: vector_add(a, b, c, n) { c[i] = a[i] + b[i]; }
