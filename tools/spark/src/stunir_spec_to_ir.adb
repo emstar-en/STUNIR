@@ -196,13 +196,53 @@ package body STUNIR_Spec_To_IR is
       return "";  --  No JSON files found
    end Find_Spec_File;
 
-   --  Main conversion procedure - NOW GENERATES SEMANTIC IR
+   --  Collect all JSON spec files from directory
+   type Spec_File_Array is array (Positive range <>) of Path_String;
+   type Spec_File_List is record
+      Files : Spec_File_Array (1 .. 10);
+      Count : Natural := 0;
+   end record;
+
+   procedure Collect_Spec_Files
+     (Spec_Dir : String;
+      File_List : out Spec_File_List;
+      Success : out Boolean)
+   is
+      Search  : Search_Type;
+      Dir_Ent : Directory_Entry_Type;
+   begin
+      File_List.Count := 0;
+      Success := True;
+
+      --  Search for all .json files
+      Start_Search (Search, Spec_Dir, "*.json", (Directory => False, others => True));
+
+      while More_Entries (Search) and File_List.Count < File_List.Files'Last loop
+         Get_Next_Entry (Search, Dir_Ent);
+         File_List.Count := File_List.Count + 1;
+         File_List.Files (File_List.Count) := 
+           Path_Strings.To_Bounded_String (Full_Name (Dir_Ent));
+      end loop;
+
+      End_Search (Search);
+
+      if File_List.Count = 0 then
+         Success := False;
+      end if;
+
+   exception
+      when others =>
+         Success := False;
+   end Collect_Spec_Files;
+
+   --  Main conversion procedure - NOW GENERATES SEMANTIC IR WITH MULTI-FILE SUPPORT
    procedure Convert_Spec_To_IR
      (Config : Conversion_Config;
       Result : out Conversion_Result)
    is
       Spec_Dir    : constant String := Path_Strings.To_String (Config.Spec_Root);
-      Spec_File   : constant String := Find_Spec_File (Spec_Dir);
+      File_List   : Spec_File_List;
+      List_OK     : Boolean;
       Module      : IR_Module;
       JSON_Output : JSON_Buffer;
       Parse_Stat  : Parse_Status;
@@ -220,22 +260,26 @@ package body STUNIR_Spec_To_IR is
          return;
       end if;
 
-      --  Step 2: Find and check spec file exists
-      if Spec_File = "" or else not Exists (Spec_File) then
+      --  Step 2: Collect all spec files
+      Put_Line ("[INFO] Collecting spec files from " & Spec_Dir & "...");
+      Collect_Spec_Files (Spec_Dir, File_List, List_OK);
+      
+      if not List_OK or File_List.Count = 0 then
          Put_Line ("[ERROR] No JSON spec files found in: " & Spec_Dir);
          Result.Status := Error_Spec_Not_Found;
          return;
       end if;
 
-      Put_Line ("[INFO] Found spec file: " & Spec_File);
+      Put_Line ("[INFO] Found" & Natural'Image (File_List.Count) & " spec file(s)");
 
-      --  Step 3: Read and parse spec JSON
-      Put_Line ("[INFO] Parsing spec from " & Spec_File & "...");
+      --  Step 3: Read and parse first spec JSON file
       declare
          File     : Ada.Text_IO.File_Type;
          JSON_Str : String (1 .. 100_000);
          Last     : Natural;
+         Spec_File : constant String := Path_Strings.To_String (File_List.Files (1));
       begin
+         Put_Line ("[INFO] Parsing spec from " & Spec_File & "...");
          Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Spec_File);
          
          --  Read entire file
@@ -263,8 +307,59 @@ package body STUNIR_Spec_To_IR is
          end if;
       end;
 
-      --  Step 4: Generate semantic IR JSON
-      Put_Line ("[INFO] Generating semantic IR...");
+      --  Step 4: If there are multiple spec files, merge their functions
+      if File_List.Count > 1 then
+         Put_Line ("[INFO] Merging functions from" & Natural'Image (File_List.Count) & " spec files...");
+         
+         for I in 2 .. File_List.Count loop
+            declare
+               File          : Ada.Text_IO.File_Type;
+               JSON_Str      : String (1 .. 100_000);
+               Last          : Natural;
+               Spec_File     : constant String := Path_Strings.To_String (File_List.Files (I));
+               Additional_Module : IR_Module;
+            begin
+               Put_Line ("[INFO] Parsing additional spec from " & Spec_File & "...");
+               Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Spec_File);
+               
+               --  Read entire file
+               Last := 0;
+               while not Ada.Text_IO.End_Of_File (File) and Last < JSON_Str'Last loop
+                  declare
+                     Line : constant String := Ada.Text_IO.Get_Line (File);
+                  begin
+                     if Last + Line'Length <= JSON_Str'Last then
+                        JSON_Str (Last + 1 .. Last + Line'Length) := Line;
+                        Last := Last + Line'Length;
+                     end if;
+                  end;
+               end loop;
+               
+               Ada.Text_IO.Close (File);
+
+               --  Parse JSON into Additional IR Module
+               Parse_Spec_JSON (JSON_Str (1 .. Last), Additional_Module, Parse_Stat);
+               
+               if Parse_Stat = Success then
+                  --  Merge functions from additional module into main module
+                  for J in 1 .. Additional_Module.Func_Cnt loop
+                     if Module.Func_Cnt < Max_Functions then
+                        Module.Func_Cnt := Module.Func_Cnt + 1;
+                        Module.Functions (Module.Func_Cnt) := Additional_Module.Functions (J);
+                     else
+                        Put_Line ("[WARN] Maximum function count reached, skipping remaining functions");
+                        exit;
+                     end if;
+                  end loop;
+               else
+                  Put_Line ("[WARN] Failed to parse " & Spec_File & ", skipping");
+               end if;
+            end;
+         end loop;
+      end if;
+
+      --  Step 5: Generate semantic IR JSON
+      Put_Line ("[INFO] Generating semantic IR with" & Natural'Image (Module.Func_Cnt) & " function(s)...");
       IR_To_JSON (Module, JSON_Output, Parse_Stat);
       
       if Parse_Stat /= Success then
@@ -273,7 +368,7 @@ package body STUNIR_Spec_To_IR is
          return;
       end if;
 
-      --  Step 5: Write IR to output file
+      --  Step 6: Write IR to output file
       if not Exists (Out_Dir) then
          Create_Directory (Out_Dir);
       end if;
