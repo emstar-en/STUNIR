@@ -37,7 +37,7 @@ pub struct FloatLiteral {
 }
 
 /// String literal
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StringLiteral {
     #[serde(flatten)]
     pub base: ExpressionNode,
@@ -45,7 +45,7 @@ pub struct StringLiteral {
 }
 
 /// Boolean literal
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BoolLiteral {
     #[serde(flatten)]
     pub base: ExpressionNode,
@@ -53,7 +53,7 @@ pub struct BoolLiteral {
 }
 
 /// Variable reference
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VarRef {
     #[serde(flatten)]
     pub base: ExpressionNode,
@@ -82,7 +82,7 @@ pub struct UnaryExpr {
 }
 
 /// Function call
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FunctionCall {
     #[serde(flatten)]
     pub base: ExpressionNode,
@@ -91,7 +91,7 @@ pub struct FunctionCall {
 }
 
 /// Member access
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MemberExpr {
     #[serde(flatten)]
     pub base: ExpressionNode,
@@ -102,7 +102,7 @@ pub struct MemberExpr {
 }
 
 /// Array access
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ArrayAccess {
     #[serde(flatten)]
     pub base: ExpressionNode,

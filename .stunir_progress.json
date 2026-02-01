@@ -1,60 +1,67 @@
 {
-  "current_version": "0.8.5",
+  "current_version": "0.8.6",
+  "last_updated": "2026-02-01",
   "status": {
     "python": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
       "features": ["break", "continue", "switch"],
-      "tests_passed": 6
+      "tests_passed": 6,
+      "test_framework": "test_v0.8.4.py"
     },
     "rust": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
       "features": ["break", "continue", "switch"],
-      "tests_passed": 6
+      "tests_passed": 2,
+      "test_framework": "tools/rust/",
+      "build_status": "PASSING",
+      "fixes_applied": [
+        "Removed Eq derive from structs containing HashMap (statements.rs)",
+        "Fixed duplicate serde rename for pre++/pre--/post++/post-- operators (types.rs)"
+      ]
     },
     "spark": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
       "features": ["break", "continue", "switch"],
       "implementation_status": "COMPLETE",
-      "tests_passed": "6/6",
-      "test_results": {
-        "break_while": "PASS",
-        "break_nested": "PASS",
-        "continue_for": "PASS",
-        "combined_features": "PASS",
-        "switch_fallthrough": "PASS",
-        "switch_simple": "PASS"
-      },
-      "notes": "All v0.8.4 features implemented and tested. Fixed loop variable declarations and switch statement code generation. All tests passing with proper C compilation."
+      "binary_status": "STORAGE_ERROR",
+      "known_issues": ["Stack overflow in Ada binaries when processing large specs"],
+      "notes": "SPARK binaries compile but have runtime stack overflow issues. Use Python/Rust pipelines for production."
     }
   },
-  "next_steps": [
-    "Plan v0.9.0 features (reserved for everything-but-Haskell milestone)",
-    "Consider Python variable redeclaration fix for consistency",
-    "SPARK stack optimization for deeper nesting (optional)"
-  ],
   "test_summary": {
-    "v0.8.5_tests": [
-      "break_nested",
-      "break_while",
-      "combined_features",
-      "continue_for",
-      "switch_fallthrough",
-      "switch_simple"
+    "python_tests": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "status": "ALL_PASSED"
+    },
+    "rust_tests": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "status": "ALL_PASSED"
+    },
+    "spark_tests": {
+      "status": "BLOCKED",
+      "reason": "STORAGE_ERROR in binaries"
+    },
+    "coverage_estimate": "33%",
+    "coverage_note": "Estimated based on Python (6 tests) + Rust (2 tests) across ~24 feature tests"
+  },
+  "v0.8.6_notes": {
+    "fixes": [
+      "Fixed Rust Eq trait derivation issue in semantic_ir/statements.rs",
+      "Fixed Rust expressions.rs Eq derivation issue",
+      "Fixed duplicate serde rename for increment/decrement operators in types.rs"
     ],
-    "rust_status": "ALL_PASSED (6/6)",
-    "python_status": "ALL_PASSED (6/6)",
-    "spark_status": "ALL_PASSED (6/6) - Feature-complete and production-ready"
+    "status": "All Python and Rust tests passing. SPARK binaries have known stack overflow issues."
   },
   "completion_date": "2026-02-01",
-  "version_status": "v0.8.4 COMPLETE - break/continue/switch in Python, Rust, and SPARK (feature-complete)",
-  "next_version": "0.9.0",
-  "versioning_rule": "Use granular versions (0.8.4, 0.8.5, etc.), reserve 0.9 for everything-but-Haskell milestone",
-  "v0.8.4_notes": {
-    "achievement": "All three pipelines (Python, Rust, SPARK) now support break/continue/switch statements",
-    "spark_status": "SPARK binaries successfully compiled and tested. 6/6 tests generate IR, 3/6 generate C code, 1/6 compiles. Implementation is feature-complete but requires codegen bug fixes for production use.",
-    "recommendation": "Use Python or Rust pipelines for production. SPARK suitable for formal verification workflows with known limitations."
-  }
+  "next_steps": [
+    "Fix SPARK stack overflow (increase stack size or optimize recursion)",
+    "Plan v0.9.0 features"
+  ]
 }
