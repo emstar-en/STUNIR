@@ -1,0 +1,106 @@
+{
+  "schema": "stunir_flat_ir_v1",
+  "ir_version": "v1",
+  "module_name": "single_level_control_flow_test",
+  "docstring": "Test spec with single-level control flow for v0.8.1",
+  "types": [],
+  "functions": [
+    {
+      "name": "test_simple_if",
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "if",
+          "condition": "x > 0",
+          "block_start": 2,
+          "block_count": 0,
+          "else_start": 0,
+          "else_count": 0
+        }
+      ]
+    },
+    {
+      "name": "test_simple_while",
+      "args": [
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "op": "while",
+          "condition": "i < n",
+          "block_start": 4,
+          "block_count": 2
+        },
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "sum + i"
+        },
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "i + 1"
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "name": "test_simple_for",
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "product",
+          "value": "1"
+        },
+        {
+          "op": "for",
+          "init": "i = 0",
+          "condition": "i < max",
+          "increment": "i = i + 1",
+          "block_start": 3,
+          "block_count": 1
+        },
+        {
+          "op": "assign",
+          "target": "product",
+          "value": "product * i"
+        },
+        {
+          "op": "return",
+          "value": "product"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T03:05:39.263831Z"
+}

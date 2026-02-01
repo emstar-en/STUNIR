@@ -376,53 +376,405 @@ package body STUNIR_JSON_Utils is
                                         end if;
                                      end;
                                   
-                                  elsif Stmt_Type = "if" then
-                                     Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_If;
-                                     declare
-                                        Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
-                                     begin
-                                        if Cond_Str'Length > 0 and Cond_Str'Length <= Max_Code_Length then
-                                           Module.Functions (Func_Idx).Statements (Current_Idx).Condition :=
-                                             Code_Buffers.To_Bounded_String (Cond_Str);
-                                        end if;
-                                     end;
-                                     -- TODO v0.8.0: Parse then/else blocks recursively and flatten
-                                     Put_Line ("[WARN] Control flow 'if' detected - recursive block parsing not yet implemented");
-                                  
-                                  elsif Stmt_Type = "while" then
-                                     Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_While;
-                                     declare
-                                        Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
-                                     begin
-                                        if Cond_Str'Length > 0 and Cond_Str'Length <= Max_Code_Length then
-                                           Module.Functions (Func_Idx).Statements (Current_Idx).Condition :=
-                                             Code_Buffers.To_Bounded_String (Cond_Str);
-                                        end if;
-                                     end;
-                                     Put_Line ("[WARN] Control flow 'while' detected - recursive block parsing not yet implemented");
-                                  
-                                  elsif Stmt_Type = "for" then
-                                     Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_For;
-                                     declare
-                                        Init_Str : constant String := Extract_String_Value (Stmt_JSON, "init");
-                                        Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
-                                        Incr_Str : constant String := Extract_String_Value (Stmt_JSON, "increment");
-                                     begin
-                                        if Init_Str'Length > 0 and Init_Str'Length <= Max_Code_Length then
-                                           Module.Functions (Func_Idx).Statements (Current_Idx).Init_Expr :=
-                                             Code_Buffers.To_Bounded_String (Init_Str);
-                                        end if;
-                                        if Cond_Str'Length > 0 and Cond_Str'Length <= Max_Code_Length then
-                                           Module.Functions (Func_Idx).Statements (Current_Idx).Condition :=
-                                             Code_Buffers.To_Bounded_String (Cond_Str);
-                                        end if;
-                                        if Incr_Str'Length > 0 and Incr_Str'Length <= Max_Code_Length then
-                                           Module.Functions (Func_Idx).Statements (Current_Idx).Incr_Expr :=
-                                             Code_Buffers.To_Bounded_String (Incr_Str);
-                                        end if;
-                                     end;
-                                     Put_Line ("[WARN] Control flow 'for' detected - recursive block parsing not yet implemented");
-                                  
+                                   elsif Stmt_Type = "if" then
+                                      -- v0.8.1: Parse if statement with flattened then/else blocks
+                                      Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_If;
+                                      declare
+                                         Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
+                                         Then_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "then_block");
+                                         Else_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "else_block");
+                                         Then_Start_Idx : Natural := 0;
+                                         Then_Count_Val : Natural := 0;
+                                         Else_Start_Idx : Natural := 0;
+                                         Else_Count_Val : Natural := 0;
+                                      begin
+                                         -- Extract condition
+                                         if Cond_Str'Length > 0 and Cond_Str'Length <= Max_Code_Length then
+                                            Module.Functions (Func_Idx).Statements (Current_Idx).Condition :=
+                                              Code_Buffers.To_Bounded_String (Cond_Str);
+                                         end if;
+                                         
+                                         -- Parse then_block and flatten
+                                         if Then_Array_Pos > 0 then
+                                            Then_Start_Idx := Module.Functions (Func_Idx).Stmt_Cnt + 1;  -- Next statement position (1-based)
+                                            declare
+                                               Block_Pos : Natural := Then_Array_Pos + 1;
+                                               Block_Start, Block_End : Natural;
+                                            begin
+                                               while Module.Functions (Func_Idx).Stmt_Cnt < Max_Statements loop
+                                                  Get_Next_Object (Stmt_JSON, Block_Pos, Block_Start, Block_End);
+                                                  exit when Block_Start = 0 or Block_End = 0;
+                                                  
+                                                  Module.Functions (Func_Idx).Stmt_Cnt := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                                  Then_Count_Val := Then_Count_Val + 1;
+                                                  
+                                                  declare
+                                                     Block_Stmt_JSON : constant String := Stmt_JSON (Block_Start .. Block_End);
+                                                     Block_Stmt_Type : constant String := Extract_String_Value (Block_Stmt_JSON, "type");
+                                                     Block_Idx : constant Positive := Module.Functions (Func_Idx).Stmt_Cnt;
+                                                  begin
+                                                     -- Initialize defaults
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Nop;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Target := Name_Strings.Null_Bounded_String;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Value := Code_Buffers.Null_Bounded_String;
+                                                     
+                                                     -- Parse statement type (single-level only for v0.8.1)
+                                                     if Block_Stmt_Type = "assign" or Block_Stmt_Type = "var_decl" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Assign;
+                                                        declare
+                                                           Target_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "target");
+                                                           Var_Name : constant String := Extract_String_Value (Block_Stmt_JSON, "var_name");
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Target_Str'Length > 0 and Target_Str'Length <= Max_Name_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Target :=
+                                                                Name_Strings.To_Bounded_String (Target_Str);
+                                                           elsif Var_Name'Length > 0 and Var_Name'Length <= Max_Name_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Target :=
+                                                                Name_Strings.To_Bounded_String (Var_Name);
+                                                           end if;
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "return" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Return;
+                                                        declare
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "call" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Call;
+                                                        declare
+                                                           Func_Name : constant String := Extract_String_Value (Block_Stmt_JSON, "func");
+                                                           Args_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "args");
+                                                        begin
+                                                           if Func_Name'Length > 0 then
+                                                              declare
+                                                                 Call_Expr : constant String := Func_Name & "(" & Args_Str & ")";
+                                                              begin
+                                                                 if Call_Expr'Length <= Max_Code_Length then
+                                                                    Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                      Code_Buffers.To_Bounded_String (Call_Expr);
+                                                                 end if;
+                                                              end;
+                                                           end if;
+                                                        end;
+                                                     else
+                                                        -- Nested control flow not supported in v0.8.1
+                                                        Put_Line ("[WARN] Nested control flow in then_block skipped (v0.8.1 limitation)");
+                                                     end if;
+                                                  end;
+                                                  
+                                                  Block_Pos := Block_End + 1;
+                                               end loop;
+                                            end;
+                                         end if;
+                                         
+                                         -- Parse else_block and flatten
+                                         if Else_Array_Pos > 0 then
+                                            Else_Start_Idx := Module.Functions (Func_Idx).Stmt_Cnt + 1;  -- Next statement position (1-based)
+                                            declare
+                                               Block_Pos : Natural := Else_Array_Pos + 1;
+                                               Block_Start, Block_End : Natural;
+                                            begin
+                                               while Module.Functions (Func_Idx).Stmt_Cnt < Max_Statements loop
+                                                  Get_Next_Object (Stmt_JSON, Block_Pos, Block_Start, Block_End);
+                                                  exit when Block_Start = 0 or Block_End = 0;
+                                                  
+                                                  Module.Functions (Func_Idx).Stmt_Cnt := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                                  Else_Count_Val := Else_Count_Val + 1;
+                                                  
+                                                  declare
+                                                     Block_Stmt_JSON : constant String := Stmt_JSON (Block_Start .. Block_End);
+                                                     Block_Stmt_Type : constant String := Extract_String_Value (Block_Stmt_JSON, "type");
+                                                     Block_Idx : constant Positive := Module.Functions (Func_Idx).Stmt_Cnt;
+                                                  begin
+                                                     -- Initialize defaults
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Nop;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Target := Name_Strings.Null_Bounded_String;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Value := Code_Buffers.Null_Bounded_String;
+                                                     
+                                                     -- Parse statement type (single-level only for v0.8.1)
+                                                     if Block_Stmt_Type = "assign" or Block_Stmt_Type = "var_decl" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Assign;
+                                                        declare
+                                                           Target_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "target");
+                                                           Var_Name : constant String := Extract_String_Value (Block_Stmt_JSON, "var_name");
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Target_Str'Length > 0 and Target_Str'Length <= Max_Name_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Target :=
+                                                                Name_Strings.To_Bounded_String (Target_Str);
+                                                           elsif Var_Name'Length > 0 and Var_Name'Length <= Max_Name_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Target :=
+                                                                Name_Strings.To_Bounded_String (Var_Name);
+                                                           end if;
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "return" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Return;
+                                                        declare
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "call" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Call;
+                                                        declare
+                                                           Func_Name : constant String := Extract_String_Value (Block_Stmt_JSON, "func");
+                                                           Args_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "args");
+                                                        begin
+                                                           if Func_Name'Length > 0 then
+                                                              declare
+                                                                 Call_Expr : constant String := Func_Name & "(" & Args_Str & ")";
+                                                              begin
+                                                                 if Call_Expr'Length <= Max_Code_Length then
+                                                                    Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                      Code_Buffers.To_Bounded_String (Call_Expr);
+                                                                 end if;
+                                                              end;
+                                                           end if;
+                                                        end;
+                                                     else
+                                                        -- Nested control flow not supported in v0.8.1
+                                                        Put_Line ("[WARN] Nested control flow in else_block skipped (v0.8.1 limitation)");
+                                                     end if;
+                                                  end;
+                                                  
+                                                  Block_Pos := Block_End + 1;
+                                               end loop;
+                                            end;
+                                         end if;
+                                         
+                                         -- Fill in block indices (1-based for Ada)
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Block_Start := Then_Start_Idx;
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Block_Count := Then_Count_Val;
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Else_Start := Else_Start_Idx;
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Else_Count := Else_Count_Val;
+                                         
+                                         Put_Line ("[INFO] Flattened if: then_block[" & Natural'Image(Then_Start_Idx) & ".." & 
+                                                   Natural'Image(Then_Start_Idx + Then_Count_Val - 1) & "] else_block[" & 
+                                                   Natural'Image(Else_Start_Idx) & ".." & Natural'Image(Else_Start_Idx + Else_Count_Val - 1) & "]");
+                                      end;
+                                   
+                                   elsif Stmt_Type = "while" then
+                                      -- v0.8.1: Parse while statement with flattened body
+                                      Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_While;
+                                      declare
+                                         Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
+                                         Body_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "body");
+                                         Body_Start_Idx : Natural := 0;
+                                         Body_Count_Val : Natural := 0;
+                                      begin
+                                         -- Extract condition
+                                         if Cond_Str'Length > 0 and Cond_Str'Length <= Max_Code_Length then
+                                            Module.Functions (Func_Idx).Statements (Current_Idx).Condition :=
+                                              Code_Buffers.To_Bounded_String (Cond_Str);
+                                         end if;
+                                         
+                                         -- Parse body and flatten
+                                         if Body_Array_Pos > 0 then
+                                            Body_Start_Idx := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                            declare
+                                               Block_Pos : Natural := Body_Array_Pos + 1;
+                                               Block_Start, Block_End : Natural;
+                                            begin
+                                               while Module.Functions (Func_Idx).Stmt_Cnt < Max_Statements loop
+                                                  Get_Next_Object (Stmt_JSON, Block_Pos, Block_Start, Block_End);
+                                                  exit when Block_Start = 0 or Block_End = 0;
+                                                  
+                                                  Module.Functions (Func_Idx).Stmt_Cnt := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                                  Body_Count_Val := Body_Count_Val + 1;
+                                                  
+                                                  declare
+                                                     Block_Stmt_JSON : constant String := Stmt_JSON (Block_Start .. Block_End);
+                                                     Block_Stmt_Type : constant String := Extract_String_Value (Block_Stmt_JSON, "type");
+                                                     Block_Idx : constant Positive := Module.Functions (Func_Idx).Stmt_Cnt;
+                                                  begin
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Nop;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Target := Name_Strings.Null_Bounded_String;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Value := Code_Buffers.Null_Bounded_String;
+                                                     
+                                                     if Block_Stmt_Type = "assign" or Block_Stmt_Type = "var_decl" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Assign;
+                                                        declare
+                                                           Target_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "target");
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Target_Str'Length > 0 and Target_Str'Length <= Max_Name_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Target :=
+                                                                Name_Strings.To_Bounded_String (Target_Str);
+                                                           end if;
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "return" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Return;
+                                                        declare
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "call" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Call;
+                                                        declare
+                                                           Func_Name : constant String := Extract_String_Value (Block_Stmt_JSON, "func");
+                                                           Args_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "args");
+                                                        begin
+                                                           if Func_Name'Length > 0 then
+                                                              declare
+                                                                 Call_Expr : constant String := Func_Name & "(" & Args_Str & ")";
+                                                              begin
+                                                                 if Call_Expr'Length <= Max_Code_Length then
+                                                                    Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                      Code_Buffers.To_Bounded_String (Call_Expr);
+                                                                 end if;
+                                                              end;
+                                                           end if;
+                                                        end;
+                                                     else
+                                                        Put_Line ("[WARN] Nested control flow in while body skipped (v0.8.1 limitation)");
+                                                     end if;
+                                                  end;
+                                                  
+                                                  Block_Pos := Block_End + 1;
+                                               end loop;
+                                            end;
+                                         end if;
+                                         
+                                         -- Fill in block indices
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Block_Start := Body_Start_Idx;
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Block_Count := Body_Count_Val;
+                                         
+                                         Put_Line ("[INFO] Flattened while: body[" & Natural'Image(Body_Start_Idx) & ".." & 
+                                                   Natural'Image(Body_Start_Idx + Body_Count_Val - 1) & "]");
+                                      end;
+                                   
+                                   elsif Stmt_Type = "for" then
+                                      -- v0.8.1: Parse for statement with flattened body
+                                      Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_For;
+                                      declare
+                                         Init_Str : constant String := Extract_String_Value (Stmt_JSON, "init");
+                                         Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
+                                         Incr_Str : constant String := Extract_String_Value (Stmt_JSON, "increment");
+                                         Body_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "body");
+                                         Body_Start_Idx : Natural := 0;
+                                         Body_Count_Val : Natural := 0;
+                                      begin
+                                         -- Extract for loop components
+                                         if Init_Str'Length > 0 and Init_Str'Length <= Max_Code_Length then
+                                            Module.Functions (Func_Idx).Statements (Current_Idx).Init_Expr :=
+                                              Code_Buffers.To_Bounded_String (Init_Str);
+                                         end if;
+                                         if Cond_Str'Length > 0 and Cond_Str'Length <= Max_Code_Length then
+                                            Module.Functions (Func_Idx).Statements (Current_Idx).Condition :=
+                                              Code_Buffers.To_Bounded_String (Cond_Str);
+                                         end if;
+                                         if Incr_Str'Length > 0 and Incr_Str'Length <= Max_Code_Length then
+                                            Module.Functions (Func_Idx).Statements (Current_Idx).Incr_Expr :=
+                                              Code_Buffers.To_Bounded_String (Incr_Str);
+                                         end if;
+                                         
+                                         -- Parse body and flatten
+                                         if Body_Array_Pos > 0 then
+                                            Body_Start_Idx := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                            declare
+                                               Block_Pos : Natural := Body_Array_Pos + 1;
+                                               Block_Start, Block_End : Natural;
+                                            begin
+                                               while Module.Functions (Func_Idx).Stmt_Cnt < Max_Statements loop
+                                                  Get_Next_Object (Stmt_JSON, Block_Pos, Block_Start, Block_End);
+                                                  exit when Block_Start = 0 or Block_End = 0;
+                                                  
+                                                  Module.Functions (Func_Idx).Stmt_Cnt := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                                  Body_Count_Val := Body_Count_Val + 1;
+                                                  
+                                                  declare
+                                                     Block_Stmt_JSON : constant String := Stmt_JSON (Block_Start .. Block_End);
+                                                     Block_Stmt_Type : constant String := Extract_String_Value (Block_Stmt_JSON, "type");
+                                                     Block_Idx : constant Positive := Module.Functions (Func_Idx).Stmt_Cnt;
+                                                  begin
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Nop;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Target := Name_Strings.Null_Bounded_String;
+                                                     Module.Functions (Func_Idx).Statements (Block_Idx).Value := Code_Buffers.Null_Bounded_String;
+                                                     
+                                                     if Block_Stmt_Type = "assign" or Block_Stmt_Type = "var_decl" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Assign;
+                                                        declare
+                                                           Target_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "target");
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Target_Str'Length > 0 and Target_Str'Length <= Max_Name_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Target :=
+                                                                Name_Strings.To_Bounded_String (Target_Str);
+                                                           end if;
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "return" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Return;
+                                                        declare
+                                                           Value_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "value");
+                                                        begin
+                                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                                              Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                                           end if;
+                                                        end;
+                                                     elsif Block_Stmt_Type = "call" then
+                                                        Module.Functions (Func_Idx).Statements (Block_Idx).Kind := Stmt_Call;
+                                                        declare
+                                                           Func_Name : constant String := Extract_String_Value (Block_Stmt_JSON, "func");
+                                                           Args_Str : constant String := Extract_String_Value (Block_Stmt_JSON, "args");
+                                                        begin
+                                                           if Func_Name'Length > 0 then
+                                                              declare
+                                                                 Call_Expr : constant String := Func_Name & "(" & Args_Str & ")";
+                                                              begin
+                                                                 if Call_Expr'Length <= Max_Code_Length then
+                                                                    Module.Functions (Func_Idx).Statements (Block_Idx).Value :=
+                                                                      Code_Buffers.To_Bounded_String (Call_Expr);
+                                                                 end if;
+                                                              end;
+                                                           end if;
+                                                        end;
+                                                     else
+                                                        Put_Line ("[WARN] Nested control flow in for body skipped (v0.8.1 limitation)");
+                                                     end if;
+                                                  end;
+                                                  
+                                                  Block_Pos := Block_End + 1;
+                                               end loop;
+                                            end;
+                                         end if;
+                                         
+                                         -- Fill in block indices
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Block_Start := Body_Start_Idx;
+                                         Module.Functions (Func_Idx).Statements (Current_Idx).Block_Count := Body_Count_Val;
+                                         
+                                         Put_Line ("[INFO] Flattened for: body[" & Natural'Image(Body_Start_Idx) & ".." & 
+                                                   Natural'Image(Body_Start_Idx + Body_Count_Val - 1) & "]");
+                                      end;
+                                   
                                   else
                                      -- Unknown statement type - keep as Stmt_Nop
                                      null;
@@ -473,8 +825,8 @@ package body STUNIR_JSON_Utils is
    begin
       Output := JSON_Buffers.Null_Bounded_String;
       
-      --  Start JSON object
-      Append_To_Buffer (Output, "{""schema"":""stunir_ir_v1"",");
+      --  Start JSON object (v0.8.1: Use stunir_flat_ir_v1 for flattened control flow)
+      Append_To_Buffer (Output, "{""schema"":""stunir_flat_ir_v1"",");
       Append_To_Buffer (Output, """ir_version"":""" & Module.IR_Version & """,");
       Append_To_Buffer (Output, """module_name"":""" & Name_Strings.To_String (Module.Module_Name) & """,");
       Append_To_Buffer (Output, """docstring"":""" & Doc_Strings.To_String (Module.Docstring) & """,");
