@@ -297,6 +297,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "while" => {
@@ -333,6 +334,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "for" => {
@@ -377,6 +379,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         
@@ -434,6 +437,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         
@@ -457,6 +461,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "continue" => {
@@ -478,6 +483,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         
@@ -519,6 +525,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "assign" => {
@@ -548,6 +555,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "var_decl" => {
@@ -578,6 +586,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "return" => {
@@ -602,6 +611,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         "comment" => {
@@ -623,6 +633,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block: None,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         
@@ -701,6 +712,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 finally_block,
                 exception_type: None,
                 exception_message: None,
+                ..Default::default()
             })
         },
         
@@ -717,22 +729,9 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             
             Ok(IRStep {
                 op: "throw".to_string(),
-                target: None,
-                value: None,
-                condition: None,
-                then_block: None,
-                else_block: None,
-                body: None,
-                init: None,
-                increment: None,
-                expr: None,
-                cases: None,
-                default: None,
-                try_block: None,
-                catch_blocks: None,
-                finally_block: None,
                 exception_type,
                 exception_message,
+                ..Default::default()
             })
         },
         
@@ -741,22 +740,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             eprintln!("[WARN] Unknown statement type: {}", stmt_type);
             Ok(IRStep {
                 op: "nop".to_string(),
-                target: None,
-                value: None,
-                condition: None,
-                then_block: None,
-                else_block: None,
-                body: None,
-                init: None,
-                increment: None,
-                expr: None,
-                cases: None,
-                default: None,
-                try_block: None,
-                catch_blocks: None,
-                finally_block: None,
-                exception_type: None,
-                exception_message: None,
+                ..Default::default()
             })
         }
     }

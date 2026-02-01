@@ -1,0 +1,54 @@
+{
+  "module": "combined_test",
+  "description": "v0.8.8 Combined data structures test",
+  "types": [
+    {
+      "name": "Person",
+      "fields": [
+        {"name": "name", "type": "string"},
+        {"name": "age", "type": "i32"},
+        {"name": "scores", "type": {"kind": "array", "element_type": "i32"}},
+        {"name": "attributes", "type": {"kind": "map", "key_type": "string", "value_type": "string"}}
+      ]
+    },
+    {
+      "name": "Team",
+      "fields": [
+        {"name": "members", "type": {"kind": "array", "element_type": "Person"}},
+        {"name": "active_ids", "type": {"kind": "set", "element_type": "i32"}}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "create_person",
+      "params": [{"name": "name", "type": "string"}, {"name": "age", "type": "i32"}],
+      "returns": "void",
+      "body": [
+        {"type": "struct_new", "target": "p", "struct_type": "Person", "fields": {}},
+        {"type": "struct_set", "target": "p", "field": "name", "value": "name"},
+        {"type": "struct_set", "target": "p", "field": "age", "value": "age"},
+        {"type": "array_new", "target": "scores", "element_type": "i32"},
+        {"type": "map_new", "target": "attrs", "key_type": "string", "value_type": "string"}
+      ]
+    },
+    {
+      "name": "complex_operations",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "array_new", "target": "numbers", "element_type": "i32"},
+        {"type": "array_push", "target": "numbers", "value": "1"},
+        {"type": "array_push", "target": "numbers", "value": "2"},
+        {"type": "array_push", "target": "numbers", "value": "3"},
+        {"type": "set_new", "target": "unique", "element_type": "i32"},
+        {"type": "set_add", "target": "unique", "value": "1"},
+        {"type": "set_add", "target": "unique", "value": "2"},
+        {"type": "map_new", "target": "counts", "key_type": "string", "value_type": "i32"},
+        {"type": "map_set", "target": "counts", "key": "total", "value": "3"},
+        {"type": "map_get", "target": "result", "source": "counts", "key": "total"},
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

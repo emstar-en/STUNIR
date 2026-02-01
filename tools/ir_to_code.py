@@ -300,6 +300,39 @@ def named_name(tr: TypeRef) -> Optional[str]:
             return tr
     return None
 
+def c_type_ref(tr) -> str:
+    """Convert a type reference (simple or complex) to C type string (v0.8.8+)."""
+    if isinstance(tr, str):
+        return c_type(tr)
+    
+    if isinstance(tr, dict):
+        kind = tr.get('kind')
+        
+        if kind == 'array':
+            elem = tr.get('element_type', 'i32')
+            size = tr.get('size')
+            c_elem = c_type_ref(elem)
+            if size is not None:
+                return c_elem  # Fixed size handled in declaration
+            else:
+                return f'{c_elem}*'  # Dynamic array as pointer
+        
+        elif kind == 'map':
+            return 'void*'  # Maps as opaque type
+        
+        elif kind == 'set':
+            return 'void*'  # Sets as opaque type
+        
+        elif kind == 'optional':
+            inner = tr.get('inner', 'void')
+            c_inner = c_type_ref(inner)
+            if c_inner == 'void':
+                return 'void*'
+            return f'{c_inner}*'  # Optional as pointer
+    
+    return 'void*'
+
+
 def c_type(tr: TypeRef) -> str:
     # Handle string types directly
     if isinstance(tr, str):
@@ -769,6 +802,194 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef, indent:
             # In C, we use longjmp with an error code
             lines.append(f'{indent_str}/* throw {exc_type}: {exc_msg} */')
             lines.append(f'{indent_str}longjmp(__stunir_exception_buf, 1);')
+            
+        # v0.8.8: Data structure operations - Arrays
+        elif op == 'array_new':
+            target = step.get('target', 'arr')
+            element_type = step.get('element_type', 'i32')
+            size = step.get('size')
+            value = step.get('value')
+            c_elem = c_type_ref(element_type)
+            
+            if size is not None:
+                # Fixed-size array
+                if value:
+                    lines.append(f'{indent_str}{c_elem} {target}[{size}] = {{{value}}};')
+                else:
+                    lines.append(f'{indent_str}{c_elem} {target}[{size}] = {{0}};')
+            else:
+                # Dynamic array (pointer + capacity)
+                lines.append(f'{indent_str}{c_elem}* {target} = NULL;')
+                lines.append(f'{indent_str}size_t {target}_len = 0;')
+                lines.append(f'{indent_str}size_t {target}_cap = 0;')
+            local_vars[target] = c_elem
+            
+        elif op == 'array_get':
+            target = step.get('target', 'val')
+            source = step.get('source', 'arr')
+            index = step.get('index', '0')
+            elem_type = local_vars.get(source, 'int32_t')
+            if target not in local_vars:
+                local_vars[target] = elem_type
+                lines.append(f'{indent_str}{elem_type} {target} = {source}[{index}];')
+            else:
+                lines.append(f'{indent_str}{target} = {source}[{index}];')
+            
+        elif op == 'array_set':
+            target = step.get('target', 'arr')
+            index = step.get('index', '0')
+            value = step.get('value', '0')
+            lines.append(f'{indent_str}{target}[{index}] = {value};')
+            
+        elif op == 'array_push':
+            target = step.get('target', 'arr')
+            value = step.get('value', '0')
+            lines.append(f'{indent_str}/* array_push: ensure capacity */')
+            lines.append(f'{indent_str}if ({target}_len >= {target}_cap) {{')
+            lines.append(f'{indent_str}  {target}_cap = {target}_cap == 0 ? 8 : {target}_cap * 2;')
+            lines.append(f'{indent_str}  {target} = realloc({target}, {target}_cap * sizeof({target}[0]));')
+            lines.append(f'{indent_str}}}')
+            lines.append(f'{indent_str}{target}[{target}_len++] = {value};')
+            
+        elif op == 'array_pop':
+            target = step.get('target', 'val')
+            source = step.get('source', 'arr')
+            elem_type = local_vars.get(source, 'int32_t')
+            if target not in local_vars:
+                local_vars[target] = elem_type
+                lines.append(f'{indent_str}{elem_type} {target} = {source}[--{source}_len];')
+            else:
+                lines.append(f'{indent_str}{target} = {source}[--{source}_len];')
+            
+        elif op == 'array_len':
+            target = step.get('target', 'len')
+            source = step.get('source', 'arr')
+            if target not in local_vars:
+                local_vars[target] = 'size_t'
+                lines.append(f'{indent_str}size_t {target} = {source}_len;')
+            else:
+                lines.append(f'{indent_str}{target} = {source}_len;')
+            
+        # v0.8.8: Data structure operations - Maps
+        elif op == 'map_new':
+            target = step.get('target', 'map')
+            key_type = step.get('key_type', 'string')
+            value_type = step.get('value_type', 'i32')
+            c_key = c_type_ref(key_type)
+            c_val = c_type_ref(value_type)
+            lines.append(f'{indent_str}/* map<{c_key}, {c_val}> {target} */')
+            lines.append(f'{indent_str}struct {{ {c_key} key; {c_val} value; bool used; }}* {target} = NULL;')
+            lines.append(f'{indent_str}size_t {target}_cap = 0;')
+            local_vars[target] = f'map_{c_key}_{c_val}'
+            
+        elif op == 'map_get':
+            target = step.get('target', 'val')
+            source = step.get('source', 'map')
+            key = step.get('key', '""')
+            lines.append(f'{indent_str}/* map_get: {target} = {source}[{key}] */')
+            lines.append(f'{indent_str}{target} = stunir_map_get({source}, {source}_cap, {key});')
+            
+        elif op == 'map_set':
+            target = step.get('target', 'map')
+            key = step.get('key', '""')
+            value = step.get('value', '0')
+            lines.append(f'{indent_str}/* map_set: {target}[{key}] = {value} */')
+            lines.append(f'{indent_str}stunir_map_set(&{target}, &{target}_cap, {key}, {value});')
+            
+        elif op == 'map_delete':
+            target = step.get('target', 'map')
+            key = step.get('key', '""')
+            lines.append(f'{indent_str}/* map_delete: delete {target}[{key}] */')
+            lines.append(f'{indent_str}stunir_map_delete({target}, {target}_cap, {key});')
+            
+        elif op == 'map_has':
+            target = step.get('target', 'exists')
+            source = step.get('source', 'map')
+            key = step.get('key', '""')
+            if target not in local_vars:
+                local_vars[target] = 'bool'
+                lines.append(f'{indent_str}bool {target} = stunir_map_has({source}, {source}_cap, {key});')
+            else:
+                lines.append(f'{indent_str}{target} = stunir_map_has({source}, {source}_cap, {key});')
+            
+        elif op == 'map_keys':
+            target = step.get('target', 'keys')
+            source = step.get('source', 'map')
+            lines.append(f'{indent_str}/* map_keys: {target} = keys({source}) */')
+            lines.append(f'{indent_str}size_t {target}_len = stunir_map_keys({source}, {source}_cap, &{target});')
+            
+        # v0.8.8: Data structure operations - Sets
+        elif op == 'set_new':
+            target = step.get('target', 'set')
+            element_type = step.get('element_type', 'i32')
+            c_elem = c_type_ref(element_type)
+            lines.append(f'{indent_str}/* set<{c_elem}> {target} */')
+            lines.append(f'{indent_str}struct {{ {c_elem} value; bool used; }}* {target} = NULL;')
+            lines.append(f'{indent_str}size_t {target}_cap = 0;')
+            local_vars[target] = f'set_{c_elem}'
+            
+        elif op == 'set_add':
+            target = step.get('target', 'set')
+            value = step.get('value', '0')
+            lines.append(f'{indent_str}/* set_add: {target}.add({value}) */')
+            lines.append(f'{indent_str}stunir_set_add(&{target}, &{target}_cap, {value});')
+            
+        elif op == 'set_remove':
+            target = step.get('target', 'set')
+            value = step.get('value', '0')
+            lines.append(f'{indent_str}/* set_remove: {target}.remove({value}) */')
+            lines.append(f'{indent_str}stunir_set_remove({target}, {target}_cap, {value});')
+            
+        elif op == 'set_has':
+            target = step.get('target', 'exists')
+            source = step.get('source', 'set')
+            value = step.get('value', '0')
+            if target not in local_vars:
+                local_vars[target] = 'bool'
+                lines.append(f'{indent_str}bool {target} = stunir_set_has({source}, {source}_cap, {value});')
+            else:
+                lines.append(f'{indent_str}{target} = stunir_set_has({source}, {source}_cap, {value});')
+            
+        elif op == 'set_union':
+            target = step.get('target', 'result')
+            source = step.get('source', 'set1')
+            source2 = step.get('source2', 'set2')
+            lines.append(f'{indent_str}/* set_union: {target} = {source} | {source2} */')
+            lines.append(f'{indent_str}stunir_set_union({source}, {source}_cap, {source2}, {source2}_cap, &{target}, &{target}_cap);')
+            
+        elif op == 'set_intersect':
+            target = step.get('target', 'result')
+            source = step.get('source', 'set1')
+            source2 = step.get('source2', 'set2')
+            lines.append(f'{indent_str}/* set_intersect: {target} = {source} & {source2} */')
+            lines.append(f'{indent_str}stunir_set_intersect({source}, {source}_cap, {source2}, {source2}_cap, &{target}, &{target}_cap);')
+            
+        # v0.8.8: Data structure operations - Structs
+        elif op == 'struct_new':
+            target = step.get('target', 'obj')
+            struct_type = step.get('struct_type', 'Object')
+            fields = step.get('fields', {})
+            field_inits = ', '.join(f'.{k} = {v}' for k, v in fields.items()) if fields else ''
+            lines.append(f'{indent_str}struct {struct_type} {target} = {{ {field_inits} }};')
+            local_vars[target] = f'struct {struct_type}'
+            
+        elif op == 'struct_get':
+            target = step.get('target', 'val')
+            source = step.get('source', 'obj')
+            field = step.get('field', 'field')
+            struct_type = local_vars.get(source, 'void*')
+            lines.append(f'{indent_str}/* struct_get: {target} = {source}.{field} */')
+            if target not in local_vars:
+                local_vars[target] = 'int32_t'  # Default type
+                lines.append(f'{indent_str}int32_t {target} = {source}.{field};')
+            else:
+                lines.append(f'{indent_str}{target} = {source}.{field};')
+            
+        elif op == 'struct_set':
+            target = step.get('target', 'obj')
+            field = step.get('field', 'field')
+            value = step.get('value', '0')
+            lines.append(f'{indent_str}{target}.{field} = {value};')
             
         else:
             # Unknown operation

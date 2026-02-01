@@ -1,19 +1,77 @@
 {
-  "current_version": "0.8.7",
+  "current_version": "0.8.8",
   "version_status": "COMPLETE",
   "last_updated": "2026-02-01",
   "status": {
     "python": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
-      "features": ["break", "continue", "switch", "try", "catch", "finally", "throw"],
+      "features": [
+        "break",
+        "continue",
+        "switch",
+        "try",
+        "catch",
+        "finally",
+        "throw",
+        "array_new",
+        "array_get",
+        "array_set",
+        "array_push",
+        "array_pop",
+        "array_len",
+        "map_new",
+        "map_get",
+        "map_set",
+        "map_delete",
+        "map_has",
+        "map_keys",
+        "set_new",
+        "set_add",
+        "set_remove",
+        "set_has",
+        "set_union",
+        "set_intersect",
+        "struct_new",
+        "struct_get",
+        "struct_set"
+      ],
       "tests_passed": 1262,
       "test_framework": "pytest"
     },
     "rust": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
-      "features": ["break", "continue", "switch", "try", "catch", "finally", "throw"],
+      "features": [
+        "break",
+        "continue",
+        "switch",
+        "try",
+        "catch",
+        "finally",
+        "throw",
+        "array_new",
+        "array_get",
+        "array_set",
+        "array_push",
+        "array_pop",
+        "array_len",
+        "map_new",
+        "map_get",
+        "map_set",
+        "map_delete",
+        "map_has",
+        "map_keys",
+        "set_new",
+        "set_add",
+        "set_remove",
+        "set_has",
+        "set_union",
+        "set_intersect",
+        "struct_new",
+        "struct_get",
+        "struct_set"
+      ],
       "tests_passed": 2,
       "test_framework": "cargo test",
       "build_status": "PASSING"
@@ -21,13 +79,28 @@
     "spark": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
-      "features": ["break", "continue", "switch", "try", "catch", "finally", "throw"],
+      "features": [
+        "break",
+        "continue",
+        "switch",
+        "try",
+        "catch",
+        "finally",
+        "throw",
+        "array_new",
+        "array_get",
+        "array_set",
+        "map_new",
+        "set_new",
+        "struct_new"
+      ],
       "implementation_status": "COMPLETE",
       "binary_status": "PASSING",
       "tests_passed": 31,
       "fixes_applied": [
         "v0.8.6: Fixed stack overflow by reducing buffer sizes",
-        "v0.8.7: Added exception handling support (try/catch/finally/throw)"
+        "v0.8.7: Added exception handling support (try/catch/finally/throw)",
+        "v0.8.8: Added data structure operations (arrays, maps, sets, structs)"
       ]
     }
   },
@@ -53,8 +126,15 @@
       "passed": 31,
       "failed": 0,
       "status": "ALL_PASSED",
-      "tested_specs": ["ardupilot_test", "v0.8.7"],
-      "tested_targets": ["c", "python", "rust"]
+      "tested_specs": [
+        "ardupilot_test",
+        "v0.8.7"
+      ],
+      "tested_targets": [
+        "c",
+        "python",
+        "rust"
+      ]
     }
   },
   "coverage": {

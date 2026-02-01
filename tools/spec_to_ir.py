@@ -90,6 +90,43 @@ def convert_type(type_str: str) -> str:
     return type_map.get(type_str, type_str)
 
 
+def convert_type_ref(type_ref: Any) -> Any:
+    """Convert spec type reference to IR type reference (v0.8.8+).
+    
+    Handles both simple types and complex types (array, map, set, optional).
+    """
+    if isinstance(type_ref, str):
+        return convert_type(type_ref)
+    
+    if isinstance(type_ref, dict):
+        kind = type_ref.get("kind")
+        result = {"kind": kind}
+        
+        if kind == "array":
+            if "element_type" in type_ref:
+                result["element_type"] = convert_type_ref(type_ref["element_type"])
+            if "size" in type_ref:
+                result["size"] = type_ref["size"]
+        
+        elif kind == "map":
+            if "key_type" in type_ref:
+                result["key_type"] = convert_type_ref(type_ref["key_type"])
+            if "value_type" in type_ref:
+                result["value_type"] = convert_type_ref(type_ref["value_type"])
+        
+        elif kind == "set":
+            if "element_type" in type_ref:
+                result["element_type"] = convert_type_ref(type_ref["element_type"])
+        
+        elif kind == "optional":
+            if "inner" in type_ref:
+                result["inner"] = convert_type_ref(type_ref["inner"])
+        
+        return result
+    
+    return type_ref
+
+
 def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
     """Convert spec JSON to semantic IR format."""
     
@@ -121,7 +158,7 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         for field in type_spec.get("fields", []):
             field_entry = {
                 "name": field.get("name", ""),
-                "type": convert_type(field.get("type", "void"))
+                "type": convert_type_ref(field.get("type", "void"))
             }
             if "optional" in field:
                 field_entry["optional"] = field["optional"]
@@ -306,6 +343,210 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                 
                 elif stmt_type == "comment":
                     step = {"op": "nop"}
+                    result_steps.append(step)
+                
+                # v0.8.8: Data structure operations - Arrays
+                elif stmt_type == "array_new":
+                    step = {"op": "array_new"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "element_type" in stmt:
+                        step["element_type"] = convert_type_ref(stmt["element_type"])
+                    if "size" in stmt:
+                        step["size"] = stmt["size"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "array_get":
+                    step = {"op": "array_get"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "index" in stmt:
+                        step["index"] = stmt["index"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "array_set":
+                    step = {"op": "array_set"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "index" in stmt:
+                        step["index"] = stmt["index"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "array_push":
+                    step = {"op": "array_push"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "array_pop":
+                    step = {"op": "array_pop"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "array_len":
+                    step = {"op": "array_len"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    result_steps.append(step)
+                
+                # v0.8.8: Data structure operations - Maps
+                elif stmt_type == "map_new":
+                    step = {"op": "map_new"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "key_type" in stmt:
+                        step["key_type"] = convert_type_ref(stmt["key_type"])
+                    if "value_type" in stmt:
+                        step["value_type"] = convert_type_ref(stmt["value_type"])
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "map_get":
+                    step = {"op": "map_get"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "key" in stmt:
+                        step["key"] = stmt["key"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "map_set":
+                    step = {"op": "map_set"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "key" in stmt:
+                        step["key"] = stmt["key"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "map_delete":
+                    step = {"op": "map_delete"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "key" in stmt:
+                        step["key"] = stmt["key"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "map_has":
+                    step = {"op": "map_has"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "key" in stmt:
+                        step["key"] = stmt["key"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "map_keys":
+                    step = {"op": "map_keys"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    result_steps.append(step)
+                
+                # v0.8.8: Data structure operations - Sets
+                elif stmt_type == "set_new":
+                    step = {"op": "set_new"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "element_type" in stmt:
+                        step["element_type"] = convert_type_ref(stmt["element_type"])
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "set_add":
+                    step = {"op": "set_add"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "set_remove":
+                    step = {"op": "set_remove"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "set_has":
+                    step = {"op": "set_has"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "set_union":
+                    step = {"op": "set_union"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "source2" in stmt:
+                        step["source2"] = stmt["source2"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "set_intersect":
+                    step = {"op": "set_intersect"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "source2" in stmt:
+                        step["source2"] = stmt["source2"]
+                    result_steps.append(step)
+                
+                # v0.8.8: Data structure operations - Structs
+                elif stmt_type == "struct_new":
+                    step = {"op": "struct_new"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "struct_type" in stmt:
+                        step["struct_type"] = stmt["struct_type"]
+                    if "fields" in stmt:
+                        step["fields"] = stmt["fields"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "struct_get":
+                    step = {"op": "struct_get"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "field" in stmt:
+                        step["field"] = stmt["field"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "struct_set":
+                    step = {"op": "struct_set"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "field" in stmt:
+                        step["field"] = stmt["field"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
                     result_steps.append(step)
                 
                 else:

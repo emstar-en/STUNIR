@@ -1,0 +1,43 @@
+{
+  "module": "sets_test",
+  "description": "v0.8.8 Set operations test",
+  "types": [
+    {
+      "name": "IntSet",
+      "fields": [
+        {"name": "elements", "type": {"kind": "set", "element_type": "i32"}}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "test_set_basic",
+      "params": [],
+      "returns": "bool",
+      "body": [
+        {"type": "set_new", "target": "s", "element_type": "i32"},
+        {"type": "set_add", "target": "s", "value": "10"},
+        {"type": "set_add", "target": "s", "value": "20"},
+        {"type": "set_add", "target": "s", "value": "10"},
+        {"type": "set_has", "target": "exists", "source": "s", "value": "10"},
+        {"type": "set_remove", "target": "s", "value": "20"},
+        {"type": "return", "value": "exists"}
+      ]
+    },
+    {
+      "name": "test_set_ops",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "set_new", "target": "set1", "element_type": "i32"},
+        {"type": "set_new", "target": "set2", "element_type": "i32"},
+        {"type": "set_add", "target": "set1", "value": "1"},
+        {"type": "set_add", "target": "set1", "value": "2"},
+        {"type": "set_add", "target": "set2", "value": "2"},
+        {"type": "set_add", "target": "set2", "value": "3"},
+        {"type": "set_union", "target": "union_result", "source": "set1", "source2": "set2"},
+        {"type": "set_intersect", "target": "intersect_result", "source": "set1", "source2": "set2"}
+      ]
+    }
+  ]
+}

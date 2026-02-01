@@ -529,6 +529,248 @@ fn translate_steps_to_c_internal(
                 lines.push(format!("{}/* throw {}: {} */", indent_str, exc_type, exc_msg));
                 lines.push(format!("{}longjmp(__stunir_exception_buf, 1);", indent_str));
             }
+            // v0.8.8: Data structure operations - Arrays
+            "array_new" => {
+                let target = step.target.as_deref().unwrap_or("arr");
+                let c_elem = "int32_t"; // Default element type
+                
+                if let Some(size) = step.size {
+                    lines.push(format!("{}{} {}[{}] = {{0}};", indent_str, c_elem, target, size));
+                } else {
+                    lines.push(format!("{}{}* {} = NULL;", indent_str, c_elem, target));
+                    lines.push(format!("{}size_t {}_len = 0;", indent_str, target));
+                    lines.push(format!("{}size_t {}_cap = 0;", indent_str, target));
+                }
+                local_vars.insert(target.to_string(), c_elem.to_string());
+            }
+            "array_get" => {
+                let target = step.target.as_deref().unwrap_or("val");
+                let source = step.source.as_deref().unwrap_or("arr");
+                let index = match &step.index {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                let elem_type = local_vars.get(source).cloned().unwrap_or_else(|| "int32_t".to_string());
+                if !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), elem_type.clone());
+                    lines.push(format!("{}{} {} = {}[{}];", indent_str, elem_type, target, source, index));
+                } else {
+                    lines.push(format!("{}{} = {}[{}];", indent_str, target, source, index));
+                }
+            }
+            "array_set" => {
+                let target = step.target.as_deref().unwrap_or("arr");
+                let index = match &step.index {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                lines.push(format!("{}{}[{}] = {};", indent_str, target, index, value));
+            }
+            "array_push" => {
+                let target = step.target.as_deref().unwrap_or("arr");
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                lines.push(format!("{}/* array_push: ensure capacity */", indent_str));
+                lines.push(format!("{}if ({}_len >= {}_cap) {{", indent_str, target, target));
+                lines.push(format!("{}  {}_cap = {}_cap == 0 ? 8 : {}_cap * 2;", indent_str, target, target, target));
+                lines.push(format!("{}  {} = realloc({}, {}_cap * sizeof({}[0]));", indent_str, target, target, target, target));
+                lines.push(format!("{}}}", indent_str));
+                lines.push(format!("{}{}[{}_len++] = {};", indent_str, target, target, value));
+            }
+            "array_pop" => {
+                let target = step.target.as_deref().unwrap_or("val");
+                let source = step.source.as_deref().unwrap_or("arr");
+                let elem_type = local_vars.get(source).cloned().unwrap_or_else(|| "int32_t".to_string());
+                if !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), elem_type.clone());
+                    lines.push(format!("{}{} {} = {}[--{}_len];", indent_str, elem_type, target, source, source));
+                } else {
+                    lines.push(format!("{}{} = {}[--{}_len];", indent_str, target, source, source));
+                }
+            }
+            "array_len" => {
+                let target = step.target.as_deref().unwrap_or("len");
+                let source = step.source.as_deref().unwrap_or("arr");
+                if !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), "size_t".to_string());
+                    lines.push(format!("{}size_t {} = {}_len;", indent_str, target, source));
+                } else {
+                    lines.push(format!("{}{} = {}_len;", indent_str, target, source));
+                }
+            }
+            // v0.8.8: Data structure operations - Maps
+            "map_new" => {
+                let target = step.target.as_deref().unwrap_or("map");
+                lines.push(format!("{}/* map<key, value> {} */", indent_str, target));
+                lines.push(format!("{}struct {{ void* key; void* value; bool used; }}* {} = NULL;", indent_str, target));
+                lines.push(format!("{}size_t {}_cap = 0;", indent_str, target));
+            }
+            "map_get" => {
+                let target = step.target.as_deref().unwrap_or("val");
+                let source = step.source.as_deref().unwrap_or("map");
+                let key = match &step.key {
+                    Some(Value::String(s)) => format!("\"{}\"", s),
+                    Some(Value::Number(n)) => n.to_string(),
+                    _ => "\"\"".to_string(),
+                };
+                lines.push(format!("{}/* map_get: {} = {}[{}] */", indent_str, target, source, key));
+                lines.push(format!("{}{} = stunir_map_get({}, {}_cap, {});", indent_str, target, source, source, key));
+            }
+            "map_set" => {
+                let target = step.target.as_deref().unwrap_or("map");
+                let key = match &step.key {
+                    Some(Value::String(s)) => format!("\"{}\"", s),
+                    Some(Value::Number(n)) => n.to_string(),
+                    _ => "\"\"".to_string(),
+                };
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                lines.push(format!("{}/* map_set: {}[{}] = {} */", indent_str, target, key, value));
+                lines.push(format!("{}stunir_map_set(&{}, &{}_cap, {}, {});", indent_str, target, target, key, value));
+            }
+            "map_delete" => {
+                let target = step.target.as_deref().unwrap_or("map");
+                let key = match &step.key {
+                    Some(Value::String(s)) => format!("\"{}\"", s),
+                    Some(Value::Number(n)) => n.to_string(),
+                    _ => "\"\"".to_string(),
+                };
+                lines.push(format!("{}/* map_delete: delete {}[{}] */", indent_str, target, key));
+                lines.push(format!("{}stunir_map_delete({}, {}_cap, {});", indent_str, target, target, key));
+            }
+            "map_has" => {
+                let target = step.target.as_deref().unwrap_or("exists");
+                let source = step.source.as_deref().unwrap_or("map");
+                let key = match &step.key {
+                    Some(Value::String(s)) => format!("\"{}\"", s),
+                    Some(Value::Number(n)) => n.to_string(),
+                    _ => "\"\"".to_string(),
+                };
+                if !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), "bool".to_string());
+                    lines.push(format!("{}bool {} = stunir_map_has({}, {}_cap, {});", indent_str, target, source, source, key));
+                } else {
+                    lines.push(format!("{}{} = stunir_map_has({}, {}_cap, {});", indent_str, target, source, source, key));
+                }
+            }
+            "map_keys" => {
+                let target = step.target.as_deref().unwrap_or("keys");
+                let source = step.source.as_deref().unwrap_or("map");
+                lines.push(format!("{}/* map_keys: {} = keys({}) */", indent_str, target, source));
+                lines.push(format!("{}size_t {}_len = stunir_map_keys({}, {}_cap, &{});", indent_str, target, source, source, target));
+            }
+            // v0.8.8: Data structure operations - Sets
+            "set_new" => {
+                let target = step.target.as_deref().unwrap_or("set");
+                lines.push(format!("{}/* set<element> {} */", indent_str, target));
+                lines.push(format!("{}struct {{ void* value; bool used; }}* {} = NULL;", indent_str, target));
+                lines.push(format!("{}size_t {}_cap = 0;", indent_str, target));
+            }
+            "set_add" => {
+                let target = step.target.as_deref().unwrap_or("set");
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                lines.push(format!("{}/* set_add: {}.add({}) */", indent_str, target, value));
+                lines.push(format!("{}stunir_set_add(&{}, &{}_cap, {});", indent_str, target, target, value));
+            }
+            "set_remove" => {
+                let target = step.target.as_deref().unwrap_or("set");
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                lines.push(format!("{}/* set_remove: {}.remove({}) */", indent_str, target, value));
+                lines.push(format!("{}stunir_set_remove({}, {}_cap, {});", indent_str, target, target, value));
+            }
+            "set_has" => {
+                let target = step.target.as_deref().unwrap_or("exists");
+                let source = step.source.as_deref().unwrap_or("set");
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                if !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), "bool".to_string());
+                    lines.push(format!("{}bool {} = stunir_set_has({}, {}_cap, {});", indent_str, target, source, source, value));
+                } else {
+                    lines.push(format!("{}{} = stunir_set_has({}, {}_cap, {});", indent_str, target, source, source, value));
+                }
+            }
+            "set_union" => {
+                let target = step.target.as_deref().unwrap_or("result");
+                let source = step.source.as_deref().unwrap_or("set1");
+                let source2 = step.source2.as_deref().unwrap_or("set2");
+                lines.push(format!("{}/* set_union: {} = {} | {} */", indent_str, target, source, source2));
+                lines.push(format!("{}stunir_set_union({}, {}_cap, {}, {}_cap, &{}, &{}_cap);", indent_str, source, source, source2, source2, target, target));
+            }
+            "set_intersect" => {
+                let target = step.target.as_deref().unwrap_or("result");
+                let source = step.source.as_deref().unwrap_or("set1");
+                let source2 = step.source2.as_deref().unwrap_or("set2");
+                lines.push(format!("{}/* set_intersect: {} = {} & {} */", indent_str, target, source, source2));
+                lines.push(format!("{}stunir_set_intersect({}, {}_cap, {}, {}_cap, &{}, &{}_cap);", indent_str, source, source, source2, source2, target, target));
+            }
+            // v0.8.8: Data structure operations - Structs
+            "struct_new" => {
+                let target = step.target.as_deref().unwrap_or("obj");
+                let struct_type = step.struct_type.as_deref().unwrap_or("Object");
+                let field_inits = match &step.fields {
+                    Some(Value::Object(map)) => {
+                        map.iter()
+                            .map(|(k, v)| format!(".{} = {}", k, match v {
+                                Value::String(s) => s.clone(),
+                                Value::Number(n) => n.to_string(),
+                                Value::Bool(b) => b.to_string(),
+                                _ => "0".to_string(),
+                            }))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    }
+                    _ => String::new(),
+                };
+                lines.push(format!("{}struct {} {} = {{ {} }};", indent_str, struct_type, target, field_inits));
+                local_vars.insert(target.to_string(), format!("struct {}", struct_type));
+            }
+            "struct_get" => {
+                let target = step.target.as_deref().unwrap_or("val");
+                let source = step.source.as_deref().unwrap_or("obj");
+                let field = step.field.as_deref().unwrap_or("field");
+                lines.push(format!("{}/* struct_get: {} = {}.{} */", indent_str, target, source, field));
+                if !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), "int32_t".to_string());
+                    lines.push(format!("{}int32_t {} = {}.{};", indent_str, target, source, field));
+                } else {
+                    lines.push(format!("{}{} = {}.{};", indent_str, target, source, field));
+                }
+            }
+            "struct_set" => {
+                let target = step.target.as_deref().unwrap_or("obj");
+                let field = step.field.as_deref().unwrap_or("field");
+                let value = match &step.value {
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::String(s)) => s.clone(),
+                    _ => "0".to_string(),
+                };
+                lines.push(format!("{}{}.{} = {};", indent_str, target, field, value));
+            }
             _ => {
                 lines.push(format!("{}/* UNKNOWN OP: {} */", indent_str, step.op));
             }

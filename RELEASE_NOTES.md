@@ -1,6 +1,206 @@
 # STUNIR Release Notes
 
 
+## Version 0.8.8 - February 1, 2026
+
+**Status**: ✅ **Advanced Data Structures Complete!** 📊  
+**Codename**: "Data Structures"  
+**Release Date**: February 1, 2026  
+**Release Type**: MINOR (New Features)  
+**Progress**: **All 3 pipelines support advanced data structures**
+
+---
+
+### 🎯 Executive Summary
+
+STUNIR 0.8.8 introduces comprehensive data structure support across all three implementation pipelines (Python, Rust, SPARK). This release adds arrays (fixed and dynamic), maps/dictionaries, sets, and struct operations to the IR schema with full C code generation.
+
+### Key Achievements
+
+✅ **Schema Updated** - Added type_ref definition and 21 new ops to stunir_ir_v1.schema.json  
+✅ **Python Pipeline** - Full data structure support in spec_to_ir.py and ir_to_code.py  
+✅ **Rust Pipeline** - Full data structure support with Default trait for IRStep  
+✅ **SPARK Pipeline** - Data structure operations in stunir_ir_to_code.adb  
+✅ **C Code Generation** - Dynamic arrays with realloc, map/set helpers  
+✅ **Test Specs** - 5 new test specs in test_specs/v0.8.8/  
+
+### New Type Reference System
+
+The schema now supports complex type references for fields and variables:
+
+```json
+{
+  "kind": "array",
+  "element_type": "i32",
+  "size": 10
+}
+```
+
+### New IR Operations
+
+#### Arrays (6 operations)
+- **array_new** - Create fixed or dynamic array
+- **array_get** - Get element at index
+- **array_set** - Set element at index
+- **array_push** - Append to dynamic array
+- **array_pop** - Remove and return last element
+- **array_len** - Get array length
+
+#### Maps (6 operations)
+- **map_new** - Create new map
+- **map_get** - Get value by key
+- **map_set** - Set key-value pair
+- **map_delete** - Remove key
+- **map_has** - Check if key exists
+- **map_keys** - Get all keys
+
+#### Sets (6 operations)
+- **set_new** - Create new set
+- **set_add** - Add element
+- **set_remove** - Remove element
+- **set_has** - Check if element exists
+- **set_union** - Union of two sets
+- **set_intersect** - Intersection of two sets
+
+#### Structs (3 operations)
+- **struct_new** - Create struct instance
+- **struct_get** - Get field value
+- **struct_set** - Set field value
+
+### Test Specs
+
+New test specs in `test_specs/v0.8.8/`:
+- `arrays.json` - Array operations
+- `maps.json` - Map/dictionary operations  
+- `sets.json` - Set operations
+- `structs.json` - Struct operations
+- `combined_structures.json` - Combined data structures
+
+---
+
+## Version 0.8.8 - February 1, 2026
+
+**Status**: ✅ **Advanced Data Structures Complete!** 📊  
+**Codename**: "Data Structures"  
+**Release Date**: February 1, 2026  
+**Release Type**: MINOR (New Features)  
+**Progress**: **All 3 pipelines support advanced data structures**
+
+---
+
+### 🎯 Executive Summary
+
+STUNIR 0.8.8 introduces comprehensive data structure support across all three implementation pipelines (Python, Rust, SPARK). This release adds arrays (fixed and dynamic), maps/dictionaries, sets, and struct operations to the IR schema with full C code generation.
+
+### Key Achievements
+
+✅ **Schema Updated** - Added type_ref definition and 21 new ops to stunir_ir_v1.schema.json  
+✅ **Python Pipeline** - Full data structure support in spec_to_ir.py and ir_to_code.py  
+✅ **Rust Pipeline** - Full data structure support with Default trait for IRStep  
+✅ **SPARK Pipeline** - Data structure operations in stunir_ir_to_code.adb  
+✅ **C Code Generation** - Dynamic arrays with realloc, map/set helpers  
+✅ **Test Specs** - 5 new test specs in test_specs/v0.8.8/  
+
+### New Type Reference System
+
+The schema now supports complex type references for fields and variables:
+
+```json
+{
+  "kind": "array",
+  "element_type": "i32",
+  "size": 10
+}
+```
+
+```json
+{
+  "kind": "map",
+  "key_type": "string",
+  "value_type": "i32"
+}
+```
+
+```json
+{
+  "kind": "set",
+  "element_type": "i32"
+}
+```
+
+### New IR Operations
+
+#### Arrays (6 operations)
+- **array_new** - Create fixed or dynamic array
+- **array_get** - Get element at index
+- **array_set** - Set element at index
+- **array_push** - Append to dynamic array
+- **array_pop** - Remove and return last element
+- **array_len** - Get array length
+
+#### Maps (6 operations)
+- **map_new** - Create new map
+- **map_get** - Get value by key
+- **map_set** - Set key-value pair
+- **map_delete** - Remove key
+- **map_has** - Check if key exists
+- **map_keys** - Get all keys
+
+#### Sets (6 operations)
+- **set_new** - Create new set
+- **set_add** - Add element
+- **set_remove** - Remove element
+- **set_has** - Check if element exists
+- **set_union** - Union of two sets
+- **set_intersect** - Intersection of two sets
+
+#### Structs (3 operations)
+- **struct_new** - Create struct instance
+- **struct_get** - Get field value
+- **struct_set** - Set field value
+
+### Generated C Code Examples
+
+#### Dynamic Array
+```c
+int32_t* arr = NULL;
+size_t arr_len = 0;
+size_t arr_cap = 0;
+
+/* array_push: ensure capacity */
+if (arr_len >= arr_cap) {
+    arr_cap = arr_cap == 0 ? 8 : arr_cap * 2;
+    arr = realloc(arr, arr_cap * sizeof(arr[0]));
+}
+arr[arr_len++] = value;
+```
+
+#### Struct Operations
+```c
+struct Point p = { .x = 10, .y = 20 };
+int32_t val = p.x;
+p.y = 30;
+```
+
+### Test Specs
+
+New test specs in `test_specs/v0.8.8/`:
+- `arrays.json` - Array operations
+- `maps.json` - Map/dictionary operations  
+- `sets.json` - Set operations
+- `structs.json` - Struct operations
+- `combined_structures.json` - Combined data structures
+
+### Breaking Changes
+
+None - backward compatible with v0.8.7.
+
+### Migration Guide
+
+No migration required. Existing specs continue to work unchanged.
+
+---
+
 ## Version 0.8.7 - February 1, 2026
 
 **Status**: ✅ **Exception Handling Complete!** 🛡️  

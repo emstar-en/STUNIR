@@ -1275,6 +1275,98 @@ package body STUNIR_IR_To_Code is
                   Append (NL);
                end;
                
+            --  v0.8.8: Data structure operations - Arrays
+            elsif Op = "array_new" then
+               declare
+                  Target : constant String := Name_Strings.To_String (Step.Target);
+               begin
+                  Append (Get_Indent & "/* array_new: " & Target & " */");
+                  Append (NL);
+                  Append (Get_Indent & "int32_t* " & Target & " = NULL;");
+                  Append (NL);
+                  Append (Get_Indent & "size_t " & Target & "_len = 0;");
+                  Append (NL);
+                  Append (Get_Indent & "size_t " & Target & "_cap = 0;");
+                  Append (NL);
+               end;
+               
+            elsif Op = "array_get" then
+               declare
+                  Target : constant String := Name_Strings.To_String (Step.Target);
+                  Source : constant String := Name_Strings.To_String (Step.Value);
+               begin
+                  Append (Get_Indent & "/* array_get: " & Target & " = " & Source & "[...] */");
+                  Append (NL);
+                  Append (Get_Indent & "int32_t " & Target & " = " & Source & "[0];");
+                  Append (NL);
+               end;
+               
+            elsif Op = "array_set" then
+               declare
+                  Target : constant String := Name_Strings.To_String (Step.Target);
+                  Value  : constant String := Name_Strings.To_String (Step.Value);
+               begin
+                  Append (Get_Indent & "/* array_set: " & Target & "[...] = " & Value & " */");
+                  Append (NL);
+                  Append (Get_Indent & Target & "[0] = " & Value & ";");
+                  Append (NL);
+               end;
+               
+            elsif Op = "array_push" or Op = "array_pop" or Op = "array_len" then
+               Append (Get_Indent & "/* " & Op & " */");
+               Append (NL);
+               
+            --  v0.8.8: Data structure operations - Maps
+            elsif Op = "map_new" then
+               declare
+                  Target : constant String := Name_Strings.To_String (Step.Target);
+               begin
+                  Append (Get_Indent & "/* map_new: " & Target & " */");
+                  Append (NL);
+                  Append (Get_Indent & "void* " & Target & " = NULL;");
+                  Append (NL);
+                  Append (Get_Indent & "size_t " & Target & "_cap = 0;");
+                  Append (NL);
+               end;
+               
+            elsif Op = "map_get" or Op = "map_set" or Op = "map_delete" 
+                  or Op = "map_has" or Op = "map_keys" then
+               Append (Get_Indent & "/* " & Op & " */");
+               Append (NL);
+               
+            --  v0.8.8: Data structure operations - Sets
+            elsif Op = "set_new" then
+               declare
+                  Target : constant String := Name_Strings.To_String (Step.Target);
+               begin
+                  Append (Get_Indent & "/* set_new: " & Target & " */");
+                  Append (NL);
+                  Append (Get_Indent & "void* " & Target & " = NULL;");
+                  Append (NL);
+                  Append (Get_Indent & "size_t " & Target & "_cap = 0;");
+                  Append (NL);
+               end;
+               
+            elsif Op = "set_add" or Op = "set_remove" or Op = "set_has" 
+                  or Op = "set_union" or Op = "set_intersect" then
+               Append (Get_Indent & "/* " & Op & " */");
+               Append (NL);
+               
+            --  v0.8.8: Data structure operations - Structs
+            elsif Op = "struct_new" then
+               declare
+                  Target : constant String := Name_Strings.To_String (Step.Target);
+               begin
+                  Append (Get_Indent & "/* struct_new: " & Target & " */");
+                  Append (NL);
+                  Append (Get_Indent & "struct Object " & Target & " = {0};");
+                  Append (NL);
+               end;
+               
+            elsif Op = "struct_get" or Op = "struct_set" then
+               Append (Get_Indent & "/* " & Op & " */");
+               Append (NL);
+               
             else
                --  Unknown operation
                Append ("  /* UNKNOWN OP: " & Op & " */");

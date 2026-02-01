@@ -11,6 +11,51 @@
     "types",
     "functions"
   ],
+  "definitions": {
+    "type_ref": {
+      "description": "Type reference - can be primitive, array, map, set, or struct reference",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Simple type name (primitive or struct reference)"
+        },
+        {
+          "type": "object",
+          "description": "Complex type definition",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["array", "map", "set", "optional"],
+              "description": "Type constructor kind"
+            },
+            "element_type": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Element type for array/set"
+            },
+            "key_type": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Key type for map"
+            },
+            "value_type": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Value type for map"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Fixed size for array (omit for dynamic)"
+            },
+            "inner": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Inner type for optional"
+            }
+          }
+        }
+      ]
+    }
+  },
   "properties": {
     "ir_version": {
       "type": "string",
@@ -59,9 +104,8 @@
                   "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
                 },
                 "type": {
-                  "type": "string",
-                  "minLength": 1,
-                  "description": "Primitive type (string,int,float,bool) or a custom type name."
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Field type - primitive, complex, or custom type name."
                 },
                 "optional": {
                   "type": "boolean",
@@ -142,7 +186,28 @@
                     "switch",
                     "try",
                     "throw",
-                    "nop"
+                    "nop",
+                    "array_new",
+                    "array_get",
+                    "array_set",
+                    "array_push",
+                    "array_pop",
+                    "array_len",
+                    "map_new",
+                    "map_get",
+                    "map_set",
+                    "map_delete",
+                    "map_has",
+                    "map_keys",
+                    "set_new",
+                    "set_add",
+                    "set_remove",
+                    "set_has",
+                    "set_union",
+                    "set_intersect",
+                    "struct_new",
+                    "struct_get",
+                    "struct_set"
                   ]
                 },
                 "target": {
@@ -271,6 +336,52 @@
                 "exception_message": {
                   "type": "string",
                   "description": "Exception message to throw"
+                },
+                "index": {
+                  "type": ["string", "integer"],
+                  "description": "Array index for array_get/array_set operations"
+                },
+                "key": {
+                  "type": ["string", "integer", "boolean"],
+                  "description": "Key for map operations"
+                },
+                "field": {
+                  "type": "string",
+                  "description": "Field name for struct_get/struct_set operations"
+                },
+                "element_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Element type for array_new/set_new"
+                },
+                "key_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Key type for map_new"
+                },
+                "value_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Value type for map_new"
+                },
+                "struct_type": {
+                  "type": "string",
+                  "description": "Struct type name for struct_new"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Size for fixed-size array_new"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Source variable for operations"
+                },
+                "source2": {
+                  "type": "string",
+                  "description": "Second source variable for set operations (union, intersect)"
+                },
+                "fields": {
+                  "type": "object",
+                  "description": "Field initializers for struct_new",
+                  "additionalProperties": true
                 }
               }
             }
