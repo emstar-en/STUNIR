@@ -34,12 +34,23 @@ def run_test(name, test_func):
         return False
 
 def create_ir(module_name, functions):
-    """Create an IR JSON structure."""
+    """Create an IR JSON structure matching Rust types.rs IRModule."""
+    # Convert params to args for compatibility with Rust
+    converted_functions = []
+    for func in functions:
+        f = dict(func)
+        if 'params' in f:
+            f['args'] = f.pop('params')
+        elif 'args' not in f:
+            f['args'] = []
+        converted_functions.append(f)
+    
     return {
-        "stunir_version": "1.0",
-        "schema_version": "stunir_ir_v1",
+        "schema": "stunir_ir_v1",
+        "ir_version": "1.0",
         "module_name": module_name,
-        "functions": functions
+        "types": [],
+        "functions": converted_functions
     }
 
 def run_ir_to_code(binary, ir_json, output_dir, target="c"):

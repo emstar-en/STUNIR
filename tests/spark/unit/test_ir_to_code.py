@@ -33,23 +33,45 @@ def run_test(name, test_func):
         return False
 
 def create_ir(module_name, functions):
+    """Create an IR JSON structure matching SPARK IRModule."""
+    # Convert params to args for compatibility
+    converted_functions = []
+    for func in functions:
+        f = dict(func)
+        if 'params' in f:
+            f['args'] = f.pop('params')
+        elif 'args' not in f:
+            f['args'] = []
+        converted_functions.append(f)
+    
     return {
-        "stunir_version": "1.0",
-        "schema_version": "stunir_ir_v1",
+        "schema": "stunir_ir_v1",
+        "ir_version": "1.0",
         "module_name": module_name,
-        "functions": functions
+        "types": [],
+        "functions": converted_functions
     }
 
 def run_ir_to_code(binary, ir_json, output_dir, target="c"):
     ir_file = os.path.join(output_dir, "ir.json")
+    output_file = os.path.join(output_dir, f"{ir_json['module_name']}.c")
     with open(ir_file, 'w') as f:
         json.dump(ir_json, f)
     
-    result = subprocess.run([binary, ir_file, output_dir], capture_output=True, text=True, timeout=30)
+    # SPARK binary uses --input/--output/--target format
+    result = subprocess.run(
+        [binary, "--input", ir_file, "--output", output_file, "--target", target],
+        capture_output=True, text=True, timeout=30
+    )
     
-    for f in os.listdir(output_dir):
-        if f.endswith('.c') and f != 'ir.json':
-            with open(os.path.join(output_dir, f)) as fp:
+    if os.path.exists(output_file):
+        with open(output_file) as fp:
+            return fp.read()
+    
+    # Fallback: check for any .c file
+    for fn in os.listdir(output_dir):
+        if fn.endswith('.c') and fn != 'ir.json':
+            with open(os.path.join(output_dir, fn)) as fp:
                 return fp.read()
     return None
 

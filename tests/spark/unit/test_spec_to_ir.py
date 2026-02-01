@@ -47,14 +47,16 @@ def run_spec_to_ir(binary, spec_json, output_dir):
     with open(spec_file, 'w') as f:
         json.dump(spec_json, f)
     
+    ir_file = os.path.join(output_dir, "ir.json")
+    
+    # SPARK binary uses --spec-root/--out format
     result = subprocess.run(
-        [binary, spec_dir, output_dir],
+        [binary, "--spec-root", spec_dir, "--out", ir_file],
         capture_output=True,
         text=True,
         timeout=30
     )
     
-    ir_file = os.path.join(output_dir, "ir.json")
     if os.path.exists(ir_file):
         with open(ir_file) as f:
             return json.load(f)
