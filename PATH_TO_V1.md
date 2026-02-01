@@ -1,41 +1,55 @@
 # Path to STUNIR v1.0
 
-**Current Version**: 0.9.0  
-**Current Progress**: 99%  
-**Target Release**: Early February 2026  
+**Current Version**: 0.6.0 (Corrected from 0.9.0 - see VERSION_ROLLBACK_EXPLANATION.md)  
+**Current Progress**: ~75-80% (Realistic Assessment)  
+**Target v0.9.0 Release**: May-June 2026 (Near-perfect without Haskell)  
+**Target v1.0.0 Release**: July-August 2026 (All 4 pipelines complete)  
 **Last Updated**: January 31, 2026
 
 ---
 
-## Progress Overview
+## ⚠️ Important Note on Versioning
 
-```
-█████████████████████████████████████████████████████████████████████████████████████████████████████ 99%
-```
-
-**Status**: 🟢 **ON TRACK** - Control Flow Complete!
-
----
-
-## Milestone Tracker
-
-| Milestone | Status | Week | Progress |
-|-----------|--------|------|----------|
-| Week 1: Project Setup | ✅ DONE | 1 | 5% |
-| Week 2-5: Core IR Design | ✅ DONE | 2-5 | 25% |
-| Week 6: Multi-Pipeline Architecture | ✅ DONE | 6 | 40% |
-| Week 7: Multi-File Support | ✅ DONE | 7 | 55% |
-| Week 8: Python Pipeline Fixes | ✅ DONE | 8 | 75% |
-| Week 9: SPARK Function Bodies | ✅ DONE | 9 | 80% |
-| Week 10: Advanced Type System | ✅ DONE | 10 | 90% |
-| Week 11: Struct/Type Operations | ✅ DONE | 11 | 95% |
-| Week 12: Call Operations | ✅ DONE | 12 | 97% |
-| Week 13: Control Flow | ✅ DONE | 13 | **99%** |
-| Week 14: Final Polish | 🔵 IN PROGRESS | 14 | 99% → 100% |
+**We rolled back from v0.9.0 to v0.6.0** because:
+- v0.9.0 requires ZERO known issues and comprehensive testing (we have known issues)
+- v1.0.0 requires ALL 4 pipelines (including Haskell) at 100% (Haskell is at ~20%)
+- Previous versioning was too aggressive (see `VERSION_ROLLBACK_EXPLANATION.md`)
+- Using proper semantic versioning going forward (see `VERSIONING_STRATEGY.md`)
 
 ---
 
-## What's Complete (99%)
+## Progress Overview (Honest Assessment)
+
+```
+████████████████████████████████████████████████████████████████████████        ~75-80%
+```
+
+**Status**: 🟡 **IN PROGRESS** - Control Flow Implemented, Significant Work Remains
+
+---
+
+## Milestone Tracker (Realistic)
+
+| Milestone | Status | Week | Actual Version | Progress |
+|-----------|--------|------|----------------|----------|
+| Week 1: Project Setup | ✅ DONE | 1 | - | 5% |
+| Week 2-5: Core IR Design | ✅ DONE | 2-5 | - | 25% |
+| Week 6: Multi-Pipeline Architecture | ✅ DONE | 6 | v0.4.0 | 40% |
+| Week 7: Multi-File Support | ✅ DONE | 7 | v0.4.1 | 50% |
+| Week 8: Python Pipeline Fixes | ✅ DONE | 8 | v0.4.2 | 60% |
+| Week 9: Function Bodies | ✅ DONE | 9 | v0.5.0 | 67% |
+| Week 10: Advanced Type System | ✅ DONE | 10 | v0.5.1 | 70% |
+| Week 11: Struct/Type Operations | ✅ DONE | 11 | v0.5.2 | 73% |
+| Week 12: Call Operations | ✅ DONE | 12 | v0.5.3 | 75% |
+| Week 13: Control Flow | ✅ DONE | 13 | **v0.6.0** | **~75-80%** |
+| Future: Error Handling | 📅 PLANNED | TBD | v0.7.0 | ~82% |
+| Future: Module System | 📅 PLANNED | TBD | v0.8.0 | ~88% |
+| Future: Final Polish | 📅 PLANNED | TBD | v0.9.0 | ~99% |
+| Future: Haskell Complete | 📅 PLANNED | TBD | v1.0.0 | 100% |
+
+---
+
+## What's Complete (~75-80%)
 
 ### ✅ Core Infrastructure (100%)
 - [x] IR Schema Design (stunir_ir_v1)
@@ -57,9 +71,9 @@
 - [x] Return Statements (`return`)
 - [x] Function Calls (`call`)
 - [x] No-ops (`nop`)
-- [x] **If/Else Statements** (`if`) ← NEW in v0.9.0
-- [x] **While Loops** (`while`) ← NEW in v0.9.0
-- [x] **For Loops** (`for`) ← NEW in v0.9.0
+- [x] **If/Else Statements** (`if`) ← NEW in v0.6.0
+- [x] **While Loops** (`while`) ← NEW in v0.6.0
+- [x] **For Loops** (`for`) ← NEW in v0.6.0
 
 ### ✅ Type System (100%)
 - [x] Primitive Types (i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, bool)
@@ -68,7 +82,7 @@
 - [x] Pointer Types (struct pointers, byte pointers)
 - [x] Type Inference
 - [x] Type Conversion
-- [x] Struct Pointer Fix (Rust) ← NEW in v0.9.0
+- [x] Struct Pointer Fix (Rust) ← NEW in v0.6.0
 
 ### ✅ Multi-File Support (100%)
 - [x] Spec File Discovery
@@ -97,7 +111,7 @@
 - [x] Unit Tests
 - [x] Integration Tests
 - [x] Cross-Pipeline Validation
-- [x] Control Flow Test Suite ← NEW in v0.9.0
+- [x] Control Flow Test Suite ← NEW in v0.6.0
 - [x] Compilation Validation
 - [ ] Performance Benchmarks (pending)
 
@@ -113,36 +127,64 @@
 
 ---
 
-## What's Left (1%)
+## What's Left (~20-25%)
 
-### 🔵 Week 14: Final Polish (1%)
+### 🔵 To Reach v0.9.0 (~20-24%)
 
-#### 1. Final Integration Testing (0.3%)
-- [ ] Cross-pipeline edge case validation
+#### 1. SPARK Pipeline Completion (~5%)
+- [ ] Recursive nested control flow bodies
+- [ ] Full parity with Python/Rust for control flow
+- [ ] Edge case handling improvements
+- [ ] Performance optimizations
+
+#### 2. Error Handling (v0.7.0) (~5%)
+- [ ] Try/catch/finally constructs
+- [ ] Error propagation
+- [ ] Type validation
+- [ ] Runtime error handling
+
+#### 3. Module System (v0.8.0) (~5%)
+- [ ] Import/export statements
+- [ ] Module resolution
+- [ ] Namespace management
+- [ ] Cross-module type checking
+
+#### 4. Comprehensive Testing (~3%)
+- [ ] 95%+ test coverage across all pipelines
+- [ ] Edge case validation
 - [ ] Stress testing with large IR files
 - [ ] Performance benchmarking
 - [ ] Memory leak detection
 
-#### 2. Documentation Completion (0.3%)
+#### 5. Bug Fixes and Polish (~2%)
+- [ ] Fix known SPARK limitations
+- [ ] Warning cleanup
+- [ ] Error message improvements
+- [ ] Code formatting consistency
+
+#### 6. Documentation Completion (~2%)
 - [ ] API reference documentation
 - [ ] Tutorial examples
 - [ ] Best practices guide
 - [ ] Migration guide for existing users
 
-#### 3. Bug Fixes and Polish (0.2%)
-- [ ] Minor bug fixes
-- [ ] Warning cleanup
-- [ ] Error message improvements
-- [ ] Code formatting consistency
+### 🔵 To Reach v1.0.0 (Additional ~20%)
 
-#### 4. Optional: SPARK Enhancements (0.2%)
-- [ ] Recursive control flow bodies (can defer to v1.1)
-- [ ] Advanced type system features
-- [ ] Performance optimizations
+#### 7. Haskell Pipeline (~18%)
+- [ ] Haskell spec-to-IR implementation
+- [ ] Haskell IR-to-code emitter
+- [ ] Full feature parity with other pipelines
+- [ ] Comprehensive testing
+
+#### 8. Production Readiness (~2%)
+- [ ] Security audit
+- [ ] Performance validation
+- [ ] Production deployment testing
+- [ ] Long-term support planning
 
 ---
 
-## Version 0.9.0 Achievements (Week 13)
+## Version 0.6.0 Achievements (Week 13)
 
 ### 🎯 Control Flow Revolution
 
@@ -298,24 +340,29 @@
 
 ## Conclusion
 
-STUNIR v0.9.0 represents **99% completion** of the v1.0 vision. With control flow fully implemented across all three pipelines, only final polish and testing remain before the v1.0 release.
+STUNIR v0.6.0 represents **~75-80% completion** of the v1.0 vision. With control flow implemented across all three pipelines (Python and Rust at 100%, SPARK at ~95%), significant work remains including error handling, module system, comprehensive testing, and Haskell pipeline completion before v1.0.0 release in July-August 2026.
 
 **Key Achievements:**
-- ✅ All major feature categories complete
-- ✅ Three production-ready pipelines
-- ✅ Comprehensive test coverage
-- ✅ Well-documented codebase
+- ✅ Core feature categories implemented (IR, pipelines, function bodies, control flow)
+- ✅ Three working pipelines (Python ~100%, Rust ~100%, SPARK ~95%)
+- ✅ Test coverage exists but not comprehensive
+- ✅ Documentation in progress
 
 **Remaining Work:**
-- Final integration testing
-- Documentation completion
-- Performance optimization
-- Bug fixes and polish
+- ⚠️ Error handling (v0.7.0)
+- ⚠️ Module system (v0.8.0)
+- ⚠️ SPARK completion (recursive control flow)
+- ⚠️ Comprehensive testing and validation
+- ⚠️ Haskell pipeline (~80% remaining)
+- ⚠️ Full documentation
+- ⚠️ Production deployment validation
 
-**Release Confidence**: 🟢 **HIGH**
+**Release Confidence**: 🟡 **MEDIUM** (realistic assessment)
 
 ---
 
 **Last Updated**: January 31, 2026  
-**Next Milestone**: v1.0 Release (Target: February 7, 2026)  
-**Current Focus**: Week 14 - Final Polish
+**Next Milestone**: v0.7.0 Release (Target: March 2026 - Error Handling)  
+**v0.9.0 Target**: May-June 2026 (Near-perfect without Haskell)  
+**v1.0.0 Target**: July-August 2026 (All 4 pipelines, production ready)  
+**Current Focus**: Bug fixes, SPARK improvements, proper versioning

@@ -1,29 +1,31 @@
 # STUNIR Release Notes
 
-## Version 0.9.0 - January 31, 2026
+## Version 0.6.0 - January 31, 2026
 
-**Status**: ✅ **BETA - WEEK 13 COMPLETE - CONTROL FLOW IMPLEMENTED**  
-**Codename**: "Control Flow Revolution"  
+**Status**: ✅ **ALPHA - WEEK 13 COMPLETE - CONTROL FLOW IMPLEMENTED**  
+**Codename**: "Control Flow Foundation"  
 **Release Date**: January 31, 2026  
-**Progress**: 99% Complete (+2% from v0.8.0)
+**Progress**: ~75-80% Complete (Realistic Assessment)
 
 ---
 
-## 🎉 Executive Summary - CONTROL FLOW MILESTONE
+## 🎯 Executive Summary - CONTROL FLOW MILESTONE
 
-STUNIR 0.9.0 implements **complete control flow statements** (if/else, while, for) across all three primary pipelines, bringing the project to near-feature-complete status. This is the **FINAL major feature category** before v1.0.
+STUNIR 0.6.0 implements **control flow statements** (if/else, while, for) across all three primary pipelines (Python, Rust, SPARK). This represents a **significant feature addition** following function body support in v0.5.x releases.
 
 ### Key Highlights
 
-✅ **Control Flow Complete** - If/else, while loops, and for loops in all 3 pipelines  
-✅ **Nested Control Flow** - Python and Rust support fully recursive nested structures  
-✅ **Type System Fixes** - Rust now handles struct pointers correctly  
-✅ **99% Completion** - Only 1% remaining for v1.0 (final polish and testing)  
-✅ **Comprehensive Testing** - New control flow test suite validates all constructs
+✅ **Control Flow Implemented** - If/else, while loops, and for loops added to all 3 pipelines  
+✅ **Nested Control Flow** - Python (~100%) and Rust (~100%) support fully recursive nested structures  
+⚠️ **SPARK Partial Support** - SPARK at ~95% (missing recursive nested control flow)  
+⚠️**Not Comprehensively Tested** - Test coverage exists but not exhaustive  
+⚠️ **Haskell Deferred** - Haskell pipeline at ~20% (v1.0 requires all 4 pipelines at 100%)  
+
+**Realistic Completion**: ~75-80% overall (not 99%)
 
 ---
 
-## What's New in 0.9.0
+## What's New in 0.6.0
 
 ### 🎯 CRITICAL FEATURE: Control Flow Implementation
 
