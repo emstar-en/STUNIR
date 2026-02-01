@@ -276,7 +276,7 @@ package body STUNIR_Spec_To_IR is
       declare
          First_Valid_Found : Boolean := False;
          File     : Ada.Text_IO.File_Type;
-         JSON_Str : String (1 .. 100_000);
+         JSON_Str : String (1 .. 50_000);
          Last     : Natural;
       begin
          for I in 1 .. File_List.Count loop
