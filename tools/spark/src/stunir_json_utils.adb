@@ -384,8 +384,14 @@ package body STUNIR_JSON_Utils is
                                         Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_If;
                                         declare
                                            Cond_Str : constant String := Extract_String_Value (Stmt_JSON, "condition");
-                                           Then_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "then_block");
-                                           Else_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "else_block");
+                                           -- Try "then_block" first (IR format), then "then" (spec format)
+                                           Then_Array_Pos_1 : constant Natural := Find_Array (Stmt_JSON, "then_block");
+                                           Then_Array_Pos_2 : constant Natural := Find_Array (Stmt_JSON, "then");
+                                           Then_Array_Pos : constant Natural := (if Then_Array_Pos_1 > 0 then Then_Array_Pos_1 else Then_Array_Pos_2);
+                                           -- Try "else_block" first (IR format), then "else" (spec format)
+                                           Else_Array_Pos_1 : constant Natural := Find_Array (Stmt_JSON, "else_block");
+                                           Else_Array_Pos_2 : constant Natural := Find_Array (Stmt_JSON, "else");
+                                           Else_Array_Pos : constant Natural := (if Else_Array_Pos_1 > 0 then Else_Array_Pos_1 else Else_Array_Pos_2);
                                            Then_Start_Idx : Natural := 0;
                                            Then_Count_Val : Natural := 0;
                                            Else_Start_Idx : Natural := 0;
@@ -501,6 +507,8 @@ package body STUNIR_JSON_Utils is
                          Flatten_Block (Func_JSON, Body_Pos);
                       end;
                 end if;
+                  end if;  -- Close the if from line 234 (if Func_Name'Length > 0)
+               end;  -- Close declare from line 227
                Func_Pos := Obj_End + 1;
             end loop;
          end;

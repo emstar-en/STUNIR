@@ -25,3 +25,31 @@ targets/spark/obj/
 test_rust_pipeline/
 test_output_spark.py
 .coverage.chatllm-*
+
+# Prevent reports and plans at root - they should go in docs/reports/
+/*_REPORT.md
+/*_REPORT.pdf
+/*_SUMMARY.md
+/*_SUMMARY.pdf
+/*_STATUS.md
+/*_STATUS.pdf
+/*_PLAN.md
+/*_PLAN.pdf
+/*_plan.md
+/*_plan.pdf
+/PUSH_STATUS*.md
+/PUSH_STATUS*.pdf
+/V0*.md
+/V0*.pdf
+/v0*.md
+/v0*.pdf
+/WEEK*.md
+/WEEK*.pdf
+
+# Temporary files that should not be at root
+/*.ada
+/*.adb
+/*.ads
+/apply_*.py
+/test_*.py
+/*.snippet

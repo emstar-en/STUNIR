@@ -271,55 +271,19 @@ package body STUNIR_Spec_To_IR is
       end if;
 
       Put_Line ("[INFO] Found" & Natural'Image (File_List.Count) & " spec file(s)");
-
-      --  Step 3: Read and parse first spec JSON file
+      --  Step 3: Parse spec files, trying each until we find a valid one
+      --  v0.8.3: Skip invalid files (like lockfiles) gracefully
       declare
+         First_Valid_Found : Boolean := False;
          File     : Ada.Text_IO.File_Type;
          JSON_Str : String (1 .. 100_000);
          Last     : Natural;
-         Spec_File : constant String := Path_Strings.To_String (File_List.Files (1));
       begin
-         Put_Line ("[INFO] Parsing spec from " & Spec_File & "...");
-         Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Spec_File);
-         
-         --  Read entire file
-         Last := 0;
-         while not Ada.Text_IO.End_Of_File (File) and Last < JSON_Str'Last loop
+         for I in 1 .. File_List.Count loop
             declare
-               Line : constant String := Ada.Text_IO.Get_Line (File);
+               Spec_File : constant String := Path_Strings.To_String (File_List.Files (I));
             begin
-               if Last + Line'Length <= JSON_Str'Last then
-                  JSON_Str (Last + 1 .. Last + Line'Length) := Line;
-                  Last := Last + Line'Length;
-               end if;
-            end;
-         end loop;
-         
-         Ada.Text_IO.Close (File);
-
-         --  Parse JSON into IR Module
-         Parse_Spec_JSON (JSON_Str (1 .. Last), Module, Parse_Stat);
-         
-         if Parse_Stat /= Success then
-            Put_Line ("[ERROR] Failed to parse spec JSON");
-            Result.Status := Error_Invalid_Spec;
-            return;
-         end if;
-      end;
-
-      --  Step 4: If there are multiple spec files, merge their functions
-      if File_List.Count > 1 then
-         Put_Line ("[INFO] Merging functions from" & Natural'Image (File_List.Count) & " spec files...");
-         
-         for I in 2 .. File_List.Count loop
-            declare
-               File          : Ada.Text_IO.File_Type;
-               JSON_Str      : String (1 .. 100_000);
-               Last          : Natural;
-               Spec_File     : constant String := Path_Strings.To_String (File_List.Files (I));
-               Additional_Module : IR_Module;
-            begin
-               Put_Line ("[INFO] Parsing additional spec from " & Spec_File & "...");
+               Put_Line ("[INFO] Parsing spec from " & Spec_File & "...");
                Ada.Text_IO.Open (File, Ada.Text_IO.In_File, Spec_File);
                
                --  Read entire file
@@ -337,26 +301,53 @@ package body STUNIR_Spec_To_IR is
                
                Ada.Text_IO.Close (File);
 
-               --  Parse JSON into Additional IR Module
-               Parse_Spec_JSON (JSON_Str (1 .. Last), Additional_Module, Parse_Stat);
-               
-               if Parse_Stat = Success then
-                  --  Merge functions from additional module into main module
-                  for J in 1 .. Additional_Module.Func_Cnt loop
-                     if Module.Func_Cnt < Max_Functions then
-                        Module.Func_Cnt := Module.Func_Cnt + 1;
-                        Module.Functions (Module.Func_Cnt) := Additional_Module.Functions (J);
-                     else
-                        Put_Line ("[WARN] Maximum function count reached, skipping remaining functions");
-                        exit;
-                     end if;
-                  end loop;
+               --  Try to parse JSON
+               if not First_Valid_Found then
+                  --  Try as first module
+                  Parse_Spec_JSON (JSON_Str (1 .. Last), Module, Parse_Stat);
+                  
+                  if Parse_Stat = Success then
+                     First_Valid_Found := True;
+                  else
+                     Put_Line ("[WARN] Failed to parse " & Spec_File & ", skipping");
+                  end if;
                else
-                  Put_Line ("[WARN] Failed to parse " & Spec_File & ", skipping");
+                  --  Merge as additional module
+                  declare
+                     Additional_Module : IR_Module;
+                  begin
+                     Parse_Spec_JSON (JSON_Str (1 .. Last), Additional_Module, Parse_Stat);
+                     
+                     if Parse_Stat = Success then
+                        --  Merge functions
+                        for J in 1 .. Additional_Module.Func_Cnt loop
+                           if Module.Func_Cnt < Max_Functions then
+                              Module.Func_Cnt := Module.Func_Cnt + 1;
+                              Module.Functions (Module.Func_Cnt) := Additional_Module.Functions (J);
+                           else
+                              Put_Line ("[WARN] Maximum function count reached");
+                              exit;
+                           end if;
+                        end loop;
+                     else
+                        Put_Line ("[WARN] Failed to parse " & Spec_File & ", skipping");
+                     end if;
+                  end;
                end if;
             end;
          end loop;
-      end if;
+         
+         --  Check if we found at least one valid spec
+         if not First_Valid_Found then
+            Put_Line ("[ERROR] No valid spec files found");
+            Result.Status := Error_Invalid_Spec;
+            return;
+         end if;
+      end;
+
+      --  Step 4: Multi-file merging is now integrated in Step 3 above
+      --  The old Step 4 code (lines 310-359) is replaced by the unified loop
+      --  Step 4 is now integrated into Step 3 (legacy code removed for v0.8.3)
 
       --  Step 5: Generate semantic IR JSON
       Put_Line ("[INFO] Generating semantic IR with" & Natural'Image (Module.Func_Cnt) & " function(s)...");
