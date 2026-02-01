@@ -1,6 +1,120 @@
 # STUNIR Release Notes
 
 
+## Version 0.8.6 - February 1, 2026
+
+**Status**: ✅ **Test Infrastructure Complete!** 🧪  
+**Codename**: "Test Infrastructure"  
+**Release Date**: February 1, 2026  
+**Release Type**: MINOR (New Features)  
+**Progress**: **100+ tests per pipeline**
+
+---
+
+### 🎯 Executive Summary
+
+STUNIR 0.8.6 introduces comprehensive test infrastructure for Rust and SPARK pipelines, along with CI/CD automation. This release ensures robust testing across all three implementation pipelines (Python, Rust, SPARK).
+
+### Key Achievements
+
+✅ **Rust Test Framework** - 100+ tests in `tests/rust/`  
+✅ **SPARK Test Framework** - 100+ tests in `tests/spark/`  
+✅ **CI/CD Automation** - GitHub Actions workflow  
+✅ **Unit Tests** - spec_to_ir and ir_to_code coverage  
+✅ **Integration Tests** - Full pipeline testing  
+✅ **v0.8.4 Feature Tests** - break/continue/switch  
+✅ **v0.7.x Nesting Tests** - Nested control flow  
+
+### New Test Infrastructure
+
+#### 1. **Rust Test Suite** (`tests/rust/`)
+```
+tests/rust/
+├── run_tests.sh           # Test runner script
+├── unit/
+│   ├── test_spec_to_ir.py # 50+ spec_to_ir tests
+│   └── test_ir_to_code.py # 50+ ir_to_code tests
+├── integration/
+│   └── test_pipeline.py   # 13 pipeline tests
+└── results/               # Test output
+```
+
+**Test Categories:**
+- Basic function tests (empty, return, params)
+- Type mapping tests (i8, i16, i32, i64, f32, f64, bool, void)
+- Assignment tests (literal, expression, multiple)
+- Control flow tests (if, else, while, for)
+- v0.8.4 features (break, continue, switch)
+- v0.7.x nested control flow
+- IR structure validation
+- Determinism verification
+
+#### 2. **SPARK Test Suite** (`tests/spark/`)
+```
+tests/spark/
+├── run_tests.sh           # Test runner script
+├── unit/
+│   ├── test_spec_to_ir.py # 50+ spec_to_ir tests
+│   └── test_ir_to_code.py # 50+ ir_to_code tests
+├── integration/
+│   └── test_pipeline.py   # 13 pipeline tests
+└── results/               # Test output
+```
+
+#### 3. **CI/CD Automation** (`.github/workflows/ci.yml`)
+
+**Jobs:**
+- `python-tests` - Python 3.9-3.12 matrix testing
+- `rust-tests` - Rust stable toolchain
+- `spark-tests` - GNAT/gprbuild compilation
+- `confluence-tests` - Cross-pipeline verification
+- `quality` - Linting and type checking
+
+**Triggers:**
+- Push to main, develop, feature/*
+- Pull requests to main, develop
+
+### Test Coverage
+
+| Pipeline | Unit Tests | Integration | Total | Coverage |
+|----------|------------|-------------|-------|----------|
+| Python   | 50+        | 6+          | 56+   | ~8.5%    |
+| Rust     | 100+       | 13          | 113+  | ~30%     |
+| SPARK    | 100+       | 13          | 113+  | ~30%     |
+
+### Running Tests
+
+```bash
+# Run all tests
+./tests/run_all_tests.sh
+
+# Run Rust tests only
+./tests/rust/run_tests.sh
+
+# Run SPARK tests only
+./tests/spark/run_tests.sh
+
+# Run with pytest
+python -m pytest tests/ -v
+```
+
+### Files Changed
+
+- `tests/rust/run_tests.sh` - NEW
+- `tests/rust/unit/test_spec_to_ir.py` - NEW
+- `tests/rust/unit/test_ir_to_code.py` - NEW
+- `tests/rust/integration/test_pipeline.py` - NEW
+- `tests/spark/run_tests.sh` - NEW
+- `tests/spark/unit/test_spec_to_ir.py` - NEW
+- `tests/spark/unit/test_ir_to_code.py` - NEW
+- `tests/spark/integration/test_pipeline.py` - NEW
+- `.github/workflows/ci.yml` - NEW
+- `tests/run_all_tests.sh` - NEW
+- `pyproject.toml` - Version bump to 0.8.6
+- `.stunir_progress.json` - Updated
+
+---
+
 ## Version 0.8.5 - February 1, 2026
 
 **Status**: ✅ **SPARK 100% Complete!** 🚀  
