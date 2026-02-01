@@ -527,7 +527,7 @@ def infer_c_type_from_value(value: str) -> str:
     # Default to int32_t for complex expressions
     return 'int32_t'
 
-def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
+def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef, indent: int = 1) -> str:
     """
     Translate IR steps to C code.
     
@@ -536,10 +536,14 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
     - return: Return statement
     - call: Function call
     - nop: No operation (comment only)
+    - if: If/else statement (condition, then_block, optional else_block)
+    - while: While loop (condition, body)
+    - for: For loop (init, condition, increment, body)
     
     Args:
         steps: List of step dictionaries from IR
         ret_type: Return type of the function
+        indent: Indentation level (default 1 for function body)
         
     Returns:
         String containing C code for the function body
@@ -547,13 +551,15 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
     if not steps:
         # Empty function body
         c_ret = c_type(ret_type)
+        indent_str = '  ' * indent
         if c_ret == 'void':
-            return '  /* Empty function body */\n  return;'
+            return f'{indent_str}/* Empty function body */\n{indent_str}return;'
         else:
-            return f'  /* Empty function body */\n  return {c_default_return(ret_type)};'
+            return f'{indent_str}/* Empty function body */\n{indent_str}return {c_default_return(ret_type)};'
     
     lines = []
     local_vars = {}  # Track declared variables with their types
+    indent_str = '  ' * indent
     
     for step in steps:
         if not isinstance(step, dict):
@@ -569,9 +575,9 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
             if target and target not in local_vars:
                 var_type = infer_c_type_from_value(value)
                 local_vars[target] = var_type
-                lines.append(f'  {var_type} {target} = {value};')
+                lines.append(f'{indent_str}{var_type} {target} = {value};')
             else:
-                lines.append(f'  {target} = {value};')
+                lines.append(f'{indent_str}{target} = {value};')
                 
         elif op == 'return':
             value = step.get('value', '')
@@ -589,16 +595,16 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
                         if match:
                             # Just use the brace part with proper C99 syntax
                             fields = match.group(2)
-                            lines.append(f'  return ({c_ret}){{{fields}}};')
+                            lines.append(f'{indent_str}return ({c_ret}){{{fields}}};')
                         else:
                             # Fallback: wrap as-is
-                            lines.append(f'  return ({c_ret}){value};')
+                            lines.append(f'{indent_str}return ({c_ret}){value};')
                     else:
-                        lines.append(f'  return {value};')
+                        lines.append(f'{indent_str}return {value};')
                 else:
-                    lines.append(f'  return {value};')
+                    lines.append(f'{indent_str}return {value};')
             else:
-                lines.append('  return;')
+                lines.append(f'{indent_str}return;')
                 
         elif op == 'call':
             # Get the function call expression from value field
@@ -611,28 +617,72 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef) -> str:
                 if target not in local_vars:
                     # Default to int32_t for function return values
                     local_vars[target] = 'int32_t'
-                    lines.append(f'  int32_t {target} = {call_expr};')
+                    lines.append(f'{indent_str}int32_t {target} = {call_expr};')
                 else:
-                    lines.append(f'  {target} = {call_expr};')
+                    lines.append(f'{indent_str}{target} = {call_expr};')
             else:
                 # Call without assignment
-                lines.append(f'  {call_expr};')
+                lines.append(f'{indent_str}{call_expr};')
                 
         elif op == 'nop':
             # No operation - just a comment
-            lines.append('  /* nop */')
+            lines.append(f'{indent_str}/* nop */')
+            
+        elif op == 'if':
+            # If/else statement
+            condition = step.get('condition', 'true')
+            then_block = step.get('then_block', [])
+            else_block = step.get('else_block', [])
+            
+            lines.append(f'{indent_str}if ({condition}) {{')
+            # Recursively translate then_block with increased indentation
+            then_body = translate_steps_to_c(then_block, ret_type, indent + 1)
+            lines.append(then_body)
+            
+            if else_block:
+                lines.append(f'{indent_str}}} else {{')
+                # Recursively translate else_block with increased indentation
+                else_body = translate_steps_to_c(else_block, ret_type, indent + 1)
+                lines.append(else_body)
+            
+            lines.append(f'{indent_str}}}')
+            
+        elif op == 'while':
+            # While loop
+            condition = step.get('condition', 'true')
+            body = step.get('body', [])
+            
+            lines.append(f'{indent_str}while ({condition}) {{')
+            # Recursively translate body with increased indentation
+            loop_body = translate_steps_to_c(body, ret_type, indent + 1)
+            lines.append(loop_body)
+            lines.append(f'{indent_str}}}')
+            
+        elif op == 'for':
+            # For loop
+            init = step.get('init', '')
+            condition = step.get('condition', 'true')
+            increment = step.get('increment', '')
+            body = step.get('body', [])
+            
+            lines.append(f'{indent_str}for ({init}; {condition}; {increment}) {{')
+            # Recursively translate body with increased indentation
+            loop_body = translate_steps_to_c(body, ret_type, indent + 1)
+            lines.append(loop_body)
+            lines.append(f'{indent_str}}}')
             
         else:
             # Unknown operation
-            lines.append(f'  /* UNKNOWN OP: {op} */')
+            lines.append(f'{indent_str}/* UNKNOWN OP: {op} */')
     
     # If no return statement was generated, add a default one
-    if not any('return' in line for line in lines):
+    # Only add default return at the top level (indent == 1)
+    if indent == 1 and not any('return' in line for line in lines):
         c_ret = c_type(ret_type)
         if c_ret == 'void':
-            lines.append('  return;')
+            lines.append(f'{indent_str}return;')
         else:
-            lines.append(f'  return {c_default_return(ret_type)};')
+            lines.append(f'{indent_str}return {c_default_return(ret_type)};')
     
     return '\n'.join(lines)
 

@@ -239,6 +239,9 @@ package body STUNIR_IR_To_Code is
                                        Step_Op   : constant String := Extract_String_Value (Step_JSON, "op");
                                        Step_Tgt  : constant String := Extract_String_Value (Step_JSON, "target");
                                        Step_Val  : constant String := Extract_String_Value (Step_JSON, "value");
+                                       Step_Cond : constant String := Extract_String_Value (Step_JSON, "condition");
+                                       Step_Init : constant String := Extract_String_Value (Step_JSON, "init");
+                                       Step_Incr : constant String := Extract_String_Value (Step_JSON, "increment");
                                     begin
                                        if Step_Op'Length > 0 then
                                           Module.Functions (Func_Idx).Step_Count := 
@@ -260,6 +263,31 @@ package body STUNIR_IR_To_Code is
                                                Name_Strings.To_Bounded_String (Step_Val);
                                           else
                                              Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Value :=
+                                               Name_Strings.Null_Bounded_String;
+                                          end if;
+                                          
+                                          --  Parse control flow fields
+                                          if Step_Cond'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Condition :=
+                                               Name_Strings.To_Bounded_String (Step_Cond);
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Condition :=
+                                               Name_Strings.Null_Bounded_String;
+                                          end if;
+                                          
+                                          if Step_Init'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Init :=
+                                               Name_Strings.To_Bounded_String (Step_Init);
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Init :=
+                                               Name_Strings.Null_Bounded_String;
+                                          end if;
+                                          
+                                          if Step_Incr'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Increment :=
+                                               Name_Strings.To_Bounded_String (Step_Incr);
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Increment :=
                                                Name_Strings.Null_Bounded_String;
                                           end if;
                                        end if;
@@ -582,6 +610,57 @@ package body STUNIR_IR_To_Code is
                --  No operation
                Append ("  /* nop */");
                Append (NL);
+               
+            elsif Op = "if" then
+               --  If/else statement
+               declare
+                  Cond : constant String := Name_Strings.To_String (Step.Condition);
+               begin
+                  Append ("  if (" & Cond & ") {");
+                  Append (NL);
+                  --  TODO: Recursively process then_block steps
+                  --  For now, just add a placeholder comment
+                  Append ("    /* then block - nested control flow support limited */");
+                  Append (NL);
+                  if Step.Else_Count > 0 then
+                     Append ("  } else {");
+                     Append (NL);
+                     Append ("    /* else block - nested control flow support limited */");
+                     Append (NL);
+                  end if;
+                  Append ("  }");
+                  Append (NL);
+               end;
+               
+            elsif Op = "while" then
+               --  While loop
+               declare
+                  Cond : constant String := Name_Strings.To_String (Step.Condition);
+               begin
+                  Append ("  while (" & Cond & ") {");
+                  Append (NL);
+                  --  TODO: Recursively process body steps
+                  Append ("    /* loop body - nested control flow support limited */");
+                  Append (NL);
+                  Append ("  }");
+                  Append (NL);
+               end;
+               
+            elsif Op = "for" then
+               --  For loop
+               declare
+                  Init_Expr : constant String := Name_Strings.To_String (Step.Init);
+                  Cond      : constant String := Name_Strings.To_String (Step.Condition);
+                  Incr      : constant String := Name_Strings.To_String (Step.Increment);
+               begin
+                  Append ("  for (" & Init_Expr & "; " & Cond & "; " & Incr & ") {");
+                  Append (NL);
+                  --  TODO: Recursively process body steps
+                  Append ("    /* loop body - nested control flow support limited */");
+                  Append (NL);
+                  Append ("  }");
+                  Append (NL);
+               end;
                
             else
                --  Unknown operation

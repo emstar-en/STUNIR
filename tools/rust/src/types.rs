@@ -108,7 +108,7 @@ pub struct IRArg {
     pub arg_type: String,
 }
 
-/// IR Step (operation) - matches stunir_ir_v1 schema
+/// IR Step (operation) - matches stunir_ir_v1 schema with control flow support
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRStep {
     pub op: String,
@@ -116,6 +116,20 @@ pub struct IRStep {
     pub target: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<serde_json::Value>,
+    
+    // Control flow fields
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub condition: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub then_block: Option<Vec<IRStep>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub else_block: Option<Vec<IRStep>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body: Option<Vec<IRStep>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub init: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub increment: Option<String>,
 }
 
 /// IR Function definition - matches stunir_ir_v1 schema

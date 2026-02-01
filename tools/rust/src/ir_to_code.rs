@@ -111,7 +111,7 @@ fn emit_c99(module: &IRModule) -> Result<String> {
         
         // Generate function body from steps
         if let Some(steps) = &func.steps {
-            let body = translate_steps_to_c(steps, &func.return_type);
+            let body = translate_steps_to_c(steps, &func.return_type, 1);
             code.push_str(&body);
             code.push_str("\n");
         } else {
@@ -191,23 +191,25 @@ fn emit_python(module: &IRModule) -> Result<String> {
 }
 
 /// Map IR type string to C type
-fn map_type_to_c(type_str: &str) -> &str {
+fn map_type_to_c(type_str: &str) -> String {
     match type_str {
-        "i8" => "int8_t",
-        "i16" => "int16_t",
-        "i32" => "int32_t",
-        "i64" => "int64_t",
-        "u8" => "uint8_t",
-        "u16" => "uint16_t",
-        "u32" => "uint32_t",
-        "u64" => "uint64_t",
-        "f32" => "float",
-        "f64" => "double",
-        "bool" => "bool",
-        "string" => "char*",
-        "byte[]" => "const uint8_t*",
-        "void" => "void",
-        _ => "void",
+        "i8" => "int8_t".to_string(),
+        "i16" => "int16_t".to_string(),
+        "i32" => "int32_t".to_string(),
+        "i64" => "int64_t".to_string(),
+        "u8" => "uint8_t".to_string(),
+        "u16" => "uint16_t".to_string(),
+        "u32" => "uint32_t".to_string(),
+        "u64" => "uint64_t".to_string(),
+        "f32" => "float".to_string(),
+        "f64" => "double".to_string(),
+        "bool" => "bool".to_string(),
+        "string" => "char*".to_string(),
+        "byte[]" => "const uint8_t*".to_string(),
+        "void" => "void".to_string(),
+        // Pass through unknown types (e.g., custom structs, pointers)
+        // This handles struct pointers correctly
+        _ => type_str.to_string(),
     }
 }
 
@@ -276,17 +278,19 @@ fn c_default_return(type_str: &str) -> &str {
     }
 }
 
-/// Translate IR steps to C code
-fn translate_steps_to_c(steps: &[IRStep], ret_type: &str) -> String {
+/// Translate IR steps to C code (with support for control flow)
+fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> String {
     use std::collections::HashMap;
     use serde_json::Value;
+    
+    let indent_str = "    ".repeat(indent);
     
     if steps.is_empty() {
         let c_ret = map_type_to_c(ret_type);
         if c_ret == "void" {
-            return "    /* Empty function body */\n    return;".to_string();
+            return format!("{}/* Empty function body */\n{}return;", indent_str, indent_str);
         } else {
-            return format!("    /* Empty function body */\n    return {};", c_default_return(ret_type));
+            return format!("{}/* Empty function body */\n{}return {};", indent_str, indent_str, c_default_return(ret_type));
         }
     }
     
@@ -307,9 +311,9 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str) -> String {
                 if !target.is_empty() && !local_vars.contains_key(target) {
                     let var_type = infer_c_type_from_value(&value_str);
                     local_vars.insert(target.to_string(), var_type.to_string());
-                    lines.push(format!("    {} {} = {};", var_type, target, value_str));
+                    lines.push(format!("{}{} {} = {};", indent_str, var_type, target, value_str));
                 } else {
-                    lines.push(format!("    {} = {};", target, value_str));
+                    lines.push(format!("{}{} = {};", indent_str, target, value_str));
                 }
             }
             "return" => {
@@ -322,11 +326,11 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str) -> String {
                 
                 let c_ret = map_type_to_c(ret_type);
                 if !value_str.is_empty() {
-                    lines.push(format!("    return {};", value_str));
+                    lines.push(format!("{}return {};", indent_str, value_str));
                 } else if c_ret == "void" {
-                    lines.push("    return;".to_string());
+                    lines.push(format!("{}return;", indent_str));
                 } else {
-                    lines.push(format!("    return {};", c_default_return(ret_type)));
+                    lines.push(format!("{}return {};", indent_str, c_default_return(ret_type)));
                 }
             }
             "call" => {
@@ -344,31 +348,78 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str) -> String {
                     if !local_vars.contains_key(target_var) {
                         // Default to int32_t for function return values
                         local_vars.insert(target_var.to_string(), "int32_t".to_string());
-                        lines.push(format!("    int32_t {} = {};", target_var, call_expr));
+                        lines.push(format!("{}int32_t {} = {};", indent_str, target_var, call_expr));
                     } else {
-                        lines.push(format!("    {} = {};", target_var, call_expr));
+                        lines.push(format!("{}{} = {};", indent_str, target_var, call_expr));
                     }
                 } else {
                     // Call without assignment
-                    lines.push(format!("    {};", call_expr));
+                    lines.push(format!("{}{};", indent_str, call_expr));
                 }
             }
             "nop" => {
-                lines.push("    /* nop */".to_string());
+                lines.push(format!("{}/* nop */", indent_str));
+            }
+            "if" => {
+                // If/else statement
+                let condition = step.condition.as_deref().unwrap_or("true");
+                lines.push(format!("{}if ({}) {{", indent_str, condition));
+                
+                if let Some(ref then_block) = step.then_block {
+                    let then_body = translate_steps_to_c(then_block, ret_type, indent + 1);
+                    lines.push(then_body);
+                }
+                
+                if let Some(ref else_block) = step.else_block {
+                    if !else_block.is_empty() {
+                        lines.push(format!("{}}} else {{", indent_str));
+                        let else_body = translate_steps_to_c(else_block, ret_type, indent + 1);
+                        lines.push(else_body);
+                    }
+                }
+                
+                lines.push(format!("{}}}", indent_str));
+            }
+            "while" => {
+                // While loop
+                let condition = step.condition.as_deref().unwrap_or("true");
+                lines.push(format!("{}while ({}) {{", indent_str, condition));
+                
+                if let Some(ref body) = step.body {
+                    let loop_body = translate_steps_to_c(body, ret_type, indent + 1);
+                    lines.push(loop_body);
+                }
+                
+                lines.push(format!("{}}}", indent_str));
+            }
+            "for" => {
+                // For loop
+                let init = step.init.as_deref().unwrap_or("");
+                let condition = step.condition.as_deref().unwrap_or("true");
+                let increment = step.increment.as_deref().unwrap_or("");
+                lines.push(format!("{}for ({}; {}; {}) {{", indent_str, init, condition, increment));
+                
+                if let Some(ref body) = step.body {
+                    let loop_body = translate_steps_to_c(body, ret_type, indent + 1);
+                    lines.push(loop_body);
+                }
+                
+                lines.push(format!("{}}}", indent_str));
             }
             _ => {
-                lines.push(format!("    /* UNKNOWN OP: {} */", step.op));
+                lines.push(format!("{}/* UNKNOWN OP: {} */", indent_str, step.op));
             }
         }
     }
     
     // If no return statement was generated, add a default one
-    if !lines.iter().any(|line| line.contains("return")) {
+    // Only add at the top level (indent == 1)
+    if indent == 1 && !lines.iter().any(|line| line.contains("return")) {
         let c_ret = map_type_to_c(ret_type);
         if c_ret == "void" {
-            lines.push("    return;".to_string());
+            lines.push(format!("{}return;", indent_str));
         } else {
-            lines.push(format!("    return {};", c_default_return(ret_type)));
+            lines.push(format!("{}return {};", indent_str, c_default_return(ret_type)));
         }
     }
     

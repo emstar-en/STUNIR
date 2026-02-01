@@ -65,12 +65,21 @@ package STUNIR_IR_To_Code is
    Max_Params : constant := 20;
    type Param_Array is array (1 .. Max_Params) of Function_Param;
 
-   --  IR Step (instruction) record
+   --  IR Step (instruction) record with control flow support
    Max_Steps : constant := 50;
    type IR_Step is record
-      Op     : Name_String;  -- Operation: assign, return, call, nop
-      Target : Name_String;  -- Assignment target or call result variable
-      Value  : Name_String;  -- Value expression or function name
+      Op        : Name_String;  -- Operation: assign, return, call, nop, if, while, for
+      Target    : Name_String;  -- Assignment target or call result variable
+      Value     : Name_String;  -- Value expression or function name
+      --  Control flow fields
+      Condition : Name_String;  -- Condition for if/while/for
+      Init      : Name_String;  -- Init expression for for loops
+      Increment : Name_String;  -- Increment expression for for loops
+      --  Block markers for nested control flow (using step indices)
+      Block_Start : Natural := 0;  -- Start index of then/body block
+      Block_Count : Natural := 0;  -- Number of steps in then/body block
+      Else_Start  : Natural := 0;  -- Start index of else block (if statements only)
+      Else_Count  : Natural := 0;  -- Number of steps in else block
    end record;
    
    type Step_Array is array (1 .. Max_Steps) of IR_Step;

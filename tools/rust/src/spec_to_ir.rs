@@ -260,6 +260,12 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 op: "return".to_string(),
                 target: None,
                 value,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
             })
         },
         "var_decl" => {
@@ -276,6 +282,12 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 op: "assign".to_string(),
                 target: Some(target),
                 value: Some(serde_json::json!(init)),
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
             })
         },
         _ => {
@@ -285,6 +297,12 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 op: "noop".to_string(),
                 target: None,
                 value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
             })
         }
     }
