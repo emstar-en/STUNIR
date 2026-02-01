@@ -1,0 +1,95 @@
+{
+  "name": "combined_optimization_test",
+  "version": "0.8.9",
+  "description": "Test spec combining multiple optimization passes",
+  "optimization_level": 2,
+  "types": [
+    {
+      "name": "Stats",
+      "fields": [
+        {"name": "sum", "type": "i32"},
+        {"name": "count", "type": "i32"}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "constant_and_dead",
+      "args": [],
+      "return_type": "i32",
+      "optimization": {"pure": true},
+      "body": [
+        {"op": "assign", "target": "x", "value": "2 + 3"},
+        {"op": "assign", "target": "unused", "value": "10 * 20", "optimization": {"dead_code": true}},
+        {"op": "nop"},
+        {"op": "return", "value": "x"},
+        {"op": "assign", "target": "unreachable", "value": 0}
+      ]
+    },
+    {
+      "name": "unreachable_branch",
+      "args": [{"name": "y", "type": "i32"}],
+      "return_type": "i32",
+      "body": [
+        {"op": "if", "condition": "false",
+          "then_block": [
+            {"op": "return", "value": -1}
+          ],
+          "else_block": [
+            {"op": "return", "value": "y * 2"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "always_true_branch",
+      "args": [{"name": "z", "type": "i32"}],
+      "return_type": "i32",
+      "body": [
+        {"op": "if", "condition": "true",
+          "then_block": [
+            {"op": "return", "value": "z + 10"}
+          ],
+          "else_block": [
+            {"op": "return", "value": 0}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dead_loop",
+      "args": [],
+      "return_type": "i32",
+      "body": [
+        {"op": "assign", "target": "sum", "value": 0},
+        {"op": "while", "condition": "false",
+          "body": [
+            {"op": "assign", "target": "sum", "value": "sum + 1"}
+          ]
+        },
+        {"op": "return", "value": "sum"}
+      ]
+    },
+    {
+      "name": "multi_level_opt",
+      "args": [{"name": "n", "type": "i32"}],
+      "return_type": "i32",
+      "optimization": {"inline": true},
+      "body": [
+        {"op": "assign", "target": "a", "value": "5 + 5"},
+        {"op": "assign", "target": "b", "value": "a * 2"},
+        {"op": "if", "condition": "1 == 1",
+          "then_block": [
+            {"op": "nop"},
+            {"op": "assign", "target": "result", "value": "b + n"},
+            {"op": "return", "value": "result"},
+            {"op": "assign", "target": "dead", "value": 999}
+          ],
+          "else_block": [
+            {"op": "return", "value": 0}
+          ]
+        }
+      ]
+    }
+  ]
+}

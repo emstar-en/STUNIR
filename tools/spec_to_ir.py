@@ -93,7 +93,7 @@ def convert_type(type_str: str) -> str:
 def convert_type_ref(type_ref: Any) -> Any:
     """Convert spec type reference to IR type reference (v0.8.8+).
     
-    Handles both simple types and complex types (array, map, set, optional).
+    Handles both simple types and complex types (array, map, set, optional, generic).
     """
     if isinstance(type_ref, str):
         return convert_type(type_ref)
@@ -122,9 +122,35 @@ def convert_type_ref(type_ref: Any) -> Any:
             if "inner" in type_ref:
                 result["inner"] = convert_type_ref(type_ref["inner"])
         
+        elif kind == "generic":
+            # v0.8.9: Generic type instantiation
+            if "base_type" in type_ref:
+                result["base_type"] = type_ref["base_type"]
+            if "type_args" in type_ref:
+                result["type_args"] = [convert_type_ref(t) for t in type_ref["type_args"]]
+        
         return result
     
     return type_ref
+
+
+def convert_type_param(param: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert a generic type parameter definition (v0.8.9+)."""
+    result = {"name": param.get("name", "T")}
+    if "constraint" in param:
+        result["constraint"] = param["constraint"]
+    if "default" in param:
+        result["default"] = convert_type_ref(param["default"])
+    return result
+
+
+def convert_generic_instantiation(inst: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert a generic type instantiation (v0.8.9+)."""
+    return {
+        "name": inst.get("name", ""),
+        "base_type": inst.get("base_type", ""),
+        "type_args": [convert_type_ref(t) for t in inst.get("type_args", [])]
+    }
 
 
 def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
@@ -154,6 +180,10 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         if "docstring" in type_spec:
             type_entry["docstring"] = type_spec["docstring"]
         
+        # v0.8.9: Generic type parameters for types
+        if "type_params" in type_spec:
+            type_entry["type_params"] = [convert_type_param(p) for p in type_spec["type_params"]]
+        
         # Convert fields
         for field in type_spec.get("fields", []):
             field_entry = {
@@ -165,6 +195,11 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
             type_entry["fields"].append(field_entry)
         
         types.append(type_entry)
+    
+    # v0.8.9: Generic instantiations
+    generic_instantiations = []
+    for inst in spec.get("generic_instantiations", []):
+        generic_instantiations.append(convert_generic_instantiation(inst))
     
     # Build functions list from module.functions or spec.functions
     functions = []
@@ -549,6 +584,30 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                         step["value"] = stmt["value"]
                     result_steps.append(step)
                 
+                # v0.8.9: Generic call operation
+                elif stmt_type == "generic_call":
+                    step = {"op": "generic_call"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    if "type_args" in stmt:
+                        step["type_args"] = [convert_type_ref(t) for t in stmt["type_args"]]
+                    if "args" in stmt:
+                        step["value"] = stmt["value"] + "(" + ", ".join(str(a) for a in stmt["args"]) + ")"
+                    result_steps.append(step)
+                
+                # v0.8.9: Type cast operation
+                elif stmt_type == "type_cast":
+                    step = {"op": "type_cast"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "source" in stmt:
+                        step["source"] = stmt["source"]
+                    if "cast_type" in stmt:
+                        step["cast_type"] = convert_type_ref(stmt["cast_type"])
+                    result_steps.append(step)
+                
                 else:
                     # Unknown statement type, convert to nop
                     result_steps.append({"op": "nop"})
@@ -564,6 +623,15 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         }
         if "docstring" in func_spec:
             func_entry["docstring"] = func_spec["docstring"]
+        
+        # v0.8.9: Generic type parameters for functions
+        if "type_params" in func_spec:
+            func_entry["type_params"] = [convert_type_param(p) for p in func_spec["type_params"]]
+        
+        # v0.8.9: Optimization hints for functions
+        if "optimization" in func_spec:
+            func_entry["optimization"] = func_spec["optimization"]
+        
         if steps:
             func_entry["steps"] = steps
         
@@ -579,6 +647,18 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         "functions": functions,
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }
+    
+    # v0.8.9: Add module-level type params if present
+    if "type_params" in spec:
+        ir["type_params"] = [convert_type_param(p) for p in spec["type_params"]]
+    
+    # v0.8.9: Add optimization level if present
+    if "optimization_level" in spec:
+        ir["optimization_level"] = spec["optimization_level"]
+    
+    # v0.8.9: Add generic instantiations if present
+    if generic_instantiations:
+        ir["generic_instantiations"] = generic_instantiations
     
     return ir
 

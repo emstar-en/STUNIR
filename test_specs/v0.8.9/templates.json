@@ -1,0 +1,124 @@
+{
+  "name": "templates_test",
+  "version": "0.8.9",
+  "description": "Test spec for C++ style template instantiation",
+  "types": [
+    {
+      "name": "Vector",
+      "type_params": [
+        {"name": "T"}
+      ],
+      "fields": [
+        {"name": "data", "type": {"kind": "array", "element_type": "T"}},
+        {"name": "size", "type": "u32"},
+        {"name": "capacity", "type": "u32"}
+      ]
+    },
+    {
+      "name": "Optional",
+      "type_params": [
+        {"name": "T"}
+      ],
+      "fields": [
+        {"name": "has_value", "type": "bool"},
+        {"name": "value", "type": "T"}
+      ]
+    },
+    {
+      "name": "Result",
+      "type_params": [
+        {"name": "T"},
+        {"name": "E", "default": "string"}
+      ],
+      "fields": [
+        {"name": "is_ok", "type": "bool"},
+        {"name": "value", "type": "T"},
+        {"name": "error", "type": "E"}
+      ]
+    }
+  ],
+  "generic_instantiations": [
+    {
+      "name": "IntVector",
+      "base_type": "Vector",
+      "type_args": ["i32"]
+    },
+    {
+      "name": "FloatVector",
+      "base_type": "Vector",
+      "type_args": ["f64"]
+    },
+    {
+      "name": "OptionalInt",
+      "base_type": "Optional",
+      "type_args": ["i32"]
+    },
+    {
+      "name": "IntResult",
+      "base_type": "Result",
+      "type_args": ["i32"]
+    }
+  ],
+  "functions": [
+    {
+      "name": "vector_push",
+      "type_params": [{"name": "T"}],
+      "args": [
+        {"name": "vec", "type": "Vector<T>"},
+        {"name": "item", "type": "T"}
+      ],
+      "return_type": "void",
+      "body": [
+        {"op": "if", "condition": "vec.size >= vec.capacity",
+          "then_block": [
+            {"op": "error", "value": "Vector capacity exceeded"}
+          ]
+        },
+        {"op": "array_set", "target": "vec.data", "index": "vec.size", "value": "item"},
+        {"op": "assign", "target": "vec.size", "value": "vec.size + 1"}
+      ]
+    },
+    {
+      "name": "optional_unwrap",
+      "type_params": [{"name": "T"}],
+      "args": [
+        {"name": "opt", "type": "Optional<T>"}
+      ],
+      "return_type": "T",
+      "body": [
+        {"op": "if", "condition": "!opt.has_value",
+          "then_block": [
+            {"op": "error", "value": "Cannot unwrap empty Optional"}
+          ]
+        },
+        {"op": "return", "value": "opt.value"}
+      ]
+    },
+    {
+      "name": "result_map",
+      "type_params": [
+        {"name": "T"},
+        {"name": "U"},
+        {"name": "E"}
+      ],
+      "args": [
+        {"name": "result", "type": "Result<T, E>"},
+        {"name": "mapper", "type": "fn(T) -> U"}
+      ],
+      "return_type": "Result<U, E>",
+      "body": [
+        {"op": "if", "condition": "result.is_ok",
+          "then_block": [
+            {"op": "call", "target": "mapped", "value": "mapper(result.value)"},
+            {"op": "struct_new", "target": "ok_result", "struct_type": "Result", "fields": {"is_ok": true, "value": "mapped", "error": ""}},
+            {"op": "return", "value": "ok_result"}
+          ],
+          "else_block": [
+            {"op": "struct_new", "target": "err_result", "struct_type": "Result", "fields": {"is_ok": false, "value": "default", "error": "result.error"}},
+            {"op": "return", "value": "err_result"}
+          ]
+        }
+      ]
+    }
+  ]
+}

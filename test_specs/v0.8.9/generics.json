@@ -1,0 +1,109 @@
+{
+  "name": "generics_test",
+  "version": "0.8.9",
+  "description": "Test spec for generic types and functions",
+  "types": [
+    {
+      "name": "Container",
+      "type_params": [
+        {"name": "T", "constraint": "Any"}
+      ],
+      "fields": [
+        {"name": "value", "type": "T"},
+        {"name": "count", "type": "i32"}
+      ]
+    },
+    {
+      "name": "Pair",
+      "type_params": [
+        {"name": "K"},
+        {"name": "V"}
+      ],
+      "fields": [
+        {"name": "key", "type": "K"},
+        {"name": "value", "type": "V"}
+      ]
+    },
+    {
+      "name": "NumericContainer",
+      "type_params": [
+        {"name": "T", "constraint": "Numeric", "default": "i32"}
+      ],
+      "fields": [
+        {"name": "data", "type": "T"},
+        {"name": "min", "type": "T"},
+        {"name": "max", "type": "T"}
+      ]
+    }
+  ],
+  "generic_instantiations": [
+    {
+      "name": "IntContainer",
+      "base_type": "Container",
+      "type_args": ["i32"]
+    },
+    {
+      "name": "StringContainer",
+      "base_type": "Container",
+      "type_args": ["string"]
+    },
+    {
+      "name": "StringIntPair",
+      "base_type": "Pair",
+      "type_args": ["string", "i32"]
+    }
+  ],
+  "functions": [
+    {
+      "name": "identity",
+      "type_params": [
+        {"name": "T"}
+      ],
+      "args": [
+        {"name": "value", "type": "T"}
+      ],
+      "return_type": "T",
+      "body": [
+        {"op": "return", "value": "value"}
+      ]
+    },
+    {
+      "name": "swap",
+      "type_params": [
+        {"name": "T"}
+      ],
+      "args": [
+        {"name": "a", "type": "T"},
+        {"name": "b", "type": "T"}
+      ],
+      "return_type": "Pair<T, T>",
+      "body": [
+        {"op": "struct_new", "target": "result", "struct_type": "Pair", "fields": {"key": "b", "value": "a"}},
+        {"op": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "create_container",
+      "type_params": [
+        {"name": "T"}
+      ],
+      "args": [
+        {"name": "initial", "type": "T"}
+      ],
+      "return_type": "Container<T>",
+      "body": [
+        {"op": "struct_new", "target": "c", "struct_type": "Container", "fields": {"value": "initial", "count": 1}},
+        {"op": "return", "value": "c"}
+      ]
+    },
+    {
+      "name": "use_int_container",
+      "args": [],
+      "return_type": "IntContainer",
+      "body": [
+        {"op": "generic_call", "target": "result", "value": "create_container", "type_args": ["i32"], "args": [42]},
+        {"op": "return", "value": "result"}
+      ]
+    }
+  ]
+}

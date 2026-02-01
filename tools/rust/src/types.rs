@@ -1,4 +1,4 @@
-//! STUNIR type definitions - stunir_ir_v1 schema compliant (v0.8.8+)
+//! STUNIR type definitions - stunir_ir_v1 schema compliant (v0.8.9+)
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -30,7 +30,7 @@ pub enum TypeRef {
     Complex(ComplexType),
 }
 
-/// Complex type definition (v0.8.8+)
+/// Complex type definition (v0.8.9+)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComplexType {
     pub kind: String,
@@ -44,6 +44,44 @@ pub struct ComplexType {
     pub size: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inner: Option<Box<TypeRef>>,
+    // v0.8.9: Generic type support
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub base_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_args: Option<Vec<TypeRef>>,
+}
+
+/// Generic type parameter (v0.8.9+)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TypeParam {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub constraint: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default: Option<TypeRef>,
+}
+
+/// Generic type instantiation (v0.8.9+)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GenericInstantiation {
+    pub name: String,
+    pub base_type: String,
+    pub type_args: Vec<TypeRef>,
+}
+
+/// Optimization hints (v0.8.9+)
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct OptimizationHint {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pure: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inline: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub const_eval: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dead_code: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub constant_value: Option<serde_json::Value>,
 }
 
 impl TypeRef {
@@ -229,12 +267,15 @@ pub struct IRField {
     pub optional: Option<bool>,
 }
 
-/// IR Type definition - matches stunir_ir_v1 schema
+/// IR Type definition - matches stunir_ir_v1 schema (v0.8.9+)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRType {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub docstring: Option<String>,
+    // v0.8.9: Generic type parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_params: Option<Vec<TypeParam>>,
     pub fields: Vec<IRField>,
 }
 
@@ -329,21 +370,35 @@ pub struct IRStep {
     pub source2: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub fields: Option<serde_json::Value>,
+    
+    // v0.8.9: Generic call and type cast fields
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub type_args: Option<Vec<TypeRef>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cast_type: Option<TypeRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub optimization: Option<OptimizationHint>,
 }
 
-/// IR Function definition - matches stunir_ir_v1 schema
+/// IR Function definition - matches stunir_ir_v1 schema (v0.8.9+)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRFunction {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub docstring: Option<String>,
+    // v0.8.9: Generic type parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_params: Option<Vec<TypeParam>>,
+    // v0.8.9: Optimization hints
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub optimization: Option<OptimizationHint>,
     pub args: Vec<IRArg>,
     pub return_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<Vec<IRStep>>,
 }
 
-/// IR Module - matches stunir_ir_v1 schema (flat structure)
+/// IR Module - matches stunir_ir_v1 schema (v0.8.9+)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRModule {
     pub schema: String,
@@ -351,7 +406,16 @@ pub struct IRModule {
     pub module_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub docstring: Option<String>,
+    // v0.8.9: Module-level type parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_params: Option<Vec<TypeParam>>,
+    // v0.8.9: Optimization level
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub optimization_level: Option<i32>,
     pub types: Vec<IRType>,
+    // v0.8.9: Generic instantiations
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub generic_instantiations: Option<Vec<GenericInstantiation>>,
     pub functions: Vec<IRFunction>,
 }
 

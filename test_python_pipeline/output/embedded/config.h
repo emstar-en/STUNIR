@@ -19,6 +19,6 @@
 #define STUNIR_NO_FLOAT 0
 
 /* Epoch */
-#define STUNIR_BUILD_EPOCH 1769856341
+#define STUNIR_BUILD_EPOCH 1769938963
 
 #endif /* CONFIG_H */

@@ -17,6 +17,7 @@ use std::collections::BTreeMap;
 pub mod types;
 pub mod hash;
 pub mod ir;
+pub mod optimizer;
 
 /// Compute SHA-256 hash of bytes
 pub fn sha256_bytes(data: &[u8]) -> String {

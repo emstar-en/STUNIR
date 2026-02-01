@@ -173,7 +173,10 @@ fn generate_ir(spec: &Value) -> Result<IRModule> {
         ir_version: "v1".to_string(),
         module_name,
         docstring,
+        type_params: None,
+        optimization_level: None,
         types,
+        generic_instantiations: None,
         functions,
     })
 }
@@ -224,6 +227,8 @@ fn parse_function(func: &Value) -> Result<IRFunction> {
     Ok(IRFunction {
         name,
         docstring,
+        type_params: None,
+        optimization: None,
         args,
         return_type,
         steps,

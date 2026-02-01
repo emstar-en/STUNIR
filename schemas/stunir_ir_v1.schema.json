@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:stunir:schema:ir:v1",
   "title": "STUNIR Intermediate Reference (IR) v1",
-  "description": "Canonical representation of a program's structure and logic, ready for deterministic multi-language emission.",
+  "description": "Canonical representation of a program's structure and logic, ready for deterministic multi-language emission. Version 0.8.9 adds generics and optimization support.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -12,8 +12,29 @@
     "functions"
   ],
   "definitions": {
+    "type_param": {
+      "description": "Generic type parameter definition (v0.8.9+)",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9_]*$",
+          "description": "Type parameter name (e.g., T, K, V)"
+        },
+        "constraint": {
+          "type": "string",
+          "description": "Type constraint (e.g., 'Comparable', 'Numeric')"
+        },
+        "default": {
+          "$ref": "#/definitions/type_ref",
+          "description": "Default type if not specified"
+        }
+      }
+    },
     "type_ref": {
-      "description": "Type reference - can be primitive, array, map, set, or struct reference",
+      "description": "Type reference - can be primitive, array, map, set, generic, or struct reference",
       "oneOf": [
         {
           "type": "string",
@@ -27,7 +48,7 @@
           "properties": {
             "kind": {
               "type": "string",
-              "enum": ["array", "map", "set", "optional"],
+              "enum": ["array", "map", "set", "optional", "generic"],
               "description": "Type constructor kind"
             },
             "element_type": {
@@ -50,10 +71,47 @@
             "inner": {
               "$ref": "#/definitions/type_ref",
               "description": "Inner type for optional"
+            },
+            "base_type": {
+              "type": "string",
+              "description": "Base generic type name for instantiation"
+            },
+            "type_args": {
+              "type": "array",
+              "description": "Type arguments for generic instantiation",
+              "items": {
+                "$ref": "#/definitions/type_ref"
+              }
             }
           }
         }
       ]
+    },
+    "optimization_hint": {
+      "description": "Optimization hints for the IR (v0.8.9+)",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pure": {
+          "type": "boolean",
+          "description": "Function has no side effects"
+        },
+        "inline": {
+          "type": "boolean",
+          "description": "Suggest inlining this function"
+        },
+        "const_eval": {
+          "type": "boolean",
+          "description": "Can be evaluated at compile time"
+        },
+        "dead_code": {
+          "type": "boolean",
+          "description": "Marked as dead code (for elimination)"
+        },
+        "constant_value": {
+          "description": "Constant-folded value if applicable"
+        }
+      }
     }
   },
   "properties": {
@@ -70,6 +128,19 @@
     "docstring": {
       "type": "string",
       "description": "High-level description of the module."
+    },
+    "type_params": {
+      "type": "array",
+      "description": "Module-level generic type parameters (v0.8.9+)",
+      "items": {
+        "$ref": "#/definitions/type_param"
+      }
+    },
+    "optimization_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "Optimization level: 0=none, 1=basic, 2=standard, 3=aggressive (v0.8.9+)"
     },
     "types": {
       "type": "array",
@@ -88,6 +159,13 @@
           },
           "docstring": {
             "type": "string"
+          },
+          "type_params": {
+            "type": "array",
+            "description": "Generic type parameters for this type (v0.8.9+)",
+            "items": {
+              "$ref": "#/definitions/type_param"
+            }
           },
           "fields": {
             "type": "array",
@@ -117,6 +195,33 @@
         }
       }
     },
+    "generic_instantiations": {
+      "type": "array",
+      "description": "List of generic type instantiations (v0.8.9+)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "base_type", "type_args"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Name of the instantiated type"
+          },
+          "base_type": {
+            "type": "string",
+            "description": "Base generic type name"
+          },
+          "type_args": {
+            "type": "array",
+            "description": "Concrete type arguments",
+            "items": {
+              "$ref": "#/definitions/type_ref"
+            }
+          }
+        }
+      }
+    },
     "functions": {
       "type": "array",
       "description": "List of executable functions/endpoints. Ordering is semantically significant and must already be canonical.",
@@ -135,6 +240,17 @@
           },
           "docstring": {
             "type": "string"
+          },
+          "type_params": {
+            "type": "array",
+            "description": "Generic type parameters for this function (v0.8.9+)",
+            "items": {
+              "$ref": "#/definitions/type_param"
+            }
+          },
+          "optimization": {
+            "$ref": "#/definitions/optimization_hint",
+            "description": "Optimization hints (v0.8.9+)"
           },
           "args": {
             "type": "array",
@@ -207,7 +323,9 @@
                     "set_intersect",
                     "struct_new",
                     "struct_get",
-                    "struct_set"
+                    "struct_set",
+                    "generic_call",
+                    "type_cast"
                   ]
                 },
                 "target": {
@@ -382,6 +500,21 @@
                   "type": "object",
                   "description": "Field initializers for struct_new",
                   "additionalProperties": true
+                },
+                "type_args": {
+                  "type": "array",
+                  "description": "Type arguments for generic_call (v0.8.9+)",
+                  "items": {
+                    "$ref": "#/definitions/type_ref"
+                  }
+                },
+                "cast_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Target type for type_cast (v0.8.9+)"
+                },
+                "optimization": {
+                  "$ref": "#/definitions/optimization_hint",
+                  "description": "Step-level optimization hints (v0.8.9+)"
                 }
               }
             }

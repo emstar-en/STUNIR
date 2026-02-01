@@ -1,5 +1,5 @@
 // STUNIR Generated Verilog Module: get_battery_status
-// Epoch: 1769856341
+// Epoch: 1769938964
 
 module get_battery_status (
     input wire clk,
