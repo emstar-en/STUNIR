@@ -185,6 +185,31 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                     }
                     result_steps.append(step)
                 
+                elif stmt_type == "switch":
+                    # v0.9.0: switch/case statement
+                    step = {
+                        "op": "switch",
+                        "expr": stmt.get("expr", "0")
+                    }
+                    
+                    # Process cases
+                    cases = []
+                    for case in stmt.get("cases", []):
+                        case_entry = {
+                            "value": case.get("value", 0),
+                            "body": convert_statements(case.get("body", []))
+                        }
+                        cases.append(case_entry)
+                    
+                    if cases:
+                        step["cases"] = cases
+                    
+                    # Process default case
+                    if "default" in stmt:
+                        step["default"] = convert_statements(stmt.get("default", []))
+                    
+                    result_steps.append(step)
+                
                 # Handle regular statements
                 elif stmt_type == "call":
                     # Build function call expression: func_name(arg1, arg2, ...)
@@ -223,6 +248,16 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                     step = {"op": "return"}
                     if "value" in stmt:
                         step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "break":
+                    # v0.9.0: break statement
+                    step = {"op": "break"}
+                    result_steps.append(step)
+                
+                elif stmt_type == "continue":
+                    # v0.9.0: continue statement
+                    step = {"op": "continue"}
                     result_steps.append(step)
                 
                 elif stmt_type == "comment":

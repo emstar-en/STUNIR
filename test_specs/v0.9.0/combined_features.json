@@ -1,0 +1,54 @@
+{
+  "module": "combined_features_test",
+  "description": "Test combined break/continue/switch features - v0.9.0",
+  "functions": [
+    {
+      "name": "complex_control_flow",
+      "returns": "i32",
+      "params": [
+        {"name": "n", "type": "i32"}
+      ],
+      "body": [
+        {"type": "assign", "target": "result", "value": "0"},
+        {
+          "type": "for",
+          "init": "i = 0",
+          "condition": "i < n",
+          "increment": "i = i + 1",
+          "body": [
+            {
+              "type": "if",
+              "condition": "i > 10",
+              "then": [
+                {"type": "break"}
+              ]
+            },
+            {
+              "type": "switch",
+              "expr": "i % 3",
+              "cases": [
+                {
+                  "value": 0,
+                  "body": [
+                    {"type": "assign", "target": "result", "value": "result + 1"},
+                    {"type": "break"}
+                  ]
+                },
+                {
+                  "value": 1,
+                  "body": [
+                    {"type": "continue"}
+                  ]
+                }
+              ],
+              "default": [
+                {"type": "assign", "target": "result", "value": "result + 2"}
+              ]
+            }
+          ]
+        },
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

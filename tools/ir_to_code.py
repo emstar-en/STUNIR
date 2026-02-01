@@ -539,6 +539,9 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef, indent:
     - if: If/else statement (condition, then_block, optional else_block)
     - while: While loop (condition, body)
     - for: For loop (init, condition, increment, body)
+    - break: Break statement (v0.9.0)
+    - continue: Continue statement (v0.9.0)
+    - switch: Switch/case statement (expr, cases, optional default) (v0.9.0)
     
     Args:
         steps: List of step dictionaries from IR
@@ -669,6 +672,40 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef, indent:
             # Recursively translate body with increased indentation
             loop_body = translate_steps_to_c(body, ret_type, indent + 1)
             lines.append(loop_body)
+            lines.append(f'{indent_str}}}')
+            
+        elif op == 'break':
+            # v0.9.0: Break statement
+            lines.append(f'{indent_str}break;')
+            
+        elif op == 'continue':
+            # v0.9.0: Continue statement
+            lines.append(f'{indent_str}continue;')
+            
+        elif op == 'switch':
+            # v0.9.0: Switch/case statement
+            expr = step.get('expr', '0')
+            cases = step.get('cases', [])
+            default = step.get('default', [])
+            
+            lines.append(f'{indent_str}switch ({expr}) {{')
+            
+            # Generate case labels
+            for case in cases:
+                case_value = case.get('value', 0)
+                case_body = case.get('body', [])
+                
+                lines.append(f'{indent_str}  case {case_value}:')
+                # Recursively translate case body with increased indentation
+                case_code = translate_steps_to_c(case_body, ret_type, indent + 2)
+                lines.append(case_code)
+            
+            # Generate default case if present
+            if default:
+                lines.append(f'{indent_str}  default:')
+                default_code = translate_steps_to_c(default, ret_type, indent + 2)
+                lines.append(default_code)
+            
             lines.append(f'{indent_str}}}')
             
         else:

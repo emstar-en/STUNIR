@@ -133,11 +133,19 @@
                     "return",
                     "call",
                     "assign",
-                    "error"
+                    "error",
+                    "if",
+                    "while",
+                    "for",
+                    "break",
+                    "continue",
+                    "switch",
+                    "nop"
                   ]
                 },
                 "target": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Target variable for assign or call operations"
                 },
                 "value": {
                   "type": [
@@ -147,7 +155,73 @@
                     "object",
                     "array",
                     "null"
-                  ]
+                  ],
+                  "description": "Value for assign, return, or call operations"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Condition expression for if, while, or for operations"
+                },
+                "then_block": {
+                  "type": "array",
+                  "description": "Then block for if operation",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "else_block": {
+                  "type": "array",
+                  "description": "Else block for if operation",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "body": {
+                  "type": "array",
+                  "description": "Body block for while or for operations, or case body for switch",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "init": {
+                  "type": "string",
+                  "description": "Initialization expression for for loop"
+                },
+                "increment": {
+                  "type": "string",
+                  "description": "Increment expression for for loop"
+                },
+                "expr": {
+                  "type": "string",
+                  "description": "Switch expression"
+                },
+                "cases": {
+                  "type": "array",
+                  "description": "Case list for switch operation",
+                  "items": {
+                    "type": "object",
+                    "required": ["value", "body"],
+                    "properties": {
+                      "value": {
+                        "type": ["integer", "string"],
+                        "description": "Case value"
+                      },
+                      "body": {
+                        "type": "array",
+                        "description": "Case body statements",
+                        "items": {
+                          "$ref": "#/properties/functions/items/properties/steps/items"
+                        }
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "type": "array",
+                  "description": "Default case for switch operation",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
                 }
               }
             }

@@ -1,0 +1,33 @@
+{
+  "module": "continue_for_test",
+  "description": "Test continue statement in for loop - v0.9.0",
+  "functions": [
+    {
+      "name": "sum_odd_numbers",
+      "returns": "i32",
+      "params": [
+        {"name": "max", "type": "i32"}
+      ],
+      "body": [
+        {"type": "assign", "target": "sum", "value": "0"},
+        {
+          "type": "for",
+          "init": "i = 0",
+          "condition": "i < max",
+          "increment": "i = i + 1",
+          "body": [
+            {
+              "type": "if",
+              "condition": "i % 2 == 0",
+              "then": [
+                {"type": "continue"}
+              ]
+            },
+            {"type": "assign", "target": "sum", "value": "sum + i"}
+          ]
+        },
+        {"type": "return", "value": "sum"}
+      ]
+    }
+  ]
+}

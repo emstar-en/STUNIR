@@ -1,5 +1,299 @@
 # STUNIR Release Notes
 
+## Version 0.9.0 - February 1, 2026
+
+**Status**: ✅ **Python 100% Complete!** 🚀  
+**Codename**: "Additional Control Flow Features"  
+**Release Date**: February 1, 2026  
+**Release Type**: MINOR (New Features)  
+**Progress**: **Python 100%** (Rust + SPARK deferred to v0.9.1)
+
+---
+
+### 🎯 Executive Summary
+
+STUNIR 0.9.0 expands control flow capabilities with three major new features:
+1. **break** statements - Exit loops early
+2. **continue** statements - Skip to next iteration
+3. **switch/case** statements - Multi-way branching
+
+This release focuses on the **Python reference implementation** as a foundation, with Rust and SPARK implementations planned for v0.9.1.
+
+### Key Achievements
+
+✅ **break/continue** - Full support in Python pipeline  
+✅ **switch/case** - Multi-way branching with fall-through support  
+✅ **Schema Updates** - IR schema extended with new operations  
+✅ **Comprehensive Tests** - 6 test specs covering all features  
+✅ **100% Test Pass Rate** - All v0.9.0 tests passing  
+
+**Milestone**: STUNIR now supports all essential C-style control flow constructs!
+
+---
+
+### What's New in 0.9.0
+
+#### 🔄 break Statement
+
+Exit loops early with the `break` statement:
+
+**Spec Format**:
+```json
+{
+  "type": "break"
+}
+```
+
+**Generated C**:
+```c
+break;
+```
+
+**Use Cases**:
+- Exit while loop when condition met
+- Exit for loop early
+- Exit nested loops (affects innermost loop)
+
+#### ⏭️ continue Statement
+
+Skip to next iteration with the `continue` statement:
+
+**Spec Format**:
+```json
+{
+  "type": "continue"
+}
+```
+
+**Generated C**:
+```c
+continue;
+```
+
+**Use Cases**:
+- Skip even numbers in loop
+- Skip invalid data
+- Filter processing in loops
+
+#### 🔀 switch/case Statement
+
+Multi-way branching based on integer values:
+
+**Spec Format**:
+```json
+{
+  "type": "switch",
+  "expr": "x",
+  "cases": [
+    {
+      "value": 1,
+      "body": [
+        {"type": "assign", "target": "result", "value": "100"},
+        {"type": "break"}
+      ]
+    },
+    {
+      "value": 2,
+      "body": [
+        {"type": "assign", "target": "result", "value": "200"},
+        {"type": "break"}
+      ]
+    }
+  ],
+  "default": [
+    {"type": "assign", "target": "result", "value": "0"}
+  ]
+}
+```
+
+**Generated C**:
+```c
+switch (x) {
+  case 1:
+    result = 100;
+    break;
+  case 2:
+    result = 200;
+    break;
+  default:
+    result = 0;
+}
+```
+
+**Features**:
+- Multiple case values
+- Optional default case
+- Fall-through support (omit break)
+- Nested switch statements
+- break in switch cases
+
+#### 📐 IR Schema Extensions
+
+**New Operations** in `stunir_ir_v1.schema.json`:
+- `"break"` - Break operation
+- `"continue"` - Continue operation
+- `"switch"` - Switch/case operation
+- `"nop"` - No operation (already existed, now documented)
+
+**New IR Fields**:
+- `expr` - Switch expression
+- `cases` - Array of case objects (value + body)
+- `default` - Default case body
+
+#### 🧪 Test Suite
+
+**6 Comprehensive Test Specs**:
+1. `break_while.json` - Break in while loop
+2. `continue_for.json` - Continue in for loop
+3. `break_nested.json` - Break in nested loops
+4. `switch_simple.json` - Simple switch with multiple cases
+5. `switch_fallthrough.json` - Switch with fall-through
+6. `combined_features.json` - All features combined
+
+**Test Results**:
+```
+Test                      IR   C Code   Status
+─────────────────────────────────────────────
+break_while               ✓    ✓        Pass
+continue_for              ✓    ✓        Pass
+break_nested              ✓    ✓        Pass
+switch_simple             ✓    ✓        Pass
+switch_fallthrough        ✓    ✓        Pass
+combined_features         ✓    ✓        Pass
+─────────────────────────────────────────────
+TOTAL: 6/6 PASSED (100%)
+```
+
+#### 🏗️ Implementation Status
+
+**Python**: ✅ 100% Complete
+- ✅ spec_to_ir.py - Parses all new statement types
+- ✅ ir_to_code.py - Generates C code for all features
+- ✅ All tests passing
+
+**Rust**: ⏸️ Deferred to v0.9.1
+- Basic structure exists
+- Implementation required
+
+**SPARK**: ⏸️ Deferred to v0.9.1
+- Formal verification required
+- Bounded recursion needs validation
+
+---
+
+### Breaking Changes
+
+**None!** This is a backward-compatible feature addition.
+
+Existing specs continue to work without modification.
+
+---
+
+### Migration Guide
+
+**For Existing Code**: No changes required.
+
+**To Use New Features**:
+
+1. Add break statements:
+```json
+{"type": "break"}
+```
+
+2. Add continue statements:
+```json
+{"type": "continue"}
+```
+
+3. Add switch statements:
+```json
+{
+  "type": "switch",
+  "expr": "x",
+  "cases": [...],
+  "default": [...]
+}
+```
+
+---
+
+### Testing
+
+**Test Script**: `test_v0.9.0.py`
+
+**Run Tests**:
+```bash
+python3 test_v0.9.0.py
+```
+
+**Expected Output**:
+```
+STUNIR v0.9.0 Test Suite
+Found 6 test spec(s)
+...
+Total: 6
+Passed: 6
+Failed: 0
+
+✓ All tests passed!
+```
+
+---
+
+### Documentation
+
+**New Files**:
+- `docs/design/v0.9.0/control_flow_design.md` - Design document
+- `test_specs/v0.9.0/*.json` - Test specifications
+- `test_v0.9.0.py` - Test suite
+
+**Updated Files**:
+- `schemas/stunir_ir_v1.schema.json` - Extended with new operations
+- `tools/spec_to_ir.py` - Added break/continue/switch parsing
+- `tools/ir_to_code.py` - Added C code generation
+- `pyproject.toml` - Version bump to 0.9.0
+
+---
+
+### Known Limitations
+
+1. **Rust/SPARK Not Implemented**: v0.9.0 is Python-only. Rust and SPARK support coming in v0.9.1.
+
+2. **switch Expression Type**: Only integer expressions supported initially. String/enum support may come in future versions.
+
+3. **break/continue Validation**: No compile-time validation that break/continue are inside loops. C compiler will catch these errors.
+
+4. **Variable Redeclaration**: Python IR generator may redeclare variables in nested scopes (pre-existing issue, not specific to v0.9.0).
+
+---
+
+### Roadmap
+
+**v0.9.1** (Next Release):
+- Implement break/continue/switch in Rust
+- Implement break/continue/switch in SPARK with formal verification
+- Cross-pipeline validation
+- Performance benchmarking
+
+**v1.0.0** (Future):
+- Full multi-language parity
+- Advanced control flow (labeled break, goto)
+- Exception handling primitives
+
+---
+
+### Contributors
+
+- STUNIR Development Team
+
+---
+
+### License
+
+MIT License - See LICENSE file for details
+
+---
+
 ## Version 0.8.3 - February 1, 2026
 
 **Status**: ✅ **SPARK 100% TESTED!** 🚀  
