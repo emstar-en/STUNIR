@@ -46,8 +46,8 @@ def convert_nested_to_flat(nested_steps: List[Dict[str, Any]]) -> List[Dict[str,
         """
         Recursively flatten steps, appending to flat_steps.
         
-        For v0.6.1: Single-level nesting only.
-        Nested control flow inside blocks is not supported yet.
+        For v0.8.2: Full multi-level nesting support (2-5 levels).
+        Nested control flow is now recursively flattened.
         """
         for step in steps:
             op = step.get("op", "")
@@ -57,27 +57,16 @@ def convert_nested_to_flat(nested_steps: List[Dict[str, Any]]) -> List[Dict[str,
                 if_index = len(flat_steps)
                 flat_steps.append(None)  # Placeholder
                 
-                # Flatten then block
+                # Flatten then block (RECURSIVE)
                 then_block = step.get("then_block", [])
                 then_start = len(flat_steps)
                 
-                # For v0.6.1: Single-level only, don't recurse
-                for then_step in then_block:
-                    # Check for nested control flow (not supported in v0.6.1)
-                    if then_step.get("op") in ["if", "while", "for"]:
-                        print(f"[WARN] Nested control flow detected in then block - "
-                              f"not supported in v0.6.1 flattened IR", file=sys.stderr)
-                        # Add placeholder instead
-                        flat_steps.append({
-                            "op": "nop",
-                            "comment": f"Unsupported nested {then_step.get('op')} in v0.6.1"
-                        })
-                    else:
-                        flat_steps.append(then_step)
+                # v0.8.2: Recursively flatten then_block
+                flatten_recursive(then_block)  # RECURSIVE CALL
                 
                 then_count = len(flat_steps) - then_start
                 
-                # Flatten else block if present
+                # Flatten else block if present (RECURSIVE)
                 else_block = step.get("else_block", [])
                 else_start = 0
                 else_count = 0
@@ -85,18 +74,8 @@ def convert_nested_to_flat(nested_steps: List[Dict[str, Any]]) -> List[Dict[str,
                 if else_block:
                     else_start = len(flat_steps)
                     
-                    # For v0.6.1: Single-level only
-                    for else_step in else_block:
-                        # Check for nested control flow
-                        if else_step.get("op") in ["if", "while", "for"]:
-                            print(f"[WARN] Nested control flow detected in else block - "
-                                  f"not supported in v0.6.1 flattened IR", file=sys.stderr)
-                            flat_steps.append({
-                                "op": "nop",
-                                "comment": f"Unsupported nested {else_step.get('op')} in v0.6.1"
-                            })
-                        else:
-                            flat_steps.append(else_step)
+                    # v0.8.2: Recursively flatten else_block
+                    flatten_recursive(else_block)  # RECURSIVE CALL
                     
                     else_count = len(flat_steps) - else_start
                 
@@ -115,21 +94,12 @@ def convert_nested_to_flat(nested_steps: List[Dict[str, Any]]) -> List[Dict[str,
                 while_index = len(flat_steps)
                 flat_steps.append(None)
                 
-                # Flatten body
+                # Flatten body (RECURSIVE)
                 body = step.get("body", [])
                 body_start = len(flat_steps)
                 
-                # For v0.6.1: Single-level only
-                for body_step in body:
-                    if body_step.get("op") in ["if", "while", "for"]:
-                        print(f"[WARN] Nested control flow detected in while body - "
-                              f"not supported in v0.6.1 flattened IR", file=sys.stderr)
-                        flat_steps.append({
-                            "op": "nop",
-                            "comment": f"Unsupported nested {body_step.get('op')} in v0.6.1"
-                        })
-                    else:
-                        flat_steps.append(body_step)
+                # v0.8.2: Recursively flatten body
+                flatten_recursive(body)  # RECURSIVE CALL
                 
                 body_count = len(flat_steps) - body_start
                 
@@ -146,21 +116,12 @@ def convert_nested_to_flat(nested_steps: List[Dict[str, Any]]) -> List[Dict[str,
                 for_index = len(flat_steps)
                 flat_steps.append(None)
                 
-                # Flatten body
+                # Flatten body (RECURSIVE)
                 body = step.get("body", [])
                 body_start = len(flat_steps)
                 
-                # For v0.6.1: Single-level only
-                for body_step in body:
-                    if body_step.get("op") in ["if", "while", "for"]:
-                        print(f"[WARN] Nested control flow detected in for body - "
-                              f"not supported in v0.6.1 flattened IR", file=sys.stderr)
-                        flat_steps.append({
-                            "op": "nop",
-                            "comment": f"Unsupported nested {body_step.get('op')} in v0.6.1"
-                        })
-                    else:
-                        flat_steps.append(body_step)
+                # v0.8.2: Recursively flatten body
+                flatten_recursive(body)  # RECURSIVE CALL
                 
                 body_count = len(flat_steps) - body_start
                 
