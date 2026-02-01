@@ -52,6 +52,14 @@ package STUNIR_JSON_Utils is
      Pre => JSON_Text'Length > 0 and Field_Name'Length > 0,
      Post => Extract_String_Value'Result'Length <= 1024;
 
+   --  Extract integer value from JSON field (helper)
+   --  Returns 0 if field not found or invalid
+   function Extract_Integer_Value
+     (JSON_Text : String;
+      Field_Name : String) return Natural
+   with
+     Pre => JSON_Text'Length > 0 and Field_Name'Length > 0;
+
    --  Find array in JSON and return position of opening bracket
    function Find_Array (JSON_Text : String; Field : String) return Natural
    with

@@ -75,6 +75,47 @@ package body STUNIR_JSON_Utils is
       return Get_String_After (JSON_Text, Pos);
    end Extract_String_Value;
 
+   --  Extract integer value from JSON field
+   function Extract_Integer_Value
+     (JSON_Text : String;
+      Field_Name : String) return Natural
+   is
+      Pos : constant Natural := Find_Field (JSON_Text, Field_Name);
+      Result : Natural := 0;
+   begin
+      if Pos = 0 then
+         return 0;
+      end if;
+      
+      --  Skip to the value (after ':' and whitespace)
+      for I in Pos .. JSON_Text'Last loop
+         if JSON_Text (I) in '0' .. '9' then
+            --  Parse digits
+            for J in I .. JSON_Text'Last loop
+               if JSON_Text (J) in '0' .. '9' then
+                  --  Convert digit and accumulate
+                  Result := Result * 10 + (Character'Pos (JSON_Text (J)) - Character'Pos ('0'));
+                  
+                  --  Safety check to prevent overflow
+                  if Result > 10_000 then
+                     return 10_000;  --  Cap at reasonable limit
+                  end if;
+               else
+                  --  End of number
+                  return Result;
+               end if;
+            end loop;
+            return Result;
+         elsif JSON_Text (I) /= ' ' and JSON_Text (I) /= ':' and 
+               JSON_Text (I) /= ASCII.HT and JSON_Text (I) /= ASCII.LF then
+            --  Non-digit, non-whitespace found before number
+            return 0;
+         end if;
+      end loop;
+      
+      return Result;
+   end Extract_Integer_Value;
+
    --  Helper: Find array in JSON
    function Find_Array (JSON_Text : String; Field : String) return Natural is
       Search_Str : constant String := """" & Field & """:";

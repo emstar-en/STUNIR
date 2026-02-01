@@ -53,6 +53,13 @@ except ImportError:
     sys.path.insert(0, "tools")
     from lib import toolchain
 
+try:
+    import ir_converter
+except ImportError:
+    # Try importing from tools directory
+    sys.path.insert(0, str(Path(__file__).parent))
+    import ir_converter
+
 
 def sha256_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
@@ -139,28 +146,47 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
         # Convert return type
         return_type = convert_type(func_spec.get("returns", "void"))
         
-        # Convert body to stunir_ir_v1 step format
-        steps = []
-        for stmt in func_spec.get("body", []):
-            # Map statement types to IR operations
-            if "type" in stmt:
+        # Convert body to stunir_ir_v1 step format (with control flow support for v0.6.1)
+        def convert_statements(stmts):
+            """Recursively convert statements to IR steps."""
+            result_steps = []
+            for stmt in stmts:
+                if "type" not in stmt:
+                    continue
+                
                 stmt_type = stmt.get("type", "nop")
                 
-                # Map spec statement types to IR ops
-                op_map = {
-                    "var_decl": "assign",
-                    "assign": "assign",
-                    "return": "return",
-                    "call": "call",
-                    "comment": "nop",
-                    "if": "call",
-                    "loop": "call"
-                }
+                # Handle control flow statements (v0.6.1)
+                if stmt_type == "if":
+                    step = {
+                        "op": "if",
+                        "condition": stmt.get("condition", "true"),
+                        "then_block": convert_statements(stmt.get("then", [])),
+                    }
+                    if "else" in stmt:
+                        step["else_block"] = convert_statements(stmt.get("else", []))
+                    result_steps.append(step)
                 
-                step = {"op": op_map.get(stmt_type, "nop")}
+                elif stmt_type == "while":
+                    step = {
+                        "op": "while",
+                        "condition": stmt.get("condition", "true"),
+                        "body": convert_statements(stmt.get("body", []))
+                    }
+                    result_steps.append(step)
                 
-                # Handle call operations specially
-                if stmt_type == "call":
+                elif stmt_type == "for":
+                    step = {
+                        "op": "for",
+                        "init": stmt.get("init", ""),
+                        "condition": stmt.get("condition", "true"),
+                        "increment": stmt.get("increment", ""),
+                        "body": convert_statements(stmt.get("body", []))
+                    }
+                    result_steps.append(step)
+                
+                # Handle regular statements
+                elif stmt_type == "call":
                     # Build function call expression: func_name(arg1, arg2, ...)
                     called_func = stmt.get("func", "unknown")
                     call_args = stmt.get("args", [])
@@ -168,45 +194,48 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                         args_str = ", ".join(str(arg) for arg in call_args)
                     else:
                         args_str = str(call_args)
-                    step["value"] = f"{called_func}({args_str})"
+                    
+                    step = {"op": "call", "value": f"{called_func}({args_str})"}
                     
                     # Handle optional assignment
                     if "assign_to" in stmt:
                         step["target"] = stmt["assign_to"]
-                else:
-                    # Extract target from var_name or target field
+                    
+                    result_steps.append(step)
+                
+                elif stmt_type == "var_decl":
+                    step = {"op": "assign"}
                     if "var_name" in stmt:
                         step["target"] = stmt["var_name"]
-                    elif "target" in stmt:
-                        step["target"] = stmt["target"]
-                    
-                    # Extract value from init, value, expr, or func_name fields
                     if "init" in stmt:
                         step["value"] = stmt["init"]
-                    elif "value" in stmt:
-                        step["value"] = stmt["value"]
-                    elif "expr" in stmt:
-                        step["value"] = stmt["expr"]
-                    elif "func_name" in stmt:
-                        step["value"] = stmt["func_name"]
-                    
-                    # Skip assign operations without values (variable declarations without initialization)
-                    if step["op"] == "assign" and "value" not in step and "target" in step:
-                        # Convert to nop for var decl without init
-                        step["op"] = "nop"
-                        # Remove target for nop
-                        if "target" in step:
-                            del step["target"]
+                    result_steps.append(step)
                 
-            else:
-                # Already in IR format with "op" field
-                step = {"op": stmt.get("op", "nop")}
-                if "target" in stmt:
-                    step["target"] = stmt["target"]
-                if "value" in stmt:
-                    step["value"] = stmt["value"]
+                elif stmt_type == "assign":
+                    step = {"op": "assign"}
+                    if "target" in stmt:
+                        step["target"] = stmt["target"]
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "return":
+                    step = {"op": "return"}
+                    if "value" in stmt:
+                        step["value"] = stmt["value"]
+                    result_steps.append(step)
+                
+                elif stmt_type == "comment":
+                    step = {"op": "nop"}
+                    result_steps.append(step)
+                
+                else:
+                    # Unknown statement type, convert to nop
+                    result_steps.append({"op": "nop"})
             
-            steps.append(step)
+            return result_steps
+        
+        steps = convert_statements(func_spec.get("body", []))
         
         func_entry = {
             "name": func_name,
@@ -252,6 +281,10 @@ def main():
     ap.add_argument("--spec-root", required=True, help="Path to spec root directory")
     ap.add_argument("--out", required=True, help="Output IR JSON file path")
     ap.add_argument("--lockfile", default="local_toolchain.lock.json", help="Path to toolchain lockfile")
+    ap.add_argument("--flat-ir", action="store_true", 
+                    help="Generate flattened IR for SPARK compatibility (single-level nesting)")
+    ap.add_argument("--flat-out", default=None,
+                    help="Output path for flattened IR (default: <out>_flat.json)")
     a = ap.parse_args()
 
     # 1. Enforce Toolchain Lock
@@ -312,6 +345,27 @@ def main():
 
     logger.info(f"Generated semantic IR with {len(ir['functions'])} functions")
     logger.info(f"Wrote semantic IR to {out_path}")
+    
+    # 4. Generate flattened IR if requested (for SPARK compatibility)
+    if a.flat_ir:
+        logger.info("Generating flattened IR for SPARK compatibility...")
+        flat_ir = ir_converter.convert_ir_module(ir)
+        
+        # Determine output path for flattened IR
+        if a.flat_out:
+            flat_out_path = Path(a.flat_out)
+        else:
+            # Default: add _flat suffix before extension
+            flat_out_path = out_path.parent / (out_path.stem + "_flat" + out_path.suffix)
+        
+        flat_out_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(flat_out_path, "w", encoding='utf-8', newline='\n') as f:
+            json.dump(flat_ir, f, indent=2, sort_keys=False)
+            f.write('\n')
+        
+        logger.info(f"Wrote flattened IR (schema: {flat_ir['schema']}) to {flat_out_path}")
+        logger.info(f"Flattened IR contains {sum(len(f.get('steps', [])) for f in flat_ir['functions'])} total steps")
 
 
 if __name__ == "__main__":

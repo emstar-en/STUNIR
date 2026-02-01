@@ -1,0 +1,277 @@
+{
+  "docstring": "Test suite for v0.6.1 single-level nesting support",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        }
+      ],
+      "name": "test_if_then",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "condition": "x > 10",
+          "op": "if",
+          "then_block": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "x * 2"
+            },
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "result + 1"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        }
+      ],
+      "name": "test_if_else",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "condition": "x > 0",
+          "else_block": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "-1"
+            }
+          ],
+          "op": "if",
+          "then_block": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "x + 10"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "test_while_loop",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "body": [
+            {
+              "op": "assign",
+              "target": "sum",
+              "value": "sum + i"
+            },
+            {
+              "op": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ],
+          "condition": "i < n",
+          "op": "while"
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        }
+      ],
+      "name": "test_for_loop",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "total",
+          "value": "0"
+        },
+        {
+          "body": [
+            {
+              "op": "assign",
+              "target": "total",
+              "value": "total + (i * 2)"
+            }
+          ],
+          "condition": "i < max",
+          "increment": "i++",
+          "init": "i = 0",
+          "op": "for"
+        },
+        {
+          "op": "return",
+          "value": "total"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "i32"
+        },
+        {
+          "name": "b",
+          "type": "i32"
+        }
+      ],
+      "name": "test_multiple_if",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "condition": "a > 0",
+          "op": "if",
+          "then_block": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "result + a"
+            }
+          ]
+        },
+        {
+          "condition": "b > 0",
+          "op": "if",
+          "then_block": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "result + b"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        },
+        {
+          "name": "y",
+          "type": "i32"
+        }
+      ],
+      "name": "test_complex_condition",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "a",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "b",
+          "value": "0"
+        },
+        {
+          "condition": "x > y",
+          "else_block": [
+            {
+              "op": "assign",
+              "target": "a",
+              "value": "y"
+            },
+            {
+              "op": "assign",
+              "target": "b",
+              "value": "x"
+            },
+            {
+              "op": "assign",
+              "target": "a",
+              "value": "a - b"
+            }
+          ],
+          "op": "if",
+          "then_block": [
+            {
+              "op": "assign",
+              "target": "a",
+              "value": "x"
+            },
+            {
+              "op": "assign",
+              "target": "b",
+              "value": "y"
+            },
+            {
+              "op": "assign",
+              "target": "a",
+              "value": "a - b"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "a"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T01:19:37.840623Z",
+  "ir_version": "v1",
+  "module_name": "control_flow_test",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

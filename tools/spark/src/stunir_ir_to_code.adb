@@ -242,6 +242,11 @@ package body STUNIR_IR_To_Code is
                                        Step_Cond : constant String := Extract_String_Value (Step_JSON, "condition");
                                        Step_Init : constant String := Extract_String_Value (Step_JSON, "init");
                                        Step_Incr : constant String := Extract_String_Value (Step_JSON, "increment");
+                                       --  Extract block indices for flattened IR (v0.6.1)
+                                       Block_Start_Val : constant Natural := Extract_Integer_Value (Step_JSON, "block_start");
+                                       Block_Count_Val : constant Natural := Extract_Integer_Value (Step_JSON, "block_count");
+                                       Else_Start_Val  : constant Natural := Extract_Integer_Value (Step_JSON, "else_start");
+                                       Else_Count_Val  : constant Natural := Extract_Integer_Value (Step_JSON, "else_count");
                                     begin
                                        if Step_Op'Length > 0 then
                                           Module.Functions (Func_Idx).Step_Count := 
@@ -290,6 +295,12 @@ package body STUNIR_IR_To_Code is
                                              Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Increment :=
                                                Name_Strings.Null_Bounded_String;
                                           end if;
+                                          
+                                          --  Store block indices for flattened IR (v0.6.1)
+                                          Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Block_Start := Block_Start_Val;
+                                          Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Block_Count := Block_Count_Val;
+                                          Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Else_Start := Else_Start_Val;
+                                          Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Else_Count := Else_Count_Val;
                                        end if;
                                     end;
                                     
@@ -519,6 +530,10 @@ package body STUNIR_IR_To_Code is
          end if;
       end Declare_Var;
       
+      --  Track which steps are part of nested blocks (v0.6.1)
+      type Step_Processed_Array is array (1 .. Max_Steps) of Boolean;
+      Processed : Step_Processed_Array := (others => False);
+      
       Has_Return : Boolean := False;
    begin
       --  Handle empty function body
@@ -533,14 +548,43 @@ package body STUNIR_IR_To_Code is
          return Result (1 .. Result_Len);
       end if;
       
-      --  Process each step
+      --  Mark all steps that are part of nested blocks
       for I in 1 .. Step_Count loop
          declare
-            Step   : constant IR_Step := Steps (I);
-            Op     : constant String := Name_Strings.To_String (Step.Op);
-            Target : constant String := Name_Strings.To_String (Step.Target);
-            Value  : constant String := Name_Strings.To_String (Step.Value);
+            Step : constant IR_Step := Steps (I);
+            Op   : constant String := Name_Strings.To_String (Step.Op);
          begin
+            if Op = "if" or Op = "while" or Op = "for" then
+               --  Mark then/body block steps as processed
+               if Step.Block_Count > 0 and Step.Block_Start > 0 then
+                  for J in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
+                     if J <= Max_Steps then
+                        Processed (J) := True;
+                     end if;
+                  end loop;
+               end if;
+               
+               --  Mark else block steps as processed (if statements)
+               if Step.Else_Count > 0 and Step.Else_Start > 0 then
+                  for J in Step.Else_Start .. Step.Else_Start + Step.Else_Count - 1 loop
+                     if J <= Max_Steps then
+                        Processed (J) := True;
+                     end if;
+                  end loop;
+               end if;
+            end if;
+         end;
+      end loop;
+      
+      --  Process each step (skip steps that are part of nested blocks)
+      for I in 1 .. Step_Count loop
+         if not Processed (I) then
+            declare
+               Step   : constant IR_Step := Steps (I);
+               Op     : constant String := Name_Strings.To_String (Step.Op);
+               Target : constant String := Name_Strings.To_String (Step.Target);
+               Value  : constant String := Name_Strings.To_String (Step.Value);
+            begin
             if Op = "assign" then
                --  Variable assignment
                if Target'Length > 0 then
@@ -612,42 +656,148 @@ package body STUNIR_IR_To_Code is
                Append (NL);
                
             elsif Op = "if" then
-               --  If/else statement
+               --  If/else statement with single-level nesting (v0.6.1)
                declare
                   Cond : constant String := Name_Strings.To_String (Step.Condition);
                begin
                   Append ("  if (" & Cond & ") {");
                   Append (NL);
-                  --  TODO: Recursively process then_block steps
-                  --  For now, just add a placeholder comment
-                  Append ("    /* then block - nested control flow support limited */");
-                  Append (NL);
-                  if Step.Else_Count > 0 then
+                  
+                  --  Process then block using block indices
+                  if Step.Block_Count > 0 and Step.Block_Start > 0 then
+                     for Block_I in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
+                        if Block_I <= Step_Count then
+                           declare
+                              Block_Step   : constant IR_Step := Steps (Block_I);
+                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
+                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
+                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
+                           begin
+                              if Block_Op = "assign" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                    Append (NL);
+                                 end if;
+                              elsif Block_Op = "return" then
+                                 if Block_Value'Length > 0 then
+                                    Append ("    return " & Block_Value & ";");
+                                 else
+                                    Append ("    return;");
+                                 end if;
+                                 Append (NL);
+                              elsif Block_Op = "call" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                 else
+                                    Append ("    " & Block_Value & ";");
+                                 end if;
+                                 Append (NL);
+                              else
+                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
+                                 Append (NL);
+                              end if;
+                           end;
+                        end if;
+                     end loop;
+                  end if;
+                  
+                  --  Process else block if present
+                  if Step.Else_Count > 0 and Step.Else_Start > 0 then
                      Append ("  } else {");
                      Append (NL);
-                     Append ("    /* else block - nested control flow support limited */");
-                     Append (NL);
+                     
+                     for Block_I in Step.Else_Start .. Step.Else_Start + Step.Else_Count - 1 loop
+                        if Block_I <= Step_Count then
+                           declare
+                              Block_Step   : constant IR_Step := Steps (Block_I);
+                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
+                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
+                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
+                           begin
+                              if Block_Op = "assign" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                    Append (NL);
+                                 end if;
+                              elsif Block_Op = "return" then
+                                 if Block_Value'Length > 0 then
+                                    Append ("    return " & Block_Value & ";");
+                                 else
+                                    Append ("    return;");
+                                 end if;
+                                 Append (NL);
+                              elsif Block_Op = "call" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                 else
+                                    Append ("    " & Block_Value & ";");
+                                 end if;
+                                 Append (NL);
+                              else
+                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
+                                 Append (NL);
+                              end if;
+                           end;
+                        end if;
+                     end loop;
                   end if;
+                  
                   Append ("  }");
                   Append (NL);
                end;
                
             elsif Op = "while" then
-               --  While loop
+               --  While loop with single-level nesting (v0.6.1)
                declare
                   Cond : constant String := Name_Strings.To_String (Step.Condition);
                begin
                   Append ("  while (" & Cond & ") {");
                   Append (NL);
-                  --  TODO: Recursively process body steps
-                  Append ("    /* loop body - nested control flow support limited */");
-                  Append (NL);
+                  
+                  --  Process body using block indices
+                  if Step.Block_Count > 0 and Step.Block_Start > 0 then
+                     for Block_I in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
+                        if Block_I <= Step_Count then
+                           declare
+                              Block_Step   : constant IR_Step := Steps (Block_I);
+                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
+                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
+                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
+                           begin
+                              if Block_Op = "assign" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                    Append (NL);
+                                 end if;
+                              elsif Block_Op = "return" then
+                                 if Block_Value'Length > 0 then
+                                    Append ("    return " & Block_Value & ";");
+                                 else
+                                    Append ("    return;");
+                                 end if;
+                                 Append (NL);
+                              elsif Block_Op = "call" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                 else
+                                    Append ("    " & Block_Value & ";");
+                                 end if;
+                                 Append (NL);
+                              else
+                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
+                                 Append (NL);
+                              end if;
+                           end;
+                        end if;
+                     end loop;
+                  end if;
+                  
                   Append ("  }");
                   Append (NL);
                end;
                
             elsif Op = "for" then
-               --  For loop
+               --  For loop with single-level nesting (v0.6.1)
                declare
                   Init_Expr : constant String := Name_Strings.To_String (Step.Init);
                   Cond      : constant String := Name_Strings.To_String (Step.Condition);
@@ -655,9 +805,45 @@ package body STUNIR_IR_To_Code is
                begin
                   Append ("  for (" & Init_Expr & "; " & Cond & "; " & Incr & ") {");
                   Append (NL);
-                  --  TODO: Recursively process body steps
-                  Append ("    /* loop body - nested control flow support limited */");
-                  Append (NL);
+                  
+                  --  Process body using block indices
+                  if Step.Block_Count > 0 and Step.Block_Start > 0 then
+                     for Block_I in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
+                        if Block_I <= Step_Count then
+                           declare
+                              Block_Step   : constant IR_Step := Steps (Block_I);
+                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
+                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
+                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
+                           begin
+                              if Block_Op = "assign" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                    Append (NL);
+                                 end if;
+                              elsif Block_Op = "return" then
+                                 if Block_Value'Length > 0 then
+                                    Append ("    return " & Block_Value & ";");
+                                 else
+                                    Append ("    return;");
+                                 end if;
+                                 Append (NL);
+                              elsif Block_Op = "call" then
+                                 if Block_Target'Length > 0 then
+                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
+                                 else
+                                    Append ("    " & Block_Value & ";");
+                                 end if;
+                                 Append (NL);
+                              else
+                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
+                                 Append (NL);
+                              end if;
+                           end;
+                        end if;
+                     end loop;
+                  end if;
+                  
                   Append ("  }");
                   Append (NL);
                end;
@@ -668,6 +854,7 @@ package body STUNIR_IR_To_Code is
                Append (NL);
             end if;
          end;
+         end if;  --  if not Processed (I)
       end loop;
       
       --  Add default return if no return statement was found
