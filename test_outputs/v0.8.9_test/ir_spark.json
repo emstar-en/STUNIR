@@ -1,0 +1,1 @@
+{"schema":"stunir_flat_ir_v1","ir_version":"v1","module_name":"generics_test","docstring":"Test module for v0.8.9 generics and optimization features","types":[],"functions":[{"name":"add_generic","args":[],"return_type":"void","steps":[]},{"name":"cast_and_add","args":[],"return_type":"void","steps":[]},{"name":"use_generic_add","args":[],"return_type":"void","steps":[]}]}

@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "module": "generics_test",
+  "version": "0.8.9",
+  "description": "Test module for v0.8.9 generics and optimization features",
+  "optimization_level": 2,
+  "type_params": [
+    {"name": "T", "constraint": "numeric"}
+  ],
+  "types": [
+    {
+      "name": "Container",
+      "kind": "struct",
+      "type_params": [{"name": "T", "constraint": "any"}],
+      "fields": [
+        {"name": "data", "type": {"kind": "generic", "base_type": "T"}},
+        {"name": "size", "type": "i32"}
+      ]
+    },
+    {
+      "name": "IntContainer",
+      "kind": "generic_instantiation",
+      "base_type": "Container",
+      "type_args": [{"kind": "primitive", "name": "i32"}]
+    }
+  ],
+  "functions": [
+    {
+      "name": "add_generic",
+      "type_params": [{"name": "T", "constraint": "numeric"}],
+      "optimization": {"inline": true, "vectorize": false},
+      "inputs": [
+        {"name": "a", "type": {"kind": "generic", "base_type": "T"}},
+        {"name": "b", "type": {"kind": "generic", "base_type": "T"}}
+      ],
+      "output": {"type": {"kind": "generic", "base_type": "T"}},
+      "steps": [
+        {"id": "result", "op": "add", "args": ["a", "b"]}
+      ],
+      "return": "result"
+    },
+    {
+      "name": "cast_and_add",
+      "inputs": [
+        {"name": "x", "type": "f32"},
+        {"name": "y", "type": "i32"}
+      ],
+      "output": {"type": "f64"},
+      "steps": [
+        {"id": "x_cast", "op": "type_cast", "source": "x", "cast_type": {"kind": "primitive", "name": "f64"}},
+        {"id": "y_cast", "op": "type_cast", "source": "y", "cast_type": {"kind": "primitive", "name": "f64"}},
+        {"id": "result", "op": "add", "args": ["x_cast", "y_cast"]}
+      ],
+      "return": "result"
+    },
+    {
+      "name": "use_generic_add",
+      "inputs": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "output": {"type": "i32"},
+      "steps": [
+        {"id": "result", "op": "generic_call", "value": "add_generic", "type_args": [{"kind": "primitive", "name": "i32"}], "args": ["a", "b"]}
+      ],
+      "return": "result"
+    }
+  ]
+}

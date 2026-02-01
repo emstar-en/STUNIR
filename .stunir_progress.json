@@ -2,7 +2,7 @@
   "current_version": "0.8.9",
   "version_status": "COMPLETE_AND_TESTED",
   "last_updated": "2026-02-01",
-  "last_test_run": "2026-02-01T10:03:00Z",
+  "last_test_run": "2026-02-01T10:22:49Z",
   "status": {
     "python": {
       "spec_to_ir": "DONE",
@@ -135,5 +135,26 @@
     "total_functions_generated": 22,
     "ir_schema": "stunir_ir_v1",
     "all_pipelines_deterministic": true
+  },
+  "test_results": {
+    "v0.8.9_validation": {
+      "python_pipeline": "PASSED",
+      "rust_pipeline": "PASSED",
+      "spark_pipeline": "PASSED",
+      "master_test_runner": "PASSED",
+      "smoke_tests": "18/18 passed",
+      "rust_tests": "5/5 passed",
+      "coverage_estimate": "62%",
+      "features_tested": [
+        "generics",
+        "type_params",
+        "generic_instantiation",
+        "optimization_level",
+        "type_cast",
+        "generic_call",
+        "dead_code_elimination",
+        "constant_folding"
+      ]
+    }
   }
 }
