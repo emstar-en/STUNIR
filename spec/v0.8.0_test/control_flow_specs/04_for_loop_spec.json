@@ -1,0 +1,16 @@
+{
+  "module": "for_test",
+  "description": "Test for loop",
+  "functions": [
+    {
+      "name": "factorial",
+      "params": [{"name": "n", "type": "i32"}],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "init": "1"},
+        {"type": "for", "init": "i = 1", "condition": "i <= n", "increment": "i = i + 1", "body": [{"type": "assign", "target": "result", "value": "result * i"}]},
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

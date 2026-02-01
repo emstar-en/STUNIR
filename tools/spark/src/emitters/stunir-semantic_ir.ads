@@ -7,11 +7,11 @@ with Ada.Strings.Bounded;
 package STUNIR.Semantic_IR is
    pragma SPARK_Mode (On);
 
-   -- Bounded strings for memory safety
+   -- Bounded strings for memory safety (reduced for v0.8.0 to prevent stack overflow)
    Max_Name_Length : constant := 128;
    Max_Type_Length : constant := 64;
    Max_Doc_Length  : constant := 512;
-   Max_Code_Length : constant := 4096;
+   Max_Code_Length : constant := 256;  -- Reduced from 4096 to 256 bytes
 
    package Name_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Name_Length);
    package Type_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Type_Length);
@@ -55,18 +55,31 @@ package STUNIR.Semantic_IR is
       Type_Ref : IR_Type_String;
    end record;
 
-   -- Statement (simplified for Phase 3a)
+   -- Statement (expanded for v0.8.0 control flow support)
    type IR_Statement_Kind is
-     (Stmt_Assign, Stmt_Call, Stmt_Return, Stmt_If, Stmt_Loop, Stmt_Nop);
+     (Stmt_Assign, Stmt_Call, Stmt_Return, Stmt_If, Stmt_While, Stmt_For, Stmt_Nop);
 
    type IR_Statement is record
-      Kind : IR_Statement_Kind := Stmt_Nop;
-      Data : IR_Code_Buffer;
+      Kind        : IR_Statement_Kind := Stmt_Nop;
+      -- For all statements
+      Data        : IR_Code_Buffer;  -- Legacy field, kept for compatibility
+      -- For assign/call/return
+      Target      : IR_Name_String;  -- Variable being assigned
+      Value       : IR_Code_Buffer;  -- Expression value
+      -- For control flow (if/while/for)
+      Condition   : IR_Code_Buffer;  -- Condition expression
+      Init_Expr   : IR_Code_Buffer;  -- For loop initialization
+      Incr_Expr   : IR_Code_Buffer;  -- For loop increment
+      -- For flattened control flow blocks
+      Block_Start : Natural := 0;    -- 1-based index of block start
+      Block_Count : Natural := 0;    -- Number of statements in block
+      Else_Start  : Natural := 0;    -- 1-based index of else block (0 if none)
+      Else_Count  : Natural := 0;    -- Number of statements in else block
    end record;
 
    -- Function definition
    Max_Args       : constant := 10;
-   Max_Statements : constant := 20;
+   Max_Statements : constant := 50;  -- Balanced for flattened control flow
    type Arg_Array is array (Positive range <>) of IR_Arg;
    type Statement_Array is array (Positive range <>) of IR_Statement;
 

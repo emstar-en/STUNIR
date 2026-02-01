@@ -1,0 +1,19 @@
+{
+  "module": "basic_test",
+  "description": "Test basic statements (assign, call, return)",
+  "functions": [
+    {
+      "name": "add",
+      "params": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "init": "0"},
+        {"type": "assign", "target": "result", "value": "a + b"},
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}
