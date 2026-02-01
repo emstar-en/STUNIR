@@ -280,7 +280,16 @@ fn c_default_return(type_str: &str) -> &str {
 
 /// Translate IR steps to C code (with support for control flow)
 fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> String {
-    use std::collections::HashMap;
+    translate_steps_to_c_internal(steps, ret_type, indent, &mut std::collections::HashMap::new())
+}
+
+/// Internal function to translate IR steps with shared variable tracking
+fn translate_steps_to_c_internal(
+    steps: &[IRStep], 
+    ret_type: &str, 
+    indent: usize,
+    local_vars: &mut std::collections::HashMap<String, String>
+) -> String {
     use serde_json::Value;
     
     let indent_str = "    ".repeat(indent);
@@ -295,7 +304,6 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> Stri
     }
     
     let mut lines = Vec::new();
-    let mut local_vars: HashMap<String, String> = HashMap::new();
     
     for step in steps {
         match step.op.as_str() {
@@ -366,14 +374,14 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> Stri
                 lines.push(format!("{}if ({}) {{", indent_str, condition));
                 
                 if let Some(ref then_block) = step.then_block {
-                    let then_body = translate_steps_to_c(then_block, ret_type, indent + 1);
+                    let then_body = translate_steps_to_c_internal(then_block, ret_type, indent + 1, local_vars);
                     lines.push(then_body);
                 }
                 
                 if let Some(ref else_block) = step.else_block {
                     if !else_block.is_empty() {
                         lines.push(format!("{}}} else {{", indent_str));
-                        let else_body = translate_steps_to_c(else_block, ret_type, indent + 1);
+                        let else_body = translate_steps_to_c_internal(else_block, ret_type, indent + 1, local_vars);
                         lines.push(else_body);
                     }
                 }
@@ -386,7 +394,7 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> Stri
                 lines.push(format!("{}while ({}) {{", indent_str, condition));
                 
                 if let Some(ref body) = step.body {
-                    let loop_body = translate_steps_to_c(body, ret_type, indent + 1);
+                    let loop_body = translate_steps_to_c_internal(body, ret_type, indent + 1, local_vars);
                     lines.push(loop_body);
                 }
                 
@@ -397,11 +405,66 @@ fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> Stri
                 let init = step.init.as_deref().unwrap_or("");
                 let condition = step.condition.as_deref().unwrap_or("true");
                 let increment = step.increment.as_deref().unwrap_or("");
+                
+                // Parse init to extract variable name and declare if needed
+                // Format: "var = value"
+                if !init.is_empty() {
+                    if let Some(eq_pos) = init.find('=') {
+                        let var_name = init[..eq_pos].trim();
+                        if !var_name.is_empty() && !local_vars.contains_key(var_name) {
+                            let init_value = init[eq_pos + 1..].trim();
+                            let var_type = infer_c_type_from_value(init_value);
+                            local_vars.insert(var_name.to_string(), var_type.to_string());
+                            // Declare variable before for loop
+                            lines.push(format!("{}{} {};", indent_str, var_type, var_name));
+                        }
+                    }
+                }
+                
                 lines.push(format!("{}for ({}; {}; {}) {{", indent_str, init, condition, increment));
                 
                 if let Some(ref body) = step.body {
-                    let loop_body = translate_steps_to_c(body, ret_type, indent + 1);
+                    let loop_body = translate_steps_to_c_internal(body, ret_type, indent + 1, local_vars);
                     lines.push(loop_body);
+                }
+                
+                lines.push(format!("{}}}", indent_str));
+            }
+            "break" => {
+                // v0.9.0: Break statement
+                lines.push(format!("{}break;", indent_str));
+            }
+            "continue" => {
+                // v0.9.0: Continue statement
+                lines.push(format!("{}continue;", indent_str));
+            }
+            "switch" => {
+                // v0.9.0: Switch/case statement
+                let expr = step.expr.as_deref().unwrap_or("0");
+                lines.push(format!("{}switch ({}) {{", indent_str, expr));
+                
+                // Generate case labels
+                if let Some(ref cases) = step.cases {
+                    for case in cases {
+                        let case_value = match &case.value {
+                            Value::String(s) => s.clone(),
+                            Value::Number(n) => n.to_string(),
+                            Value::Bool(b) => b.to_string(),
+                            _ => "0".to_string(),
+                        };
+                        lines.push(format!("{}  case {}:", indent_str, case_value));
+                        
+                        // Recursively translate case body with increased indentation
+                        let case_code = translate_steps_to_c_internal(&case.body, ret_type, indent + 2, local_vars);
+                        lines.push(case_code);
+                    }
+                }
+                
+                // Generate default case if present
+                if let Some(ref default) = step.default {
+                    lines.push(format!("{}  default:", indent_str));
+                    let default_code = translate_steps_to_c_internal(default, ret_type, indent + 2, local_vars);
+                    lines.push(default_code);
                 }
                 
                 lines.push(format!("{}}}", indent_str));

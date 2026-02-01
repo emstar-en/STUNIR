@@ -108,6 +108,13 @@ pub struct IRArg {
     pub arg_type: String,
 }
 
+/// IR Case entry for switch statements (v0.9.0)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRCase {
+    pub value: serde_json::Value,
+    pub body: Vec<IRStep>,
+}
+
 /// IR Step (operation) - matches stunir_ir_v1 schema with control flow support
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRStep {
@@ -117,7 +124,7 @@ pub struct IRStep {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<serde_json::Value>,
     
-    // Control flow fields
+    // Control flow fields (v0.6.1+)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -130,6 +137,14 @@ pub struct IRStep {
     pub init: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub increment: Option<String>,
+    
+    // Switch/case fields (v0.9.0)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expr: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cases: Option<Vec<IRCase>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default: Option<Vec<IRStep>>,
 }
 
 /// IR Function definition - matches stunir_ir_v1 schema

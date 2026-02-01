@@ -245,20 +245,259 @@ fn parse_arg(param: &Value) -> Result<IRArg> {
 }
 
 fn parse_statement(stmt: &Value) -> Result<IRStep> {
-    use stunir_tools::types::IRStep;
+    use stunir_tools::types::{IRStep, IRCase};
     
     let stmt_type = stmt["type"]
         .as_str()
         .context("Statement missing 'type'")?;
     
     match stmt_type {
-        "return" => {
+        // Control flow statements (v0.6.1)
+        "if" => {
+            let condition = stmt["condition"]
+                .as_str()
+                .unwrap_or("true")
+                .to_string();
+            
+            let then_block = if let Some(then_stmts) = stmt["then"].as_array() {
+                Some(
+                    then_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                Some(vec![])
+            };
+            
+            let else_block = if let Some(else_stmts) = stmt["else"].as_array() {
+                Some(
+                    else_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                None
+            };
+            
+            Ok(IRStep {
+                op: "if".to_string(),
+                target: None,
+                value: None,
+                condition: Some(condition),
+                then_block,
+                else_block,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        "while" => {
+            let condition = stmt["condition"]
+                .as_str()
+                .unwrap_or("true")
+                .to_string();
+            
+            let body = if let Some(body_stmts) = stmt["body"].as_array() {
+                Some(
+                    body_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                Some(vec![])
+            };
+            
+            Ok(IRStep {
+                op: "while".to_string(),
+                target: None,
+                value: None,
+                condition: Some(condition),
+                then_block: None,
+                else_block: None,
+                body,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        "for" => {
+            let init = stmt["init"]
+                .as_str()
+                .unwrap_or("")
+                .to_string();
+            let condition = stmt["condition"]
+                .as_str()
+                .unwrap_or("true")
+                .to_string();
+            let increment = stmt["increment"]
+                .as_str()
+                .unwrap_or("")
+                .to_string();
+            
+            let body = if let Some(body_stmts) = stmt["body"].as_array() {
+                Some(
+                    body_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                Some(vec![])
+            };
+            
+            Ok(IRStep {
+                op: "for".to_string(),
+                target: None,
+                value: None,
+                condition: Some(condition),
+                then_block: None,
+                else_block: None,
+                body,
+                init: Some(init),
+                increment: Some(increment),
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        
+        // Switch/case statement (v0.9.0)
+        "switch" => {
+            let expr = stmt["expr"]
+                .as_str()
+                .unwrap_or("0")
+                .to_string();
+            
+            let cases = if let Some(case_array) = stmt["cases"].as_array() {
+                let parsed_cases: Result<Vec<IRCase>> = case_array.iter()
+                    .map(|c| {
+                        let value = c["value"].clone();
+                        let body = if let Some(body_stmts) = c["body"].as_array() {
+                            body_stmts.iter()
+                                .map(|s| parse_statement(s))
+                                .collect::<Result<Vec<_>>>()?
+                        } else {
+                            vec![]
+                        };
+                        Ok(IRCase { value, body })
+                    })
+                    .collect();
+                Some(parsed_cases?)
+            } else {
+                None
+            };
+            
+            let default = if let Some(default_stmts) = stmt["default"].as_array() {
+                Some(
+                    default_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                None
+            };
+            
+            Ok(IRStep {
+                op: "switch".to_string(),
+                target: None,
+                value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: Some(expr),
+                cases,
+                default,
+            })
+        },
+        
+        // Break/continue statements (v0.9.0)
+        "break" => {
+            Ok(IRStep {
+                op: "break".to_string(),
+                target: None,
+                value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        "continue" => {
+            Ok(IRStep {
+                op: "continue".to_string(),
+                target: None,
+                value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        
+        // Regular statements
+        "call" => {
+            let called_func = stmt["func"]
+                .as_str()
+                .unwrap_or("unknown");
+            let args = stmt["args"].as_array()
+                .map(|arr| {
+                    arr.iter()
+                        .map(|v| v.as_str().unwrap_or(""))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                })
+                .unwrap_or_default();
+            
+            let value = format!("{}({})", called_func, args);
+            
+            let target = stmt["assign_to"]
+                .as_str()
+                .map(|s| s.to_string());
+            
+            Ok(IRStep {
+                op: "call".to_string(),
+                target,
+                value: Some(serde_json::json!(value)),
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        "assign" => {
+            let target = stmt["target"]
+                .as_str()
+                .context("assign missing 'target'")?
+                .to_string();
             let value = stmt["value"]
                 .as_str()
                 .map(|v| serde_json::json!(v));
+            
             Ok(IRStep {
-                op: "return".to_string(),
-                target: None,
+                op: "assign".to_string(),
+                target: Some(target),
                 value,
                 condition: None,
                 then_block: None,
@@ -266,6 +505,9 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 body: None,
                 init: None,
                 increment: None,
+                expr: None,
+                cases: None,
+                default: None,
             })
         },
         "var_decl" => {
@@ -288,13 +530,33 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 body: None,
                 init: None,
                 increment: None,
+                expr: None,
+                cases: None,
+                default: None,
             })
         },
-        _ => {
-            // Unknown statement type - return a noop
-            eprintln!("[WARN] Unknown statement type: {}", stmt_type);
+        "return" => {
+            let value = stmt["value"]
+                .as_str()
+                .map(|v| serde_json::json!(v));
             Ok(IRStep {
-                op: "noop".to_string(),
+                op: "return".to_string(),
+                target: None,
+                value,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        "comment" => {
+            Ok(IRStep {
+                op: "nop".to_string(),
                 target: None,
                 value: None,
                 condition: None,
@@ -303,6 +565,27 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 body: None,
                 init: None,
                 increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+            })
+        },
+        _ => {
+            // Unknown statement type - return a noop
+            eprintln!("[WARN] Unknown statement type: {}", stmt_type);
+            Ok(IRStep {
+                op: "nop".to_string(),
+                target: None,
+                value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
             })
         }
     }

@@ -1,0 +1,39 @@
+{
+  "current_version": "0.9.0",
+  "status": {
+    "python": {
+      "spec_to_ir": "DONE",
+      "ir_to_code": "DONE",
+      "features": ["break", "continue", "switch"],
+      "tests_passed": 6
+    },
+    "rust": {
+      "spec_to_ir": "DONE",
+      "ir_to_code": "DONE",
+      "features": ["break", "continue", "switch"],
+      "tests_passed": 6
+    },
+    "spark": {
+      "spec_to_ir": "TODO",
+      "ir_to_code": "TODO",
+      "features": []
+    }
+  },
+  "next_steps": [
+    "SPARK spec_to_ir break/continue/switch",
+    "SPARK ir_to_code break/continue/switch",
+    "Test SPARK pipeline"
+  ],
+  "test_summary": {
+    "v0.9.0_tests": [
+      "break_nested",
+      "break_while",
+      "combined_features",
+      "continue_for",
+      "switch_fallthrough",
+      "switch_simple"
+    ],
+    "rust_status": "ALL_PASSED",
+    "python_status": "ALL_PASSED"
+  }
+}
