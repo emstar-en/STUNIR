@@ -1,4 +1,4 @@
-# SPARK Implementation Roadmap for v0.9.0 Features
+# SPARK Implementation Roadmap for v0.8.4 Features
 
 **Date:** 2026-02-01  
 **Target Version:** v0.9.1  
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This document provides a detailed roadmap for implementing v0.9.0 control flow features (break, continue, switch/case) in the SPARK pipeline. The implementation must maintain SPARK's formal verification guarantees and bounded type safety.
+This document provides a detailed roadmap for implementing v0.8.4 control flow features (break, continue, switch/case) in the SPARK pipeline. The implementation must maintain SPARK's formal verification guarantees and bounded type safety.
 
 ---
 
@@ -62,9 +62,9 @@ type IR_Step_Op is (
     Op_If,
     Op_While,
     Op_For,
-    Op_Break,      -- v0.9.0
-    Op_Continue,   -- v0.9.0
-    Op_Switch,     -- v0.9.0
+    Op_Break,      -- v0.8.4
+    Op_Continue,   -- v0.8.4
+    Op_Switch,     -- v0.8.4
     Op_Nop
 );
 ```
@@ -107,7 +107,7 @@ type IR_Step is record
     Init        : Bounded_String := Null_Bounded_String;
     Increment   : Bounded_String := Null_Bounded_String;
     
-    -- v0.9.0: Switch/case fields
+    -- v0.8.4: Switch/case fields
     Switch_Expr : Bounded_String := Null_Bounded_String;
     Cases       : IR_Switch_Cases;
     Cases_Count : Natural := 0;
@@ -131,7 +131,7 @@ end record;
 **Add:**
 ```ada
 elsif Stmt_Type = "break" then
-    -- v0.9.0: Break statement
+    -- v0.8.4: Break statement
     declare
         Step : IR_Step;
     begin
@@ -147,7 +147,7 @@ elsif Stmt_Type = "break" then
 **Add:**
 ```ada
 elsif Stmt_Type = "continue" then
-    -- v0.9.0: Continue statement
+    -- v0.8.4: Continue statement
     declare
         Step : IR_Step;
     begin
@@ -163,7 +163,7 @@ elsif Stmt_Type = "continue" then
 **Add (more complex):**
 ```ada
 elsif Stmt_Type = "switch" then
-    -- v0.9.0: Switch/case statement
+    -- v0.8.4: Switch/case statement
     declare
         Step : IR_Step;
         Switch_Expr : constant String := Get_JSON_String (Stmt_Obj, "expr");
@@ -236,11 +236,11 @@ elsif Stmt_Type = "switch" then
 **Add:**
 ```ada
 when Op_Break =>
-    -- v0.9.0: Break statement
+    -- v0.8.4: Break statement
     Append (Builder, Get_Indent (Indent) & "break;");
     
 when Op_Continue =>
-    -- v0.9.0: Continue statement
+    -- v0.8.4: Continue statement
     Append (Builder, Get_Indent (Indent) & "continue;");
 ```
 
@@ -249,7 +249,7 @@ when Op_Continue =>
 **Add:**
 ```ada
 when Op_Switch =>
-    -- v0.9.0: Switch/case statement
+    -- v0.8.4: Switch/case statement
     declare
         Switch_Expr : constant String := To_String (Step.Switch_Expr);
     begin
@@ -331,7 +331,7 @@ gprbuild -P stunir_tools.gpr -p
 ```bash
 # Test break_while
 bin/stunir_spec_to_ir_main \
-    --spec-root ../../test_specs/v0.9.0 \
+    --spec-root ../../test_specs/v0.8.4 \
     --out /tmp/test_spark_ir.json
 
 bin/stunir_ir_to_code_main \
@@ -388,7 +388,7 @@ with
 
 ### Integration Tests
 
-- Run all 6 v0.9.0 test specs
+- Run all 6 v0.8.4 test specs
 - Compare output with Python and Rust
 - Verify C code compilation
 - Verify functional equivalence
@@ -415,7 +415,7 @@ with
 
 ## Success Criteria
 
-- [ ] All 6 v0.9.0 test specs pass in SPARK pipeline
+- [ ] All 6 v0.8.4 test specs pass in SPARK pipeline
 - [ ] Generated C code compiles without warnings
 - [ ] IR output matches Python/Rust structurally
 - [ ] C code output is functionally equivalent to Python/Rust
@@ -465,7 +465,7 @@ with
 2. **Allocate time** for implementation (3-4 hours)
 3. **Set up test environment** (GNAT compiler, test specs)
 4. **Implement incrementally:** break/continue first, then switch
-5. **Test thoroughly** with all 6 v0.9.0 specs
+5. **Test thoroughly** with all 6 v0.8.4 specs
 6. **Cross-validate** with Python and Rust
 7. **Update documentation** (this roadmap + implementation status)
 

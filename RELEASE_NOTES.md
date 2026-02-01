@@ -1,23 +1,25 @@
 # STUNIR Release Notes
 
-## Version 0.9.0 - February 1, 2026
+## Version 0.8.4 - February 1, 2026
 
 **Status**: ✅ **Python 100% Complete!** 🚀  
 **Codename**: "Additional Control Flow Features"  
 **Release Date**: February 1, 2026  
-**Release Type**: MINOR (New Features)  
-**Progress**: **Python 100%** (Rust + SPARK deferred to v0.9.1)
+**Release Type**: PATCH (New Features)  
+**Progress**: **Python 100%** (Rust + SPARK deferred to v0.8.5)
+
+**Versioning Note**: v0.9.0 is **reserved** for the "everything-but-Haskell milestone". Current work uses granular versions (0.8.4, 0.8.5, etc.).
 
 ---
 
 ### 🎯 Executive Summary
 
-STUNIR 0.9.0 expands control flow capabilities with three major new features:
+STUNIR 0.8.4 expands control flow capabilities with three major new features:
 1. **break** statements - Exit loops early
 2. **continue** statements - Skip to next iteration
 3. **switch/case** statements - Multi-way branching
 
-This release focuses on the **Python reference implementation** as a foundation, with Rust and SPARK implementations planned for v0.9.1.
+This release focuses on the **Python reference implementation** as a foundation, with Rust and SPARK implementations planned for v0.8.5.
 
 ### Key Achievements
 
@@ -25,13 +27,13 @@ This release focuses on the **Python reference implementation** as a foundation,
 ✅ **switch/case** - Multi-way branching with fall-through support  
 ✅ **Schema Updates** - IR schema extended with new operations  
 ✅ **Comprehensive Tests** - 6 test specs covering all features  
-✅ **100% Test Pass Rate** - All v0.9.0 tests passing  
+✅ **100% Test Pass Rate** - All v0.8.4 tests passing  
 
 **Milestone**: STUNIR now supports all essential C-style control flow constructs!
 
 ---
 
-### What's New in 0.9.0
+### What's New in 0.8.4
 
 #### 🔄 break Statement
 
@@ -171,11 +173,11 @@ TOTAL: 6/6 PASSED (100%)
 - ✅ ir_to_code.py - Generates C code for all features
 - ✅ All tests passing
 
-**Rust**: ⏸️ Deferred to v0.9.1
+**Rust**: ⏸️ Deferred to v0.8.5
 - Basic structure exists
 - Implementation required
 
-**SPARK**: ⏸️ Deferred to v0.9.1
+**SPARK**: ⏸️ Deferred to v0.8.5
 - Formal verification required
 - Bounded recursion needs validation
 
@@ -219,16 +221,16 @@ Existing specs continue to work without modification.
 
 ### Testing
 
-**Test Script**: `test_v0.9.0.py`
+**Test Script**: `test_v0.8.4.py`
 
 **Run Tests**:
 ```bash
-python3 test_v0.9.0.py
+python3 test_v0.8.4.py
 ```
 
 **Expected Output**:
 ```
-STUNIR v0.9.0 Test Suite
+STUNIR v0.8.4 Test Suite
 Found 6 test spec(s)
 ...
 Total: 6
@@ -243,40 +245,45 @@ Failed: 0
 ### Documentation
 
 **New Files**:
-- `docs/design/v0.9.0/control_flow_design.md` - Design document
-- `test_specs/v0.9.0/*.json` - Test specifications
-- `test_v0.9.0.py` - Test suite
+- `docs/design/v0.8.4/control_flow_design.md` - Design document
+- `test_specs/v0.8.4/*.json` - Test specifications
+- `test_v0.8.4.py` - Test suite
 
 **Updated Files**:
 - `schemas/stunir_ir_v1.schema.json` - Extended with new operations
 - `tools/spec_to_ir.py` - Added break/continue/switch parsing
 - `tools/ir_to_code.py` - Added C code generation
-- `pyproject.toml` - Version bump to 0.9.0
+- `pyproject.toml` - Version bump to 0.8.4
 
 ---
 
 ### Known Limitations
 
-1. **Rust/SPARK Not Implemented**: v0.9.0 is Python-only. Rust and SPARK support coming in v0.9.1.
+1. **Rust/SPARK Not Implemented**: v0.8.4 is Python-only. Rust and SPARK support coming in v0.8.5.
 
 2. **switch Expression Type**: Only integer expressions supported initially. String/enum support may come in future versions.
 
 3. **break/continue Validation**: No compile-time validation that break/continue are inside loops. C compiler will catch these errors.
 
-4. **Variable Redeclaration**: Python IR generator may redeclare variables in nested scopes (pre-existing issue, not specific to v0.9.0).
+4. **Variable Redeclaration**: Python IR generator may redeclare variables in nested scopes (pre-existing issue, not specific to v0.8.4).
 
 ---
 
 ### Roadmap
 
-**v0.9.1** (Next Release):
+**v0.8.5** (Next Release):
 - Implement break/continue/switch in Rust
 - Implement break/continue/switch in SPARK with formal verification
 - Cross-pipeline validation
 - Performance benchmarking
 
+**v0.9.0** (Reserved Milestone):
+- Everything-but-Haskell working milestone
+- All pipelines at feature parity (except Haskell)
+- Production-ready state
+
 **v1.0.0** (Future):
-- Full multi-language parity
+- Full multi-language parity (including Haskell)
 - Advanced control flow (labeled break, goto)
 - Exception handling primitives
 

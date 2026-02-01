@@ -492,6 +492,98 @@ package body STUNIR_JSON_Utils is
                                            Put_Line ("[INFO] Flattened for: body[" & Natural'Image(Body_Start_Idx) & ".." & 
                                                      Natural'Image(Body_Start_Idx + Body_Count_Val - 1) & "]");
                                         end;
+                                     elsif Stmt_Type = "break" then
+                                        -- v0.9.0: Break statement
+                                        Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_Break;
+                                        Put_Line ("[INFO] Added break statement");
+                                     elsif Stmt_Type = "continue" then
+                                        -- v0.9.0: Continue statement
+                                        Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_Continue;
+                                        Put_Line ("[INFO] Added continue statement");
+                                     elsif Stmt_Type = "switch" then
+                                        -- v0.9.0: Switch/case statement
+                                        Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_Switch;
+                                        declare
+                                           Expr_Str : constant String := Extract_String_Value (Stmt_JSON, "expr");
+                                           Cases_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "cases");
+                                           Default_Array_Pos : constant Natural := Find_Array (Stmt_JSON, "default");
+                                           Case_Pos : Natural;
+                                           Case_Start, Case_End : Natural;
+                                           Case_Count : Natural := 0;
+                                        begin
+                                           -- Extract switch expression
+                                           if Expr_Str'Length > 0 and Expr_Str'Length <= Max_Code_Length then
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Value :=
+                                                Code_Buffers.To_Bounded_String (Expr_Str);
+                                           end if;
+                                           
+                                           -- Process cases array
+                                           if Cases_Array_Pos > 0 then
+                                              Case_Pos := Cases_Array_Pos + 1;
+                                              while Case_Count < Max_Cases loop
+                                                 Get_Next_Object (Stmt_JSON, Case_Pos, Case_Start, Case_End);
+                                                 exit when Case_Start = 0 or Case_End = 0;
+                                                 
+                                                 declare
+                                                    Case_JSON : constant String := Stmt_JSON (Case_Start .. Case_End);
+                                                    Case_Value_Str : constant String := Extract_String_Value (Case_JSON, "value");
+                                                    Case_Body_Pos : constant Natural := Find_Array (Case_JSON, "body");
+                                                    Case_Body_Start : Natural := 0;
+                                                    Case_Body_Count : Natural := 0;
+                                                    Count_Before : Natural;
+                                                 begin
+                                                    Case_Count := Case_Count + 1;
+                                                    
+                                                    -- Store case value
+                                                    if Case_Value_Str'Length > 0 and Case_Value_Str'Length <= Max_Code_Length then
+                                                       Module.Functions (Func_Idx).Statements (Current_Idx).Cases (Case_Count).Case_Value :=
+                                                         Code_Buffers.To_Bounded_String (Case_Value_Str);
+                                                    end if;
+                                                    
+                                                    -- Recursively flatten case body
+                                                    if Case_Body_Pos > 0 then
+                                                       Case_Body_Start := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                                       Count_Before := Module.Functions (Func_Idx).Stmt_Cnt;
+                                                       Flatten_Block (Case_JSON, Case_Body_Pos, Depth + 1);
+                                                       Case_Body_Count := Module.Functions (Func_Idx).Stmt_Cnt - Count_Before;
+                                                    end if;
+                                                    
+                                                    -- Store case block indices
+                                                    Module.Functions (Func_Idx).Statements (Current_Idx).Cases (Case_Count).Block_Start := Case_Body_Start;
+                                                    Module.Functions (Func_Idx).Statements (Current_Idx).Cases (Case_Count).Block_Count := Case_Body_Count;
+                                                    
+                                                    Put_Line ("[INFO] Flattened case " & Natural'Image(Case_Count) & 
+                                                              ": value=" & Case_Value_Str & 
+                                                              " body[" & Natural'Image(Case_Body_Start) & ".." & 
+                                                              Natural'Image(Case_Body_Start + Case_Body_Count - 1) & "]");
+                                                 end;
+                                                 
+                                                 Case_Pos := Case_End + 1;
+                                              end loop;
+                                              
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Case_Cnt := Case_Count;
+                                           end if;
+                                           
+                                           -- Process default case
+                                           if Default_Array_Pos > 0 then
+                                              declare
+                                                 Default_Start : Natural := 0;
+                                                 Default_Count : Natural := 0;
+                                                 Count_Before : Natural;
+                                              begin
+                                                 Default_Start := Module.Functions (Func_Idx).Stmt_Cnt + 1;
+                                                 Count_Before := Module.Functions (Func_Idx).Stmt_Cnt;
+                                                 Flatten_Block (Stmt_JSON, Default_Array_Pos, Depth + 1);
+                                                 Default_Count := Module.Functions (Func_Idx).Stmt_Cnt - Count_Before;
+                                                 
+                                                 Module.Functions (Func_Idx).Statements (Current_Idx).Else_Start := Default_Start;
+                                                 Module.Functions (Func_Idx).Statements (Current_Idx).Else_Count := Default_Count;
+                                                 
+                                                 Put_Line ("[INFO] Flattened default: body[" & Natural'Image(Default_Start) & ".." & 
+                                                           Natural'Image(Default_Start + Default_Count - 1) & "]");
+                                              end;
+                                           end if;
+                                        end;
                                      else
                                         -- Unknown statement type - keep as Stmt_Nop
                                         null;
@@ -652,6 +744,45 @@ package body STUNIR_JSON_Utils is
                       if Stmt.Block_Start > 0 then
                          Append_To_Buffer (Output, ",""block_start"":" & Natural'Image (Stmt.Block_Start));
                          Append_To_Buffer (Output, ",""block_count"":" & Natural'Image (Stmt.Block_Count));
+                      end if;
+                   
+                   when Stmt_Break =>
+                      -- v0.9.0: Break statement
+                      Append_To_Buffer (Output, """op"":""break""");
+                   
+                   when Stmt_Continue =>
+                      -- v0.9.0: Continue statement
+                      Append_To_Buffer (Output, """op"":""continue""");
+                   
+                   when Stmt_Switch =>
+                      -- v0.9.0: Switch/case statement
+                      Append_To_Buffer (Output, """op"":""switch""");
+                      if Code_Buffers.Length (Stmt.Value) > 0 then
+                         Append_To_Buffer (Output, ",""expr"":""" & Code_Buffers.To_String (Stmt.Value) & """");
+                      end if;
+                      -- Emit cases array
+                      if Stmt.Case_Cnt > 0 then
+                         Append_To_Buffer (Output, ",""cases"":[");
+                         for Case_Idx in 1 .. Stmt.Case_Cnt loop
+                            if Case_Idx > 1 then
+                               Append_To_Buffer (Output, ",");
+                            end if;
+                            Append_To_Buffer (Output, "{""value"":""" & 
+                                              Code_Buffers.To_String (Stmt.Cases (Case_Idx).Case_Value) & """");
+                            if Stmt.Cases (Case_Idx).Block_Start > 0 then
+                               Append_To_Buffer (Output, ",""block_start"":" & 
+                                                 Natural'Image (Stmt.Cases (Case_Idx).Block_Start));
+                               Append_To_Buffer (Output, ",""block_count"":" & 
+                                                 Natural'Image (Stmt.Cases (Case_Idx).Block_Count));
+                            end if;
+                            Append_To_Buffer (Output, "}");
+                         end loop;
+                         Append_To_Buffer (Output, "]");
+                      end if;
+                      -- Emit default block if present
+                      if Stmt.Else_Start > 0 then
+                         Append_To_Buffer (Output, ",""default_start"":" & Natural'Image (Stmt.Else_Start));
+                         Append_To_Buffer (Output, ",""default_count"":" & Natural'Image (Stmt.Else_Count));
                       end if;
                    
                    when Stmt_Nop =>

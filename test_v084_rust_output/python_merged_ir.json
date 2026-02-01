@@ -1,0 +1,396 @@
+{
+  "docstring": "Test break in nested loops - v0.9.0",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "target",
+          "type": "i32"
+        }
+      ],
+      "name": "find_pair_sum",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "found",
+          "value": "0"
+        },
+        {
+          "body": [
+            {
+              "body": [
+                {
+                  "condition": "i + j == target",
+                  "op": "if",
+                  "then_block": [
+                    {
+                      "op": "assign",
+                      "target": "found",
+                      "value": "1"
+                    },
+                    {
+                      "op": "break"
+                    }
+                  ]
+                }
+              ],
+              "condition": "j < 10",
+              "increment": "j = j + 1",
+              "init": "j = 0",
+              "op": "for"
+            },
+            {
+              "condition": "found == 1",
+              "op": "if",
+              "then_block": [
+                {
+                  "op": "break"
+                }
+              ]
+            }
+          ],
+          "condition": "i < 10",
+          "increment": "i = i + 1",
+          "init": "i = 0",
+          "op": "for"
+        },
+        {
+          "op": "return",
+          "value": "found"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        },
+        {
+          "name": "divisor",
+          "type": "i32"
+        }
+      ],
+      "name": "find_first_divisible",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "1"
+        },
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "-1"
+        },
+        {
+          "body": [
+            {
+              "condition": "i % divisor == 0",
+              "op": "if",
+              "then_block": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "i"
+                },
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "op": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ],
+          "condition": "i < max",
+          "op": "while"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "complex_control_flow",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "body": [
+            {
+              "condition": "i > 10",
+              "op": "if",
+              "then_block": [
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "cases": [
+                {
+                  "body": [
+                    {
+                      "op": "assign",
+                      "target": "result",
+                      "value": "result + 1"
+                    },
+                    {
+                      "op": "break"
+                    }
+                  ],
+                  "value": 0
+                },
+                {
+                  "body": [
+                    {
+                      "op": "continue"
+                    }
+                  ],
+                  "value": 1
+                }
+              ],
+              "default": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "result + 2"
+                }
+              ],
+              "expr": "i % 3",
+              "op": "switch"
+            }
+          ],
+          "condition": "i < n",
+          "increment": "i = i + 1",
+          "init": "i = 0",
+          "op": "for"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        }
+      ],
+      "name": "sum_odd_numbers",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "body": [
+            {
+              "condition": "i % 2 == 0",
+              "op": "if",
+              "then_block": [
+                {
+                  "op": "continue"
+                }
+              ]
+            },
+            {
+              "op": "assign",
+              "target": "sum",
+              "value": "sum + i"
+            }
+          ],
+          "condition": "i < max",
+          "increment": "i = i + 1",
+          "init": "i = 0",
+          "op": "for"
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "cmd",
+          "type": "i32"
+        }
+      ],
+      "name": "handle_command",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "status",
+          "value": "0"
+        },
+        {
+          "cases": [
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "status",
+                  "value": "status + 1"
+                }
+              ],
+              "value": 1
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "status",
+                  "value": "status + 10"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 2
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "status",
+                  "value": "100"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 3
+            }
+          ],
+          "default": [
+            {
+              "op": "assign",
+              "target": "status",
+              "value": "-1"
+            }
+          ],
+          "expr": "cmd",
+          "op": "switch"
+        },
+        {
+          "op": "return",
+          "value": "status"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "day",
+          "type": "i32"
+        }
+      ],
+      "name": "get_day_type",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "cases": [
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "1"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 1
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "1"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 2
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "2"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 6
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "2"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 7
+            }
+          ],
+          "default": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "1"
+            }
+          ],
+          "expr": "day",
+          "op": "switch"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T06:17:25.937160Z",
+  "ir_version": "v1",
+  "module_name": "break_nested_test",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

@@ -1,0 +1,54 @@
+{
+  "module": "switch_simple_test",
+  "description": "Test simple switch/case statement - v0.9.0",
+  "functions": [
+    {
+      "name": "get_day_type",
+      "returns": "i32",
+      "params": [
+        {"name": "day", "type": "i32"}
+      ],
+      "body": [
+        {"type": "assign", "target": "result", "value": "0"},
+        {
+          "type": "switch",
+          "expr": "day",
+          "cases": [
+            {
+              "value": 1,
+              "body": [
+                {"type": "assign", "target": "result", "value": "1"},
+                {"type": "break"}
+              ]
+            },
+            {
+              "value": 2,
+              "body": [
+                {"type": "assign", "target": "result", "value": "1"},
+                {"type": "break"}
+              ]
+            },
+            {
+              "value": 6,
+              "body": [
+                {"type": "assign", "target": "result", "value": "2"},
+                {"type": "break"}
+              ]
+            },
+            {
+              "value": 7,
+              "body": [
+                {"type": "assign", "target": "result", "value": "2"},
+                {"type": "break"}
+              ]
+            }
+          ],
+          "default": [
+            {"type": "assign", "target": "result", "value": "1"}
+          ]
+        },
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

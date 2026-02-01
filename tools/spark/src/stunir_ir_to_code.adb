@@ -301,6 +301,62 @@ package body STUNIR_IR_To_Code is
                                           Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Block_Start := Block_Start_Val;
                                           Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Block_Count := Block_Count_Val;
                                           Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Else_Start := Else_Start_Val;
+                                           
+                                           --  Parse switch/case fields (v0.9.0)
+                                           if Step_Op = "switch" then
+                                              declare
+                                                 Expr_Val : constant String := Extract_String_Value (Step_JSON, "expr");
+                                                 Cases_Pos : constant Natural := Find_Array (Step_JSON, "cases");
+                                                 Default_Start_Val : constant Natural := Extract_Integer_Value (Step_JSON, "default_start");
+                                                 Default_Count_Val : constant Natural := Extract_Integer_Value (Step_JSON, "default_count");
+                                                 Current_Step_Idx : constant Positive := Module.Functions (Func_Idx).Step_Count;
+                                              begin
+                                                 --  Store switch expression in Value field
+                                                 if Expr_Val'Length > 0 then
+                                                    Module.Functions (Func_Idx).Steps (Current_Step_Idx).Value :=
+                                                      Name_Strings.To_Bounded_String (Expr_Val);
+                                                 end if;
+                                                 
+                                                 --  Parse cases array
+                                                 Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count := 0;
+                                                 if Cases_Pos > 0 then
+                                                    declare
+                                                       Case_Pos : Natural := Cases_Pos + 1;
+                                                       Case_Start, Case_End : Natural;
+                                                    begin
+                                                       while Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count < Max_Switch_Cases loop
+                                                          Get_Next_Object (Step_JSON, Case_Pos, Case_Start, Case_End);
+                                                          exit when Case_Start = 0 or Case_End = 0;
+                                                          
+                                                          declare
+                                                             Case_JSON : constant String := Step_JSON (Case_Start .. Case_End);
+                                                             Case_Val  : constant String := Extract_String_Value (Case_JSON, "value");
+                                                             Case_Block_Start : constant Natural := Extract_Integer_Value (Case_JSON, "block_start");
+                                                             Case_Block_Count : constant Natural := Extract_Integer_Value (Case_JSON, "block_count");
+                                                             Case_Idx : Positive;
+                                                          begin
+                                                             Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count :=
+                                                               Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count + 1;
+                                                             Case_Idx := Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count;
+                                                             
+                                                             Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Case_Value :=
+                                                               Name_Strings.To_Bounded_String (Case_Val);
+                                                             Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Block_Start :=
+                                                               Case_Block_Start;
+                                                             Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Block_Count :=
+                                                               Case_Block_Count;
+                                                          end;
+                                                          
+                                                          Case_Pos := Case_End + 1;
+                                                       end loop;
+                                                    end;
+                                                 end if;
+                                                 
+                                                 --  Store default block indices
+                                                 Module.Functions (Func_Idx).Steps (Current_Step_Idx).Default_Start := Default_Start_Val;
+                                                 Module.Functions (Func_Idx).Steps (Current_Step_Idx).Default_Count := Default_Count_Val;
+                                              end;
+                                           end if;
                                           Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Else_Count := Else_Count_Val;
                                        end if;
                                     end;
@@ -862,6 +918,105 @@ package body STUNIR_IR_To_Code is
                                 Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
                            begin
                               Append (Nested_Body);
+                           end;
+                        end if;
+                     end;
+                  end if;
+                  
+                  Append (Get_Indent & "}");
+                  Append (NL);
+               end;
+               
+            elsif Op = "break" then
+               --  v0.9.0: Break statement
+               Append (Get_Indent & "break;");
+               Append (NL);
+               
+            elsif Op = "continue" then
+               --  v0.9.0: Continue statement
+               Append (Get_Indent & "continue;");
+               Append (NL);
+               
+            elsif Op = "switch" then
+               --  v0.9.0: Switch/case statement
+               declare
+                  Expr : constant String := Name_Strings.To_String (Step.Value);
+               begin
+                  Append (Get_Indent & "switch (" & Expr & ") {");
+                  Append (NL);
+                  
+                  --  Generate case labels
+                  for Case_Idx in 1 .. Step.Case_Count loop
+                     declare
+                        Case_Val : constant String := Name_Strings.To_String (Step.Cases (Case_Idx).Case_Value);
+                        Case_Block_Start : constant Natural := Step.Cases (Case_Idx).Block_Start;
+                        Case_Block_End   : constant Natural := Step.Cases (Case_Idx).Block_Start + Step.Cases (Case_Idx).Block_Count - 1;
+                        Case_Steps       : Step_Array;
+                        Case_Step_Count  : Natural := 0;
+                     begin
+                        Append (Get_Indent & "  case " & Case_Val & ":");
+                        Append (NL);
+                        
+                        --  Mark case block steps as processed
+                        for J in Case_Block_Start .. Case_Block_End loop
+                           if J <= Step_Count then
+                              Processed (J) := True;
+                           end if;
+                        end loop;
+                        
+                        --  Extract and translate case body RECURSIVELY
+                        if Step.Cases (Case_Idx).Block_Count > 0 and Case_Block_Start > 0 then
+                           for Block_I in Case_Block_Start .. Case_Block_End loop
+                              if Block_I <= Step_Count then
+                                 Case_Step_Count := Case_Step_Count + 1;
+                                 Case_Steps (Case_Step_Count) := Steps (Block_I);
+                              end if;
+                           end loop;
+                           
+                           if Case_Step_Count > 0 then
+                              declare
+                                 Case_Code : constant String := 
+                                   Translate_Steps_To_C (Case_Steps, Case_Step_Count, Ret_Type, Depth + 1, Indent + 2);
+                              begin
+                                 Append (Case_Code);
+                              end;
+                           end if;
+                        end if;
+                     end;
+                  end loop;
+                  
+                  --  Generate default case if present
+                  if Step.Default_Count > 0 and Step.Default_Start > 0 then
+                     declare
+                        Default_Block_Start : constant Natural := Step.Default_Start;
+                        Default_Block_End   : constant Natural := Step.Default_Start + Step.Default_Count - 1;
+                        Default_Steps       : Step_Array;
+                        Default_Step_Count  : Natural := 0;
+                     begin
+                        Append (Get_Indent & "  default:");
+                        Append (NL);
+                        
+                        --  Mark default block steps as processed
+                        for J in Default_Block_Start .. Default_Block_End loop
+                           if J <= Step_Count then
+                              Processed (J) := True;
+                           end if;
+                        end loop;
+                        
+                        --  Extract and translate default body RECURSIVELY
+                        for Block_I in Default_Block_Start .. Default_Block_End loop
+                           if Block_I <= Step_Count then
+                              Default_Step_Count := Default_Step_Count + 1;
+                              Default_Steps (Default_Step_Count) := Steps (Block_I);
+                           end if;
+                        end loop;
+                        
+                        if Default_Step_Count > 0 then
+                           declare
+                              Default_Code : constant String := 
+                                Translate_Steps_To_C (Default_Steps, Default_Step_Count, Ret_Type, Depth + 1, Indent + 2);
+                           begin
+                              Append (Default_Code);
                            end;
                         end if;
                      end;

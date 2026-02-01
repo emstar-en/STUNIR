@@ -1,7 +1,7 @@
-# STUNIR v0.9.0 Implementation Summary
+# STUNIR v0.8.4 Implementation Summary
 
 **Date**: February 1, 2026  
-**Version**: 0.9.0  
+**Version**: 0.8.4  
 **Status**: ✅ **COMPLETE**  
 **Commit**: 3c5820a
 
@@ -9,7 +9,7 @@
 
 ## 🎯 Mission Accomplished!
 
-STUNIR v0.9.0 has been successfully implemented and committed to the devsite branch!
+STUNIR v0.8.4 has been successfully implemented and committed to the devsite branch!
 
 ---
 
@@ -46,31 +46,31 @@ STUNIR v0.9.0 has been successfully implemented and committed to the devsite bra
 **Total**: 17 files (11 new, 6 modified)
 
 **New Files**:
-- `docs/design/v0.9.0/control_flow_design.md` - Design specification
-- `docs/reports/v0.9.0/V0.9.0_COMPLETION_REPORT.md` - Full report
-- `docs/reports/v0.9.0/IMPLEMENTATION_SUMMARY.md` - This file
-- `test_specs/v0.9.0/break_while.json` - Break test
-- `test_specs/v0.9.0/continue_for.json` - Continue test
-- `test_specs/v0.9.0/break_nested.json` - Nested break test
-- `test_specs/v0.9.0/switch_simple.json` - Simple switch test
-- `test_specs/v0.9.0/switch_fallthrough.json` - Fall-through test
-- `test_specs/v0.9.0/combined_features.json` - Combined test
-- `test_v0.9.0.py` - Test runner
+- `docs/design/v0.8.4/control_flow_design.md` - Design specification
+- `docs/reports/v0.8.4/V0.8.4_COMPLETION_REPORT.md` - Full report
+- `docs/reports/v0.8.4/IMPLEMENTATION_SUMMARY.md` - This file
+- `test_specs/v0.8.4/break_while.json` - Break test
+- `test_specs/v0.8.4/continue_for.json` - Continue test
+- `test_specs/v0.8.4/break_nested.json` - Nested break test
+- `test_specs/v0.8.4/switch_simple.json` - Simple switch test
+- `test_specs/v0.8.4/switch_fallthrough.json` - Fall-through test
+- `test_specs/v0.8.4/combined_features.json` - Combined test
+- `test_v0.8.4.py` - Test runner
 - PDF versions (auto-generated)
 
 **Modified Files**:
-- `pyproject.toml` - Version: 0.8.3 → 0.9.0
+- `pyproject.toml` - Version: 0.8.3 → 0.8.4
 - `schemas/stunir_ir_v1.schema.json` - Added break/continue/switch ops
 - `tools/spec_to_ir.py` - Added statement parsing
 - `tools/ir_to_code.py` - Added C code generation
-- `RELEASE_NOTES.md` - Added v0.9.0 section
+- `RELEASE_NOTES.md` - Added v0.8.4 section
 
 ---
 
 ## 🧪 Test Results
 
 ```
-STUNIR v0.9.0 Test Suite
+STUNIR v0.8.4 Test Suite
 ========================
 Total Tests:    6
 Passed:         6
@@ -215,27 +215,27 @@ switch (day) {
 
 **Branch**: devsite  
 **Commit**: 3c5820a  
-**Commit Message**: Release v0.9.0: Additional Control Flow Features
+**Commit Message**: Release v0.8.4: Additional Control Flow Features
 
 **Files in Commit**:
 ```
 M  .abacus.donotdelete
 M  RELEASE_NOTES.md
-A  docs/design/v0.9.0/control_flow_design.md
-A  docs/design/v0.9.0/control_flow_design.pdf
-A  docs/reports/v0.9.0/V0.9.0_COMPLETION_REPORT.md
-A  docs/reports/v0.9.0/V0.9.0_COMPLETION_REPORT.pdf
+A  docs/design/v0.8.4/control_flow_design.md
+A  docs/design/v0.8.4/control_flow_design.pdf
+A  docs/reports/v0.8.4/V0.8.4_COMPLETION_REPORT.md
+A  docs/reports/v0.8.4/V0.8.4_COMPLETION_REPORT.pdf
 M  pyproject.toml
 M  schemas/stunir_ir_v1.schema.json
-A  test_specs/v0.9.0/break_nested.json
-A  test_specs/v0.9.0/break_while.json
-A  test_specs/v0.9.0/combined_features.json
-A  test_specs/v0.9.0/continue_for.json
-A  test_specs/v0.9.0/switch_fallthrough.json
-A  test_specs/v0.9.0/switch_simple.json
+A  test_specs/v0.8.4/break_nested.json
+A  test_specs/v0.8.4/break_while.json
+A  test_specs/v0.8.4/combined_features.json
+A  test_specs/v0.8.4/continue_for.json
+A  test_specs/v0.8.4/switch_fallthrough.json
+A  test_specs/v0.8.4/switch_simple.json
 M  tools/ir_to_code.py
 M  tools/spec_to_ir.py
-A  test_v0.9.0.py
+A  test_v0.8.4.py
 ```
 
 ---
@@ -246,7 +246,7 @@ A  test_v0.9.0.py
 
 ```bash
 cd /home/ubuntu/stunir_repo
-python3 test_v0.9.0.py
+python3 test_v0.8.4.py
 ```
 
 ### Test Individual Specs
@@ -260,7 +260,7 @@ sys.path.insert(0, 'tools')
 from spec_to_ir import convert_spec_to_ir
 from ir_to_code import translate_steps_to_c
 
-with open('test_specs/v0.9.0/break_while.json', 'r') as f:
+with open('test_specs/v0.8.4/break_while.json', 'r') as f:
     spec = json.load(f)
 
 ir = convert_spec_to_ir(spec)
@@ -333,13 +333,13 @@ Add new control flow to your JSON specs:
 
 ### Available Documents
 
-1. **Design Document**: `docs/design/v0.9.0/control_flow_design.md`
+1. **Design Document**: `docs/design/v0.8.4/control_flow_design.md`
    - Complete feature specifications
    - IR representation details
    - C code generation guidelines
    - Edge cases and validation rules
 
-2. **Completion Report**: `docs/reports/v0.9.0/V0.9.0_COMPLETION_REPORT.md`
+2. **Completion Report**: `docs/reports/v0.8.4/V0.8.4_COMPLETION_REPORT.md`
    - Full implementation details
    - Test results
    - Performance analysis
@@ -366,14 +366,14 @@ Add new control flow to your JSON specs:
 | Test Coverage | >90% | 100% | ✅ |
 | Test Pass Rate | >95% | 100% | ✅ |
 | Documentation | Complete | Complete | ✅ |
-| Version Bump | Done | 0.9.0 | ✅ |
+| Version Bump | Done | 0.8.4 | ✅ |
 | Git Commit | Done | 3c5820a | ✅ |
 
 ---
 
 ## 🎉 Celebration!
 
-STUNIR v0.9.0 is **COMPLETE** and **COMMITTED**!
+STUNIR v0.8.4 is **COMPLETE** and **COMMITTED**!
 
 ### Key Achievements
 
@@ -402,14 +402,14 @@ This makes STUNIR a **complete control flow framework** for deterministic IR gen
 ## 📞 Contact & Support
 
 For questions or issues:
-- Review design docs in `docs/design/v0.9.0/`
-- Check completion report in `docs/reports/v0.9.0/`
-- Run tests with `python3 test_v0.9.0.py`
+- Review design docs in `docs/design/v0.8.4/`
+- Check completion report in `docs/reports/v0.8.4/`
+- Run tests with `python3 test_v0.8.4.py`
 - Review release notes in `RELEASE_NOTES.md`
 
 ---
 
-**Version**: 0.9.0  
+**Version**: 0.8.4  
 **Date**: February 1, 2026  
 **Status**: ✅ **RELEASED**  
 **Python**: 100% Complete  

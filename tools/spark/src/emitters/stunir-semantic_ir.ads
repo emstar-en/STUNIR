@@ -55,9 +55,20 @@ package STUNIR.Semantic_IR is
       Type_Ref : IR_Type_String;
    end record;
 
-   -- Statement (expanded for v0.8.0 control flow support)
+   -- Statement (expanded for v0.9.0: added break, continue, switch/case)
    type IR_Statement_Kind is
-     (Stmt_Assign, Stmt_Call, Stmt_Return, Stmt_If, Stmt_While, Stmt_For, Stmt_Nop);
+     (Stmt_Assign, Stmt_Call, Stmt_Return, Stmt_If, Stmt_While, Stmt_For, 
+      Stmt_Break, Stmt_Continue, Stmt_Switch, Stmt_Nop);
+
+   -- Switch case entry (v0.9.0)
+   type Switch_Case_Entry is record
+      Case_Value  : IR_Code_Buffer;  -- Case value expression
+      Block_Start : Natural := 0;    -- 1-based index of case block start
+      Block_Count : Natural := 0;    -- Number of statements in case block
+   end record;
+   
+   Max_Cases : constant := 10;  -- Maximum cases per switch (bounded for SPARK)
+   type Case_Array is array (Positive range <>) of Switch_Case_Entry;
 
    type IR_Statement is record
       Kind        : IR_Statement_Kind := Stmt_Nop;
@@ -65,7 +76,7 @@ package STUNIR.Semantic_IR is
       Data        : IR_Code_Buffer;  -- Legacy field, kept for compatibility
       -- For assign/call/return
       Target      : IR_Name_String;  -- Variable being assigned
-      Value       : IR_Code_Buffer;  -- Expression value
+      Value       : IR_Code_Buffer;  -- Expression value (also switch expr)
       -- For control flow (if/while/for)
       Condition   : IR_Code_Buffer;  -- Condition expression
       Init_Expr   : IR_Code_Buffer;  -- For loop initialization
@@ -73,8 +84,11 @@ package STUNIR.Semantic_IR is
       -- For flattened control flow blocks
       Block_Start : Natural := 0;    -- 1-based index of block start
       Block_Count : Natural := 0;    -- Number of statements in block
-      Else_Start  : Natural := 0;    -- 1-based index of else block (0 if none)
-      Else_Count  : Natural := 0;    -- Number of statements in else block
+      Else_Start  : Natural := 0;    -- 1-based index of else/default block (0 if none)
+      Else_Count  : Natural := 0;    -- Number of statements in else/default block
+      -- For switch/case statements (v0.9.0)
+      Case_Cnt    : Natural range 0 .. Max_Cases := 0;
+      Cases       : Case_Array (1 .. Max_Cases);
    end record;
 
    -- Function definition

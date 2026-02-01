@@ -73,16 +73,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimized IR generation with bounded data structures
 - Memory-safe code generation without runtime overhead
 
-## [0.9.0] - 2026-01-24 (Week 4)
+## [0.8.4] - 2026-02-01 (Control Flow Features)
 
 ### Added
-- SPARK emitter implementation for 26 categories
-- DO-178C compliance annotations
-- Formal verification contracts for all emitters
+- Break statement support in Python pipeline
+- Continue statement support in Python pipeline
+- Switch/case statement support in Python pipeline
+- Enhanced control flow IR schema
 
-### Fixed
-- All critical blockers resolved
-- Test suite made operational
+### Changed
+- Version rolled back from 0.9.0 to 0.8.4
+- Established versioning rule: reserve 0.9.0 for everything-but-Haskell milestone
+- Use granular versions (0.8.4, 0.8.5, etc.) for incremental features
+
+### Note
+- v0.9.0 is reserved for "everything-but-Haskell working" milestone
 
 ## [0.8.0] - 2026-01-17 (Week 3)
 
@@ -150,7 +155,7 @@ This is the initial 1.0.0 release. No upgrade required.
 **For detailed API documentation, see:** [API_REFERENCE_v1.0.md](docs/API_REFERENCE_v1.0.md)
 
 [1.0.0]: https://github.com/stunir/stunir/releases/tag/v1.0.0
-[0.9.0]: https://github.com/stunir/stunir/releases/tag/v0.9.0
+[0.8.4]: https://github.com/stunir/stunir/releases/tag/v0.8.4
 [0.8.0]: https://github.com/stunir/stunir/releases/tag/v0.8.0
 [0.7.0]: https://github.com/stunir/stunir/releases/tag/v0.7.0
 [0.6.0]: https://github.com/stunir/stunir/releases/tag/v0.6.0

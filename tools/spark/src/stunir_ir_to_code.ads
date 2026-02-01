@@ -74,10 +74,21 @@ package STUNIR_IR_To_Code is
 
    --  IR Step (instruction) record with control flow support
    Max_Steps : constant := 50;
+   Max_Switch_Cases : constant := 10;  -- Max cases in switch statement (v0.9.0)
+   
+   --  Switch case entry (v0.9.0)
+   type Switch_Case_Entry is record
+      Case_Value  : Name_String;  -- Case value (number or string)
+      Block_Start : Natural := 0;  -- Start index of case block
+      Block_Count : Natural := 0;  -- Number of steps in case block
+   end record;
+   
+   type Switch_Case_Array is array (1 .. Max_Switch_Cases) of Switch_Case_Entry;
+   
    type IR_Step is record
-      Op        : Name_String;  -- Operation: assign, return, call, nop, if, while, for
+      Op        : Name_String;  -- Operation: assign, return, call, nop, if, while, for, break, continue, switch
       Target    : Name_String;  -- Assignment target or call result variable
-      Value     : Name_String;  -- Value expression or function name
+      Value     : Name_String;  -- Value expression or function name (also switch expr)
       --  Control flow fields
       Condition : Name_String;  -- Condition for if/while/for
       Init      : Name_String;  -- Init expression for for loops
@@ -87,6 +98,11 @@ package STUNIR_IR_To_Code is
       Block_Count : Natural := 0;  -- Number of steps in then/body block
       Else_Start  : Natural := 0;  -- Start index of else block (if statements only)
       Else_Count  : Natural := 0;  -- Number of steps in else block
+      --  Switch/case fields (v0.9.0)
+      Case_Count  : Natural := 0;  -- Number of cases in switch
+      Cases       : Switch_Case_Array;  -- Array of case entries
+      Default_Start : Natural := 0;  -- Start index of default block
+      Default_Count : Natural := 0;  -- Number of steps in default block
    end record;
    
    type Step_Array is array (1 .. Max_Steps) of IR_Step;

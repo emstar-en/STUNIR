@@ -1,6 +1,6 @@
-# STUNIR v0.9.0 - Additional Control Flow Features Design
+# STUNIR v0.8.4 - Additional Control Flow Features Design
 
-## Version: v0.9.0
+## Version: v0.8.4
 ## Date: 2026-01-31
 ## Status: In Progress
 
@@ -8,7 +8,7 @@
 
 ## 1. Overview
 
-This document defines the design and implementation of additional control flow features for STUNIR v0.9.0:
+This document defines the design and implementation of additional control flow features for STUNIR v0.8.4:
 - **break** statements (exit loop early)
 - **continue** statements (skip to next iteration)
 - **switch/case** statements (multi-way branching)
