@@ -15,7 +15,7 @@ pub struct StatementNode {
 }
 
 /// Block statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BlockStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -25,7 +25,7 @@ pub struct BlockStmt {
 }
 
 /// Expression statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ExprStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -33,7 +33,7 @@ pub struct ExprStmt {
 }
 
 /// If statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct IfStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -44,7 +44,7 @@ pub struct IfStmt {
 }
 
 /// While statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct WhileStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -57,7 +57,7 @@ pub struct WhileStmt {
 }
 
 /// For statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ForStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -74,7 +74,7 @@ pub struct ForStmt {
 }
 
 /// Return statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ReturnStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -83,14 +83,14 @@ pub struct ReturnStmt {
 }
 
 /// Break statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BreakStmt {
     #[serde(flatten)]
     pub base: StatementNode,
 }
 
 /// Continue statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ContinueStmt {
     #[serde(flatten)]
     pub base: StatementNode,
@@ -121,7 +121,7 @@ impl Default for MutabilityKind {
 }
 
 /// Assignment statement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AssignStmt {
     #[serde(flatten)]
     pub base: StatementNode,

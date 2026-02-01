@@ -92,8 +92,9 @@ package STUNIR.Semantic_IR is
    end record;
 
    -- Function definition
-   Max_Args       : constant := 10;
-   Max_Statements : constant := 50;  -- Balanced for flattened control flow
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Args       : constant := 8;
+   Max_Statements : constant := 32;  -- Balanced for flattened control flow
    type Arg_Array is array (Positive range <>) of IR_Arg;
    type Statement_Array is array (Positive range <>) of IR_Statement;
 

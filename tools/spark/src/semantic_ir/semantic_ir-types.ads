@@ -11,9 +11,10 @@ package Semantic_IR.Types with
    SPARK_Mode => On
 is
    -- Bounded string types for safety
-   Max_Name_Length : constant := 256;
+   --  v0.8.6: Reduced from 256 to 128 to lower stack usage
+   Max_Name_Length : constant := 128;
    Max_Hash_Length : constant := 71; -- "sha256:" + 64 hex chars
-   Max_Path_Length : constant := 512;
+   Max_Path_Length : constant := 256;
    
    package Name_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Name_Length);
    package Hash_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Hash_Length);

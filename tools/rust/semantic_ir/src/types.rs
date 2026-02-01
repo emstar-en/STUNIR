@@ -128,13 +128,13 @@ pub enum UnaryOperator {
     Not,
     #[serde(rename = "~")]
     BitNot,
-    #[serde(rename = "++")]
+    #[serde(rename = "pre++")]
     PreInc,
-    #[serde(rename = "--")]
+    #[serde(rename = "pre--")]
     PreDec,
-    #[serde(rename = "++")]
+    #[serde(rename = "post++")]
     PostInc,
-    #[serde(rename = "--")]
+    #[serde(rename = "post--")]
     PostDec,
     #[serde(rename = "*")]
     Deref,

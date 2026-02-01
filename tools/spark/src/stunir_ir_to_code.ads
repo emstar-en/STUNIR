@@ -31,12 +31,13 @@ package STUNIR_IR_To_Code is
    Recursion_Depth_Exceeded : exception;
 
    --  Maximum sizes
-   Max_Path_Length    : constant := 512;
-   Max_Name_Length    : constant := 128;
-   Max_Template_Size  : constant := 16384;
-   Max_Output_Size    : constant := 65536;
-   Max_Functions      : constant := 100;
-   Max_Types          : constant := 50;
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Path_Length    : constant := 256;
+   Max_Name_Length    : constant := 64;
+   Max_Template_Size  : constant := 8192;
+   Max_Output_Size    : constant := 32768;
+   Max_Functions      : constant := 20;
+   Max_Types          : constant := 16;
 
    --  Bounded string types
    package Path_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
@@ -69,12 +70,14 @@ package STUNIR_IR_To_Code is
    end record;
 
    --  Array of parameters
-   Max_Params : constant := 20;
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Params : constant := 10;
    type Param_Array is array (1 .. Max_Params) of Function_Param;
 
    --  IR Step (instruction) record with control flow support
-   Max_Steps : constant := 50;
-   Max_Switch_Cases : constant := 10;  -- Max cases in switch statement (v0.9.0)
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Steps : constant := 32;
+   Max_Switch_Cases : constant := 8;  -- Max cases in switch statement (v0.9.0)
    
    --  Switch case entry (v0.9.0)
    type Switch_Case_Entry is record

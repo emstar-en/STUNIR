@@ -11,7 +11,8 @@ package Semantic_IR.Modules with
    SPARK_Mode => On
 is
    -- Import statement
-   Max_Symbols : constant := 64;
+   --  v0.8.6: Reduced from 64 to 16 to lower stack usage
+   Max_Symbols : constant := 16;
    type Symbol_List is array (1 .. Max_Symbols) of IR_Name;
    
    type Import_Statement is record
@@ -34,9 +35,10 @@ is
    end record;
    
    -- Module structure
-   Max_Imports       : constant := 32;
-   Max_Exports       : constant := 128;
-   Max_Declarations  : constant := 256;
+   --  v0.8.6: Reduced limits to lower stack usage
+   Max_Imports       : constant := 16;
+   Max_Exports       : constant := 32;
+   Max_Declarations  : constant := 64;
    
    type Import_List is array (1 .. Max_Imports) of Import_Statement;
    type Export_List is array (1 .. Max_Exports) of IR_Name;

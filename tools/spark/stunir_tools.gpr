@@ -29,11 +29,15 @@ project STUNIR_Tools is
    end Compiler;
 
    package Binder is
-      for Default_Switches ("Ada") use ("-E");  -- Exception traceback
+      for Default_Switches ("Ada") use 
+        ("-E",       -- Exception traceback
+         "-d32m");   -- 32MB primary stack size
    end Binder;
 
    package Linker is
-      for Default_Switches ("Ada") use ("-g");  -- Debug info
+      for Default_Switches ("Ada") use 
+        ("-g",                          -- Debug info
+         "-Wl,-z,stacksize=16777216");  -- 16MB stack size
    end Linker;
 
    package Prove is
