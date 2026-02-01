@@ -135,8 +135,60 @@ def convert_nested_to_flat(nested_steps: List[Dict[str, Any]]) -> List[Dict[str,
                     "block_count": body_count
                 }
             
+            elif op == "switch":
+                # v0.8.5: Add switch statement support
+                # Reserve slot for switch statement
+                switch_index = len(flat_steps)
+                flat_steps.append(None)
+                
+                # Flatten each case body (RECURSIVE)
+                cases = step.get("cases", [])
+                flat_cases = []
+                
+                for case in cases:
+                    case_body = case.get("body", [])
+                    case_start = len(flat_steps)
+                    
+                    # Recursively flatten case body
+                    flatten_recursive(case_body)
+                    
+                    case_count = len(flat_steps) - case_start
+                    
+                    # v0.8.5: Convert case value to string for SPARK compatibility
+                    case_value = case.get("value", "")
+                    if isinstance(case_value, (int, float)):
+                        case_value = str(case_value)
+                    
+                    flat_cases.append({
+                        "value": case_value,
+                        "block_start": case_start + 1,  # Convert to 1-based indexing
+                        "block_count": case_count
+                    })
+                
+                # Flatten default block if present (RECURSIVE)
+                default_block = step.get("default", [])
+                default_start = 0
+                default_count = 0
+                
+                if default_block:
+                    default_start = len(flat_steps)
+                    
+                    # Recursively flatten default block
+                    flatten_recursive(default_block)
+                    
+                    default_count = len(flat_steps) - default_start
+                
+                # Fill in the switch statement (1-based for Ada compatibility)
+                flat_steps[switch_index] = {
+                    "op": "switch",
+                    "expr": step.get("expr", ""),
+                    "cases": flat_cases,
+                    "default_start": default_start + 1 if default_start > 0 else 0,  # Convert to 1-based
+                    "default_count": default_count
+                }
+            
             else:
-                # Regular step (assign, return, call, nop, etc.)
+                # Regular step (assign, return, call, nop, break, continue, etc.)
                 flat_steps.append(step)
     
     flatten_recursive(nested_steps)

@@ -1,5 +1,95 @@
 # STUNIR Release Notes
 
+
+## Version 0.8.5 - February 1, 2026
+
+**Status**: ✅ **SPARK 100% Complete!** 🚀  
+**Codename**: "SPARK Control Flow Completion"  
+**Release Date**: February 1, 2026  
+**Release Type**: PATCH (Bug Fixes)  
+**Progress**: **SPARK 100%** - All tests passing (6/6)
+
+---
+
+### 🎯 Executive Summary
+
+STUNIR 0.8.5 completes the SPARK implementation by fixing critical bugs in loop variable declarations and switch statement code generation. This release brings SPARK to feature parity with Python and Rust implementations.
+
+### Key Achievements
+
+✅ **Loop Variable Declarations** - Fixed for-loop variable declarations  
+✅ **Switch Statement Generation** - Fixed case value parsing and code generation  
+✅ **IR Converter Enhancement** - Added switch statement flattening support  
+✅ **Variable Scoping** - Fixed variable redeclaration in nested blocks  
+✅ **100% Test Pass Rate** - All 6 v0.8.4 tests now passing in SPARK  
+✅ **C Compilation** - Generated C code compiles without errors  
+
+### What's Fixed
+
+#### 1. **Loop Variable Declarations** (`stunir_ir_to_code.adb`)
+- Added automatic variable declaration extraction from for-loop init expressions
+- Variables like `i` in `for (i = 0; ...)` are now properly declared before the loop
+- Supports both simple variable names and type-prefixed declarations
+
+#### 2. **Switch Statement Code Generation** 
+- **IR Converter** (`ir_converter.py`): Added switch statement flattening with case value string conversion
+- **Case Value Parsing** (`stunir_ir_to_code.adb`): Fixed integer-to-string conversion for case values
+- **Block Index Validation**: Added proper bounds checking to prevent stack overflow
+- **Index Adjustment**: Fixed recursive block index adjustment with proper range validation
+
+#### 3. **Variable Scoping in Nested Blocks**
+- Assignments in nested blocks (Depth > 1) no longer redeclare variables
+- Assumes variables are declared in parent scope
+- Prevents C compilation errors from variable redeclaration
+
+### Test Results
+
+**All 6 tests passing:**
+- ✅ `break_nested` - Nested break statements
+- ✅ `break_while` - Break in while loops
+- ✅ `combined_features` - Mixed control flow features
+- ✅ `continue_for` - Continue in for loops
+- ✅ `switch_fallthrough` - Switch with fall-through
+- ✅ `switch_simple` - Basic switch statements
+
+### Implementation Details
+
+**Files Modified:**
+1. `tools/spark/src/stunir_ir_to_code.adb` - Core code generation fixes
+2. `tools/ir_converter.py` - Switch statement flattening
+3. `pyproject.toml` - Version bump to 0.8.5
+4. `.stunir_progress.json` - Updated status to 6/6 passing
+
+**Key Code Changes:**
+- Loop variable declaration extraction (lines 909-968)
+- Switch case value string conversion (lines 331-360)
+- Block index validation with bounds checking
+- Depth-aware variable declaration logic (lines 684-707)
+
+### Compatibility
+
+- **Requires**: `ulimit -s unlimited` for deep nesting (existing requirement)
+- **C Compilation**: Generated C code compiles with `gcc -std=c99 -Wall -Wextra`
+- **Backward Compatible**: All v0.8.4 features preserved
+
+### Migration Notes
+
+No migration required. Existing v0.8.4 specs work with v0.8.5.
+
+### Known Limitations
+
+- Python implementation still has variable redeclaration issue (non-critical)
+- Maximum recursion depth: 5 levels (existing limitation)
+- Maximum switch cases: 20 (existing limitation)
+
+### Next Steps
+
+- v0.9.0: Reserved for everything-but-Haskell milestone
+- Consider Python variable fix for consistency
+- Optional: SPARK stack optimization for deeper nesting
+
+---
+
 ## Version 0.8.4 - February 1, 2026
 
 **Status**: ✅ **Python 100% Complete!** 🚀  

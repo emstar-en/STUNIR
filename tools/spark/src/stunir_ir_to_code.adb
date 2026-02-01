@@ -328,19 +328,36 @@ package body STUNIR_IR_To_Code is
                                                           Get_Next_Object (Step_JSON, Case_Pos, Case_Start, Case_End);
                                                           exit when Case_Start = 0 or Case_End = 0;
                                                           
-                                                          declare
-                                                             Case_JSON : constant String := Step_JSON (Case_Start .. Case_End);
-                                                             Case_Val  : constant String := Extract_String_Value (Case_JSON, "value");
-                                                             Case_Block_Start : constant Natural := Extract_Integer_Value (Case_JSON, "block_start");
-                                                             Case_Block_Count : constant Natural := Extract_Integer_Value (Case_JSON, "block_count");
-                                                             Case_Idx : Positive;
-                                                          begin
-                                                             Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count :=
-                                                               Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count + 1;
-                                                             Case_Idx := Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count;
-                                                             
-                                                             Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Case_Value :=
-                                                               Name_Strings.To_Bounded_String (Case_Val);
+                                                           declare
+                                                              Case_JSON : constant String := Step_JSON (Case_Start .. Case_End);
+                                                              Case_Val_Int : constant Natural := Extract_Integer_Value (Case_JSON, "value");
+                                                              Case_Val_Str : constant String := Extract_String_Value (Case_JSON, "value");
+                                                              Case_Block_Start : constant Natural := Extract_Integer_Value (Case_JSON, "block_start");
+                                                              Case_Block_Count : constant Natural := Extract_Integer_Value (Case_JSON, "block_count");
+                                                              Case_Idx : Positive;
+                                                           begin
+                                                              Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count :=
+                                                                Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count + 1;
+                                                              Case_Idx := Module.Functions (Func_Idx).Steps (Current_Step_Idx).Case_Count;
+                                                              
+                                                              --  v0.8.5: Handle both integer and string case values
+                                                              if Case_Val_Str'Length > 0 then
+                                                                 --  String value (e.g., "case_a")
+                                                                 Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Case_Value :=
+                                                                   Name_Strings.To_Bounded_String (Case_Val_Str);
+                                                              else
+                                                                 --  Integer value (convert to string)
+                                                                 declare
+                                                                    Val_Img : constant String := Natural'Image (Case_Val_Int);
+                                                                    --  Trim leading space from 'Image
+                                                                    Val_Trimmed : constant String := (if Val_Img(Val_Img'First) = ' ' 
+                                                                                                      then Val_Img (Val_Img'First + 1 .. Val_Img'Last) 
+                                                                                                      else Val_Img);
+                                                                 begin
+                                                                    Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Case_Value :=
+                                                                      Name_Strings.To_Bounded_String (Val_Trimmed);
+                                                                 end;
+                                                              end if;
                                                              Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Block_Start :=
                                                                Case_Block_Start;
                                                              Module.Functions (Func_Idx).Steps (Current_Step_Idx).Cases (Case_Idx).Block_Count :=
@@ -665,23 +682,29 @@ package body STUNIR_IR_To_Code is
                Value  : constant String := Name_Strings.To_String (Step.Value);
             begin
             if Op = "assign" then
-               --  Variable assignment
-               if Target'Length > 0 then
-                  if not Is_Var_Declared (Target) then
-                     --  First use - declare with type inference
-                     declare
-                        Var_Type : constant String := Infer_C_Type_From_Value (Value);
-                     begin
-                        Declare_Var (Target, Var_Type);
-                        Append ("  " & Var_Type & " " & Target & " = " & Value & ";");
-                        Append (NL);
-                     end;
-                  else
-                     --  Already declared - just assign
-                     Append ("  " & Target & " = " & Value & ";");
-                     Append (NL);
-                  end if;
-               end if;
+                --  Variable assignment
+                if Target'Length > 0 then
+                   --  v0.8.5: In nested blocks (Depth > 1), don't redeclare variables
+                   --  Assume they're declared in parent scope
+                   if Depth > 1 then
+                      --  Nested block - just assign without declaration
+                      Append (Get_Indent & Target & " = " & Value & ";");
+                      Append (NL);
+                   elsif not Is_Var_Declared (Target) then
+                      --  First use in top-level function - declare with type inference
+                      declare
+                         Var_Type : constant String := Infer_C_Type_From_Value (Value);
+                      begin
+                         Declare_Var (Target, Var_Type);
+                         Append ("  " & Var_Type & " " & Target & " = " & Value & ";");
+                         Append (NL);
+                      end;
+                   else
+                      --  Already declared - just assign
+                      Append ("  " & Target & " = " & Value & ";");
+                      Append (NL);
+                   end if;
+                end if;
                
             elsif Op = "return" then
                --  Return statement
@@ -743,84 +766,109 @@ package body STUNIR_IR_To_Code is
                   Append (NL);
                   
                   --  Process then block RECURSIVELY using block indices
-                  if Step.Block_Count > 0 and Step.Block_Start > 0 then
-                     declare
-                        Then_Block_Start : constant Natural := Step.Block_Start;
-                        Then_Block_End   : constant Natural := Step.Block_Start + Step.Block_Count - 1;
-                        Then_Steps       : Step_Array;
-                        Then_Count       : Natural := 0;
-                     begin
-                        --  Extract sub-array for then block and adjust indices
-                        for Block_I in Then_Block_Start .. Then_Block_End loop
-                           if Block_I <= Step_Count then
-                              Then_Count := Then_Count + 1;
-                              Then_Steps (Then_Count) := Steps (Block_I);
-                              
-                              --  Adjust block indices to be relative to the extracted sub-array
-                              if Then_Steps (Then_Count).Block_Start > 0 then
-                                 Then_Steps (Then_Count).Block_Start := 
-                                   Then_Steps (Then_Count).Block_Start - Then_Block_Start + 1;
-                              end if;
-                              if Then_Steps (Then_Count).Else_Start > 0 then
-                                 Then_Steps (Then_Count).Else_Start := 
-                                   Then_Steps (Then_Count).Else_Start - Then_Block_Start + 1;
-                              end if;
-                           end if;
-                        end loop;
-                        
-                        --  RECURSIVE CALL for then block
-                        if Then_Count > 0 then
-                           declare
-                              Nested_Body : constant String := 
-                                Translate_Steps_To_C (Then_Steps, Then_Count, Ret_Type, Depth + 1, Indent + 1);
-                           begin
-                              Append (Nested_Body);
-                           end;
-                        end if;
-                     end;
-                  end if;
+                   if Step.Block_Count > 0 and Step.Block_Start > 0 and Step.Block_Start <= Step_Count then
+                      declare
+                         Then_Block_Start : constant Natural := Step.Block_Start;
+                         Then_Block_End   : Natural := Step.Block_Start + Step.Block_Count - 1;
+                         Then_Steps       : Step_Array;
+                         Then_Count       : Natural := 0;
+                      begin
+                         --  v0.8.5: Validate block end doesn't exceed step count
+                         if Then_Block_End > Step_Count then
+                            Then_Block_End := Step_Count;
+                         end if;
+                         
+                         --  Extract sub-array for then block WITH INDEX ADJUSTMENT (v0.8.5)
+                         for Block_I in Then_Block_Start .. Then_Block_End loop
+                            if Block_I <= Step_Count then
+                               Then_Count := Then_Count + 1;
+                               Then_Steps (Then_Count) := Steps (Block_I);
+                               
+                               --  Adjust block indices to be relative to the extracted sub-array
+                               --  Only adjust if the index is within the extracted range
+                               if Then_Steps (Then_Count).Block_Start >= Then_Block_Start 
+                                 and Then_Steps (Then_Count).Block_Start <= Then_Block_End then
+                                  Then_Steps (Then_Count).Block_Start := 
+                                    Then_Steps (Then_Count).Block_Start - Then_Block_Start + 1;
+                               else
+                                  Then_Steps (Then_Count).Block_Start := 0;  --  Out of range, disable
+                               end if;
+                               
+                               if Then_Steps (Then_Count).Else_Start >= Then_Block_Start 
+                                 and Then_Steps (Then_Count).Else_Start <= Then_Block_End then
+                                  Then_Steps (Then_Count).Else_Start := 
+                                    Then_Steps (Then_Count).Else_Start - Then_Block_Start + 1;
+                               else
+                                  Then_Steps (Then_Count).Else_Start := 0;  --  Out of range, disable
+                               end if;
+                            end if;
+                         end loop;
+                         
+                         --  RECURSIVE CALL for then block
+                         if Then_Count > 0 then
+                            declare
+                               Nested_Body : constant String := 
+                                 Translate_Steps_To_C (Then_Steps, Then_Count, Ret_Type, Depth + 1, Indent + 1);
+                            begin
+                               Append (Nested_Body);
+                            end;
+                         end if;
+                      end;
+                   end if;
                   
                   --  Process else block if present RECURSIVELY
-                  if Step.Else_Count > 0 and Step.Else_Start > 0 then
-                     Append (Get_Indent & "} else {");
-                     Append (NL);
-                     
-                     declare
-                        Else_Block_Start : constant Natural := Step.Else_Start;
-                        Else_Block_End   : constant Natural := Step.Else_Start + Step.Else_Count - 1;
-                        Else_Steps       : Step_Array;
-                        Else_Count       : Natural := 0;
-                     begin
-                        --  Extract sub-array for else block and adjust indices
-                        for Block_I in Else_Block_Start .. Else_Block_End loop
-                           if Block_I <= Step_Count then
-                              Else_Count := Else_Count + 1;
-                              Else_Steps (Else_Count) := Steps (Block_I);
-                              
-                              --  Adjust block indices to be relative to the extracted sub-array
-                              if Else_Steps (Else_Count).Block_Start > 0 then
-                                 Else_Steps (Else_Count).Block_Start := 
-                                   Else_Steps (Else_Count).Block_Start - Else_Block_Start + 1;
-                              end if;
-                              if Else_Steps (Else_Count).Else_Start > 0 then
-                                 Else_Steps (Else_Count).Else_Start := 
-                                   Else_Steps (Else_Count).Else_Start - Else_Block_Start + 1;
-                              end if;
-                           end if;
-                        end loop;
-                        
-                        --  RECURSIVE CALL for else block
-                        if Else_Count > 0 then
-                           declare
-                              Nested_Body : constant String := 
-                                Translate_Steps_To_C (Else_Steps, Else_Count, Ret_Type, Depth + 1, Indent + 1);
-                           begin
-                              Append (Nested_Body);
-                           end;
-                        end if;
-                     end;
-                  end if;
-                  
+                   if Step.Else_Count > 0 and Step.Else_Start > 0 and Step.Else_Start <= Step_Count then
+                      Append (Get_Indent & "} else {");
+                      Append (NL);
+                      
+                      declare
+                         Else_Block_Start : constant Natural := Step.Else_Start;
+                         Else_Block_End   : Natural := Step.Else_Start + Step.Else_Count - 1;
+                         Else_Steps       : Step_Array;
+                         Else_Count       : Natural := 0;
+                      begin
+                         --  v0.8.5: Validate block end doesn't exceed step count
+                         if Else_Block_End > Step_Count then
+                            Else_Block_End := Step_Count;
+                         end if;
+                         
+                         --  Extract sub-array for else block WITH INDEX ADJUSTMENT (v0.8.5)
+                         for Block_I in Else_Block_Start .. Else_Block_End loop
+                            if Block_I <= Step_Count then
+                               Else_Count := Else_Count + 1;
+                               Else_Steps (Else_Count) := Steps (Block_I);
+                               
+                               --  Adjust block indices to be relative to the extracted sub-array
+                               --  Only adjust if the index is within the extracted range
+                               if Else_Steps (Else_Count).Block_Start >= Else_Block_Start 
+                                 and Else_Steps (Else_Count).Block_Start <= Else_Block_End then
+                                  Else_Steps (Else_Count).Block_Start := 
+                                    Else_Steps (Else_Count).Block_Start - Else_Block_Start + 1;
+                               else
+                                  Else_Steps (Else_Count).Block_Start := 0;  --  Out of range, disable
+                               end if;
+                               
+                               if Else_Steps (Else_Count).Else_Start >= Else_Block_Start 
+                                 and Else_Steps (Else_Count).Else_Start <= Else_Block_End then
+                                  Else_Steps (Else_Count).Else_Start := 
+                                    Else_Steps (Else_Count).Else_Start - Else_Block_Start + 1;
+                               else
+                                  Else_Steps (Else_Count).Else_Start := 0;  --  Out of range, disable
+                               end if;
+                            end if;
+                         end loop;
+                         
+                         --  RECURSIVE CALL for else block
+                         if Else_Count > 0 then
+                            declare
+                               Nested_Body : constant String := 
+                                 Translate_Steps_To_C (Else_Steps, Else_Count, Ret_Type, Depth + 1, Indent + 1);
+                            begin
+                               Append (Nested_Body);
+                            end;
+                         end if;
+                      end;
+                   end if;
                   Append (Get_Indent & "}");
                   Append (NL);
                end;
@@ -834,94 +882,181 @@ package body STUNIR_IR_To_Code is
                   Append (NL);
                   
                   --  Process body RECURSIVELY using block indices
-                  if Step.Block_Count > 0 and Step.Block_Start > 0 then
-                     declare
-                        Body_Block_Start : constant Natural := Step.Block_Start;
-                        Body_Block_End   : constant Natural := Step.Block_Start + Step.Block_Count - 1;
-                        Body_Steps       : Step_Array;
-                        Body_Count       : Natural := 0;
-                     begin
-                        --  Extract sub-array for loop body and adjust indices
-                        for Block_I in Body_Block_Start .. Body_Block_End loop
-                           if Block_I <= Step_Count then
-                              Body_Count := Body_Count + 1;
-                              Body_Steps (Body_Count) := Steps (Block_I);
-                              
-                              --  Adjust block indices to be relative to the extracted sub-array
-                              if Body_Steps (Body_Count).Block_Start > 0 then
-                                 Body_Steps (Body_Count).Block_Start := 
-                                   Body_Steps (Body_Count).Block_Start - Body_Block_Start + 1;
-                              end if;
-                              if Body_Steps (Body_Count).Else_Start > 0 then
-                                 Body_Steps (Body_Count).Else_Start := 
-                                   Body_Steps (Body_Count).Else_Start - Body_Block_Start + 1;
-                              end if;
-                           end if;
-                        end loop;
-                        
-                        --  RECURSIVE CALL for loop body
-                        if Body_Count > 0 then
-                           declare
-                              Nested_Body : constant String := 
-                                Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
-                           begin
-                              Append (Nested_Body);
-                           end;
-                        end if;
-                     end;
-                  end if;
+                   if Step.Block_Count > 0 and Step.Block_Start > 0 and Step.Block_Start <= Step_Count then
+                      declare
+                         Body_Block_Start : constant Natural := Step.Block_Start;
+                         Body_Block_End   : Natural := Step.Block_Start + Step.Block_Count - 1;
+                         Body_Steps       : Step_Array;
+                         Body_Count       : Natural := 0;
+                      begin
+                         --  v0.8.5: Validate block end doesn't exceed step count
+                         if Body_Block_End > Step_Count then
+                            Body_Block_End := Step_Count;
+                         end if;
+                         
+                         --  Extract sub-array for loop body WITH INDEX ADJUSTMENT (v0.8.5)
+                         for Block_I in Body_Block_Start .. Body_Block_End loop
+                            if Block_I <= Step_Count then
+                               Body_Count := Body_Count + 1;
+                               Body_Steps (Body_Count) := Steps (Block_I);
+                               
+                               --  Adjust block indices to be relative to the extracted sub-array
+                               --  Only adjust if the index is within the extracted range
+                               if Body_Steps (Body_Count).Block_Start >= Body_Block_Start 
+                                 and Body_Steps (Body_Count).Block_Start <= Body_Block_End then
+                                  Body_Steps (Body_Count).Block_Start := 
+                                    Body_Steps (Body_Count).Block_Start - Body_Block_Start + 1;
+                               else
+                                  Body_Steps (Body_Count).Block_Start := 0;  --  Out of range, disable
+                               end if;
+                               
+                               if Body_Steps (Body_Count).Else_Start >= Body_Block_Start 
+                                 and Body_Steps (Body_Count).Else_Start <= Body_Block_End then
+                                  Body_Steps (Body_Count).Else_Start := 
+                                    Body_Steps (Body_Count).Else_Start - Body_Block_Start + 1;
+                               else
+                                  Body_Steps (Body_Count).Else_Start := 0;  --  Out of range, disable
+                               end if;
+                            end if;
+                         end loop;
+                         
+                         --  RECURSIVE CALL for loop body
+                         if Body_Count > 0 then
+                            declare
+                               Nested_Body : constant String := 
+                                 Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
+                            begin
+                               Append (Nested_Body);
+                            end;
+                         end if;
+                      end;
+                   end if;
                   
                   Append (Get_Indent & "}");
                   Append (NL);
                end;
                
             elsif Op = "for" then
-               --  For loop with RECURSIVE multi-level nesting (v0.7.1)
-               declare
-                  Init_Expr : constant String := Name_Strings.To_String (Step.Init);
-                  Cond      : constant String := Name_Strings.To_String (Step.Condition);
-                  Incr      : constant String := Name_Strings.To_String (Step.Increment);
-               begin
-                  Append (Get_Indent & "for (" & Init_Expr & "; " & Cond & "; " & Incr & ") {");
-                  Append (NL);
+                --  For loop with RECURSIVE multi-level nesting (v0.7.1)
+                declare
+                   Init_Expr : constant String := Name_Strings.To_String (Step.Init);
+                   Cond      : constant String := Name_Strings.To_String (Step.Condition);
+                   Incr      : constant String := Name_Strings.To_String (Step.Increment);
+                begin
+                   --  v0.8.5: Extract and declare loop variable from init expression
+                   --  Handle cases like "i = 0" or "int i = 0"
+                   if Init_Expr'Length > 0 then
+                      declare
+                         Eq_Pos : Natural := 0;
+                         Loop_Var : String (1 .. 64);
+                         Loop_Var_Len : Natural := 0;
+                      begin
+                         --  Find the '=' sign
+                         for I in Init_Expr'Range loop
+                            if Init_Expr (I) = '=' then
+                               Eq_Pos := I;
+                               exit;
+                            end if;
+                         end loop;
+                         
+                         if Eq_Pos > Init_Expr'First then
+                            --  Extract variable name (everything before '=')
+                            declare
+                               Before_Eq : constant String := Init_Expr (Init_Expr'First .. Eq_Pos - 1);
+                               Start_Idx : Natural := Before_Eq'First;
+                            begin
+                               --  Skip leading whitespace and type keywords
+                               --  Look for the last token before '='
+                               for I in reverse Before_Eq'Range loop
+                                  if Before_Eq (I) /= ' ' then
+                                     --  Found end of variable name
+                                     declare
+                                        End_Idx : constant Natural := I;
+                                     begin
+                                        --  Find start of variable name (scan backwards)
+                                        Start_Idx := End_Idx;
+                                        for J in reverse Before_Eq'First .. End_Idx loop
+                                           if Before_Eq (J) = ' ' then
+                                              Start_Idx := J + 1;
+                                              exit;
+                                           end if;
+                                           Start_Idx := J;
+                                        end loop;
+                                        
+                                        --  Extract the variable name
+                                        if Start_Idx <= End_Idx and (End_Idx - Start_Idx + 1) <= Loop_Var'Length then
+                                           Loop_Var_Len := End_Idx - Start_Idx + 1;
+                                           Loop_Var (1 .. Loop_Var_Len) := Before_Eq (Start_Idx .. End_Idx);
+                                           
+                                           --  Declare variable if not already declared
+                                           if not Is_Var_Declared (Loop_Var (1 .. Loop_Var_Len)) then
+                                              Declare_Var (Loop_Var (1 .. Loop_Var_Len), "int32_t");
+                                              Append (Get_Indent & "int32_t " & Loop_Var (1 .. Loop_Var_Len) & ";");
+                                              Append (NL);
+                                           end if;
+                                        end if;
+                                     end;
+                                     exit;
+                                  end if;
+                               end loop;
+                            end;
+                         end if;
+                      end;
+                   end if;
+                   
+                   Append (Get_Indent & "for (" & Init_Expr & "; " & Cond & "; " & Incr & ") {");
+                   Append (NL);
                   
-                  --  Process body RECURSIVELY using block indices
-                  if Step.Block_Count > 0 and Step.Block_Start > 0 then
-                     declare
-                        Body_Block_Start : constant Natural := Step.Block_Start;
-                        Body_Block_End   : constant Natural := Step.Block_Start + Step.Block_Count - 1;
-                        Body_Steps       : Step_Array;
-                        Body_Count       : Natural := 0;
-                     begin
-                        --  Extract sub-array for loop body and adjust indices
-                        for Block_I in Body_Block_Start .. Body_Block_End loop
-                           if Block_I <= Step_Count then
-                              Body_Count := Body_Count + 1;
-                              Body_Steps (Body_Count) := Steps (Block_I);
-                              
-                              --  Adjust block indices to be relative to the extracted sub-array
-                              if Body_Steps (Body_Count).Block_Start > 0 then
-                                 Body_Steps (Body_Count).Block_Start := 
-                                   Body_Steps (Body_Count).Block_Start - Body_Block_Start + 1;
-                              end if;
-                              if Body_Steps (Body_Count).Else_Start > 0 then
-                                 Body_Steps (Body_Count).Else_Start := 
-                                   Body_Steps (Body_Count).Else_Start - Body_Block_Start + 1;
-                              end if;
-                           end if;
-                        end loop;
-                        
-                        --  RECURSIVE CALL for loop body
-                        if Body_Count > 0 then
-                           declare
-                              Nested_Body : constant String := 
-                                Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
-                           begin
-                              Append (Nested_Body);
-                           end;
-                        end if;
-                     end;
-                  end if;
+                   --  Process body RECURSIVELY using block indices
+                   if Step.Block_Count > 0 and Step.Block_Start > 0 and Step.Block_Start <= Step_Count then
+                      declare
+                         Body_Block_Start : constant Natural := Step.Block_Start;
+                         Body_Block_End   : Natural := Step.Block_Start + Step.Block_Count - 1;
+                         Body_Steps       : Step_Array;
+                         Body_Count       : Natural := 0;
+                      begin
+                         --  v0.8.5: Validate block end doesn't exceed step count
+                         if Body_Block_End > Step_Count then
+                            Body_Block_End := Step_Count;
+                         end if;
+                         
+                         --  Extract sub-array for loop body WITH INDEX ADJUSTMENT (v0.8.5)
+                         for Block_I in Body_Block_Start .. Body_Block_End loop
+                            if Block_I <= Step_Count then
+                               Body_Count := Body_Count + 1;
+                               Body_Steps (Body_Count) := Steps (Block_I);
+                               
+                               --  Adjust block indices to be relative to the extracted sub-array
+                               --  Only adjust if the index is within the extracted range
+                               if Body_Steps (Body_Count).Block_Start >= Body_Block_Start 
+                                 and Body_Steps (Body_Count).Block_Start <= Body_Block_End then
+                                  Body_Steps (Body_Count).Block_Start := 
+                                    Body_Steps (Body_Count).Block_Start - Body_Block_Start + 1;
+                               else
+                                  Body_Steps (Body_Count).Block_Start := 0;  --  Out of range, disable
+                               end if;
+                               
+                               if Body_Steps (Body_Count).Else_Start >= Body_Block_Start 
+                                 and Body_Steps (Body_Count).Else_Start <= Body_Block_End then
+                                  Body_Steps (Body_Count).Else_Start := 
+                                    Body_Steps (Body_Count).Else_Start - Body_Block_Start + 1;
+                               else
+                                  Body_Steps (Body_Count).Else_Start := 0;  --  Out of range, disable
+                               end if;
+                            end if;
+                         end loop;
+                         
+                         --  RECURSIVE CALL for loop body
+                         if Body_Count > 0 then
+                            declare
+                               Nested_Body : constant String := 
+                                 Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
+                            begin
+                               Append (Nested_Body);
+                            end;
+                         end if;
+                      end;
+                   end if;
                   
                   Append (Get_Indent & "}");
                   Append (NL);
@@ -946,81 +1081,93 @@ package body STUNIR_IR_To_Code is
                   Append (NL);
                   
                   --  Generate case labels
-                  for Case_Idx in 1 .. Step.Case_Count loop
-                     declare
-                        Case_Val : constant String := Name_Strings.To_String (Step.Cases (Case_Idx).Case_Value);
-                        Case_Block_Start : constant Natural := Step.Cases (Case_Idx).Block_Start;
-                        Case_Block_End   : constant Natural := Step.Cases (Case_Idx).Block_Start + Step.Cases (Case_Idx).Block_Count - 1;
-                        Case_Steps       : Step_Array;
-                        Case_Step_Count  : Natural := 0;
-                     begin
-                        Append (Get_Indent & "  case " & Case_Val & ":");
-                        Append (NL);
-                        
-                        --  Mark case block steps as processed
-                        for J in Case_Block_Start .. Case_Block_End loop
-                           if J <= Step_Count then
-                              Processed (J) := True;
-                           end if;
-                        end loop;
-                        
-                        --  Extract and translate case body RECURSIVELY
-                        if Step.Cases (Case_Idx).Block_Count > 0 and Case_Block_Start > 0 then
-                           for Block_I in Case_Block_Start .. Case_Block_End loop
-                              if Block_I <= Step_Count then
-                                 Case_Step_Count := Case_Step_Count + 1;
-                                 Case_Steps (Case_Step_Count) := Steps (Block_I);
-                              end if;
-                           end loop;
-                           
-                           if Case_Step_Count > 0 then
-                              declare
-                                 Case_Code : constant String := 
-                                   Translate_Steps_To_C (Case_Steps, Case_Step_Count, Ret_Type, Depth + 1, Indent + 2);
-                              begin
-                                 Append (Case_Code);
-                              end;
-                           end if;
-                        end if;
-                     end;
-                  end loop;
+                   for Case_Idx in 1 .. Step.Case_Count loop
+                      declare
+                         Case_Val : constant String := Name_Strings.To_String (Step.Cases (Case_Idx).Case_Value);
+                         Case_Block_Start : constant Natural := Step.Cases (Case_Idx).Block_Start;
+                         Case_Block_End   : Natural := Step.Cases (Case_Idx).Block_Start + Step.Cases (Case_Idx).Block_Count - 1;
+                         Case_Steps       : Step_Array;
+                         Case_Step_Count  : Natural := 0;
+                      begin
+                         Append (Get_Indent & "  case " & Case_Val & ":");
+                         Append (NL);
+                         
+                         --  v0.8.5: Validate block bounds
+                         if Case_Block_Start > 0 and Case_Block_Start <= Step_Count then
+                            if Case_Block_End > Step_Count then
+                               Case_Block_End := Step_Count;
+                            end if;
+                            
+                            --  Mark case block steps as processed
+                            for J in Case_Block_Start .. Case_Block_End loop
+                               if J <= Step_Count then
+                                  Processed (J) := True;
+                               end if;
+                            end loop;
+                            
+                            --  Extract and translate case body RECURSIVELY
+                            if Step.Cases (Case_Idx).Block_Count > 0 then
+                               for Block_I in Case_Block_Start .. Case_Block_End loop
+                                  if Block_I <= Step_Count then
+                                     Case_Step_Count := Case_Step_Count + 1;
+                                     Case_Steps (Case_Step_Count) := Steps (Block_I);
+                                  end if;
+                               end loop;
+                               
+                               if Case_Step_Count > 0 then
+                                  declare
+                                     Case_Code : constant String := 
+                                       Translate_Steps_To_C (Case_Steps, Case_Step_Count, Ret_Type, Depth + 1, Indent + 2);
+                                  begin
+                                     Append (Case_Code);
+                                  end;
+                               end if;
+                            end if;
+                         end if;
+                      end;
+                   end loop;
                   
-                  --  Generate default case if present
-                  if Step.Default_Count > 0 and Step.Default_Start > 0 then
-                     declare
-                        Default_Block_Start : constant Natural := Step.Default_Start;
-                        Default_Block_End   : constant Natural := Step.Default_Start + Step.Default_Count - 1;
-                        Default_Steps       : Step_Array;
-                        Default_Step_Count  : Natural := 0;
-                     begin
-                        Append (Get_Indent & "  default:");
-                        Append (NL);
-                        
-                        --  Mark default block steps as processed
-                        for J in Default_Block_Start .. Default_Block_End loop
-                           if J <= Step_Count then
-                              Processed (J) := True;
-                           end if;
-                        end loop;
-                        
-                        --  Extract and translate default body RECURSIVELY
-                        for Block_I in Default_Block_Start .. Default_Block_End loop
-                           if Block_I <= Step_Count then
-                              Default_Step_Count := Default_Step_Count + 1;
-                              Default_Steps (Default_Step_Count) := Steps (Block_I);
-                           end if;
-                        end loop;
-                        
-                        if Default_Step_Count > 0 then
-                           declare
-                              Default_Code : constant String := 
-                                Translate_Steps_To_C (Default_Steps, Default_Step_Count, Ret_Type, Depth + 1, Indent + 2);
-                           begin
-                              Append (Default_Code);
-                           end;
-                        end if;
-                     end;
-                  end if;
+                   --  Generate default case if present
+                   if Step.Default_Count > 0 and Step.Default_Start > 0 and Step.Default_Start <= Step_Count then
+                      declare
+                         Default_Block_Start : constant Natural := Step.Default_Start;
+                         Default_Block_End   : Natural := Step.Default_Start + Step.Default_Count - 1;
+                         Default_Steps       : Step_Array;
+                         Default_Step_Count  : Natural := 0;
+                      begin
+                         --  v0.8.5: Validate block end doesn't exceed step count
+                         if Default_Block_End > Step_Count then
+                            Default_Block_End := Step_Count;
+                         end if;
+                         
+                         Append (Get_Indent & "  default:");
+                         Append (NL);
+                         
+                         --  Mark default block steps as processed
+                         for J in Default_Block_Start .. Default_Block_End loop
+                            if J <= Step_Count then
+                               Processed (J) := True;
+                            end if;
+                         end loop;
+                         
+                         --  Extract and translate default body RECURSIVELY
+                         for Block_I in Default_Block_Start .. Default_Block_End loop
+                            if Block_I <= Step_Count then
+                               Default_Step_Count := Default_Step_Count + 1;
+                               Default_Steps (Default_Step_Count) := Steps (Block_I);
+                            end if;
+                         end loop;
+                         
+                         if Default_Step_Count > 0 then
+                            declare
+                               Default_Code : constant String := 
+                                 Translate_Steps_To_C (Default_Steps, Default_Step_Count, Ret_Type, Depth + 1, Indent + 2);
+                            begin
+                               Append (Default_Code);
+                            end;
+                         end if;
+                      end;
+                   end if;
                   
                   Append (Get_Indent & "}");
                   Append (NL);
