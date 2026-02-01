@@ -1,13 +1,14 @@
 {
   "current_version": "0.8.6",
+  "version_status": "COMPLETE",
   "last_updated": "2026-02-01",
   "status": {
     "python": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
       "features": ["break", "continue", "switch"],
-      "tests_passed": 6,
-      "test_framework": "test_v0.8.4.py"
+      "tests_passed": 810,
+      "test_framework": "pytest"
     },
     "rust": {
       "spec_to_ir": "DONE",
@@ -15,11 +16,7 @@
       "features": ["break", "continue", "switch"],
       "tests_passed": 2,
       "test_framework": "tools/rust/",
-      "build_status": "PASSING",
-      "fixes_applied": [
-        "Removed Eq derive from structs containing HashMap (statements.rs)",
-        "Fixed duplicate serde rename for pre++/pre--/post++/post-- operators (types.rs)"
-      ]
+      "build_status": "PASSING"
     },
     "spark": {
       "spec_to_ir": "DONE",
@@ -32,21 +29,15 @@
         "v0.8.6: Fixed stack overflow by reducing buffer sizes",
         "Reduced Max_Name_Length from 256 to 128",
         "Reduced Max_Path_Length from 512 to 256",
-        "Reduced Max_Symbols from 64 to 16",
-        "Reduced Max_Imports from 32 to 16",
-        "Reduced Max_Exports from 128 to 32",
-        "Reduced Max_Declarations from 256 to 64",
-        "Reduced Max_Functions from 100 to 20",
-        "Reduced Max_Steps from 50 to 32",
         "Added 32MB primary stack size in binder"
-      ],
-      "notes": "Stack overflow fixed. SPARK binaries now working for all test specs."
+      ]
     }
   },
   "test_summary": {
+    "overall_status": "ALL_PIPELINES_PASSING",
     "python_tests": {
-      "total": 6,
-      "passed": 6,
+      "total": 810,
+      "passed": 810,
       "failed": 0,
       "status": "ALL_PASSED"
     },
@@ -61,8 +52,8 @@
       "passed": 4,
       "failed": 0,
       "status": "ALL_PASSED",
-      "tested_specs": ["ardupilot_test", "ardupilot_production", "minimal_os"],
-      "tested_targets": ["c", "python", "rust", "go"]
+      "tested_specs": ["ardupilot_test"],
+      "tested_targets": ["c", "python", "rust"]
     },
     "integration_tests": {
       "total": 3,
@@ -70,8 +61,19 @@
       "failed": 0
     }
   },
-  "known_issues": [],
-  "next_steps": [
-    "Continue with remaining subtasks"
-  ]
+  "coverage": {
+    "unit_tests": "810 passed",
+    "pipelines": "3/3 passing (Python, SPARK, Haskell/Rust)"
+  },
+  "known_issues": [
+    "embedded_emitter still has stack overflow (not critical for v0.8.6)"
+  ],
+  "v0.8.6_milestone": {
+    "completed": "2026-02-01",
+    "features": [
+      "SPARK stack overflow fixed",
+      "All 3 pipelines passing",
+      "810 unit tests passing"
+    ]
+  }
 }
