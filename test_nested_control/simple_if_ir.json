@@ -1,0 +1,35 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "simple_test",
+  "docstring": "Test simple control flow",
+  "generated_at": "2026-02-01T00:00:00Z",
+  "types": [],
+  "functions": [
+    {
+      "name": "simple_if_test",
+      "args": [
+        {"name": "x", "type": "i32"}
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "if",
+          "condition": "x > 0",
+          "block_start": "2",
+          "block_count": "1",
+          "else_start": "3",
+          "else_count": "1"
+        },
+        {
+          "op": "return",
+          "value": "1"
+        },
+        {
+          "op": "return",
+          "value": "0"
+        }
+      ]
+    }
+  ]
+}
