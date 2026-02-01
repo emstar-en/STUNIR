@@ -1,19 +1,19 @@
 {
-  "current_version": "0.8.6",
+  "current_version": "0.8.7",
   "version_status": "COMPLETE",
   "last_updated": "2026-02-01",
   "status": {
     "python": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
-      "features": ["break", "continue", "switch"],
+      "features": ["break", "continue", "switch", "try", "catch", "finally", "throw"],
       "tests_passed": 810,
       "test_framework": "pytest"
     },
     "rust": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
-      "features": ["break", "continue", "switch"],
+      "features": ["break", "continue", "switch", "try", "catch", "finally", "throw"],
       "tests_passed": 2,
       "test_framework": "tools/rust/",
       "build_status": "PASSING"
@@ -21,7 +21,7 @@
     "spark": {
       "spec_to_ir": "DONE",
       "ir_to_code": "DONE",
-      "features": ["break", "continue", "switch"],
+      "features": ["break", "continue", "switch", "try", "catch", "finally", "throw"],
       "implementation_status": "COMPLETE",
       "binary_status": "PASSING",
       "tests_passed": 4,
@@ -29,7 +29,8 @@
         "v0.8.6: Fixed stack overflow by reducing buffer sizes",
         "Reduced Max_Name_Length from 256 to 128",
         "Reduced Max_Path_Length from 512 to 256",
-        "Added 32MB primary stack size in binder"
+        "Added 32MB primary stack size in binder",
+        "v0.8.7: Added exception handling support"
       ]
     }
   },
@@ -52,7 +53,7 @@
       "passed": 4,
       "failed": 0,
       "status": "ALL_PASSED",
-      "tested_specs": ["ardupilot_test"],
+      "tested_specs": ["ardupilot_test", "v0.8.7"],
       "tested_targets": ["c", "python", "rust"]
     },
     "integration_tests": {
@@ -63,17 +64,18 @@
   },
   "coverage": {
     "unit_tests": "810 passed",
-    "pipelines": "3/3 passing (Python, SPARK, Haskell/Rust)"
+    "pipelines": "3/3 passing (Python, SPARK, Rust)"
   },
   "known_issues": [
-    "embedded_emitter still has stack overflow (not critical for v0.8.6)"
+    "embedded_emitter still has stack overflow (not critical)"
   ],
-  "v0.8.6_milestone": {
+  "v0.8.7_milestone": {
     "completed": "2026-02-01",
     "features": [
-      "SPARK stack overflow fixed",
-      "All 3 pipelines passing",
-      "810 unit tests passing"
+      "Exception handling: try/catch/finally/throw",
+      "All 3 pipelines support exceptions",
+      "C code uses setjmp/longjmp pattern",
+      "5 new test specs for exception handling"
     ]
   }
 }

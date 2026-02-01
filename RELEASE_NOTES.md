@@ -1,6 +1,99 @@
 # STUNIR Release Notes
 
 
+## Version 0.8.7 - February 1, 2026
+
+**Status**: ✅ **Exception Handling Complete!** 🛡️  
+**Codename**: "Exception Handling"  
+**Release Date**: February 1, 2026  
+**Release Type**: MINOR (New Features)  
+**Progress**: **All 3 pipelines support exceptions**
+
+---
+
+### 🎯 Executive Summary
+
+STUNIR 0.8.7 introduces comprehensive exception handling support across all three implementation pipelines (Python, Rust, SPARK). This release adds try/catch/finally/throw operations to the IR schema and implements C code generation using the setjmp/longjmp pattern.
+
+### Key Achievements
+
+✅ **Schema Updated** - Added `try`, `throw` ops to stunir_ir_v1.schema.json  
+✅ **Python Pipeline** - Full exception handling in spec_to_ir.py and ir_to_code.py  
+✅ **Rust Pipeline** - Full exception handling in spec_to_ir.rs and ir_to_code.rs  
+✅ **SPARK Pipeline** - Exception handling in stunir_ir_to_code.adb  
+✅ **C Code Generation** - Uses setjmp/longjmp pattern for exception simulation  
+✅ **Test Specs** - 5 new test specs in test_specs/v0.8.7/  
+
+### New IR Operations
+
+#### 1. **try** - Exception handling block
+```json
+{
+  "op": "try",
+  "try_block": [...],
+  "catch_blocks": [
+    {
+      "exception_type": "DivisionByZero",
+      "exception_var": "err",
+      "body": [...]
+    }
+  ],
+  "finally_block": [...]
+}
+```
+
+#### 2. **throw** - Throw exception
+```json
+{
+  "op": "throw",
+  "exception_type": "ValueError",
+  "exception_message": "Invalid input"
+}
+```
+
+### Generated C Code Pattern
+
+```c
+/* BEGIN TRY-CATCH BLOCK */
+{
+  jmp_buf __stunir_exception_buf;
+  int __stunir_exception_code = 0;
+  if ((__stunir_exception_code = setjmp(__stunir_exception_buf)) == 0) {
+    /* TRY */
+    // try block code
+  } else {
+    /* CATCH */
+    int err = __stunir_exception_code;
+    // catch block code
+  }
+  /* FINALLY */
+  // finally block code
+}
+/* END TRY-CATCH BLOCK */
+```
+
+### New Test Specs
+
+| Test File | Description |
+|-----------|-------------|
+| `try_catch.json` | Basic try/catch |
+| `try_finally.json` | Try with finally only |
+| `try_catch_finally.json` | Complete try/catch/finally |
+| `nested_try.json` | Nested try blocks |
+| `exception_propagation.json` | Cross-function propagation |
+
+### Files Modified
+
+- `schemas/stunir_ir_v1.schema.json` - Added try/throw ops
+- `tools/spec_to_ir.py` - Parse try/catch/finally/throw
+- `tools/ir_to_code.py` - Generate C code with setjmp/longjmp
+- `tools/rust/src/types.rs` - Added IRCatch struct
+- `tools/rust/src/spec_to_ir.rs` - Parse exception handling
+- `tools/rust/src/ir_to_code.rs` - Generate C code
+- `tools/spark/src/stunir_ir_to_code.adb` - Added try/throw handling
+
+---
+
 ## Version 0.8.6 - February 1, 2026
 
 **Status**: ✅ **Test Infrastructure Complete!** 🧪  

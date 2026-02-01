@@ -260,6 +260,50 @@ def convert_spec_to_ir(spec: Dict[str, Any]) -> Dict[str, Any]:
                     step = {"op": "continue"}
                     result_steps.append(step)
                 
+                elif stmt_type == "try":
+                    # v0.8.7: try/catch/finally exception handling
+                    step = {"op": "try"}
+                    
+                    # Parse try block
+                    if "try" in stmt:
+                        step["try_block"] = convert_statements(stmt.get("try", []))
+                    elif "body" in stmt:
+                        step["try_block"] = convert_statements(stmt.get("body", []))
+                    else:
+                        step["try_block"] = []
+                    
+                    # Parse catch blocks
+                    catches = stmt.get("catch", stmt.get("catches", []))
+                    if catches:
+                        catch_blocks = []
+                        # Handle single catch or list of catches
+                        if isinstance(catches, dict):
+                            catches = [catches]
+                        for catch in catches:
+                            catch_entry = {
+                                "exception_type": catch.get("exception_type", catch.get("type", "*")),
+                                "body": convert_statements(catch.get("body", []))
+                            }
+                            if "exception_var" in catch or "var" in catch:
+                                catch_entry["exception_var"] = catch.get("exception_var", catch.get("var", "e"))
+                            catch_blocks.append(catch_entry)
+                        step["catch_blocks"] = catch_blocks
+                    
+                    # Parse finally block
+                    if "finally" in stmt:
+                        step["finally_block"] = convert_statements(stmt.get("finally", []))
+                    
+                    result_steps.append(step)
+                
+                elif stmt_type == "throw":
+                    # v0.8.7: throw exception
+                    step = {"op": "throw"}
+                    if "exception_type" in stmt or "type" in stmt:
+                        step["exception_type"] = stmt.get("exception_type", stmt.get("type", "Exception"))
+                    if "message" in stmt or "exception_message" in stmt:
+                        step["exception_message"] = stmt.get("exception_message", stmt.get("message", ""))
+                    result_steps.append(step)
+                
                 elif stmt_type == "comment":
                     step = {"op": "nop"}
                     result_steps.append(step)

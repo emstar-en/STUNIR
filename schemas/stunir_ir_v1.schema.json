@@ -140,6 +140,8 @@
                     "break",
                     "continue",
                     "switch",
+                    "try",
+                    "throw",
                     "nop"
                   ]
                 },
@@ -222,6 +224,53 @@
                   "items": {
                     "$ref": "#/properties/functions/items/properties/steps/items"
                   }
+                },
+                "try_block": {
+                  "type": "array",
+                  "description": "Try block for exception handling",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "catch_blocks": {
+                  "type": "array",
+                  "description": "Catch blocks for exception handling",
+                  "items": {
+                    "type": "object",
+                    "required": ["exception_type", "body"],
+                    "properties": {
+                      "exception_type": {
+                        "type": "string",
+                        "description": "Exception type to catch (or '*' for all)"
+                      },
+                      "exception_var": {
+                        "type": "string",
+                        "description": "Variable name for caught exception"
+                      },
+                      "body": {
+                        "type": "array",
+                        "description": "Catch block statements",
+                        "items": {
+                          "$ref": "#/properties/functions/items/properties/steps/items"
+                        }
+                      }
+                    }
+                  }
+                },
+                "finally_block": {
+                  "type": "array",
+                  "description": "Finally block for exception handling",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "exception_type": {
+                  "type": "string",
+                  "description": "Exception type to throw"
+                },
+                "exception_message": {
+                  "type": "string",
+                  "description": "Exception message to throw"
                 }
               }
             }

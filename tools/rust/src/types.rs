@@ -115,6 +115,15 @@ pub struct IRCase {
     pub body: Vec<IRStep>,
 }
 
+/// IR Catch block entry for exception handling (v0.8.7)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IRCatch {
+    pub exception_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exception_var: Option<String>,
+    pub body: Vec<IRStep>,
+}
+
 /// IR Step (operation) - matches stunir_ir_v1 schema with control flow support
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IRStep {
@@ -145,6 +154,18 @@ pub struct IRStep {
     pub cases: Option<Vec<IRCase>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<Vec<IRStep>>,
+    
+    // Exception handling fields (v0.8.7)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub try_block: Option<Vec<IRStep>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub catch_blocks: Option<Vec<IRCatch>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub finally_block: Option<Vec<IRStep>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exception_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exception_message: Option<String>,
 }
 
 /// IR Function definition - matches stunir_ir_v1 schema

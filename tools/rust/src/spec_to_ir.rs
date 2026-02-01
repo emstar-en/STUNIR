@@ -292,6 +292,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "while" => {
@@ -323,6 +328,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "for" => {
@@ -362,6 +372,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         
@@ -414,6 +429,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: Some(expr),
                 cases,
                 default,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         
@@ -432,6 +452,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "continue" => {
@@ -448,6 +473,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         
@@ -484,6 +514,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "assign" => {
@@ -508,6 +543,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "var_decl" => {
@@ -533,6 +573,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "return" => {
@@ -552,6 +597,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
         "comment" => {
@@ -568,8 +618,124 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         },
+        
+        // v0.8.7: try/catch/finally exception handling
+        "try" => {
+            use stunir_tools::types::IRCatch;
+            
+            // Parse try block
+            let try_block = if let Some(try_stmts) = stmt["try"].as_array()
+                .or_else(|| stmt["body"].as_array()) {
+                Some(
+                    try_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                Some(vec![])
+            };
+            
+            // Parse catch blocks
+            let catches = stmt["catch"].as_array()
+                .or_else(|| stmt["catches"].as_array());
+            let catch_blocks = if let Some(catch_array) = catches {
+                let parsed_catches: Result<Vec<IRCatch>> = catch_array.iter()
+                    .map(|c| {
+                        let exception_type = c["exception_type"]
+                            .as_str()
+                            .or_else(|| c["type"].as_str())
+                            .unwrap_or("*")
+                            .to_string();
+                        let exception_var = c["exception_var"]
+                            .as_str()
+                            .or_else(|| c["var"].as_str())
+                            .map(|s| s.to_string());
+                        let body = if let Some(body_stmts) = c["body"].as_array() {
+                            body_stmts.iter()
+                                .map(|s| parse_statement(s))
+                                .collect::<Result<Vec<_>>>()?
+                        } else {
+                            vec![]
+                        };
+                        Ok(IRCatch { exception_type, exception_var, body })
+                    })
+                    .collect();
+                Some(parsed_catches?)
+            } else {
+                None
+            };
+            
+            // Parse finally block
+            let finally_block = if let Some(finally_stmts) = stmt["finally"].as_array() {
+                Some(
+                    finally_stmts.iter()
+                        .map(|s| parse_statement(s))
+                        .collect::<Result<Vec<_>>>()?
+                )
+            } else {
+                None
+            };
+            
+            Ok(IRStep {
+                op: "try".to_string(),
+                target: None,
+                value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+                try_block,
+                catch_blocks,
+                finally_block,
+                exception_type: None,
+                exception_message: None,
+            })
+        },
+        
+        // v0.8.7: throw exception
+        "throw" => {
+            let exception_type = stmt["exception_type"]
+                .as_str()
+                .or_else(|| stmt["type"].as_str())
+                .map(|s| s.to_string());
+            let exception_message = stmt["exception_message"]
+                .as_str()
+                .or_else(|| stmt["message"].as_str())
+                .map(|s| s.to_string());
+            
+            Ok(IRStep {
+                op: "throw".to_string(),
+                target: None,
+                value: None,
+                condition: None,
+                then_block: None,
+                else_block: None,
+                body: None,
+                init: None,
+                increment: None,
+                expr: None,
+                cases: None,
+                default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type,
+                exception_message,
+            })
+        },
+        
         _ => {
             // Unknown statement type - return a noop
             eprintln!("[WARN] Unknown statement type: {}", stmt_type);
@@ -586,6 +752,11 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 expr: None,
                 cases: None,
                 default: None,
+                try_block: None,
+                catch_blocks: None,
+                finally_block: None,
+                exception_type: None,
+                exception_message: None,
             })
         }
     }

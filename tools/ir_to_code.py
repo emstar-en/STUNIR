@@ -708,6 +708,68 @@ def translate_steps_to_c(steps: List[Dict[str, Any]], ret_type: TypeRef, indent:
             
             lines.append(f'{indent_str}}}')
             
+        elif op == 'try':
+            # v0.8.7: try/catch/finally exception handling
+            # Note: C doesn't have native exception handling; use setjmp/longjmp pattern
+            try_block = step.get('try_block', [])
+            catch_blocks = step.get('catch_blocks', [])
+            finally_block = step.get('finally_block', [])
+            
+            lines.append(f'{indent_str}/* BEGIN TRY-CATCH BLOCK */')
+            lines.append(f'{indent_str}{{')
+            lines.append(f'{indent_str}  jmp_buf __stunir_exception_buf;')
+            lines.append(f'{indent_str}  int __stunir_exception_code = 0;')
+            lines.append(f'{indent_str}  if ((__stunir_exception_code = setjmp(__stunir_exception_buf)) == 0) {{')
+            
+            # Try block
+            lines.append(f'{indent_str}    /* TRY */')
+            try_body = translate_steps_to_c(try_block, ret_type, indent + 2)
+            lines.append(try_body)
+            
+            lines.append(f'{indent_str}  }} else {{')
+            lines.append(f'{indent_str}    /* CATCH */')
+            
+            # Catch blocks
+            if catch_blocks:
+                for i, catch in enumerate(catch_blocks):
+                    exc_type = catch.get('exception_type', '*')
+                    exc_var = catch.get('exception_var', 'e')
+                    catch_body = catch.get('body', [])
+                    
+                    if exc_type == '*':
+                        # Catch all
+                        lines.append(f'{indent_str}    /* catch (all) */')
+                        lines.append(f'{indent_str}    int {exc_var} = __stunir_exception_code;')
+                    else:
+                        # Specific exception type (encoded as integer)
+                        lines.append(f'{indent_str}    /* catch ({exc_type}) */')
+                        lines.append(f'{indent_str}    int {exc_var} = __stunir_exception_code;')
+                    
+                    catch_code = translate_steps_to_c(catch_body, ret_type, indent + 2)
+                    lines.append(catch_code)
+            else:
+                lines.append(f'{indent_str}    /* No catch handlers */')
+            
+            lines.append(f'{indent_str}  }}')
+            
+            # Finally block
+            if finally_block:
+                lines.append(f'{indent_str}  /* FINALLY */')
+                finally_code = translate_steps_to_c(finally_block, ret_type, indent + 1)
+                lines.append(finally_code)
+            
+            lines.append(f'{indent_str}}}')
+            lines.append(f'{indent_str}/* END TRY-CATCH BLOCK */')
+            
+        elif op == 'throw':
+            # v0.8.7: throw exception
+            exc_type = step.get('exception_type', 'Exception')
+            exc_msg = step.get('exception_message', '')
+            
+            # In C, we use longjmp with an error code
+            lines.append(f'{indent_str}/* throw {exc_type}: {exc_msg} */')
+            lines.append(f'{indent_str}longjmp(__stunir_exception_buf, 1);')
+            
         else:
             # Unknown operation
             lines.append(f'{indent_str}/* UNKNOWN OP: {op} */')

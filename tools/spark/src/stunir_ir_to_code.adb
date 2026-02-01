@@ -1173,6 +1173,108 @@ package body STUNIR_IR_To_Code is
                   Append (NL);
                end;
                
+            elsif Op = "try" then
+               --  v0.8.7: try/catch/finally exception handling
+               --  Note: C doesn't have native exception handling; use setjmp/longjmp pattern
+               Append (Get_Indent & "/* BEGIN TRY-CATCH BLOCK */");
+               Append (NL);
+               Append (Get_Indent & "{");
+               Append (NL);
+               Append (Get_Indent & "  jmp_buf __stunir_exception_buf;");
+               Append (NL);
+               Append (Get_Indent & "  int __stunir_exception_code = 0;");
+               Append (NL);
+               Append (Get_Indent & "  if ((__stunir_exception_code = setjmp(__stunir_exception_buf)) == 0) {");
+               Append (NL);
+               Append (Get_Indent & "    /* TRY */");
+               Append (NL);
+               
+               --  Process try block using block_start/block_count
+               if Step.Block_Start > 0 and Step.Block_Start <= Step_Count then
+                  declare
+                     Try_Block_End : Natural := Step.Block_Start + Step.Block_Count - 1;
+                     Try_Steps : Step_Array;
+                     Try_Step_Count : Natural := 0;
+                  begin
+                     if Try_Block_End > Step_Count then
+                        Try_Block_End := Step_Count;
+                     end if;
+                     
+                     for J in Step.Block_Start .. Try_Block_End loop
+                        if J <= Step_Count then
+                           Processed (J) := True;
+                           Try_Step_Count := Try_Step_Count + 1;
+                           Try_Steps (Try_Step_Count) := Steps (J);
+                        end if;
+                     end loop;
+                     
+                     if Try_Step_Count > 0 then
+                        declare
+                           Try_Code : constant String :=
+                             Translate_Steps_To_C (Try_Steps, Try_Step_Count, Ret_Type, Depth + 1, Indent + 2);
+                        begin
+                           Append (Try_Code);
+                        end;
+                     end if;
+                  end;
+               end if;
+               
+               Append (Get_Indent & "  } else {");
+               Append (NL);
+               Append (Get_Indent & "    /* CATCH */");
+               Append (NL);
+               Append (Get_Indent & "    int e = __stunir_exception_code;");
+               Append (NL);
+               
+               --  Process else block (catch) if present
+               if Step.Else_Start > 0 and Step.Else_Start <= Step_Count then
+                  declare
+                     Catch_Block_End : Natural := Step.Else_Start + Step.Else_Count - 1;
+                     Catch_Steps : Step_Array;
+                     Catch_Step_Count : Natural := 0;
+                  begin
+                     if Catch_Block_End > Step_Count then
+                        Catch_Block_End := Step_Count;
+                     end if;
+                     
+                     for J in Step.Else_Start .. Catch_Block_End loop
+                        if J <= Step_Count then
+                           Processed (J) := True;
+                           Catch_Step_Count := Catch_Step_Count + 1;
+                           Catch_Steps (Catch_Step_Count) := Steps (J);
+                        end if;
+                     end loop;
+                     
+                     if Catch_Step_Count > 0 then
+                        declare
+                           Catch_Code : constant String :=
+                             Translate_Steps_To_C (Catch_Steps, Catch_Step_Count, Ret_Type, Depth + 1, Indent + 2);
+                        begin
+                           Append (Catch_Code);
+                        end;
+                     end if;
+                  end;
+               end if;
+               
+               Append (Get_Indent & "  }");
+               Append (NL);
+               Append (Get_Indent & "}");
+               Append (NL);
+               Append (Get_Indent & "/* END TRY-CATCH BLOCK */");
+               Append (NL);
+               
+            elsif Op = "throw" then
+               --  v0.8.7: throw exception
+               declare
+                  Exc_Type : constant String := Name_Strings.To_String (Step.Target);
+                  Exc_Msg  : constant String := Name_Strings.To_String (Step.Value);
+               begin
+                  Append (Get_Indent & "/* throw " & Exc_Type & ": " & Exc_Msg & " */");
+                  Append (NL);
+                  Append (Get_Indent & "longjmp(__stunir_exception_buf, 1);");
+                  Append (NL);
+               end;
+               
             else
                --  Unknown operation
                Append ("  /* UNKNOWN OP: " & Op & " */");

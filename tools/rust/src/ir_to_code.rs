@@ -469,6 +469,66 @@ fn translate_steps_to_c_internal(
                 
                 lines.push(format!("{}}}", indent_str));
             }
+            "try" => {
+                // v0.8.7: try/catch/finally exception handling
+                // Note: C doesn't have native exception handling; use setjmp/longjmp pattern
+                lines.push(format!("{}/* BEGIN TRY-CATCH BLOCK */", indent_str));
+                lines.push(format!("{}{{", indent_str));
+                lines.push(format!("{}  jmp_buf __stunir_exception_buf;", indent_str));
+                lines.push(format!("{}  int __stunir_exception_code = 0;", indent_str));
+                lines.push(format!("{}  if ((__stunir_exception_code = setjmp(__stunir_exception_buf)) == 0) {{", indent_str));
+                
+                // Try block
+                lines.push(format!("{}    /* TRY */", indent_str));
+                if let Some(ref try_block) = step.try_block {
+                    let try_body = translate_steps_to_c_internal(try_block, ret_type, indent + 2, local_vars);
+                    lines.push(try_body);
+                }
+                
+                lines.push(format!("{}  }} else {{", indent_str));
+                lines.push(format!("{}    /* CATCH */", indent_str));
+                
+                // Catch blocks
+                if let Some(ref catch_blocks) = step.catch_blocks {
+                    for catch in catch_blocks {
+                        let exc_type = &catch.exception_type;
+                        let exc_var = catch.exception_var.as_deref().unwrap_or("e");
+                        
+                        if exc_type == "*" {
+                            lines.push(format!("{}    /* catch (all) */", indent_str));
+                        } else {
+                            lines.push(format!("{}    /* catch ({}) */", indent_str, exc_type));
+                        }
+                        lines.push(format!("{}    int {} = __stunir_exception_code;", indent_str, exc_var));
+                        
+                        let catch_code = translate_steps_to_c_internal(&catch.body, ret_type, indent + 2, local_vars);
+                        lines.push(catch_code);
+                    }
+                } else {
+                    lines.push(format!("{}    /* No catch handlers */", indent_str));
+                }
+                
+                lines.push(format!("{}  }}", indent_str));
+                
+                // Finally block
+                if let Some(ref finally_block) = step.finally_block {
+                    lines.push(format!("{}  /* FINALLY */", indent_str));
+                    let finally_code = translate_steps_to_c_internal(finally_block, ret_type, indent + 1, local_vars);
+                    lines.push(finally_code);
+                }
+                
+                lines.push(format!("{}}}", indent_str));
+                lines.push(format!("{}/* END TRY-CATCH BLOCK */", indent_str));
+            }
+            "throw" => {
+                // v0.8.7: throw exception
+                let exc_type = step.exception_type.as_deref().unwrap_or("Exception");
+                let exc_msg = step.exception_message.as_deref().unwrap_or("");
+                
+                // In C, we use longjmp with an error code
+                lines.push(format!("{}/* throw {}: {} */", indent_str, exc_type, exc_msg));
+                lines.push(format!("{}longjmp(__stunir_exception_buf, 1);", indent_str));
+            }
             _ => {
                 lines.push(format!("{}/* UNKNOWN OP: {} */", indent_str, step.op));
             }
