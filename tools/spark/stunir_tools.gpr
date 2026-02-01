@@ -19,7 +19,7 @@ project STUNIR_Tools is
 
    package Compiler is
       for Default_Switches ("Ada") use
-        ("-gnat2012",      -- Ada 2012
+        ("-gnat2022",      -- Ada 2022 (for Unbounded_String support)
          "-gnatwa",        -- All warnings
          "-gnatVa",        -- All validity checks
          "-gnatf",         -- Full errors

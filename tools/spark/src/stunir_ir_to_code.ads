@@ -20,8 +20,15 @@ with Ada.Strings.Bounded;
 package STUNIR_IR_To_Code is
 
    --  Version information
-   Version : constant String := "0.2.0";
+   Version : constant String := "0.7.0";
    Tool_ID : constant String := "stunir_ir_to_code_spark";
+
+   --  Recursion control (v0.7.0 - Bounded Recursion)
+   Max_Recursion_Depth : constant := 5;  -- Maximum nesting depth
+   subtype Recursion_Depth is Natural range 0 .. Max_Recursion_Depth;
+   
+   --  Exception raised when recursion depth is exceeded
+   Recursion_Depth_Exceeded : exception;
 
    --  Maximum sizes
    Max_Path_Length    : constant := 512;

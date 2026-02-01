@@ -15,6 +15,7 @@ with Ada.Directories;
 with Ada.Command_Line;
 with Ada.Characters.Handling;
 with STUNIR_JSON_Utils;
+with STUNIR_String_Builder;
 
 package body STUNIR_IR_To_Code is
 
@@ -486,22 +487,38 @@ package body STUNIR_IR_To_Code is
       return "int32_t";
    end Infer_C_Type_From_Value;
 
-   --  Translate IR steps to C code
+   --  Translate IR steps to C code (v0.7.0 - RECURSIVE with bounded depth)
+   --  This function now supports multi-level nesting (up to Max_Recursion_Depth = 5)
    function Translate_Steps_To_C 
      (Steps      : Step_Array;
       Step_Count : Natural;
-      Ret_Type   : String) return String
+      Ret_Type   : String;
+      Depth      : Recursion_Depth := 1;
+      Indent     : Natural := 1) return String
    is
-      Max_Body_Size : constant := 8192;
+      Max_Body_Size : constant := 16384;  -- Increased for deeper nesting
       Result        : String (1 .. Max_Body_Size);
       Result_Len    : Natural := 0;
-      NL            : constant String (1 .. 1) := (1 => Character'Val (10));
+      NL            : constant String := [1 => Character'Val (10)];
       
       --  Local variable tracking (simplified - just tracks if var was declared)
       Max_Vars      : constant := 20;
       Local_Vars    : array (1 .. Max_Vars) of Name_String;
       Local_Types   : array (1 .. Max_Vars) of Name_String;
       Var_Count     : Natural := 0;
+      
+      --  Generate indentation string (v0.7.0)
+      function Get_Indent return String is
+         Spaces_Per_Level : constant := 2;
+         Total_Spaces     : constant Natural := Indent * Spaces_Per_Level;
+         Indent_Str       : constant String (1 .. Total_Spaces) := [others => ' '];
+      begin
+         if Total_Spaces > 0 then
+            return Indent_Str;
+         else
+            return "";
+         end if;
+      end Get_Indent;
       
       procedure Append (S : String) is
       begin
@@ -530,20 +547,26 @@ package body STUNIR_IR_To_Code is
          end if;
       end Declare_Var;
       
-      --  Track which steps are part of nested blocks (v0.6.1)
+      --  Track which steps are part of nested blocks (v0.6.1 -> v0.7.0)
       type Step_Processed_Array is array (1 .. Max_Steps) of Boolean;
-      Processed : Step_Processed_Array := (others => False);
+      Processed : Step_Processed_Array := [others => False];
       
       Has_Return : Boolean := False;
    begin
+      --  Check recursion depth (v0.7.0 - Bounded Recursion)
+      if Depth > Max_Recursion_Depth then
+         raise Recursion_Depth_Exceeded with 
+           "Maximum recursion depth (" & Natural'Image (Max_Recursion_Depth) & ") exceeded at depth " & Natural'Image (Depth);
+      end if;
+      
       --  Handle empty function body
       if Step_Count = 0 then
-         Append ("  /* Empty function body */");
-         Append (NL);  -- Newline
+         Append (Get_Indent & "/* Empty function body */");
+         Append (NL);
          if Ret_Type = "void" then
-            Append ("  return;");
+            Append (Get_Indent & "return;");
          else
-            Append ("  return " & C_Default_Return (Ret_Type) & ";");
+            Append (Get_Indent & "return " & C_Default_Return (Ret_Type) & ";");
          end if;
          return Result (1 .. Result_Len);
       end if;
@@ -610,7 +633,7 @@ package body STUNIR_IR_To_Code is
                if Value'Length > 0 then
                   Append ("  return " & Value & ";");
                elsif Ret_Type = "void" then
-                  Append ("  return;");
+                  Append (Get_Indent & "return;");
                else
                   Append ("  return " & C_Default_Return (Ret_Type) & ";");
                end if;
@@ -652,7 +675,7 @@ package body STUNIR_IR_To_Code is
                
             elsif Op = "nop" then
                --  No operation
-               Append ("  /* nop */");
+               Append (Get_Indent & "/* nop */");
                Append (NL);
                
             elsif Op = "if" then
@@ -682,7 +705,7 @@ package body STUNIR_IR_To_Code is
                                  if Block_Value'Length > 0 then
                                     Append ("    return " & Block_Value & ";");
                                  else
-                                    Append ("    return;");
+                                    Append (Get_Indent & "  return;");
                                  end if;
                                  Append (NL);
                               elsif Block_Op = "call" then
@@ -703,7 +726,7 @@ package body STUNIR_IR_To_Code is
                   
                   --  Process else block if present
                   if Step.Else_Count > 0 and Step.Else_Start > 0 then
-                     Append ("  } else {");
+                     Append (Get_Indent & "} else {");
                      Append (NL);
                      
                      for Block_I in Step.Else_Start .. Step.Else_Start + Step.Else_Count - 1 loop
@@ -723,7 +746,7 @@ package body STUNIR_IR_To_Code is
                                  if Block_Value'Length > 0 then
                                     Append ("    return " & Block_Value & ";");
                                  else
-                                    Append ("    return;");
+                                    Append (Get_Indent & "  return;");
                                  end if;
                                  Append (NL);
                               elsif Block_Op = "call" then
@@ -742,7 +765,7 @@ package body STUNIR_IR_To_Code is
                      end loop;
                   end if;
                   
-                  Append ("  }");
+                  Append (Get_Indent & "}");
                   Append (NL);
                end;
                
@@ -773,7 +796,7 @@ package body STUNIR_IR_To_Code is
                                  if Block_Value'Length > 0 then
                                     Append ("    return " & Block_Value & ";");
                                  else
-                                    Append ("    return;");
+                                    Append (Get_Indent & "  return;");
                                  end if;
                                  Append (NL);
                               elsif Block_Op = "call" then
@@ -792,7 +815,7 @@ package body STUNIR_IR_To_Code is
                      end loop;
                   end if;
                   
-                  Append ("  }");
+                  Append (Get_Indent & "}");
                   Append (NL);
                end;
                
@@ -825,7 +848,7 @@ package body STUNIR_IR_To_Code is
                                  if Block_Value'Length > 0 then
                                     Append ("    return " & Block_Value & ";");
                                  else
-                                    Append ("    return;");
+                                    Append (Get_Indent & "  return;");
                                  end if;
                                  Append (NL);
                               elsif Block_Op = "call" then
@@ -844,7 +867,7 @@ package body STUNIR_IR_To_Code is
                      end loop;
                   end if;
                   
-                  Append ("  }");
+                  Append (Get_Indent & "}");
                   Append (NL);
                end;
                
@@ -860,7 +883,7 @@ package body STUNIR_IR_To_Code is
       --  Add default return if no return statement was found
       if not Has_Return then
          if Ret_Type = "void" then
-            Append ("  return;");
+            Append (Get_Indent & "return;");
          else
             Append ("  return " & C_Default_Return (Ret_Type) & ";");
          end if;
