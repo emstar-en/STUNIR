@@ -496,7 +496,7 @@ package body STUNIR_IR_To_Code is
       Depth      : Recursion_Depth := 1;
       Indent     : Natural := 1) return String
    is
-      Max_Body_Size : constant := 16384;  -- Increased for deeper nesting
+      Max_Body_Size : constant := 32768;  -- Increased for 5-level nesting
       Result        : String (1 .. Max_Body_Size);
       Result_Len    : Natural := 0;
       NL            : constant String := [1 => Character'Val (10)];
@@ -679,90 +679,90 @@ package body STUNIR_IR_To_Code is
                Append (NL);
                
             elsif Op = "if" then
-               --  If/else statement with single-level nesting (v0.6.1)
+               --  If/else statement with RECURSIVE multi-level nesting (v0.7.1)
                declare
                   Cond : constant String := Name_Strings.To_String (Step.Condition);
                begin
-                  Append ("  if (" & Cond & ") {");
+                  Append (Get_Indent & "if (" & Cond & ") {");
                   Append (NL);
                   
-                  --  Process then block using block indices
+                  --  Process then block RECURSIVELY using block indices
                   if Step.Block_Count > 0 and Step.Block_Start > 0 then
-                     for Block_I in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
-                        if Block_I <= Step_Count then
-                           declare
-                              Block_Step   : constant IR_Step := Steps (Block_I);
-                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
-                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
-                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
-                           begin
-                              if Block_Op = "assign" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                    Append (NL);
-                                 end if;
-                              elsif Block_Op = "return" then
-                                 if Block_Value'Length > 0 then
-                                    Append ("    return " & Block_Value & ";");
-                                 else
-                                    Append (Get_Indent & "  return;");
-                                 end if;
-                                 Append (NL);
-                              elsif Block_Op = "call" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                 else
-                                    Append ("    " & Block_Value & ";");
-                                 end if;
-                                 Append (NL);
-                              else
-                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
-                                 Append (NL);
+                     declare
+                        Then_Block_Start : constant Natural := Step.Block_Start;
+                        Then_Block_End   : constant Natural := Step.Block_Start + Step.Block_Count - 1;
+                        Then_Steps       : Step_Array;
+                        Then_Count       : Natural := 0;
+                     begin
+                        --  Extract sub-array for then block and adjust indices
+                        for Block_I in Then_Block_Start .. Then_Block_End loop
+                           if Block_I <= Step_Count then
+                              Then_Count := Then_Count + 1;
+                              Then_Steps (Then_Count) := Steps (Block_I);
+                              
+                              --  Adjust block indices to be relative to the extracted sub-array
+                              if Then_Steps (Then_Count).Block_Start > 0 then
+                                 Then_Steps (Then_Count).Block_Start := 
+                                   Then_Steps (Then_Count).Block_Start - Then_Block_Start + 1;
                               end if;
+                              if Then_Steps (Then_Count).Else_Start > 0 then
+                                 Then_Steps (Then_Count).Else_Start := 
+                                   Then_Steps (Then_Count).Else_Start - Then_Block_Start + 1;
+                              end if;
+                           end if;
+                        end loop;
+                        
+                        --  RECURSIVE CALL for then block
+                        if Then_Count > 0 then
+                           declare
+                              Nested_Body : constant String := 
+                                Translate_Steps_To_C (Then_Steps, Then_Count, Ret_Type, Depth + 1, Indent + 1);
+                           begin
+                              Append (Nested_Body);
                            end;
                         end if;
-                     end loop;
+                     end;
                   end if;
                   
-                  --  Process else block if present
+                  --  Process else block if present RECURSIVELY
                   if Step.Else_Count > 0 and Step.Else_Start > 0 then
                      Append (Get_Indent & "} else {");
                      Append (NL);
                      
-                     for Block_I in Step.Else_Start .. Step.Else_Start + Step.Else_Count - 1 loop
-                        if Block_I <= Step_Count then
-                           declare
-                              Block_Step   : constant IR_Step := Steps (Block_I);
-                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
-                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
-                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
-                           begin
-                              if Block_Op = "assign" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                    Append (NL);
-                                 end if;
-                              elsif Block_Op = "return" then
-                                 if Block_Value'Length > 0 then
-                                    Append ("    return " & Block_Value & ";");
-                                 else
-                                    Append (Get_Indent & "  return;");
-                                 end if;
-                                 Append (NL);
-                              elsif Block_Op = "call" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                 else
-                                    Append ("    " & Block_Value & ";");
-                                 end if;
-                                 Append (NL);
-                              else
-                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
-                                 Append (NL);
+                     declare
+                        Else_Block_Start : constant Natural := Step.Else_Start;
+                        Else_Block_End   : constant Natural := Step.Else_Start + Step.Else_Count - 1;
+                        Else_Steps       : Step_Array;
+                        Else_Count       : Natural := 0;
+                     begin
+                        --  Extract sub-array for else block and adjust indices
+                        for Block_I in Else_Block_Start .. Else_Block_End loop
+                           if Block_I <= Step_Count then
+                              Else_Count := Else_Count + 1;
+                              Else_Steps (Else_Count) := Steps (Block_I);
+                              
+                              --  Adjust block indices to be relative to the extracted sub-array
+                              if Else_Steps (Else_Count).Block_Start > 0 then
+                                 Else_Steps (Else_Count).Block_Start := 
+                                   Else_Steps (Else_Count).Block_Start - Else_Block_Start + 1;
                               end if;
+                              if Else_Steps (Else_Count).Else_Start > 0 then
+                                 Else_Steps (Else_Count).Else_Start := 
+                                   Else_Steps (Else_Count).Else_Start - Else_Block_Start + 1;
+                              end if;
+                           end if;
+                        end loop;
+                        
+                        --  RECURSIVE CALL for else block
+                        if Else_Count > 0 then
+                           declare
+                              Nested_Body : constant String := 
+                                Translate_Steps_To_C (Else_Steps, Else_Count, Ret_Type, Depth + 1, Indent + 1);
+                           begin
+                              Append (Nested_Body);
                            end;
                         end if;
-                     end loop;
+                     end;
                   end if;
                   
                   Append (Get_Indent & "}");
@@ -770,49 +770,49 @@ package body STUNIR_IR_To_Code is
                end;
                
             elsif Op = "while" then
-               --  While loop with single-level nesting (v0.6.1)
+               --  While loop with RECURSIVE multi-level nesting (v0.7.1)
                declare
                   Cond : constant String := Name_Strings.To_String (Step.Condition);
                begin
-                  Append ("  while (" & Cond & ") {");
+                  Append (Get_Indent & "while (" & Cond & ") {");
                   Append (NL);
                   
-                  --  Process body using block indices
+                  --  Process body RECURSIVELY using block indices
                   if Step.Block_Count > 0 and Step.Block_Start > 0 then
-                     for Block_I in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
-                        if Block_I <= Step_Count then
-                           declare
-                              Block_Step   : constant IR_Step := Steps (Block_I);
-                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
-                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
-                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
-                           begin
-                              if Block_Op = "assign" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                    Append (NL);
-                                 end if;
-                              elsif Block_Op = "return" then
-                                 if Block_Value'Length > 0 then
-                                    Append ("    return " & Block_Value & ";");
-                                 else
-                                    Append (Get_Indent & "  return;");
-                                 end if;
-                                 Append (NL);
-                              elsif Block_Op = "call" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                 else
-                                    Append ("    " & Block_Value & ";");
-                                 end if;
-                                 Append (NL);
-                              else
-                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
-                                 Append (NL);
+                     declare
+                        Body_Block_Start : constant Natural := Step.Block_Start;
+                        Body_Block_End   : constant Natural := Step.Block_Start + Step.Block_Count - 1;
+                        Body_Steps       : Step_Array;
+                        Body_Count       : Natural := 0;
+                     begin
+                        --  Extract sub-array for loop body and adjust indices
+                        for Block_I in Body_Block_Start .. Body_Block_End loop
+                           if Block_I <= Step_Count then
+                              Body_Count := Body_Count + 1;
+                              Body_Steps (Body_Count) := Steps (Block_I);
+                              
+                              --  Adjust block indices to be relative to the extracted sub-array
+                              if Body_Steps (Body_Count).Block_Start > 0 then
+                                 Body_Steps (Body_Count).Block_Start := 
+                                   Body_Steps (Body_Count).Block_Start - Body_Block_Start + 1;
                               end if;
+                              if Body_Steps (Body_Count).Else_Start > 0 then
+                                 Body_Steps (Body_Count).Else_Start := 
+                                   Body_Steps (Body_Count).Else_Start - Body_Block_Start + 1;
+                              end if;
+                           end if;
+                        end loop;
+                        
+                        --  RECURSIVE CALL for loop body
+                        if Body_Count > 0 then
+                           declare
+                              Nested_Body : constant String := 
+                                Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
+                           begin
+                              Append (Nested_Body);
                            end;
                         end if;
-                     end loop;
+                     end;
                   end if;
                   
                   Append (Get_Indent & "}");
@@ -820,51 +820,51 @@ package body STUNIR_IR_To_Code is
                end;
                
             elsif Op = "for" then
-               --  For loop with single-level nesting (v0.6.1)
+               --  For loop with RECURSIVE multi-level nesting (v0.7.1)
                declare
                   Init_Expr : constant String := Name_Strings.To_String (Step.Init);
                   Cond      : constant String := Name_Strings.To_String (Step.Condition);
                   Incr      : constant String := Name_Strings.To_String (Step.Increment);
                begin
-                  Append ("  for (" & Init_Expr & "; " & Cond & "; " & Incr & ") {");
+                  Append (Get_Indent & "for (" & Init_Expr & "; " & Cond & "; " & Incr & ") {");
                   Append (NL);
                   
-                  --  Process body using block indices
+                  --  Process body RECURSIVELY using block indices
                   if Step.Block_Count > 0 and Step.Block_Start > 0 then
-                     for Block_I in Step.Block_Start .. Step.Block_Start + Step.Block_Count - 1 loop
-                        if Block_I <= Step_Count then
-                           declare
-                              Block_Step   : constant IR_Step := Steps (Block_I);
-                              Block_Op     : constant String := Name_Strings.To_String (Block_Step.Op);
-                              Block_Target : constant String := Name_Strings.To_String (Block_Step.Target);
-                              Block_Value  : constant String := Name_Strings.To_String (Block_Step.Value);
-                           begin
-                              if Block_Op = "assign" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                    Append (NL);
-                                 end if;
-                              elsif Block_Op = "return" then
-                                 if Block_Value'Length > 0 then
-                                    Append ("    return " & Block_Value & ";");
-                                 else
-                                    Append (Get_Indent & "  return;");
-                                 end if;
-                                 Append (NL);
-                              elsif Block_Op = "call" then
-                                 if Block_Target'Length > 0 then
-                                    Append ("    " & Block_Target & " = " & Block_Value & ";");
-                                 else
-                                    Append ("    " & Block_Value & ";");
-                                 end if;
-                                 Append (NL);
-                              else
-                                 Append ("    /* unsupported nested op: " & Block_Op & " */");
-                                 Append (NL);
+                     declare
+                        Body_Block_Start : constant Natural := Step.Block_Start;
+                        Body_Block_End   : constant Natural := Step.Block_Start + Step.Block_Count - 1;
+                        Body_Steps       : Step_Array;
+                        Body_Count       : Natural := 0;
+                     begin
+                        --  Extract sub-array for loop body and adjust indices
+                        for Block_I in Body_Block_Start .. Body_Block_End loop
+                           if Block_I <= Step_Count then
+                              Body_Count := Body_Count + 1;
+                              Body_Steps (Body_Count) := Steps (Block_I);
+                              
+                              --  Adjust block indices to be relative to the extracted sub-array
+                              if Body_Steps (Body_Count).Block_Start > 0 then
+                                 Body_Steps (Body_Count).Block_Start := 
+                                   Body_Steps (Body_Count).Block_Start - Body_Block_Start + 1;
                               end if;
+                              if Body_Steps (Body_Count).Else_Start > 0 then
+                                 Body_Steps (Body_Count).Else_Start := 
+                                   Body_Steps (Body_Count).Else_Start - Body_Block_Start + 1;
+                              end if;
+                           end if;
+                        end loop;
+                        
+                        --  RECURSIVE CALL for loop body
+                        if Body_Count > 0 then
+                           declare
+                              Nested_Body : constant String := 
+                                Translate_Steps_To_C (Body_Steps, Body_Count, Ret_Type, Depth + 1, Indent + 1);
+                           begin
+                              Append (Nested_Body);
                            end;
                         end if;
-                     end loop;
+                     end;
                   end if;
                   
                   Append (Get_Indent & "}");
@@ -880,8 +880,9 @@ package body STUNIR_IR_To_Code is
          end if;  --  if not Processed (I)
       end loop;
       
-      --  Add default return if no return statement was found
-      if not Has_Return then
+      --  Add default return if no return statement was found (only at top level)
+      --  Don't add default return in nested recursive calls (Depth > 1)
+      if not Has_Return and Depth = 1 then
          if Ret_Type = "void" then
             Append (Get_Indent & "return;");
          else
