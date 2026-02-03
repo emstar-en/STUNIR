@@ -1,0 +1,40 @@
+--  STUNIR Phase 3 SPARK Migration Project
+--  Test Infrastructure Components
+
+with "stunir_core.gpr";
+
+project Stunir_Phase3 is
+
+   for Source_Dirs use (
+      "test_harness",
+      "result_validator",
+      "coverage_analyzer",
+      "test_data_gen",
+      "test_orchestrator"
+   );
+
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+   for Library_Name use "stunir_phase3";
+   for Library_Kind use "static";
+
+   package Compiler is
+      for Default_Switches ("Ada") use (
+         "-gnat2012",     --  Ada 2012
+         "-gnata",        --  Enable assertions
+         "-gnatwa",       --  Enable all warnings
+         "-gnatwe",       --  Treat warnings as errors
+         "-gnatVa",       --  Enable all validity checks
+         "-gnaty3abcefhiklmnprstux"  --  Style checks
+      );
+   end Compiler;
+
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "--level=2",
+         "--timeout=30",
+         "--steps=10000"
+      );
+   end Prove;
+
+end Stunir_Phase3;

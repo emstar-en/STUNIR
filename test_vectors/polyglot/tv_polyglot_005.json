@@ -1,0 +1,38 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify all targets produce deterministic output",
+  "expected_hash": "8b120b09c9cad234f3cc19f5841f97d788d3c3d08e757b717bbf255ac41a64c4",
+  "expected_output": {
+    "all_deterministic": true,
+    "c89_hash_stable": true,
+    "c99_hash_stable": true,
+    "rust_hash_stable": true
+  },
+  "id": "tv_polyglot_005",
+  "input": {
+    "ir": {
+      "functions": [
+        {
+          "name": "test",
+          "params": [],
+          "returns": "void"
+        }
+      ],
+      "module": "determinism_test",
+      "schema": "stunir.ir.v1"
+    },
+    "runs": 2,
+    "targets": [
+      "rust",
+      "c89",
+      "c99"
+    ]
+  },
+  "name": "Polyglot Determinism",
+  "schema": "stunir.test_vector.polyglot.v1",
+  "tags": [
+    "determinism",
+    "polyglot",
+    "critical"
+  ]
+}

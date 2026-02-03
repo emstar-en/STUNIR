@@ -1,0 +1,7 @@
+{
+  "Commands": "Directory",
+  "IR": "Directory",
+  "Main.hs": "File",
+  "StunirPack.hs": "File",
+  "StunirPipeline.hs": "File"
+}

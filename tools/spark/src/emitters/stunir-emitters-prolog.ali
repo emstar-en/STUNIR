@@ -1,0 +1,264 @@
+V "GNAT Lib v12"
+A -gnatc
+P NO FX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_ENUMERATION_MAPS
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_ASPECT_SPECIFICATIONS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV NO_ELABORATION_CODE
+
+U stunir.emitters.prolog%b  stunir-emitters-prolog.adb  5a0147bb OO PK IU
+Z ada.strings.text_buffers%s  a-sttebu.adb	a-sttebu.ali
+W stunir.emitters%s	stunir-emitters.adb	stunir-emitters.ali
+
+U stunir.emitters.prolog%s  stunir-emitters-prolog.ads  dbe9f57b EB EE OO PK IU
+Z ada.strings.text_buffers%s  a-sttebu.adb	a-sttebu.ali
+W stunir%s		stunir.ads		stunir.ali
+W stunir.emitters%s	stunir-emitters.adb	stunir-emitters.ali
+W stunir.semantic_ir%s	stunir-semantic_ir.adb	stunir-semantic_ir.ali
+
+D ada.ads		20220819080952 76789da1 ada%s
+D a-charac.ads		20220819080952 2d3ec45b ada.characters%s
+D a-chlat1.ads		20220819080952 e0d72e76 ada.characters.latin_1%s
+D a-string.ads		20220819080952 90ac6797 ada.strings%s
+D a-strbou.ads		20220819080952 376eca2a ada.strings.bounded%s
+D a-strmap.ads		20220819080952 233229cd ada.strings.maps%s
+D a-strsea.ads		20220819080952 6f718bb4 ada.strings.search%s
+D a-strsup.ads		20220819080952 07a33570 ada.strings.superbounded%s
+D a-sttebu.ads		20220819080952 18209c64 ada.strings.text_buffers%s
+D a-stuten.ads		20220819080952 33c54060 ada.strings.utf_encoding%s
+D interfac.ads		20220819080952 edec285f interfaces%s
+D stunir.ads		20260131064959 87e0db1d stunir%s
+D stunir-emitters.ads	20260131062306 5c79c518 stunir.emitters%s
+D stunir-emitters-prolog.ads  20260131065217 bb7eba82 stunir.emitters.prolog%s
+D stunir-emitters-prolog.adb  20260131064950 e17ffd39 stunir.emitters.prolog%b
+D stunir-semantic_ir.ads  20260131062306 60974ff9 stunir.semantic_ir%s
+D system.ads		20220819080952 a2da961d system%s
+D s-unstyp.ads		20220819080952 fa2a7f59 system.unsigned_types%s
+D unchconv.ads		20220819080952 ca2f9e18 unchecked_conversion%s
+G a e
+G c Z s b [emit_module stunir__emitters__prolog 48 25 none]
+G c Z s b [emit_type stunir__emitters__prolog 57 25 none]
+G c Z s b [emit_function stunir__emitters__prolog 66 25 none]
+G c Z s b [get_comment_prefix stunir__emitters__prolog 76 13 none]
+G c Z s b [get_module_syntax stunir__emitters__prolog 81 13 none]
+G c Z s b [map_type_to_prolog stunir__emitters__prolog 86 13 none]
+G c Z s b [supports_tabling stunir__emitters__prolog 93 13 none]
+G c Z s b [supports_clp stunir__emitters__prolog 97 13 none]
+G c Z s b [supports_assertions stunir__emitters__prolog 101 13 none]
+G c Z s b [emit_predicate_head stunir__emitters__prolog 106 14 none]
+G c Z s b [emit_clause_separator stunir__emitters__prolog 115 14 none]
+G c Z s b [emit_body_goal stunir__emitters__prolog 121 14 none]
+G c Z s b [emit_space stunir__emitters__prolog 128 14 none]
+G c Z s b [emit_newline stunir__emitters__prolog 134 14 none]
+X 5 a-strbou.ads
+74R12*Bounded_String<8|61R9>
+77r7*Null_Bounded_String{74R12[16|19]} 15|173r30[16|19] 334r30[16|19] 391r30[16|19]
+82I15*Length_Range{natural}
+84V16*Length{82I15[16|19]} 14|55s50[16|19] 64s50[16|19] 73s50[16|19] 119s44[16|19]
+. 119s76[16|19] 132s44[16|19] 132s75[16|19] 138s44[16|19] 138s75[16|19] 15|91s23[16|19]
+. 103s23[16|19] 118s23[16|19] 140s23[16|19] 153s23[16|19]
+125V16*To_String{string} 15|170s53[16|16] 171s52[16|18] 295s58[16|19] 310s58[16|19]
+. 330s51[16|16] 331s50[16|18] 366s31[16|16] 367s31[16|17] 386s51[16|16] 387s50[16|18]
+. 442s56[16|16]
+415U17*Append 15|92s23[16|19] 104s23[16|19] 119s23[16|19] 121s26[16|19] 123s29[16|19]
+. 125s32[16|19] 128s26[16|19] 141s23[16|19] 154s23[16|19] 177s20[16|19] 182s20[16|19]
+. 191s26[16|19] 198s29[16|19] 206s26[16|19] 213s29[16|19] 221s26[16|19] 228s29[16|19]
+. 236s26[16|19] 243s29[16|19] 251s26[16|19] 258s26[16|19] 265s26[16|19] 272s26[16|19]
+. 279s29[16|19] 295s29[16|19] 310s29[16|19] 341s26[16|19] 344s26[16|19] 350s26[16|19]
+. 355s29[16|19] 360s26[16|19] 365s29[16|19] 396s23[16|19] 405s29[16|19] 411s29[16|19]
+. 423s23[16|19] 425s26[16|19] 427s29[16|19] 430s23[16|19] 437s20[16|19] 450s26[16|19]
+. 451s26[16|19] 456s20[16|19] 466s20[16|19]
+X 12 stunir.ads
+5K9*STUNIR 12e11 14|5r6 5r30 6r6 6r30 8r9 140r5 15|5r14 473r5
+X 13 stunir-emitters.ads
+7K16*Emitters 12|5k9 13|65e20 14|6w13 6r37 8r16 140r12 15|5r21 473r12
+18H9*Base_Emitter 21e14 14|43r31
+X 14 stunir-emitters-prolog.ads
+8K25*Prolog 13|7k16 14|140l21 140e27 15|5b30 473l21 473t27
+13E9*Prolog_Dialect 21e15 25r24 76r43 81r42 88r19 93r41 97r37 101r44 15|14r43
+. 27r42 44r19 67r41 72r37 77r44 178r9
+14n7*SWI_Prolog{13E9} 25r42 35r25 15|17r15 30r15 74r25 190r15
+15n7*GNU_Prolog{13E9} 15|19r15 32r15 74r38 205r15
+16n7*SICStus{13E9} 15|17r28 30r28 74r51 220r15
+17n7*YAP{13E9} 15|17r38 30r38 69r31 235r15 410r18
+18n7*XSB{13E9} 15|17r44 30r44 69r25 250r15 404r18
+19n7*Ciao{13E9} 15|19r28 30r60 79r24 257r15 339r15 422r63
+20n7*BProlog{13E9} 15|19r35 34r15 74r71 264r15
+21n7*ECLiPSe{13E9} 15|17r50 30r50 74r61 271r15
+24R9*Prolog_Config 31e14 34r30 44r16
+25e7*Dialect{13E9} 35m7 15|169r75 178r43 189r24 332r75 338r24 388r75 402r68
+. 403r27 422r53
+26b7*Use_Tabling{boolean} 36m7 15|402r22
+27b7*Use_CLP{boolean} 37m7 15|197r28 212r28 227r28 242r28 278r28
+28b7*Use_Assertions{boolean} 38m7 15|422r22
+29i7*Indent_Size{positive} 39m7
+30i7*Max_Line_Width{positive} 40m7
+34r4*Default_Config{24R9} 44r33
+43R9*Prolog_Emitter<13|18R9> 45e14 48P25 49r23 57P25 58r23 66P25 67r23 15|163r23
+. 324r23 380r23
+44r7*Config{24R9} 15|169r68 178r36 189r17 197r21 212r21 227r21 242r21 278r21
+. 332r68 338r17 388r68 402r15 402r61 403r20 422r15 422r46
+48U25*Emit_Module<13|24p14> 49=7 50>7 51<7 52<7 15|162b14 318l8 318t19
+49r7 Self{43R9} 15|163b7 169r63 178r31 189r12 197r16 212r16 227r16 242r16
+. 278r16 293m24 308m28
+50r7 Module{16|91R9} 54r37 15|164b7 170r64 171r63 288r21 293r30 303r21 308r34
+51r7 Output{16|24R12} 55r58 15|165b7 173m7 177m28 179m21 182m28 183m21 185m21
+. 191m34 192m27 194m27 198m37 199m30 201m30 206m34 207m27 209m27 213m37 214m30
+. 216m30 221m34 222m27 224m27 228m37 229m30 231m30 236m34 237m27 239m27 243m37
+. 244m30 246m30 251m34 252m27 254m27 258m34 259m27 261m27 265m34 266m27 268m27
+. 272m34 273m27 275m27 279m37 280m30 282m30 295m37 296m30 310m37 311m30
+52b7 Success{boolean} 55r24 15|166b7 174m7 317m7
+57U25*Emit_Type<13|34p14> 58=7 59>7 60<7 61<7 15|293s13 323b14 374l8 374t17
+58r7 Self{43R9} 15|324b7 332r63 338r12
+59r7 T{16|44R9} 63r20 15|325b7 330r62 331r61 364r27 366r42 367r42
+60r7 Output{16|24R12} 64r58 15|326b7 334m7 341m34 342m27 344m34 345m27 350m34
+. 351m27 355m37 356m30 360m34 361m27 365m37 368m30
+61b7 Success{boolean} 64r24 15|327b7 335m7 373m7
+66U25*Emit_Function<13|44p14> 67=7 68>7 69<7 70<7 15|308s13 379b14 471l8
+. 471t21
+67r7 Self{43R9} 15|380b7 388r63 402r10 402r56 403r15 422r10 422r41
+68r7 Func{16|73R9} 72r20 15|381b7 386r62 387r61 389r35 424r24 426r20 440r21
+. 442r67
+69r7 Output{16|24R12} 73r58 15|382b7 391m7 396m31 397m24 405m37 407m30 411m37
+. 413m30 423m31 425m34 427m37 430m31 431m24 437m28 450m34 451m34 456m28 459m30
+. 462m21 466m28 467m21
+70b7 Success{boolean} 73r24 15|383b7 392m7 470m7
+76V13*Get_Comment_Prefix{string} 76>33 79r14 15|14b13 22l8 22t26 169s43 332s43
+. 388s43
+76e33 Dialect{13E9} 15|14b33 16r12
+81V13*Get_Module_Syntax{string} 81>32 84r14 15|27b13 37l8 37t25
+81e32 Dialect{13E9} 15|27b32 29r12
+86V13*Map_Type_To_Prolog{string} 87>7 88>7 91r14 15|42b13 62l8 62t26
+87e7 Prim_Type{16|27E9} 15|43b7 48r12
+88e7 Dialect{13E9} 15|44b7 46r28
+93V13*Supports_Tabling{boolean} 93>31 15|67b13 70l8 70t24 402s38
+93e31 Dialect{13E9} 15|67b31 69r14
+97V13*Supports_CLP{boolean} 97>27 15|72b13 75l8 75t20
+97e27 Dialect{13E9} 15|72b27 74r14
+101V13*Supports_Assertions{boolean} 101>34 15|77b13 80l8 80t27
+101e34 Dialect{13E9} 15|77b34 79r14
+106U14*Emit_Predicate_Head 107=7 108>7 109>7 110<7 15|109b14 132l8 132t27
+107r7 Buffer{16|24R12} 15|110b7 118r31 119m31 121m34 123m37 125m40 128m34
+108a7 Predicate_Name{string} 112r13 112r43 15|111b7 118r41 119r39
+109i7 Arity{natural} 113r17 15|112b7 120r13 122r27 124r23
+110b7 Success{boolean} 15|113b7 117m7 130m10
+115U14*Emit_Clause_Separator 116=7 117<7 15|134b14 144l8 144t29 459s7
+116r7 Buffer{16|24R12} 119r52 119r84 15|135b7 140r31 141m31
+117b7 Success{boolean} 119r18 15|136b7 139m7 142m10
+121U14*Emit_Body_Goal 122=7 123>7 124<7 15|146b14 157l8 157t22
+122r7 Buffer{16|24R12} 15|147b7 153r31 154m31
+123a7 Goal{string} 126r13 126r33 15|148b7 153r41 154r39
+124b7 Success{boolean} 15|149b7 152m7 155m10
+128U14*Emit_Space 129=7 130<7 15|85b14 95l8 95t18
+129r7 Buffer{16|24R12} 132r52 132r83 15|86b7 91r31 92m31
+130b7 Success{boolean} 132r18 15|87b7 90m7 93m10
+134U14*Emit_Newline 135=7 136<7 15|97b14 107l8 107t20 179s7 183s7 185s7 192s13
+. 194s13 199s16 201s16 207s13 209s13 214s16 216s16 222s13 224s13 229s16 231s16
+. 237s13 239s13 244s16 246s16 252s13 254s13 259s13 261s13 266s13 268s13 273s13
+. 275s13 280s16 282s16 296s16 311s16 342s13 345s13 351s13 356s16 361s13 368s16
+. 397s10 407s16 413s16 431s10 462s7 467s7
+135r7 Buffer{16|24R12} 138r52 138r83 15|98b7 103r31 104m31
+136b7 Success{boolean} 138r18 15|99b7 102m7 105m10
+X 15 stunir-emitters-prolog.adb
+8e4 New_Line{character} 104r44
+9e4 Space{character} 92r44
+115b7 Temp_Success{boolean}
+122i17 I{integer} 124r19
+168b7 Temp_Success{boolean} 179m29 180r14 183m29 184r14 185m29 186r14 192m35
+. 193r20 194m35 195r20 199m38 200r23 201m38 202r23 207m35 208r20 209m35 210r20
+. 214m38 215r23 216m38 217r23 222m35 223r20 224m35 225r20 229m38 230r23 231m38
+. 232r23 237m35 238r20 239m35 240r20 244m38 245r23 246m38 247r23 252m35 253r20
+. 254m35 255r20 259m35 260r20 261m35 262r20 266m35 267r20 268m35 269r20 273m35
+. 274r20 275m35 276r20 280m38 281r23 282m38 283r23 296m38 297r23 311m38 312r23
+169a7 Comment_Prefix{string} 177r36 182r36
+170a7 Module_Name{string} 191r57 206r57 221r57 236r57 251r57 258r57 265r57
+. 272r57
+171a7 Module_Doc{string}
+288i11 I{integer} 293r44
+290r13 Type_Output{16|24R12} 293m48 295r69
+291b13 Type_Success{boolean} 293m61 294r16
+303i11 I{integer} 308r52
+305r13 Func_Output{16|24R12} 308m56 310r69
+306b13 Func_Success{boolean} 308m69 309r16
+329b7 Temp_Success{boolean} 342m35 343r20 345m35 346r20 351m35 352r20 356m38
+. 357r23 361m35 362r20 368m38 369r23
+330a7 Type_Name{string} 341r58 344r42 344r60 350r70
+331a7 Type_Doc{string} 354r16 355r62
+332a7 Comment_Prefix{string} 350r42 355r45 360r42 365r45
+364i17 I{integer} 366r52 367r52
+385b7 Temp_Success{boolean} 397m32 398r17 407m38 408r23 413m38 414r23 431m32
+. 432r17 459m38 460r14 462m29 463r14 467m29 468r14
+386a7 Func_Name{string} 405r59 411r59 423r52 437r36
+387a7 Func_Doc{string} 395r10 396r56
+388a7 Comment_Prefix{string} 396r39
+389i7 Arity{natural} 406r33 406r60 412r33 412r60
+424i14 I{integer} 426r16
+440i11 I{integer} 442r78
+442a13 Arg_Name{string} 443r37
+443a13 Capitalized{string} 446r16 446r48 446r61 447m16 447r29 448r48 448r61
+. 450r42
+X 16 stunir-semantic_ir.ads
+7K16*Semantic_IR 14|5w13 5r37 16|119e23
+14N4*Max_Code_Length 15|91r41 103r41 118r71 140r46 153r56
+16K12*Name_Strings[5|57] 15|170r40 330r38 366r18 386r38 442r43
+17K12*Type_Strings[5|57] 15|367r18
+18K12*Doc_Strings[5|57] 15|171r40 331r38 387r38
+19K12*Code_Buffers[5|57] 14|55r37 64r37 73r37 119r31 119r63 132r31 132r62
+. 138r31 138r62 15|91r10 92r10 103r10 104r10 118r10 119r10 121r13 123r16
+. 125r19 128r13 140r10 141r10 153r10 154r10 173r17 177r7 182r7 191r13 198r16
+. 206r13 213r16 221r13 228r16 236r13 243r16 251r13 258r13 265r13 272r13 279r16
+. 295r16 295r45 310r16 310r45 334r17 341r13 344r13 350r13 355r16 360r13 365r16
+. 391r17 396r10 405r16 411r16 423r10 425r13 427r16 430r10 437r7 450r13 451r13
+. 456r7 466r7
+21R12*IR_Name_String{5|74R12[16]}
+22R12*IR_Type_String{5|74R12[17]}
+23R12*IR_Doc_String{5|74R12[18]}
+24R12*IR_Code_Buffer{5|74R12[19]} 14|51r23 60r23 69r23 107r31 116r24 122r24
+. 129r24 135r24 15|86r24 98r24 110r31 135r24 147r24 165r23 290r27 305r27
+. 326r23 382r23
+27E9*IR_Primitive_Type 14|87r19 15|43r19 16|31e26
+28n7*Type_String{27E9} 15|49r15
+28n20*Type_Int{27E9} 15|51r15
+28n30*Type_Float{27E9} 15|55r15
+28n42*Type_Bool{27E9} 15|57r15
+28n53*Type_Void{27E9} 15|59r15
+29n7*Type_I8{27E9} 15|51r26
+29n16*Type_I16{27E9} 15|51r36
+29n26*Type_I32{27E9} 15|51r47
+29n36*Type_I64{27E9} 15|51r58
+30n7*Type_U8{27E9} 15|53r15
+30n16*Type_U16{27E9} 15|53r25
+30n26*Type_U32{27E9} 15|53r36
+30n36*Type_U64{27E9} 15|53r47
+31n7*Type_F32{27E9} 15|55r28
+31n17*Type_F64{27E9} 15|55r39
+35r7*Name{21R12} 15|366r55
+36r7*Type_Ref{22R12} 15|367r55
+42A9*Field_Array(34R9)<integer>
+44R9*IR_Type_Def 14|59r23 15|325r23 16|50e4
+45r7*Name{21R12} 15|330r64
+46r7*Docstring{23R12} 15|331r63
+47a7*Fields{42A9} 15|366r44 367r44
+48i7*Field_Cnt{integer} 14|63r22 15|364r29
+54r7*Name{21R12} 15|442r81
+70A9*Arg_Array(53R9)<integer>
+73R9*IR_Function 14|68r23 15|381r23 16|82e4
+74r7*Name{21R12} 15|386r67
+75r7*Docstring{23R12} 15|387r66
+76a7*Args{70A9} 15|442r72
+79i7*Arg_Cnt{integer} 14|72r25 15|389r40 424r29 426r25 440r26
+88A9*Type_Array(44R9)<integer>
+89A9*Function_Array(73R9)<integer>
+91R9*IR_Module 14|50r23 15|164r23 16|100e4
+93r7*Module_Name{21R12} 15|170r71
+94r7*Docstring{23R12} 15|171r70
+95a7*Types{88A9} 15|293r37
+96a7*Functions{89A9} 15|308r41
+97i7*Type_Cnt{integer} 15|288r28
+98i7*Func_Cnt{integer} 15|303r28
+104V13*Is_Valid_Module{boolean} 14|54s20
+

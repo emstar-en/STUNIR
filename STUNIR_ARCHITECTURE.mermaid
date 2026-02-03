@@ -1,0 +1,23 @@
+graph TD
+    User[User / CI] -->|Invokes| BuildScript[scripts/build.sh]
+
+    subgraph "Polyglot Dispatcher"
+        BuildScript -->|Check Profile| Detect{Detect Runtime}
+        Detect -->|Profile=Native| Native[Native Binary
+(bin/stunir-cli)]
+        Detect -->|Profile=Default| Python[Python Toolchain
+(stunir.main)]
+        Detect -->|Profile=Shell| Shell[Shell-Native Lib
+(scripts/lib/)]
+    end
+
+    subgraph "Core Logic"
+        Native -->|Executes| Logic[IR Generation & Verification]
+        Python -->|Executes| Logic
+        Shell -->|Executes| Logic
+    end
+
+    Logic -->|Reads| Spec[Spec (JSON)]
+    Logic -->|Reads| Lock[Toolchain Lock]
+    Logic -->|Produces| Code[Source Code]
+    Logic -->|Produces| Receipt[Receipt (JSON)]

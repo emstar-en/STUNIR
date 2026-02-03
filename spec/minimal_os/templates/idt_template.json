@@ -1,0 +1,117 @@
+{
+  "$schema": "../schemas/idt_schema.json",
+  "template_name": "idt_template",
+  "version": "1.0.0",
+  "description": "Interrupt Descriptor Table specification template for OS development",
+  "target_architectures": ["x86", "x86_64"],
+  "do178c_compliance": "Level A",
+  
+  "idt_config": {
+    "mode": "x86_64",
+    "syntax": "intel",
+    "vector_count": 256,
+    "default_handler": "default_interrupt_handler",
+    "kernel_code_selector": "0x08"
+  },
+  
+  "gate_types": {
+    "interrupt_gate_64": {
+      "type_attr": "0x8E",
+      "description": "64-bit Interrupt Gate (DPL=0, Present)"
+    },
+    "trap_gate_64": {
+      "type_attr": "0x8F",
+      "description": "64-bit Trap Gate (DPL=0, Present)"
+    },
+    "interrupt_gate_user": {
+      "type_attr": "0xEE",
+      "description": "64-bit Interrupt Gate (DPL=3, Present) - User callable"
+    }
+  },
+  
+  "exceptions": [
+    {"vector": 0, "name": "divide_error", "mnemonic": "#DE", "has_error_code": false, "handler": "isr0"},
+    {"vector": 1, "name": "debug", "mnemonic": "#DB", "has_error_code": false, "handler": "isr1"},
+    {"vector": 2, "name": "nmi", "mnemonic": "NMI", "has_error_code": false, "handler": "isr2"},
+    {"vector": 3, "name": "breakpoint", "mnemonic": "#BP", "has_error_code": false, "handler": "isr3", "gate_type": "trap_gate_64"},
+    {"vector": 4, "name": "overflow", "mnemonic": "#OF", "has_error_code": false, "handler": "isr4"},
+    {"vector": 5, "name": "bound_range", "mnemonic": "#BR", "has_error_code": false, "handler": "isr5"},
+    {"vector": 6, "name": "invalid_opcode", "mnemonic": "#UD", "has_error_code": false, "handler": "isr6"},
+    {"vector": 7, "name": "device_not_available", "mnemonic": "#NM", "has_error_code": false, "handler": "isr7"},
+    {"vector": 8, "name": "double_fault", "mnemonic": "#DF", "has_error_code": true, "handler": "isr8", "ist": 1},
+    {"vector": 9, "name": "coprocessor_segment", "mnemonic": "-", "has_error_code": false, "handler": "isr9"},
+    {"vector": 10, "name": "invalid_tss", "mnemonic": "#TS", "has_error_code": true, "handler": "isr10"},
+    {"vector": 11, "name": "segment_not_present", "mnemonic": "#NP", "has_error_code": true, "handler": "isr11"},
+    {"vector": 12, "name": "stack_segment_fault", "mnemonic": "#SS", "has_error_code": true, "handler": "isr12"},
+    {"vector": 13, "name": "general_protection", "mnemonic": "#GP", "has_error_code": true, "handler": "isr13"},
+    {"vector": 14, "name": "page_fault", "mnemonic": "#PF", "has_error_code": true, "handler": "isr14"},
+    {"vector": 15, "name": "reserved_15", "mnemonic": "-", "has_error_code": false, "handler": "isr15"},
+    {"vector": 16, "name": "x87_fpu_error", "mnemonic": "#MF", "has_error_code": false, "handler": "isr16"},
+    {"vector": 17, "name": "alignment_check", "mnemonic": "#AC", "has_error_code": true, "handler": "isr17"},
+    {"vector": 18, "name": "machine_check", "mnemonic": "#MC", "has_error_code": false, "handler": "isr18", "ist": 2},
+    {"vector": 19, "name": "simd_exception", "mnemonic": "#XM", "has_error_code": false, "handler": "isr19"},
+    {"vector": 20, "name": "virtualization", "mnemonic": "#VE", "has_error_code": false, "handler": "isr20"},
+    {"vector": 21, "name": "control_protection", "mnemonic": "#CP", "has_error_code": true, "handler": "isr21"},
+    {"vector": 22, "name": "reserved_22", "mnemonic": "-", "has_error_code": false, "handler": "isr22"},
+    {"vector": 23, "name": "reserved_23", "mnemonic": "-", "has_error_code": false, "handler": "isr23"},
+    {"vector": 24, "name": "reserved_24", "mnemonic": "-", "has_error_code": false, "handler": "isr24"},
+    {"vector": 25, "name": "reserved_25", "mnemonic": "-", "has_error_code": false, "handler": "isr25"},
+    {"vector": 26, "name": "reserved_26", "mnemonic": "-", "has_error_code": false, "handler": "isr26"},
+    {"vector": 27, "name": "reserved_27", "mnemonic": "-", "has_error_code": false, "handler": "isr27"},
+    {"vector": 28, "name": "hypervisor_injection", "mnemonic": "#HV", "has_error_code": false, "handler": "isr28"},
+    {"vector": 29, "name": "vmm_communication", "mnemonic": "#VC", "has_error_code": true, "handler": "isr29"},
+    {"vector": 30, "name": "security_exception", "mnemonic": "#SX", "has_error_code": true, "handler": "isr30"},
+    {"vector": 31, "name": "reserved_31", "mnemonic": "-", "has_error_code": false, "handler": "isr31"}
+  ],
+  
+  "irqs": {
+    "base_vector": 32,
+    "count": 16,
+    "pic_remap": true,
+    "entries": [
+      {"irq": 0, "vector": 32, "name": "timer", "handler": "irq0_handler"},
+      {"irq": 1, "vector": 33, "name": "keyboard", "handler": "irq1_handler"},
+      {"irq": 2, "vector": 34, "name": "cascade", "handler": "irq2_handler"},
+      {"irq": 3, "vector": 35, "name": "com2", "handler": "irq3_handler"},
+      {"irq": 4, "vector": 36, "name": "com1", "handler": "irq4_handler"},
+      {"irq": 5, "vector": 37, "name": "lpt2", "handler": "irq5_handler"},
+      {"irq": 6, "vector": 38, "name": "floppy", "handler": "irq6_handler"},
+      {"irq": 7, "vector": 39, "name": "lpt1", "handler": "irq7_handler"},
+      {"irq": 8, "vector": 40, "name": "rtc", "handler": "irq8_handler"},
+      {"irq": 9, "vector": 41, "name": "acpi", "handler": "irq9_handler"},
+      {"irq": 10, "vector": 42, "name": "available_10", "handler": "irq10_handler"},
+      {"irq": 11, "vector": 43, "name": "available_11", "handler": "irq11_handler"},
+      {"irq": 12, "vector": 44, "name": "mouse", "handler": "irq12_handler"},
+      {"irq": 13, "vector": 45, "name": "fpu", "handler": "irq13_handler"},
+      {"irq": 14, "vector": 46, "name": "primary_ata", "handler": "irq14_handler"},
+      {"irq": 15, "vector": 47, "name": "secondary_ata", "handler": "irq15_handler"}
+    ]
+  },
+  
+  "syscall_vector": {
+    "vector": 128,
+    "name": "syscall",
+    "handler": "syscall_handler",
+    "gate_type": "interrupt_gate_user"
+  },
+  
+  "idt_entry_format_64": {
+    "offset_low": "bits 0-15 of handler address",
+    "selector": "code segment selector (16 bits)",
+    "ist": "Interrupt Stack Table index (3 bits)",
+    "reserved_1": "5 bits, must be 0",
+    "type_attr": "gate type and attributes (8 bits)",
+    "offset_mid": "bits 16-31 of handler address",
+    "offset_high": "bits 32-63 of handler address",
+    "reserved_2": "32 bits, must be 0",
+    "total_size": "16 bytes per entry"
+  },
+  
+  "generation_options": {
+    "emit_isr_stubs": true,
+    "emit_common_handler": true,
+    "emit_idt_setup_function": true,
+    "emit_handler_table": true,
+    "output_format": "nasm"
+  }
+}

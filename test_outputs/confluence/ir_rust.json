@@ -1,0 +1,21 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "unnamed_module",
+  "docstring": "Simple MAVLink heartbeat message handler",
+  "types": [],
+  "functions": [
+    {
+      "name": "parse_heartbeat",
+      "args": [],
+      "return_type": "void",
+      "steps": []
+    },
+    {
+      "name": "send_heartbeat",
+      "args": [],
+      "return_type": "void",
+      "steps": []
+    }
+  ]
+}

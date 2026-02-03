@@ -1,0 +1,96 @@
+{
+  "docstring": "Test simple switch/case statement - v0.9.0",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "day",
+          "type": "i32"
+        }
+      ],
+      "name": "get_day_type",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "cases": [
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "1"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 1
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "1"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 2
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "2"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 6
+            },
+            {
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "2"
+                },
+                {
+                  "op": "break"
+                }
+              ],
+              "value": 7
+            }
+          ],
+          "default": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "1"
+            }
+          ],
+          "expr": "day",
+          "op": "switch"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T06:20:48.752192Z",
+  "ir_version": "v1",
+  "module_name": "switch_simple_test",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

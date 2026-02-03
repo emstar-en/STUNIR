@@ -1,0 +1,526 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:stunir:schema:ir:v1",
+  "title": "STUNIR Intermediate Reference (IR) v1",
+  "description": "Canonical representation of a program's structure and logic, ready for deterministic multi-language emission. Version 0.8.9 adds generics and optimization support.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ir_version",
+    "module_name",
+    "types",
+    "functions"
+  ],
+  "definitions": {
+    "type_param": {
+      "description": "Generic type parameter definition (v0.8.9+)",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9_]*$",
+          "description": "Type parameter name (e.g., T, K, V)"
+        },
+        "constraint": {
+          "type": "string",
+          "description": "Type constraint (e.g., 'Comparable', 'Numeric')"
+        },
+        "default": {
+          "$ref": "#/definitions/type_ref",
+          "description": "Default type if not specified"
+        }
+      }
+    },
+    "type_ref": {
+      "description": "Type reference - can be primitive, array, map, set, generic, or struct reference",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Simple type name (primitive or struct reference)"
+        },
+        {
+          "type": "object",
+          "description": "Complex type definition",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["array", "map", "set", "optional", "generic"],
+              "description": "Type constructor kind"
+            },
+            "element_type": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Element type for array/set"
+            },
+            "key_type": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Key type for map"
+            },
+            "value_type": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Value type for map"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Fixed size for array (omit for dynamic)"
+            },
+            "inner": {
+              "$ref": "#/definitions/type_ref",
+              "description": "Inner type for optional"
+            },
+            "base_type": {
+              "type": "string",
+              "description": "Base generic type name for instantiation"
+            },
+            "type_args": {
+              "type": "array",
+              "description": "Type arguments for generic instantiation",
+              "items": {
+                "$ref": "#/definitions/type_ref"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "optimization_hint": {
+      "description": "Optimization hints for the IR (v0.8.9+)",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pure": {
+          "type": "boolean",
+          "description": "Function has no side effects"
+        },
+        "inline": {
+          "type": "boolean",
+          "description": "Suggest inlining this function"
+        },
+        "const_eval": {
+          "type": "boolean",
+          "description": "Can be evaluated at compile time"
+        },
+        "dead_code": {
+          "type": "boolean",
+          "description": "Marked as dead code (for elimination)"
+        },
+        "constant_value": {
+          "description": "Constant-folded value if applicable"
+        }
+      }
+    }
+  },
+  "properties": {
+    "ir_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Version tag for this IR object model."
+    },
+    "module_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+      "description": "Logical name of the module/program."
+    },
+    "docstring": {
+      "type": "string",
+      "description": "High-level description of the module."
+    },
+    "type_params": {
+      "type": "array",
+      "description": "Module-level generic type parameters (v0.8.9+)",
+      "items": {
+        "$ref": "#/definitions/type_param"
+      }
+    },
+    "optimization_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "Optimization level: 0=none, 1=basic, 2=standard, 3=aggressive (v0.8.9+)"
+    },
+    "types": {
+      "type": "array",
+      "description": "List of data models/structs defined in the program. Ordering is semantically significant and must already be canonical.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "fields"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "docstring": {
+            "type": "string"
+          },
+          "type_params": {
+            "type": "array",
+            "description": "Generic type parameters for this type (v0.8.9+)",
+            "items": {
+              "$ref": "#/definitions/type_param"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "type"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                },
+                "type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Field type - primitive, complex, or custom type name."
+                },
+                "optional": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "generic_instantiations": {
+      "type": "array",
+      "description": "List of generic type instantiations (v0.8.9+)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "base_type", "type_args"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Name of the instantiated type"
+          },
+          "base_type": {
+            "type": "string",
+            "description": "Base generic type name"
+          },
+          "type_args": {
+            "type": "array",
+            "description": "Concrete type arguments",
+            "items": {
+              "$ref": "#/definitions/type_ref"
+            }
+          }
+        }
+      }
+    },
+    "functions": {
+      "type": "array",
+      "description": "List of executable functions/endpoints. Ordering is semantically significant and must already be canonical.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "args",
+          "return_type"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "docstring": {
+            "type": "string"
+          },
+          "type_params": {
+            "type": "array",
+            "description": "Generic type parameters for this function (v0.8.9+)",
+            "items": {
+              "$ref": "#/definitions/type_param"
+            }
+          },
+          "optimization": {
+            "$ref": "#/definitions/optimization_hint",
+            "description": "Optimization hints (v0.8.9+)"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "type"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "return_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "steps": {
+            "type": "array",
+            "description": "Simplified v1 operation list (mini-AST).",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "op"
+              ],
+              "properties": {
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "return",
+                    "call",
+                    "assign",
+                    "error",
+                    "if",
+                    "while",
+                    "for",
+                    "break",
+                    "continue",
+                    "switch",
+                    "try",
+                    "throw",
+                    "nop",
+                    "array_new",
+                    "array_get",
+                    "array_set",
+                    "array_push",
+                    "array_pop",
+                    "array_len",
+                    "map_new",
+                    "map_get",
+                    "map_set",
+                    "map_delete",
+                    "map_has",
+                    "map_keys",
+                    "set_new",
+                    "set_add",
+                    "set_remove",
+                    "set_has",
+                    "set_union",
+                    "set_intersect",
+                    "struct_new",
+                    "struct_get",
+                    "struct_set",
+                    "generic_call",
+                    "type_cast"
+                  ]
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Target variable for assign or call operations"
+                },
+                "value": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "object",
+                    "array",
+                    "null"
+                  ],
+                  "description": "Value for assign, return, or call operations"
+                },
+                "condition": {
+                  "type": "string",
+                  "description": "Condition expression for if, while, or for operations"
+                },
+                "then_block": {
+                  "type": "array",
+                  "description": "Then block for if operation",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "else_block": {
+                  "type": "array",
+                  "description": "Else block for if operation",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "body": {
+                  "type": "array",
+                  "description": "Body block for while or for operations, or case body for switch",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "init": {
+                  "type": "string",
+                  "description": "Initialization expression for for loop"
+                },
+                "increment": {
+                  "type": "string",
+                  "description": "Increment expression for for loop"
+                },
+                "expr": {
+                  "type": "string",
+                  "description": "Switch expression"
+                },
+                "cases": {
+                  "type": "array",
+                  "description": "Case list for switch operation",
+                  "items": {
+                    "type": "object",
+                    "required": ["value", "body"],
+                    "properties": {
+                      "value": {
+                        "type": ["integer", "string"],
+                        "description": "Case value"
+                      },
+                      "body": {
+                        "type": "array",
+                        "description": "Case body statements",
+                        "items": {
+                          "$ref": "#/properties/functions/items/properties/steps/items"
+                        }
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "type": "array",
+                  "description": "Default case for switch operation",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "try_block": {
+                  "type": "array",
+                  "description": "Try block for exception handling",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "catch_blocks": {
+                  "type": "array",
+                  "description": "Catch blocks for exception handling",
+                  "items": {
+                    "type": "object",
+                    "required": ["exception_type", "body"],
+                    "properties": {
+                      "exception_type": {
+                        "type": "string",
+                        "description": "Exception type to catch (or '*' for all)"
+                      },
+                      "exception_var": {
+                        "type": "string",
+                        "description": "Variable name for caught exception"
+                      },
+                      "body": {
+                        "type": "array",
+                        "description": "Catch block statements",
+                        "items": {
+                          "$ref": "#/properties/functions/items/properties/steps/items"
+                        }
+                      }
+                    }
+                  }
+                },
+                "finally_block": {
+                  "type": "array",
+                  "description": "Finally block for exception handling",
+                  "items": {
+                    "$ref": "#/properties/functions/items/properties/steps/items"
+                  }
+                },
+                "exception_type": {
+                  "type": "string",
+                  "description": "Exception type to throw"
+                },
+                "exception_message": {
+                  "type": "string",
+                  "description": "Exception message to throw"
+                },
+                "index": {
+                  "type": ["string", "integer"],
+                  "description": "Array index for array_get/array_set operations"
+                },
+                "key": {
+                  "type": ["string", "integer", "boolean"],
+                  "description": "Key for map operations"
+                },
+                "field": {
+                  "type": "string",
+                  "description": "Field name for struct_get/struct_set operations"
+                },
+                "element_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Element type for array_new/set_new"
+                },
+                "key_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Key type for map_new"
+                },
+                "value_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Value type for map_new"
+                },
+                "struct_type": {
+                  "type": "string",
+                  "description": "Struct type name for struct_new"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Size for fixed-size array_new"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Source variable for operations"
+                },
+                "source2": {
+                  "type": "string",
+                  "description": "Second source variable for set operations (union, intersect)"
+                },
+                "fields": {
+                  "type": "object",
+                  "description": "Field initializers for struct_new",
+                  "additionalProperties": true
+                },
+                "type_args": {
+                  "type": "array",
+                  "description": "Type arguments for generic_call (v0.8.9+)",
+                  "items": {
+                    "$ref": "#/definitions/type_ref"
+                  }
+                },
+                "cast_type": {
+                  "$ref": "#/definitions/type_ref",
+                  "description": "Target type for type_cast (v0.8.9+)"
+                },
+                "optimization": {
+                  "$ref": "#/definitions/optimization_hint",
+                  "description": "Step-level optimization hints (v0.8.9+)"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

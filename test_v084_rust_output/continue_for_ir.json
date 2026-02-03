@@ -1,0 +1,52 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "continue_for_test",
+  "docstring": "Test continue statement in for loop - v0.9.0",
+  "types": [],
+  "functions": [
+    {
+      "name": "sum_odd_numbers",
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "op": "for",
+          "condition": "i < max",
+          "body": [
+            {
+              "op": "if",
+              "condition": "i % 2 == 0",
+              "then_block": [
+                {
+                  "op": "continue"
+                }
+              ]
+            },
+            {
+              "op": "assign",
+              "target": "sum",
+              "value": "sum + i"
+            }
+          ],
+          "init": "i = 0",
+          "increment": "i = i + 1"
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    }
+  ]
+}

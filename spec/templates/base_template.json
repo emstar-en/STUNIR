@@ -1,0 +1,22 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "${id}",
+  "name": "${name}",
+  "version": "${version:1.0.0}",
+  "description": "${description:}",
+  "profile": "${profile:profile3}",
+  "stages": [
+    "STANDARDIZATION",
+    "UNIQUE_NORMALS",
+    "IR",
+    "BINARY",
+    "RECEIPT"
+  ],
+  "targets": "${targets}",
+  "dependencies": "${dependencies:[]}",
+  "metadata": {
+    "author": "${author:}",
+    "created": "${created:}",
+    "license": "${license:MIT}"
+  }
+}

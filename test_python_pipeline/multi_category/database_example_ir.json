@@ -1,0 +1,66 @@
+{
+  "docstring": "Database operations example",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "host",
+          "type": "string"
+        },
+        {
+          "name": "port",
+          "type": "i32"
+        }
+      ],
+      "name": "connect",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'conn_id', 'var_type': 'i32', 'init': '-1'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "conn_id",
+          "type": "i32"
+        },
+        {
+          "name": "query",
+          "type": "string"
+        }
+      ],
+      "name": "execute_query",
+      "return_type": "string",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'string', 'init': '\"\"'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "conn_id",
+          "type": "i32"
+        }
+      ],
+      "name": "close",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'true'}",
+          "kind": "var_decl"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:09:54.274365Z",
+  "ir_version": "v1",
+  "module_name": "database_example",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

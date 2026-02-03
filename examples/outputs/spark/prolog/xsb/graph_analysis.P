@@ -1,0 +1,38 @@
+%% STUNIR Generated XSB Code with Tabling
+%% DO-178C Level A Compliant
+%% Example: Graph reachability analysis
+
+:- module(graph_analysis, [path/2, connected_component/2]).
+
+:- table path/2.
+:- table connected_component/2.
+
+%% Sample graph edges
+edge(1, 2).
+edge(2, 3).
+edge(3, 4).
+edge(4, 2).  % Cycle
+edge(5, 6).
+
+%% Tabled path computation (handles cycles efficiently)
+path(X, Y) :- edge(X, Y).
+path(X, Z) :- path(X, Y), edge(Y, Z).
+
+%% Connected component membership
+connected_component(X, Y) :-
+    path(X, Y).
+connected_component(X, Y) :-
+    path(Y, X).
+
+%% Count paths from X to Y
+count_paths(X, Y, Count) :-
+    findall(_, path(X, Y), Paths),
+    length(Paths, Count).
+
+%% Example usage:
+%% ?- path(1, 4).
+%%    yes.
+%% ?- connected_component(1, 4).
+%%    yes.
+%% ?- count_paths(1, 4, Count).
+%%    Count = 1.

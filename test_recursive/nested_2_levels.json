@@ -1,0 +1,19 @@
+{
+  "schema": "stunir_ir_v1",
+  "module_name": "nested_2_levels",
+  "description": "Test 2-level nesting",
+  "functions": [
+    {
+      "name": "test_nested_2",
+      "return_type": "i32",
+      "args": [{"name": "x", "type": "i32"}],
+      "steps": [
+        {"op": "if", "condition": "x > 0", "block_start": 2, "block_count": 3, "else_start": 5, "else_count": 1},
+        {"op": "if", "condition": "x > 10", "block_start": 3, "block_count": 1, "else_start": 4, "else_count": 1},
+        {"op": "return", "value": "100"},
+        {"op": "return", "value": "10"},
+        {"op": "return", "value": "0"}
+      ]
+    }
+  ]
+}

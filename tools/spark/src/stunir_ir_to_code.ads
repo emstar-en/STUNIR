@@ -1,0 +1,218 @@
+-------------------------------------------------------------------------------
+--  STUNIR IR to Code Emitter - Ada SPARK Specification
+--  PRIMARY IMPLEMENTATION (Ada SPARK is the default language for STUNIR tools)
+--
+--  This package provides deterministic code generation from STUNIR IR.
+--
+--  Design principles:
+--  - Determinism: output depends ONLY on IR + template pack files
+--  - Hermeticity: no network access, stdlib only
+--  - Verification: all operations are SPARK-provable
+--
+--  Copyright (c) 2026 STUNIR Project
+--  License: MIT
+-------------------------------------------------------------------------------
+
+pragma SPARK_Mode (On);
+
+with Ada.Strings.Bounded;
+
+package STUNIR_IR_To_Code is
+
+   --  Version information
+   Version : constant String := "0.7.1";
+   Tool_ID : constant String := "stunir_ir_to_code_spark";
+
+   --  Recursion control (v0.7.0 - Bounded Recursion, v0.7.1 - increased for 5-level nesting)
+   Max_Recursion_Depth : constant := 6;  -- Maximum nesting depth (5 levels + 1 for innermost blocks)
+   subtype Recursion_Depth is Natural range 0 .. Max_Recursion_Depth;
+   
+   --  Exception raised when recursion depth is exceeded
+   Recursion_Depth_Exceeded : exception;
+
+   --  Maximum sizes
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Path_Length    : constant := 256;
+   Max_Name_Length    : constant := 64;
+   Max_Template_Size  : constant := 8192;
+   Max_Output_Size    : constant := 32768;
+   Max_Functions      : constant := 20;
+   Max_Types          : constant := 16;
+
+   --  Bounded string types
+   package Path_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
+     (Max => Max_Path_Length);
+   subtype Path_String is Path_Strings.Bounded_String;
+
+   package Name_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
+     (Max => Max_Name_Length);
+   subtype Name_String is Name_Strings.Bounded_String;
+
+   --  Supported target languages
+   type Target_Language is
+     (Target_Python,
+      Target_Rust,
+      Target_C,
+      Target_Cpp,
+      Target_Go,
+      Target_JavaScript,
+      Target_TypeScript,
+      Target_Java,
+      Target_CSharp,
+      Target_WASM,
+      Target_Assembly_X86,
+      Target_Assembly_ARM);
+
+   --  Function parameter record
+   type Function_Param is record
+      Name      : Name_String;
+      Type_Name : Name_String;
+   end record;
+
+   --  Array of parameters
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Params : constant := 10;
+   type Param_Array is array (1 .. Max_Params) of Function_Param;
+
+   --  IR Step (instruction) record with control flow support
+   --  v0.8.6: Reduced limits to prevent stack overflow
+   Max_Steps : constant := 32;
+   Max_Switch_Cases : constant := 8;  -- Max cases in switch statement (v0.9.0)
+   
+   --  Switch case entry (v0.9.0)
+   type Switch_Case_Entry is record
+      Case_Value  : Name_String;  -- Case value (number or string)
+      Block_Start : Natural := 0;  -- Start index of case block
+      Block_Count : Natural := 0;  -- Number of steps in case block
+   end record;
+   
+   type Switch_Case_Array is array (1 .. Max_Switch_Cases) of Switch_Case_Entry;
+   
+   type IR_Step is record
+      Op        : Name_String;  -- Operation: assign, return, call, nop, if, while, for, break, continue, switch
+      Target    : Name_String;  -- Assignment target or call result variable
+      Value     : Name_String;  -- Value expression or function name (also switch expr)
+      --  Control flow fields
+      Condition : Name_String;  -- Condition for if/while/for
+      Init      : Name_String;  -- Init expression for for loops
+      Increment : Name_String;  -- Increment expression for for loops
+      --  Block markers for nested control flow (using step indices)
+      Block_Start : Natural := 0;  -- Start index of then/body block
+      Block_Count : Natural := 0;  -- Number of steps in then/body block
+      Else_Start  : Natural := 0;  -- Start index of else block (if statements only)
+      Else_Count  : Natural := 0;  -- Number of steps in else block
+      --  Switch/case fields (v0.9.0)
+      Case_Count  : Natural := 0;  -- Number of cases in switch
+      Cases       : Switch_Case_Array;  -- Array of case entries
+      Default_Start : Natural := 0;  -- Start index of default block
+      Default_Count : Natural := 0;  -- Number of steps in default block
+      --  Data structure fields (v0.8.8+)
+      Index     : Name_String;
+      Key       : Name_String;
+      Field     : Name_String;
+      Source    : Name_String;
+      Source2   : Name_String;
+      Size      : Natural := 0;
+      Struct_Type : Name_String;
+   end record;
+   
+   type Step_Array is array (1 .. Max_Steps) of IR_Step;
+
+   --  Function definition record
+   type Function_Definition is record
+      Name        : Name_String;
+      Params      : Param_Array;
+      Param_Count : Natural := 0;
+      Return_Type : Name_String;
+      Is_Public   : Boolean := True;
+      Steps       : Step_Array;
+      Step_Count  : Natural := 0;
+   end record;
+
+   --  Array of function definitions
+   type Function_Array is array (1 .. Max_Functions) of Function_Definition;
+
+   --  IR module record
+   type IR_Module is record
+      Schema       : Name_String;
+      Module_Name  : Name_String;
+      Description  : Path_String;
+      Functions    : Function_Array;
+      Func_Count   : Natural := 0;
+   end record;
+
+   --  Emission result status
+   type Emission_Status is
+     (Success,
+      Error_IR_Not_Found,
+      Error_IR_Parse_Failed,
+      Error_Template_Not_Found,
+      Error_Template_Invalid,
+      Error_Output_Write_Failed,
+      Error_Unsupported_Target);
+
+   --  Emission result record
+   type Emission_Result is record
+      Status       : Emission_Status := Success;
+      Output_Path  : Path_String;
+      Output_Size  : Natural := 0;
+      Functions_Emitted : Natural := 0;
+   end record;
+
+   --  Emission configuration
+   type Emission_Config is record
+      IR_Path        : Path_String;
+      Template_Path  : Path_String;
+      Output_Path    : Path_String;
+      Target         : Target_Language := Target_Python;
+      Emit_Comments  : Boolean := True;
+      Emit_Metadata  : Boolean := True;
+   end record;
+
+   --  Initialize emission configuration
+   procedure Initialize_Config
+     (Config        : out Emission_Config;
+      IR_Path       : String;
+      Template_Path : String;
+      Output_Path   : String;
+      Target        : Target_Language := Target_Python)
+   with
+     Pre => IR_Path'Length <= Max_Path_Length and
+            Template_Path'Length <= Max_Path_Length and
+            Output_Path'Length <= Max_Path_Length;
+
+   --  Parse IR from JSON file
+   procedure Parse_IR
+     (IR_Path   : Path_String;
+      Module    : out IR_Module;
+      Success   : out Boolean);
+
+   --  Load template for target language
+   procedure Load_Template
+     (Template_Path : Path_String;
+      Target        : Target_Language;
+      Template      : out Path_String;
+      Success       : out Boolean);
+
+   --  Get file extension for target language
+   function Get_File_Extension (Target : Target_Language) return String;
+
+   --  Emit code for a single function
+   procedure Emit_Function
+     (Func     : Function_Definition;
+      Target   : Target_Language;
+      Output   : out Path_String;
+      Success  : out Boolean);
+
+   --  Main emission procedure
+   procedure Emit_Code
+     (Config : Emission_Config;
+      Result : out Emission_Result)
+   with
+     Post => (if Result.Status = Success
+              then Result.Functions_Emitted >= 0);
+
+   --  Entry point for command-line execution
+   procedure Run_IR_To_Code;
+
+end STUNIR_IR_To_Code;

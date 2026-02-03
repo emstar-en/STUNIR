@@ -1,0 +1,55 @@
+{
+  "schema": "stunir.contract.validation.v1",
+  "contract_id": "stunir-validation-pipeline-v1",
+  "stage_id": "validation",
+  "stage_type": "validation",
+  "schema_version": "v1",
+  "description": "Core validation contract for STUNIR pipeline",
+  "rules": {
+    "hash_verification": true,
+    "schema_validation": true,
+    "receipt_integrity": true,
+    "determinism_check": true,
+    "canonical_json": true
+  },
+  "validators": [
+    {
+      "name": "sha256_hash",
+      "type": "hash",
+      "algorithm": "sha256",
+      "required": true
+    },
+    {
+      "name": "json_schema",
+      "type": "schema",
+      "schema_ref": "receipt_build_v1.schema.json",
+      "required": true
+    },
+    {
+      "name": "dcbor_format",
+      "type": "format",
+      "format": "dcbor",
+      "required": false
+    }
+  ],
+  "error_handling": {
+    "mode": "strict",
+    "on_hash_mismatch": "fail",
+    "on_schema_invalid": "fail",
+    "on_missing_receipt": "fail"
+  },
+  "input_requirements": {
+    "receipt_schema": "stunir.receipt.build.v1",
+    "ir_manifest_required": true
+  },
+  "output": {
+    "validation_receipt": true,
+    "validation_report": true
+  },
+  "dependencies": [],
+  "success_criteria": {
+    "all_hashes_valid": true,
+    "schema_compliant": true,
+    "no_missing_artifacts": true
+  }
+}

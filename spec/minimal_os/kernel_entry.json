@@ -1,0 +1,144 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "kernel_entry",
+  "description": "64-bit kernel entry with GDT/IDT setup for STUNIR minimal OS",
+  "target": {
+    "architecture": "x86_64",
+    "format": "assembly",
+    "syntax": "nasm"
+  },
+  "constants": [
+    {"name": "GDT_NULL", "type": "u8", "value": "0"},
+    {"name": "GDT_CODE_SEG", "type": "u8", "value": "0x08"},
+    {"name": "GDT_DATA_SEG", "type": "u8", "value": "0x10"},
+    {"name": "GDT_CODE64_SEG", "type": "u8", "value": "0x18"},
+    {"name": "GDT_DATA64_SEG", "type": "u8", "value": "0x20"},
+    {"name": "CR0_PE", "type": "u32", "value": "0x00000001"},
+    {"name": "CR0_PG", "type": "u32", "value": "0x80000000"},
+    {"name": "CR4_PAE", "type": "u32", "value": "0x00000020"},
+    {"name": "EFER_MSR", "type": "u32", "value": "0xC0000080"},
+    {"name": "EFER_LME", "type": "u32", "value": "0x00000100"}
+  ],
+  "sections": [
+    {
+      "name": ".data",
+      "type": "data",
+      "symbols": [
+        {
+          "name": "gdt64",
+          "type": "gdt",
+          "entries": [
+            {"name": "null", "access": "0x00", "flags": "0x00", "base": 0, "limit": 0},
+            {"name": "code64", "access": "0x9A", "flags": "0xA0", "base": 0, "limit": "0xFFFFF"},
+            {"name": "data64", "access": "0x92", "flags": "0xC0", "base": 0, "limit": "0xFFFFF"}
+          ]
+        },
+        {
+          "name": "gdt64_ptr",
+          "type": "gdt_ptr",
+          "gdt_ref": "gdt64"
+        }
+      ]
+    },
+    {
+      "name": ".bss",
+      "type": "bss",
+      "symbols": [
+        {"name": "pml4", "size": 4096, "align": 4096},
+        {"name": "pdpt", "size": 4096, "align": 4096},
+        {"name": "pd", "size": 4096, "align": 4096},
+        {"name": "idt64", "size": 4096, "align": 16},
+        {"name": "stack64_bottom", "size": 16384, "align": 16},
+        {"name": "stack64_top", "size": 0}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "setup_paging",
+      "type": "function",
+      "section": ".text",
+      "description": "Set up identity mapping for first 2MB using 2MB pages",
+      "body": [
+        {"type": "comment", "text": "Clear page tables"},
+        {"type": "mov", "dest": "edi", "src": "pml4"},
+        {"type": "xor", "dest": "eax", "src": "eax"},
+        {"type": "mov", "dest": "ecx", "src": "3072"},
+        {"type": "rep_stosd"},
+        {"type": "comment", "text": "Set up PML4[0] -> PDPT"},
+        {"type": "mov", "dest": "eax", "src": "pdpt"},
+        {"type": "or", "dest": "eax", "src": "0x03"},
+        {"type": "mov", "dest": "[pml4]", "src": "eax"},
+        {"type": "comment", "text": "Set up PDPT[0] -> PD"},
+        {"type": "mov", "dest": "eax", "src": "pd"},
+        {"type": "or", "dest": "eax", "src": "0x03"},
+        {"type": "mov", "dest": "[pdpt]", "src": "eax"},
+        {"type": "comment", "text": "Set up PD[0] with 2MB page (PS=1)"},
+        {"type": "mov", "dest": "dword [pd]", "src": "0x00000083"},
+        {"type": "ret"}
+      ]
+    },
+    {
+      "name": "enter_long_mode",
+      "type": "function",
+      "global": true,
+      "section": ".text",
+      "description": "Transition from protected mode to long mode",
+      "body": [
+        {"type": "comment", "text": "Disable paging first"},
+        {"type": "mov", "dest": "eax", "src": "cr0"},
+        {"type": "and", "dest": "eax", "src": "0x7FFFFFFF"},
+        {"type": "mov", "dest": "cr0", "src": "eax"},
+        {"type": "comment", "text": "Set up page tables"},
+        {"type": "call", "func": "setup_paging"},
+        {"type": "comment", "text": "Load PML4 into CR3"},
+        {"type": "mov", "dest": "eax", "src": "pml4"},
+        {"type": "mov", "dest": "cr3", "src": "eax"},
+        {"type": "comment", "text": "Enable PAE"},
+        {"type": "mov", "dest": "eax", "src": "cr4"},
+        {"type": "or", "dest": "eax", "src": "CR4_PAE"},
+        {"type": "mov", "dest": "cr4", "src": "eax"},
+        {"type": "comment", "text": "Enable Long Mode in EFER MSR"},
+        {"type": "mov", "dest": "ecx", "src": "EFER_MSR"},
+        {"type": "rdmsr"},
+        {"type": "or", "dest": "eax", "src": "EFER_LME"},
+        {"type": "wrmsr"},
+        {"type": "comment", "text": "Enable paging"},
+        {"type": "mov", "dest": "eax", "src": "cr0"},
+        {"type": "or", "dest": "eax", "src": "CR0_PG"},
+        {"type": "mov", "dest": "cr0", "src": "eax"},
+        {"type": "comment", "text": "Load 64-bit GDT"},
+        {"type": "lgdt", "src": "[gdt64_ptr]"},
+        {"type": "comment", "text": "Far jump to 64-bit code"},
+        {"type": "jmp", "selector": "0x08", "target": "long_mode_start"}
+      ]
+    },
+    {
+      "name": "long_mode_start",
+      "type": "function",
+      "bits": 64,
+      "section": ".text",
+      "description": "64-bit mode entry point",
+      "body": [
+        {"type": "comment", "text": "Set up segment registers"},
+        {"type": "mov", "dest": "ax", "src": "0x10"},
+        {"type": "mov", "dest": "ds", "src": "ax"},
+        {"type": "mov", "dest": "es", "src": "ax"},
+        {"type": "mov", "dest": "fs", "src": "ax"},
+        {"type": "mov", "dest": "gs", "src": "ax"},
+        {"type": "mov", "dest": "ss", "src": "ax"},
+        {"type": "comment", "text": "Set up 64-bit stack"},
+        {"type": "mov", "dest": "rsp", "src": "stack64_top"},
+        {"type": "comment", "text": "Call kernel main"},
+        {"type": "call", "func": "kernel_main"},
+        {"type": "label", "name": ".hang64"},
+        {"type": "cli"},
+        {"type": "hlt"},
+        {"type": "jmp", "target": ".hang64"}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "kernel_main", "type": "function"}
+  ]
+}

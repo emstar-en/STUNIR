@@ -1,0 +1,49 @@
+[
+  {
+    "op": "replace",
+    "path": "/targets/smt/required_contracts",
+    "value": []
+  },
+  {
+    "op": "replace",
+    "path": "/targets/smt/notes",
+    "value": [
+      "SMT-LIB v2 / SMT2 source emission baseline (no solver required for emission).",
+      "Use smt_z3 for Z3-backed sample execution."
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/targets/smt_z3",
+    "value": {
+      "notes": [
+        "Logic/5GL target using SMT-LIB + Z3 (solver-backed).",
+        "Receipt may bind solver stdout as an artifact via @stdout outputs."
+      ],
+      "optional_contracts": [],
+      "required_contracts": [
+        "z3_solver"
+      ]
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/target_aliases/z3",
+    "value": "smt_z3"
+  },
+  {
+    "op": "replace",
+    "path": "/target_aliases/smt2",
+    "value": "smt"
+  },
+  {
+    "op": "replace",
+    "path": "/target_aliases/smtlib2",
+    "value": "smt"
+  },
+  {
+    "op": "replace",
+    "path": "/target_aliases/smtlib",
+    "value": "smt"
+  }
+]

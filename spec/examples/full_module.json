@@ -1,0 +1,84 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "example-full-module",
+  "name": "Complete Module Example",
+  "version": "1.0.0",
+  "description": "A comprehensive example demonstrating all spec features",
+  "profile": "profile4",
+  "stages": [
+    "STANDARDIZATION",
+    "UNIQUE_NORMALS",
+    "IR",
+    "BINARY",
+    "RECEIPT"
+  ],
+  "targets": ["rust", "c99", "python"],
+  "dependencies": [
+    {"name": "std", "version": "^1.0.0"}
+  ],
+  "module": {
+    "name": "complete_example",
+    "imports": [
+      {"module": "std.io", "items": ["print", "println"]},
+      {"module": "std.math", "items": ["sqrt", "pow"]}
+    ],
+    "exports": ["Rectangle", "Circle", "area", "perimeter"],
+    "types": [
+      {
+        "name": "Rectangle",
+        "kind": "struct",
+        "fields": [
+          {"name": "width", "type": "f64"},
+          {"name": "height", "type": "f64"}
+        ]
+      },
+      {
+        "name": "Circle",
+        "kind": "struct",
+        "fields": [
+          {"name": "radius", "type": "f64"}
+        ]
+      },
+      {
+        "name": "Shape",
+        "kind": "enum",
+        "variants": [
+          {"name": "Rect", "type": "Rectangle"},
+          {"name": "Circ", "type": "Circle"}
+        ]
+      }
+    ],
+    "constants": [
+      {"name": "PI", "type": "f64", "value": 3.141592653589793},
+      {"name": "E", "type": "f64", "value": 2.718281828459045}
+    ],
+    "functions": [
+      {
+        "name": "area",
+        "params": [{"name": "shape", "type": "Shape"}],
+        "returns": "f64",
+        "doc": "Calculate area of a shape"
+      },
+      {
+        "name": "perimeter",
+        "params": [{"name": "shape", "type": "Shape"}],
+        "returns": "f64",
+        "doc": "Calculate perimeter of a shape"
+      },
+      {
+        "name": "scale",
+        "params": [
+          {"name": "shape", "type": "Shape"},
+          {"name": "factor", "type": "f64"}
+        ],
+        "returns": "Shape",
+        "doc": "Scale a shape by a factor"
+      }
+    ]
+  },
+  "metadata": {
+    "author": "STUNIR Team",
+    "license": "MIT",
+    "repository": "https://github.com/emstar-en/STUNIR"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "stunir_ir_v1",
+  "module_name": "nested_3_levels",
+  "description": "Test 3-level nesting",
+  "functions": [
+    {
+      "name": "test_nested_3",
+      "return_type": "i32",
+      "args": [{"name": "x", "type": "i32"}],
+      "steps": [
+        {"op": "if", "condition": "x > 0", "block_start": 2, "block_count": 5, "else_start": 0, "else_count": 0},
+        {"op": "if", "condition": "x > 10", "block_start": 3, "block_count": 3, "else_start": 0, "else_count": 0},
+        {"op": "if", "condition": "x > 20", "block_start": 4, "block_count": 1, "else_start": 5, "else_count": 1},
+        {"op": "return", "value": "200"},
+        {"op": "return", "value": "100"},
+        {"op": "return", "value": "10"}
+      ]
+    }
+  ]
+}

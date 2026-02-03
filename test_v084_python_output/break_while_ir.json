@@ -1,0 +1,65 @@
+{
+  "docstring": "Test break statement in while loop - v0.9.0",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        },
+        {
+          "name": "divisor",
+          "type": "i32"
+        }
+      ],
+      "name": "find_first_divisible",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "1"
+        },
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "-1"
+        },
+        {
+          "body": [
+            {
+              "condition": "i % divisor == 0",
+              "op": "if",
+              "then_block": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "i"
+                },
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "op": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ],
+          "condition": "i < max",
+          "op": "while"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T06:21:49.360710Z",
+  "ir_version": "v1",
+  "module_name": "break_while_test",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.attestation.pipeline.v1.schema.json",
+  "title": "STUNIR Attestation Pipeline Stage Schema",
+  "description": "Schema for attestation generation and verification pipeline stage",
+  "type": "object",
+  "required": ["stage_id", "attestation_contract", "operation"],
+  "properties": {
+    "stage_id": {
+      "const": "attestation"
+    },
+    "attestation_contract": {
+      "type": "string",
+      "const": "stunir.contract.attestation.v1"
+    },
+    "operation": {
+      "type": "string",
+      "enum": ["generate", "verify", "sign"]
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "build_receipt": {"type": "string"},
+        "ir_manifest": {"type": "string"},
+        "signing_key": {"type": "string"}
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "attestation_file": {"type": "string"},
+        "format": {"type": "string", "enum": ["dsse_json", "dsse_dcbor"]}
+      }
+    },
+    "verification_result": {
+      "type": "object",
+      "properties": {
+        "signature_valid": {"type": "boolean"},
+        "subjects_verified": {"type": "boolean"},
+        "predicate_valid": {"type": "boolean"}
+      }
+    }
+  }
+}

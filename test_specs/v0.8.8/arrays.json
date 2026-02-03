@@ -1,0 +1,40 @@
+{
+  "module": "arrays_test",
+  "description": "v0.8.8 Array operations test",
+  "types": [
+    {
+      "name": "IntArray",
+      "fields": [
+        {"name": "data", "type": {"kind": "array", "element_type": "i32", "size": 10}},
+        {"name": "length", "type": "u32"}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "test_fixed_array",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "array_new", "target": "arr", "element_type": "i32", "size": 5},
+        {"type": "array_set", "target": "arr", "index": 0, "value": "10"},
+        {"type": "array_set", "target": "arr", "index": 1, "value": "20"},
+        {"type": "array_get", "target": "val", "source": "arr", "index": 0},
+        {"type": "return", "value": "val"}
+      ]
+    },
+    {
+      "name": "test_dynamic_array",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "array_new", "target": "arr", "element_type": "i32"},
+        {"type": "array_push", "target": "arr", "value": "100"},
+        {"type": "array_push", "target": "arr", "value": "200"},
+        {"type": "array_len", "target": "len", "source": "arr"},
+        {"type": "array_pop", "target": "last", "source": "arr"},
+        {"type": "return", "value": "last"}
+      ]
+    }
+  ]
+}

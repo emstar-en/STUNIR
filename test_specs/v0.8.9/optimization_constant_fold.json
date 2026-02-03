@@ -1,0 +1,74 @@
+{
+  "name": "constant_fold_test",
+  "version": "0.8.9",
+  "description": "Test spec for constant folding optimization",
+  "types": [],
+  "functions": [
+    {
+      "name": "arithmetic_folding",
+      "args": [],
+      "return_type": "i32",
+      "body": [
+        {"op": "assign", "target": "a", "value": "1 + 2"},
+        {"op": "assign", "target": "b", "value": "10 - 3"},
+        {"op": "assign", "target": "c", "value": "4 * 5"},
+        {"op": "assign", "target": "d", "value": "20 / 4"},
+        {"op": "return", "value": "a + b + c + d"}
+      ]
+    },
+    {
+      "name": "boolean_folding",
+      "args": [],
+      "return_type": "bool",
+      "body": [
+        {"op": "assign", "target": "x", "value": "true && true"},
+        {"op": "assign", "target": "y", "value": "true && false"},
+        {"op": "assign", "target": "z", "value": "false || true"},
+        {"op": "return", "value": "x && z"}
+      ]
+    },
+    {
+      "name": "comparison_folding",
+      "args": [],
+      "return_type": "i32",
+      "body": [
+        {"op": "if", "condition": "1 > 0",
+          "then_block": [
+            {"op": "return", "value": 100}
+          ],
+          "else_block": [
+            {"op": "return", "value": 0}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nested_constant_folding",
+      "args": [{"name": "x", "type": "i32"}],
+      "return_type": "i32",
+      "body": [
+        {"op": "assign", "target": "const_a", "value": "2 + 3"},
+        {"op": "assign", "target": "const_b", "value": "6 * 7"},
+        {"op": "if", "condition": "10 > 5",
+          "then_block": [
+            {"op": "assign", "target": "result", "value": "const_a + x"}
+          ],
+          "else_block": [
+            {"op": "assign", "target": "result", "value": "const_b + x"}
+          ]
+        },
+        {"op": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "float_folding",
+      "args": [],
+      "return_type": "f64",
+      "body": [
+        {"op": "assign", "target": "pi_approx", "value": "3.14 * 2"},
+        {"op": "assign", "target": "half", "value": "1.0 / 2.0"},
+        {"op": "return", "value": "pi_approx"}
+      ]
+    }
+  ]
+}

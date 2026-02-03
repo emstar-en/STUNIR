@@ -1,0 +1,5 @@
+{
+  "src": "Directory",
+  "Cargo.lock": "File",
+  "Cargo.toml": "File"
+}

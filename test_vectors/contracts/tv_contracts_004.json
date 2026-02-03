@@ -1,0 +1,30 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Detect invalid profile specification",
+  "expected_hash": "88efeebc715b0c4e1737678202b31b58ffab2b1bb17d25788645791e07a2327a",
+  "expected_output": {
+    "error": "Unknown profile: profile99",
+    "profile_valid": false,
+    "valid": false
+  },
+  "id": "tv_contracts_004",
+  "input": {
+    "contract": {
+      "epoch": 1735500000,
+      "id": "contract_invalid_001",
+      "profile": "profile99",
+      "schema": "stunir.contract.v1",
+      "stages": [
+        "build"
+      ]
+    }
+  },
+  "name": "Invalid Profile Contract",
+  "schema": "stunir.test_vector.contracts.v1",
+  "tags": [
+    "unit",
+    "validation",
+    "contracts",
+    "negative"
+  ]
+}

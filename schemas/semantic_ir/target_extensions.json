@@ -1,0 +1,194 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/target_extensions_v1.json",
+  "title": "STUNIR Target-Specific Extensions",
+  "description": "Target-specific IR extensions for embedded, GPU, WASM, and specialized targets",
+  "definitions": {
+    "EmbeddedExtensions": {
+      "type": "object",
+      "properties": {
+        "interrupt_vector": {"type": "integer", "minimum": 0},
+        "save_context": {"type": "boolean"},
+        "stack_size": {"type": "integer", "minimum": 0},
+        "priority": {"type": "integer"},
+        "memory_section": {
+          "type": "string",
+          "enum": [".text", ".data", ".bss", ".rodata", ".flash", ".ram", ".eeprom"]
+        },
+        "alignment": {"type": "integer", "minimum": 1},
+        "volatile": {"type": "boolean"},
+        "register_usage": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "startup_function": {"type": "boolean"},
+        "naked_function": {"type": "boolean"}
+      }
+    },
+    "GPUExtensions": {
+      "type": "object",
+      "properties": {
+        "execution_model": {
+          "type": "string",
+          "enum": ["kernel", "vertex", "fragment", "compute", "ray_gen", "closest_hit", "miss"]
+        },
+        "workgroup_size": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1},
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "shared_memory": {"type": "integer", "minimum": 0},
+        "local_size": {"type": "integer", "minimum": 0},
+        "address_space": {
+          "type": "string",
+          "enum": ["global", "local", "constant", "private", "generic"]
+        },
+        "barrier_type": {
+          "type": "string",
+          "enum": ["local", "global", "image"]
+        },
+        "warp_size": {"type": "integer"},
+        "max_registers": {"type": "integer"},
+        "vectorize": {"type": "boolean"},
+        "unroll_factor": {"type": "integer", "minimum": 0}
+      }
+    },
+    "WASMExtensions": {
+      "type": "object",
+      "properties": {
+        "wasm_export": {"type": "string"},
+        "wasm_import": {
+          "type": "object",
+          "properties": {
+            "module": {"type": "string"},
+            "name": {"type": "string"}
+          }
+        },
+        "wasm_type": {
+          "type": "string",
+          "enum": ["i32", "i64", "f32", "f64", "externref", "funcref"]
+        },
+        "table_index": {"type": "integer", "minimum": 0},
+        "memory_index": {"type": "integer", "minimum": 0},
+        "start_function": {"type": "boolean"},
+        "simd": {"type": "boolean"},
+        "threads": {"type": "boolean"},
+        "exception_handling": {"type": "boolean"}
+      }
+    },
+    "RealtimeExtensions": {
+      "type": "object",
+      "properties": {
+        "wcet": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Worst-case execution time in microseconds"
+        },
+        "deadline": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Deadline in microseconds"
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Period for periodic tasks in microseconds"
+        },
+        "priority": {"type": "integer"},
+        "preemptible": {"type": "boolean"},
+        "scheduling_policy": {
+          "type": "string",
+          "enum": ["fixed_priority", "edf", "rate_monotonic", "deadline_monotonic"]
+        }
+      }
+    },
+    "SafetyCriticalExtensions": {
+      "type": "object",
+      "properties": {
+        "dal": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D", "E"],
+          "description": "Design Assurance Level"
+        },
+        "verification_method": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["static_analysis", "dynamic_testing", "formal_verification", "code_review"]
+          }
+        },
+        "requirements_trace": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "safety_contract": {
+          "type": "object",
+          "properties": {
+            "preconditions": {"type": "array", "items": {"type": "string"}},
+            "postconditions": {"type": "array", "items": {"type": "string"}},
+            "invariants": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "memory_bounds": {
+          "type": "object",
+          "properties": {
+            "stack_max": {"type": "integer"},
+            "heap_max": {"type": "integer"}
+          }
+        }
+      }
+    },
+    "FunctionalExtensions": {
+      "type": "object",
+      "properties": {
+        "pure": {"type": "boolean"},
+        "tail_recursive": {"type": "boolean"},
+        "lazy_evaluation": {"type": "boolean"},
+        "memoize": {"type": "boolean"},
+        "higher_order": {"type": "boolean"},
+        "closure_capture": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "JITExtensions": {
+      "type": "object",
+      "properties": {
+        "hot_path": {"type": "boolean"},
+        "inline_cache": {"type": "boolean"},
+        "speculative_optimization": {"type": "boolean"},
+        "deoptimization_guard": {"type": "boolean"},
+        "profiling_hook": {"type": "string"}
+      }
+    },
+    "QuantumExtensions": {
+      "type": "object",
+      "properties": {
+        "qubit_count": {"type": "integer", "minimum": 1},
+        "entanglement_pattern": {"type": "string"},
+        "gate_set": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "measurement_basis": {"type": "string"},
+        "error_correction": {"type": "boolean"}
+      }
+    },
+    "TargetAttributes": {
+      "type": "object",
+      "properties": {
+        "embedded": {"$ref": "#/definitions/EmbeddedExtensions"},
+        "gpu": {"$ref": "#/definitions/GPUExtensions"},
+        "wasm": {"$ref": "#/definitions/WASMExtensions"},
+        "realtime": {"$ref": "#/definitions/RealtimeExtensions"},
+        "safety_critical": {"$ref": "#/definitions/SafetyCriticalExtensions"},
+        "functional": {"$ref": "#/definitions/FunctionalExtensions"},
+        "jit": {"$ref": "#/definitions/JITExtensions"},
+        "quantum": {"$ref": "#/definitions/QuantumExtensions"}
+      },
+      "description": "Target-specific attributes can be attached to any declaration or statement node"
+    }
+  }
+}

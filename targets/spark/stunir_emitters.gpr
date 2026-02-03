@@ -1,0 +1,86 @@
+--  STUNIR Emitters - GNAT Project File
+--  Ada SPARK Target Emitters
+--  DO-178C Level A Compliant Build Configuration
+
+project Stunir_Emitters is
+
+   for Source_Dirs use (
+      ".",
+      "embedded",
+      "gpu",
+      "wasm",
+      "assembly/arm",
+      "assembly/x86",
+      "polyglot/c89",
+      "polyglot/c99",
+      "polyglot/rust",
+      "lisp",
+      "lisp/common_lisp",
+      "lisp/scheme",
+      "lisp/clojure",
+      "lisp/racket",
+      "lisp/emacs_lisp",
+      "lisp/guile",
+      "lisp/hy",
+      "lisp/janet",
+      "asp",
+      "beam",
+      "business",
+      "bytecode",
+      "constraints",
+      "expert_systems",
+      "fpga",
+      "functional",
+      "grammar",
+      "lexer",
+      "mobile",
+      "oop",
+      "parser",
+      "planning",
+      "prolog",
+      "scientific",
+      "systems",
+      "asm"
+   );
+
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+
+   for Main use ("embedded_emitter_main.adb");
+
+   package Compiler is
+      --  SPARK verification and safety-critical settings
+      for Default_Switches ("Ada") use (
+         "-gnatwa",          --  All warnings enabled
+         "-gnatwC",          --  Suppress conditional warnings
+         "-gnata",           --  Assertions enabled
+         "-gnatVa",          --  All validity checks
+         "-gnatf",           --  Full error info
+         "-gnat2012",        --  Ada 2012 standard
+         "-O2",              --  Optimization level 2
+         "-gnatp"            --  Suppress runtime checks (for verified code)
+      );
+   end Compiler;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-s", "-j4");
+   end Builder;
+
+   package Prove is
+      --  GNATprove settings for SPARK verification
+      for Proof_Switches ("Ada") use (
+         "--level=2",        --  Proof level
+         "--prover=all",     --  Use all available provers
+         "--timeout=60"      --  Proof timeout
+      );
+   end Prove;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-E");  --  Exception traceback
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("Ada") use ("-g");
+   end Linker;
+
+end Stunir_Emitters;

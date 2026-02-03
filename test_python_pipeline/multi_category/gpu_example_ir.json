@@ -1,0 +1,66 @@
+{
+  "docstring": "GPU computing example with CUDA-style kernels",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "f32"
+        },
+        {
+          "name": "b",
+          "type": "f32"
+        },
+        {
+          "name": "c",
+          "type": "f32"
+        },
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "vector_add_kernel",
+      "return_type": "void",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'tid', 'var_type': 'i32', 'init': 'threadIdx.x'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "f32"
+        },
+        {
+          "name": "b",
+          "type": "f32"
+        },
+        {
+          "name": "c",
+          "type": "f32"
+        },
+        {
+          "name": "width",
+          "type": "i32"
+        }
+      ],
+      "name": "matrix_mul_kernel",
+      "return_type": "void",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'row', 'var_type': 'i32', 'init': 'blockIdx.y * blockDim.y + threadIdx.y'}",
+          "kind": "var_decl"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:09:55.065500Z",
+  "ir_version": "v1",
+  "module_name": "gpu_example",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

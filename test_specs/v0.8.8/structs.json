@@ -1,0 +1,45 @@
+{
+  "module": "structs_test",
+  "description": "v0.8.8 Struct/record operations test",
+  "types": [
+    {
+      "name": "Point",
+      "fields": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"}
+      ]
+    },
+    {
+      "name": "Rectangle",
+      "fields": [
+        {"name": "top_left", "type": "Point"},
+        {"name": "width", "type": "i32"},
+        {"name": "height", "type": "i32"}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "test_struct_new",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "struct_new", "target": "p", "struct_type": "Point", "fields": {"x": "10", "y": "20"}},
+        {"type": "struct_get", "target": "val", "source": "p", "field": "x"},
+        {"type": "return", "value": "val"}
+      ]
+    },
+    {
+      "name": "test_struct_set",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "struct_new", "target": "p", "struct_type": "Point", "fields": {"x": "0", "y": "0"}},
+        {"type": "struct_set", "target": "p", "field": "x", "value": "100"},
+        {"type": "struct_set", "target": "p", "field": "y", "value": "200"},
+        {"type": "struct_get", "target": "x_val", "source": "p", "field": "x"},
+        {"type": "return", "value": "x_val"}
+      ]
+    }
+  ]
+}

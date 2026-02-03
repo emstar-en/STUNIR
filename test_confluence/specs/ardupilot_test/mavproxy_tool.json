@@ -1,0 +1,160 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "mavproxy_tool",
+  "description": "MAVProxy-style tool for Ardupilot drone control and telemetry",
+  "types": [
+    {
+      "name": "VehicleState",
+      "fields": [
+        { "name": "armed", "type": "bool" },
+        { "name": "mode", "type": "u8" },
+        { "name": "battery_pct", "type": "u8" },
+        { "name": "gps_fix", "type": "u8" }
+      ]
+    },
+    {
+      "name": "Position",
+      "fields": [
+        { "name": "latitude", "type": "i32" },
+        { "name": "longitude", "type": "i32" },
+        { "name": "altitude", "type": "i32" }
+      ]
+    },
+    {
+      "name": "Attitude",
+      "fields": [
+        { "name": "roll", "type": "i16" },
+        { "name": "pitch", "type": "i16" },
+        { "name": "yaw", "type": "i16" }
+      ]
+    }
+  ],
+  "constants": [
+    { "name": "MODE_STABILIZE", "type": "u8", "value": "0" },
+    { "name": "MODE_ALT_HOLD", "type": "u8", "value": "2" },
+    { "name": "MODE_LOITER", "type": "u8", "value": "5" },
+    { "name": "MODE_AUTO", "type": "u8", "value": "3" },
+    { "name": "MODE_RTL", "type": "u8", "value": "6" },
+    { "name": "MAV_CMD_TAKEOFF", "type": "u16", "value": "22" },
+    { "name": "MAV_CMD_LAND", "type": "u16", "value": "21" }
+  ],
+  "functions": [
+    {
+      "name": "init_mavlink",
+      "params": [
+        { "name": "port", "type": "u16" }
+      ],
+      "returns": "i32",
+      "description": "Initialize MAVLink connection on specified port",
+      "body": [
+        { "type": "var_decl", "var_name": "connection_fd", "var_type": "i32", "init": "-1" },
+        { "type": "comment", "text": "Open serial/UDP connection" },
+        { "type": "return", "value": "connection_fd" }
+      ]
+    },
+    {
+      "name": "arm_vehicle",
+      "params": [
+        { "name": "sysid", "type": "u8" },
+        { "name": "compid", "type": "u8" }
+      ],
+      "returns": "bool",
+      "description": "Send arm command to vehicle",
+      "body": [
+        { "type": "var_decl", "var_name": "success", "var_type": "bool", "init": "false" },
+        { "type": "comment", "text": "Send MAV_CMD_COMPONENT_ARM_DISARM" },
+        { "type": "return", "value": "success" }
+      ]
+    },
+    {
+      "name": "disarm_vehicle",
+      "params": [
+        { "name": "sysid", "type": "u8" },
+        { "name": "compid", "type": "u8" }
+      ],
+      "returns": "bool",
+      "description": "Send disarm command to vehicle",
+      "body": [
+        { "type": "var_decl", "var_name": "success", "var_type": "bool", "init": "false" },
+        { "type": "return", "value": "success" }
+      ]
+    },
+    {
+      "name": "set_mode",
+      "params": [
+        { "name": "sysid", "type": "u8" },
+        { "name": "mode", "type": "u8" }
+      ],
+      "returns": "bool",
+      "description": "Set vehicle flight mode",
+      "body": [
+        { "type": "var_decl", "var_name": "result", "var_type": "bool", "init": "false" },
+        { "type": "return", "value": "result" }
+      ]
+    },
+    {
+      "name": "send_takeoff_cmd",
+      "params": [
+        { "name": "sysid", "type": "u8" },
+        { "name": "altitude", "type": "i32" }
+      ],
+      "returns": "bool",
+      "description": "Command vehicle to takeoff to specified altitude",
+      "body": [
+        { "type": "var_decl", "var_name": "success", "var_type": "bool", "init": "false" },
+        { "type": "return", "value": "success" }
+      ]
+    },
+    {
+      "name": "send_land_cmd",
+      "params": [
+        { "name": "sysid", "type": "u8" }
+      ],
+      "returns": "bool",
+      "description": "Command vehicle to land",
+      "body": [
+        { "type": "var_decl", "var_name": "success", "var_type": "bool", "init": "false" },
+        { "type": "return", "value": "success" }
+      ]
+    },
+    {
+      "name": "get_position",
+      "params": [
+        { "name": "sysid", "type": "u8" }
+      ],
+      "returns": "Position",
+      "description": "Get current GPS position from vehicle",
+      "body": [
+        { "type": "var_decl", "var_name": "pos_lat", "var_type": "i32", "init": "0" },
+        { "type": "var_decl", "var_name": "pos_lon", "var_type": "i32", "init": "0" },
+        { "type": "var_decl", "var_name": "pos_alt", "var_type": "i32", "init": "0" },
+        { "type": "return", "value": "Position{pos_lat, pos_lon, pos_alt}" }
+      ]
+    },
+    {
+      "name": "get_battery_status",
+      "params": [
+        { "name": "sysid", "type": "u8" }
+      ],
+      "returns": "u8",
+      "description": "Get battery percentage remaining",
+      "body": [
+        { "type": "var_decl", "var_name": "battery_pct", "var_type": "u8", "init": "100" },
+        { "type": "return", "value": "battery_pct" }
+      ]
+    },
+    {
+      "name": "request_heartbeat",
+      "params": [
+        { "name": "sysid", "type": "u8" },
+        { "name": "compid", "type": "u8" }
+      ],
+      "returns": "i32",
+      "description": "Send heartbeat request and return status",
+      "body": [
+        { "type": "var_decl", "var_name": "status", "var_type": "i32", "init": "0" },
+        { "type": "return", "value": "status" }
+      ]
+    }
+  ]
+}

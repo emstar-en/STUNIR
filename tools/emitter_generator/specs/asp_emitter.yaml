@@ -1,0 +1,76 @@
+# STUNIR Emitter Specification: ASP
+# Answer Set Programming
+
+category: asp
+description: "Answer Set Programming emitter (Clingo, DLV, ASP-Core-2)"
+
+output_types:
+  - clingo
+  - dlv
+  - asp_core2
+
+features:
+  - logic_rules
+  - constraints
+  - optimization
+  - choice_rules
+
+extension: lp
+
+config:
+  Solver: "String"
+  Use_Optimization: "Boolean"
+  Use_Choice_Rules: "Boolean"
+
+config_defaults:
+  Solver: "clingo"
+  Use_Optimization: true
+  Use_Choice_Rules: true
+
+type_map:
+  constant: "#const"
+  variable: "Variable"
+  predicate: "Predicate"
+
+ir_fields:
+  required:
+    - rules
+    - facts
+  optional:
+    - constraints
+    - optimization
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+
+output_format: |
+  Clingo ASP format.
+
+example_output: |
+  % Facts
+  node(1..5).
+  
+  % Rules
+  edge(X,Y) :- node(X), node(Y), X != Y.
+  
+  % Constraints
+  :- edge(X,X).
+  
+  % Optimization
+  #minimize { 1@1,X,Y : edge(X,Y) }.
+
+architectures:
+  - any
+
+notes: |
+  - Clingo is the primary target
+  - Support for ASP-Core-2 standard
+  - Optimization statements
+  - Choice rules for non-determinism

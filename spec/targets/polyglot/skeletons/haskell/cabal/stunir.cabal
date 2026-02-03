@@ -1,0 +1,10 @@
+cabal-version:      2.4
+name:               stunir-program
+version:            0.0.0
+build-type:         Simple
+
+executable stunir-program
+  main-is:          Main.hs
+  hs-source-dirs:   app, src
+  default-language: Haskell2010
+  build-depends:    base >= 4.14 && < 5

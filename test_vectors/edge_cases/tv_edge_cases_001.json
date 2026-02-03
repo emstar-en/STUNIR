@@ -1,0 +1,22 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify graceful handling of empty spec file",
+  "expected_hash": "baae36810708d64bee21089e32e928488a268ed19b1e77014432109a0ff1fdb7",
+  "expected_output": {
+    "error": "Empty or invalid spec",
+    "graceful_failure": true,
+    "parsed": false
+  },
+  "id": "tv_edge_cases_001",
+  "input": {
+    "operation": "parse",
+    "spec": {}
+  },
+  "name": "Empty Spec Input",
+  "schema": "stunir.test_vector.edge_cases.v1",
+  "tags": [
+    "edge_case",
+    "empty",
+    "error_handling"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "stunir.contract.profile.v3",
+  "rules": {
+    "integer_only": true,
+    "sorted_keys": true,
+    "no_floats": true,
+    "canonical_json": "strict",
+    "dcbor_output": true
+  },
+  "toolchain": {
+    "haskell": "GHC 9.4.8",
+    "rust": "1.75.0",
+    "cabal": "3.10.2.0"
+  },
+  "receipt_schema": "stunir.receipt.build.v1"
+}

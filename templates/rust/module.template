@@ -1,0 +1,19 @@
+// STUNIR: Rust emission (raw target)
+// module: {{ module_name }}
+{% if docstring %}//! {{ docstring }}
+{% endif %}
+
+#![allow(unused)]
+
+{% for t in types_render %}/// type: {{ t.name }}
+#[derive(Debug, Clone)]
+pub struct {{ t.name }} {
+{% for f in t.fields %}    pub {{ f.name }}: {{ f.rs_type }},
+{% endfor %}}
+
+{% endfor %}{% for fn in functions_render %}/// fn: {{ fn.name }}
+pub fn {{ fn.name }}({{ fn.rs_args }}) -> {{ fn.rs_ret }} {
+    unimplemented!()
+}
+
+{% endfor %}

@@ -1,0 +1,64 @@
+{
+  "ir_hash": "af933d930aae1cba3c7a14fcc02819721b5afa784d5d1c922db76ba31c4acca6",
+  "module": {
+    "functions": [
+      {
+        "body": [],
+        "name": "init_mavlink",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "arm_vehicle",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "disarm_vehicle",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "set_mode",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "send_takeoff_cmd",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "send_land_cmd",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "get_position",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "get_battery_status",
+        "parameters": [],
+        "return_type": "type_void"
+      },
+      {
+        "body": [],
+        "name": "request_heartbeat",
+        "parameters": [],
+        "return_type": "type_void"
+      }
+    ],
+    "name": "unnamed_module",
+    "version": "1.0.0"
+  },
+  "schema": "stunir_ir_v1"
+}

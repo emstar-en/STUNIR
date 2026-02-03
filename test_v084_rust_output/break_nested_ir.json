@@ -1,0 +1,69 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "break_nested_test",
+  "docstring": "Test break in nested loops - v0.9.0",
+  "types": [],
+  "functions": [
+    {
+      "name": "find_pair_sum",
+      "args": [
+        {
+          "name": "target",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "found",
+          "value": "0"
+        },
+        {
+          "op": "for",
+          "condition": "i < 10",
+          "body": [
+            {
+              "op": "for",
+              "condition": "j < 10",
+              "body": [
+                {
+                  "op": "if",
+                  "condition": "i + j == target",
+                  "then_block": [
+                    {
+                      "op": "assign",
+                      "target": "found",
+                      "value": "1"
+                    },
+                    {
+                      "op": "break"
+                    }
+                  ]
+                }
+              ],
+              "init": "j = 0",
+              "increment": "j = j + 1"
+            },
+            {
+              "op": "if",
+              "condition": "found == 1",
+              "then_block": [
+                {
+                  "op": "break"
+                }
+              ]
+            }
+          ],
+          "init": "i = 0",
+          "increment": "i = i + 1"
+        },
+        {
+          "op": "return",
+          "value": "found"
+        }
+      ]
+    }
+  ]
+}

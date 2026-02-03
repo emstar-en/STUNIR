@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.io/schemas/multiboot2_schema.json",
+  "title": "STUNIR Multiboot2 Specification Schema",
+  "description": "JSON Schema for Multiboot2 bootloader header specifications",
+  "type": "object",
+  "required": ["template_name", "version", "multiboot2_config", "header", "tags"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "template_name": {"type": "string"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "description": {"type": "string"},
+    "target_architectures": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["i386", "x86_64", "mips32"]}
+    },
+    "do178c_compliance": {"type": "string"},
+    "multiboot2_config": {
+      "type": "object",
+      "required": ["architecture", "entry_point"],
+      "properties": {
+        "architecture": {"type": "string", "enum": ["i386", "x86_64"]},
+        "entry_point": {"type": "string"},
+        "stack_size": {"type": "integer", "minimum": 4096},
+        "syntax": {"type": "string", "enum": ["intel", "att"]}
+      }
+    },
+    "header": {
+      "type": "object",
+      "required": ["magic"],
+      "properties": {
+        "magic": {"type": "string", "const": "0xE85250D6"},
+        "architecture": {"type": "integer"},
+        "header_length": {"type": "string"},
+        "checksum": {"type": "string"}
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "type_id"],
+        "properties": {
+          "type": {"type": "string"},
+          "type_id": {"type": "integer", "minimum": 0, "maximum": 21},
+          "flags": {"type": "integer"},
+          "enabled": {"type": "boolean"},
+          "width": {"type": "integer"},
+          "height": {"type": "integer"},
+          "depth": {"type": "integer"},
+          "size": {"type": "integer"},
+          "required_tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tag_type": {"type": "integer"},
+                "name": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "linker_script_template": {
+      "type": "object",
+      "properties": {
+        "entry_point": {"type": "string"},
+        "load_address": {"type": "string"},
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {"type": "string"},
+              "address": {"type": "string"},
+              "flags": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "generation_options": {
+      "type": "object",
+      "properties": {
+        "emit_header": {"type": "boolean"},
+        "emit_boot_entry": {"type": "boolean"},
+        "emit_linker_script": {"type": "boolean"},
+        "output_format": {"type": "string", "enum": ["nasm", "gas", "fasm"]}
+      }
+    }
+  }
+}

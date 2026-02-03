@@ -1,0 +1,48 @@
+{
+  "module": "break_nested_test",
+  "description": "Test break in nested loops - v0.9.0",
+  "functions": [
+    {
+      "name": "find_pair_sum",
+      "returns": "i32",
+      "params": [
+        {"name": "target", "type": "i32"}
+      ],
+      "body": [
+        {"type": "assign", "target": "found", "value": "0"},
+        {
+          "type": "for",
+          "init": "i = 0",
+          "condition": "i < 10",
+          "increment": "i = i + 1",
+          "body": [
+            {
+              "type": "for",
+              "init": "j = 0",
+              "condition": "j < 10",
+              "increment": "j = j + 1",
+              "body": [
+                {
+                  "type": "if",
+                  "condition": "i + j == target",
+                  "then": [
+                    {"type": "assign", "target": "found", "value": "1"},
+                    {"type": "break"}
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if",
+              "condition": "found == 1",
+              "then": [
+                {"type": "break"}
+              ]
+            }
+          ]
+        },
+        {"type": "return", "value": "found"}
+      ]
+    }
+  ]
+}

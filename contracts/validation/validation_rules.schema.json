@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.validation.rules.v1.schema.json",
+  "title": "STUNIR Validation Rules Schema",
+  "description": "JSON Schema for validation rule definitions",
+  "type": "object",
+  "required": ["rule_id", "rule_type", "enabled"],
+  "properties": {
+    "rule_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "rule_type": {
+      "type": "string",
+      "enum": ["hash", "schema", "format", "presence", "determinism"]
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["error", "warning", "info"],
+      "default": "error"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "remediation": {
+      "type": "string"
+    }
+  }
+}

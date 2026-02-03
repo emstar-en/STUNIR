@@ -1,0 +1,37 @@
+{
+  "module": "mixed_nesting",
+  "description": "Test mixed control flow nesting patterns",
+  "functions": [
+    {
+      "name": "test_mixed",
+      "returns": "void",
+      "params": [{"name": "x", "type": "i32"}],
+      "body": [
+        {
+          "type": "for",
+          "init": "int i = 0",
+          "condition": "i < x",
+          "increment": "i++",
+          "body": [
+            {
+              "type": "if",
+              "condition": "i % 2 == 0",
+              "then": [
+                {
+                  "type": "while",
+                  "condition": "i < 10",
+                  "body": [
+                    {"type": "assign", "target": "i", "value": "i + 1"}
+                  ]
+                }
+              ],
+              "else": [
+                {"type": "call", "func": "process", "args": ["i"]}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

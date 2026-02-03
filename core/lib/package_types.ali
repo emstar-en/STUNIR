@@ -1,0 +1,174 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+
+RN
+RV NO_SECONDARY_STACK
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+RV NO_IMPLICIT_LOOPS
+RV NO_ELABORATION_CODE
+
+U package_types%b	package_types.adb	0c17d799 NE OO PK
+Z system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+
+U package_types%s	package_types.ads	de4b80b5 EE OO PK
+
+D package_types.ads	20260130013122 de4b80b5 package_types%s
+D package_types.adb	20260130013122 d25c572c package_types%b
+D system.ads		20220819080952 a2da961d system%s
+D s-parame.ads		20220819080952 d494a4a6 system.parameters%s
+D s-secsta.ads		20220819080952 62cd9202 system.secondary_stack%s
+D s-stoele.ads		20220819080952 6d8e1ff4 system.storage_elements%s
+G a e
+G c Z s s [artifact_entryIP package_types 73 9 none]
+G c Z s s [trace_entryIP package_types 114 9 none]
+G c Z s s [config_itemIP package_types 142 9 none]
+G c Z s s [Tartifact_arrayBIP package_types 99 4 none]
+G c Z s s [Ttrace_arrayBIP package_types 136 4 none]
+G c Z s s [Tconfig_arrayBIP package_types 168 4 none]
+G c Z s s [compliance_packageIP package_types 174 9 none]
+G c Z s b [status_message package_types 236 13 none]
+G c Z s b [tql_name package_types 237 13 none]
+G c Z s b [dal_name package_types 238 13 none]
+G c Z s b [artifact_kind_name package_types 239 13 none]
+G c Z s b [trace_kind_name package_types 240 13 none]
+X 1 package_types.ads
+14K9*Package_Types 242l5 242e18 2|7b14 74l5 74t18
+20N4*Max_Name_Length 39r46 40r46
+21N4*Max_Path_Length 43r46 44r46
+22N4*Max_Hash_Length 47r46 48r46
+23N4*Max_Artifacts 97r50 98r49
+24N4*Max_Trace_Entries 134r47 135r46
+25N4*Max_Config_Items 166r48 167r47
+26N4*Max_Description_Length 51r46 52r46
+32E9*TQL_Level 32e57 180r22 237r31 2|23r31
+32n23*TQL_1{32E9} 2|26r15
+32n30*TQL_2{32E9} 2|27r15
+32n37*TQL_3{32E9} 2|28r15
+32n44*TQL_4{32E9} 2|29r15
+32n51*TQL_5{32E9} 205r24 2|30r15
+33E9*DAL_Level 33e57 181r22 238r31 2|34r31
+33n23*DAL_A{33E9} 2|37r15
+33n30*DAL_B{33E9} 2|38r15
+33n37*DAL_C{33E9} 2|39r15
+33n44*DAL_D{33E9} 2|40r15
+33n51*DAL_E{33E9} 206r24 2|41r15
+39I12*Name_Index{positive} 41r35
+40I12*Name_Length{natural} 75r21 116r21 118r21 144r21 146r21 177r22 179r22
+41A12*Name_String{string}<integer> 74r21 115r21 117r21 143r21 145r21 176r22
+. 178r22
+43I12*Path_Index{positive} 45r35
+44I12*Path_Length{natural} 77r21
+45A12*Path_String{string}<integer> 76r21
+47I12*Hash_Index{positive} 49r35
+48I12*Hash_Length{natural} 79r21 148r21
+49A12*Hash_String{string}<integer> 78r21 147r21
+51I12*Desc_Index{positive} 53r35
+52I12*Desc_Length{natural} 150r21
+53A12*Desc_String{string}<integer> 149r21
+59E9*Artifact_Kind 71e5 80r21 239r40 2|45r40
+60n7*Source_Code{59E9} 92r21 2|48r15
+61n7*Object_Code{59E9} 2|49r15
+62n7*Executable{59E9} 2|50r15
+63n7*Test_Case{59E9} 2|51r15
+64n7*Test_Result{59E9} 2|52r15
+65n7*Coverage_Data{59E9} 2|53r15
+66n7*Proof_Result{59E9} 2|54r15
+67n7*Document{59E9} 2|55r15
+68n7*Configuration{59E9} 2|56r15
+69n7*Receipt{59E9} 2|57r15
+70n7*Manifest{59E9} 2|58r15
+73R9*Artifact_Entry 83e14 85r35 99r53
+74a7*Name{41A12} 86m7
+75i7*Name_Len{40I12} 87m7
+76a7*Path{45A12} 88m7
+77i7*Path_Len{44I12} 89m7
+78a7*Hash{49A12} 90m7
+79i7*Hash_Len{48I12} 91m7
+80e7*Kind{59E9} 92m7
+81i7*Size_Bytes{natural} 93m7
+82b7*Is_Valid{boolean} 94m7
+85r4*Null_Artifact_Entry{73R9} 207r35
+97I12*Artifact_Index{positive} 99r34
+98I12*Artifact_Count{natural} 185r23
+99A9*Artifact_Array(73R9)<integer> 184r22
+105E9*Trace_Kind 112e5 119r21 240r37 2|62r37
+106n7*Req_To_Design{105E9} 129r21 2|65r15
+107n7*Design_To_Code{105E9} 2|66r15
+108n7*Code_To_Test{105E9} 2|67r15
+109n7*Test_To_Result{105E9} 2|68r15
+110n7*Req_To_Test{105E9} 2|69r15
+111n7*Code_To_Proof{105E9} 2|70r15
+114R9*Trace_Entry 122e14 124r32 136r47
+115a7*Source_ID{41A12} 125m7
+116i7*Source_Len{40I12} 126m7
+117a7*Target_ID{41A12} 127m7
+118i7*Target_Len{40I12} 128m7
+119e7*Kind{105E9} 129m7
+120b7*Verified{boolean} 130m7
+121b7*Is_Valid{boolean} 131m7
+124r4*Null_Trace_Entry{114R9} 209r35
+134I12*Trace_Index{positive} 136r31
+135I12*Trace_Count{natural} 189r22
+136A9*Trace_Array(114R9)<integer> 188r22
+142R9*Config_Item 152e14 154r32 168r49
+143a7*Name{41A12} 155m7
+144i7*Name_Len{40I12} 156m7
+145a7*Version{41A12} 157m7
+146i7*Version_Len{40I12} 158m7
+147a7*Hash{49A12} 159m7
+148i7*Hash_Len{48I12} 160m7
+149a7*Description{53A12} 161m7
+150i7*Desc_Len{52I12} 162m7
+151b7*Is_Valid{boolean} 163m7
+154r4*Null_Config_Item{142R9} 211r35
+166I12*Config_Index{positive} 168r32
+167I12*Config_Count{natural} 193r22
+168A9*Config_Array(142R9)<integer> 192r22
+174R9*Compliance_Package 198e14 200r39
+176a7*Tool_Name{41A12} 201m7
+177i7*Tool_Name_Len{40I12} 202m7
+178a7*Version{41A12} 203m7
+179i7*Version_Len{40I12} 204m7
+180e7*TQL{32E9} 205m7
+181e7*DAL{33E9} 206m7
+184a7*Artifacts{99A9} 207m7
+185i7*Artifact_Total{98I12} 208m7
+188a7*Traces{136A9} 209m7
+189i7*Trace_Total{135I12} 210m7
+192a7*Config_Items{168A9} 211m7
+193i7*Config_Total{167I12} 212m7
+196b7*Is_Complete{boolean} 213m7
+197b7*Is_Valid{boolean} 214m7
+200r4*Null_Compliance_Package{174R9}
+221E9*Package_Status 230e5 236r38 2|9r38
+222n7*Success{221E9} 2|12r15
+223n7*Invalid_Config{221E9} 2|13r15
+224n7*Artifact_Missing{221E9} 2|14r15
+225n7*Hash_Mismatch{221E9} 2|15r15
+226n7*Trace_Incomplete{221E9} 2|16r15
+227n7*Generation_Failed{221E9} 2|17r15
+228n7*Validation_Failed{221E9} 2|18r15
+229n7*IO_Error{221E9} 2|19r15
+236V13*Status_Message{string} 236>29 2|9b13 21l8 21t22
+236e29 Status{221E9} 2|9b29 11r12
+237V13*TQL_Name{string} 237>23 2|23b13 32l8 32t16
+237e23 Level{32E9} 2|23b23 25r12
+238V13*DAL_Name{string} 238>23 2|34b13 43l8 43t16
+238e23 Level{33E9} 2|34b23 36r12
+239V13*Artifact_Kind_Name{string} 239>33 2|45b13 60l8 60t26
+239e33 Kind{59E9} 2|45b33 47r12
+240V13*Trace_Kind_Name{string} 240>30 2|62b13 72l8 72t23
+240e30 Kind{105E9} 2|62b30 64r12
+

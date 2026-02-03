@@ -1,0 +1,36 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify epochs always increase for sequential operations",
+  "expected_hash": "b59be72b48a6d9df687b4f895c74ee40510ce49f4f4df36eb76d4c12709787c2",
+  "expected_output": {
+    "no_regression": true,
+    "property_holds": true,
+    "strictly_increasing": true
+  },
+  "id": "tv_property_004",
+  "input": {
+    "field": "epoch",
+    "property": "monotonicity",
+    "sequence": [
+      {
+        "epoch": 1735500000,
+        "op": "create"
+      },
+      {
+        "epoch": 1735500001,
+        "op": "update"
+      },
+      {
+        "epoch": 1735500002,
+        "op": "finalize"
+      }
+    ]
+  },
+  "name": "Epoch Monotonicity",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "monotonicity",
+    "temporal"
+  ]
+}

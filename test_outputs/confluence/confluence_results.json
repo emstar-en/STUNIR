@@ -1,0 +1,38 @@
+{
+  "test_run": "2026-01-31T11:54:09.906807",
+  "ir_tests": {
+    "spark": {
+      "success": true,
+      "message": "Success",
+      "ir_valid": true,
+      "function_count": 1
+    },
+    "python": {
+      "success": true,
+      "message": "Success",
+      "ir_valid": true,
+      "function_count": 13
+    },
+    "rust": {
+      "success": true,
+      "message": "Success",
+      "ir_valid": true,
+      "function_count": 2
+    }
+  },
+  "emitter_tests": {},
+  "summary": {
+    "ir_pipelines_tested": 3,
+    "ir_pipelines_passing": 3,
+    "emitters_tested": 10,
+    "emitters_available": 0,
+    "confluence_achieved": true
+  },
+  "ir_comparison": {
+    "schema_match": true,
+    "structure_match": false,
+    "differences": [
+      "Function count mismatch: [1, 13, 2]"
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.shared.verifier_base.v1.schema.json",
+  "title": "STUNIR Verifier Base Schema",
+  "description": "Base schema for verification contracts",
+  "type": "object",
+  "required": ["verifier_id", "verification_mode"],
+  "properties": {
+    "verifier_id": {
+      "type": "string"
+    },
+    "verification_mode": {
+      "type": "string",
+      "enum": ["python_full", "binary_portable", "shell_only", "shell_strict"]
+    },
+    "tools_required": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "no_python": {"type": "boolean"},
+        "no_custom_binaries": {"type": "boolean"},
+        "posix_only": {"type": "boolean"},
+        "network_allowed": {"type": "boolean"}
+      }
+    },
+    "hash_algorithms": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["sha256", "sha384", "sha512"]},
+      "default": ["sha256"]
+    },
+    "error_handling": {
+      "type": "string",
+      "enum": ["strict", "permissive", "warn"]
+    }
+  }
+}

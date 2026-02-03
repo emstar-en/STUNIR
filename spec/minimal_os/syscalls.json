@@ -1,0 +1,155 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "syscalls",
+  "description": "Minimal syscall interface for STUNIR minimal OS",
+  "target": {
+    "architecture": "x86_64",
+    "format": "mixed",
+    "assembly_syntax": "nasm",
+    "c_standard": "c89"
+  },
+  "constants": [
+    {"name": "SYS_PRINT", "type": "u64", "value": "0"},
+    {"name": "SYS_YIELD", "type": "u64", "value": "1"},
+    {"name": "SYS_EXIT", "type": "u64", "value": "2"},
+    {"name": "SYS_GETPID", "type": "u64", "value": "3"},
+    {"name": "SYS_SLEEP", "type": "u64", "value": "4"},
+    {"name": "SYSCALL_VECTOR", "type": "u8", "value": "0x80"}
+  ],
+  "functions": [
+    {
+      "name": "syscall_handler",
+      "description": "Main syscall dispatch handler",
+      "params": [
+        {"name": "syscall_num", "type": "u64"},
+        {"name": "arg1", "type": "u64"},
+        {"name": "arg2", "type": "u64"},
+        {"name": "arg3", "type": "u64"}
+      ],
+      "returns": "i64",
+      "body": [
+        {"type": "switch", "expr": "syscall_num", "cases": [
+          {
+            "value": "SYS_PRINT",
+            "body": [
+              {"type": "call", "func": "serial_write_string", "args": ["(char*)arg1"]},
+              {"type": "return", "value": "0"}
+            ]
+          },
+          {
+            "value": "SYS_YIELD",
+            "body": [
+              {"type": "call", "func": "yield"},
+              {"type": "return", "value": "0"}
+            ]
+          },
+          {
+            "value": "SYS_EXIT",
+            "body": [
+              {"type": "call", "func": "task_exit"},
+              {"type": "return", "value": "0"}
+            ]
+          },
+          {
+            "value": "SYS_GETPID",
+            "body": [
+              {"type": "return", "value": "get_current_task_id()"}
+            ]
+          },
+          {
+            "value": "SYS_SLEEP",
+            "body": [
+              {"type": "call", "func": "timer_sleep", "args": ["(u32)arg1"]},
+              {"type": "return", "value": "0"}
+            ]
+          }
+        ], "default": [
+          {"type": "return", "value": "-1"}
+        ]}
+      ]
+    },
+    {
+      "name": "syscall_init",
+      "description": "Install syscall handler in IDT",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "call", "func": "idt_set_gate", "args": ["SYSCALL_VECTOR", "(u64)syscall_entry", "0x08", "0xEE"]}
+      ]
+    },
+    {
+      "name": "sys_print",
+      "description": "Userspace print syscall wrapper",
+      "params": [
+        {"name": "str", "type": "char*"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "i64"},
+        {"type": "asm", "code": "int $0x80", "inputs": ["a (SYS_PRINT)", "D ((u64)str)"], "outputs": ["=a (result)"]},
+        {"type": "return", "value": "(i32)result"}
+      ]
+    },
+    {
+      "name": "sys_yield",
+      "description": "Userspace yield syscall wrapper",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "asm", "code": "int $0x80", "inputs": ["a (SYS_YIELD)"]}
+      ]
+    },
+    {
+      "name": "sys_exit",
+      "description": "Userspace exit syscall wrapper",
+      "params": [
+        {"name": "code", "type": "i32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "asm", "code": "int $0x80", "inputs": ["a (SYS_EXIT)", "D ((u64)code)"]},
+        {"type": "while", "condition": "1", "body": []}
+      ]
+    },
+    {
+      "name": "sys_getpid",
+      "description": "Get current task ID",
+      "params": [],
+      "returns": "u32",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "i64"},
+        {"type": "asm", "code": "int $0x80", "inputs": ["a (SYS_GETPID)"], "outputs": ["=a (result)"]},
+        {"type": "return", "value": "(u32)result"}
+      ]
+    }
+  ],
+  "assembly_functions": [
+    {
+      "name": "syscall_entry",
+      "global": true,
+      "description": "Syscall entry point (called via int 0x80)",
+      "body": [
+        {"type": "comment", "text": "Save registers"},
+        {"type": "push_all"},
+        {"type": "comment", "text": "Call C handler: syscall_handler(rax, rdi, rsi, rdx)"},
+        {"type": "mov", "dest": "rcx", "src": "rdx"},
+        {"type": "mov", "dest": "rdx", "src": "rsi"},
+        {"type": "mov", "dest": "rsi", "src": "rdi"},
+        {"type": "mov", "dest": "rdi", "src": "rax"},
+        {"type": "call", "func": "syscall_handler"},
+        {"type": "comment", "text": "Return value in rax"},
+        {"type": "mov", "dest": "[rsp + 120]", "src": "rax"},
+        {"type": "pop_all"},
+        {"type": "iretq"}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "serial_write_string", "type": "function"},
+    {"name": "yield", "type": "function"},
+    {"name": "task_exit", "type": "function"},
+    {"name": "get_current_task_id", "type": "function"},
+    {"name": "timer_sleep", "type": "function"},
+    {"name": "idt_set_gate", "type": "function"}
+  ]
+}

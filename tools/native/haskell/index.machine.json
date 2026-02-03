@@ -1,0 +1,9 @@
+{
+  "src": "Directory",
+  "stunir-native": "Directory",
+  "test_vectors": "Directory",
+  "Setup.hs": "File",
+  "StunirNative.hs": "File",
+  "cabal.project": "File",
+  "stunir-native.cabal": "File"
+}

@@ -1,0 +1,29 @@
+# Python Pipeline End-to-End Test
+# Date: 2026-01-31
+
+## Test 1: spec_to_ir
+python3 tools/spec_to_ir.py \
+  --spec-root spec/ardupilot_test \
+  --out test_outputs/python_pipeline/ir.json \
+  --lockfile local_toolchain.lock.json
+
+## Test 2: ir_to_code (C target)
+python3 tools/ir_to_code.py \
+  --ir test_outputs/python_pipeline/ir.json \
+  --lang c \
+  --templates templates/c \
+  --out test_outputs/python_pipeline/
+
+## Test 3: ir_to_code (Python target)
+python3 tools/ir_to_code.py \
+  --ir test_outputs/python_pipeline/ir.json \
+  --lang python \
+  --templates templates/python \
+  --out test_outputs/python_pipeline/
+
+## Test 4: ir_to_code (Rust target)
+python3 tools/ir_to_code.py \
+  --ir test_outputs/python_pipeline/ir.json \
+  --lang rust \
+  --templates templates/rust \
+  --out test_outputs/python_pipeline/

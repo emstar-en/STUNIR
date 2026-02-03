@@ -1,0 +1,1 @@
+{"build.sh":"Entry: Polyglot dispatch (Py/Sh)","verify.sh":"Entry: Verify artifact determinism","generate_manifest.sh":"Tool: Gen Manifest V1 (Sorted/SHA256)","reset_ai_bins.sh":"Util: Reset meta/ai_bins","lib/dispatch.sh":"Lib: Select tool implementation","lib/receipt.sh":"Lib: Gen Canonical JSON receipt"}

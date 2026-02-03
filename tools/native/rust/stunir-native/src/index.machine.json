@@ -1,0 +1,23 @@
+{
+  "emit": "Directory",
+  "canonical.rs": "File",
+  "check_toolchain.rs": "File",
+  "emit.rs": "File",
+  "errors.rs": "File",
+  "gen_provenance.rs": "File",
+  "hash.rs": "File",
+  "import.rs": "File",
+  "ir.rs": "File",
+  "ir_v1.rs": "File",
+  "jcs.rs": "File",
+  "main.rs": "File",
+  "path_policy.rs": "File",
+  "provenance.rs": "File",
+  "receipt.rs": "File",
+  "spec.rs": "File",
+  "spec_to_ir.rs": "File",
+  "toolchain.rs": "File",
+  "validate.rs": "File",
+  "verify_emit.rs": "File",
+  "verify_pack.rs": "File"
+}

@@ -1,0 +1,120 @@
+{
+  "doc_type": "stunir.ir_in_source_markers_matrix.v0",
+  "languages": {
+    "asp": {
+      "comment_styles": [
+        "%",
+        "#"
+      ],
+      "extensions": [
+        ".lp"
+      ]
+    },
+    "c": {
+      "comment_styles": [
+        "/* */",
+        "//"
+      ],
+      "extensions": [
+        ".c",
+        ".h"
+      ]
+    },
+    "datalog": {
+      "comment_styles": [
+        "//",
+        "/* */",
+        "#"
+      ],
+      "extensions": [
+        ".dl"
+      ]
+    },
+    "elixir": {
+      "comment_styles": [
+        "#"
+      ],
+      "extensions": [
+        ".ex",
+        ".exs"
+      ]
+    },
+    "erlang": {
+      "comment_styles": [
+        "%"
+      ],
+      "extensions": [
+        ".erl",
+        ".hrl"
+      ]
+    },
+    "go": {
+      "comment_styles": [
+        "/* */",
+        "//"
+      ],
+      "extensions": [
+        ".go"
+      ]
+    },
+    "haskell": {
+      "comment_styles": [
+        "{- -}",
+        "--"
+      ],
+      "extensions": [
+        ".hs"
+      ]
+    },
+    "minizinc": {
+      "comment_styles": [
+        "%"
+      ],
+      "extensions": [
+        ".mzn"
+      ]
+    },
+    "prolog": {
+      "comment_styles": [
+        "%"
+      ],
+      "extensions": [
+        ".pl"
+      ]
+    },
+    "rust": {
+      "comment_styles": [
+        "/* */",
+        "//"
+      ],
+      "extensions": [
+        ".rs"
+      ]
+    }
+  },
+  "normalization": {
+    "accept_markers_anywhere": true,
+    "case_sensitive_markers": true,
+    "strip_comment_wrappers": true
+  },
+  "record_types": {
+    "embedded": {
+      "b64url": {
+        "padding": "forbid",
+        "whitespace": "ignore"
+      },
+      "lines": [
+        "STUNIR_IR_SHA256 <hex>",
+        "STUNIR_IR_B64URL_BEGIN",
+        "<b64url payload lines>",
+        "STUNIR_IR_B64URL_END"
+      ]
+    },
+    "reference": {
+      "lines": [
+        "STUNIR_IR_REF uri=<repo-relative-path>",
+        "STUNIR_IR_SHA256 <hex>"
+      ]
+    }
+  }
+}

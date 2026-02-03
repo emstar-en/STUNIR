@@ -1,0 +1,13 @@
+{
+  "emit": "Directory",
+  "canonical.rs": "File",
+  "emit.rs": "File",
+  "hello.c": "File",
+  "hello.txt": "File",
+  "import.rs": "File",
+  "ir_v1.rs": "File",
+  "main.rs": "File",
+  "spec_to_ir.rs": "File",
+  "toolchain.rs": "File",
+  "validate.rs": "File"
+}

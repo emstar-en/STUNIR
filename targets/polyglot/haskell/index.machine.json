@@ -1,0 +1,4 @@
+{
+  "polyglot_haskell.machine.json": "Polyglot Haskell targets (c89/c99 equiv)",
+  "targets_polyglot.machine.json": "Complete targets \u2192 polyglot \u2192 haskell pipeline stage"
+}

@@ -1,0 +1,16 @@
+{
+  "ir_hash": "4831d9e8fff033b4c4c22b993905c22d60f1e61056bec00dbaca55264c420644",
+  "module": {
+    "functions": [
+      {
+        "body": [],
+        "name": "add",
+        "parameters": [],
+        "return_type": "type_i32"
+      }
+    ],
+    "name": "simple_module",
+    "version": "1.0.0"
+  },
+  "schema": "stunir_ir_v1"
+}

@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "doc_id": "STUNIR-ARCH-003",
+    "title": "STUNIR Profile 3: Shell-Native Architecture Refinement",
+    "status": "DRAFT",
+    "date": "2025-12-28"
+  },
+  "decisions": {
+    "primary_objective": {
+      "statement": "Shell-only mode is strictly for ORCHESTRATION and VERIFICATION.",
+      "implication": "Semantic generation (IR -> Code) requires a compiled STUNIR binary or Python. Shell scripts will not attempt complex semantic parsing."
+    },
+    "verification_strategy": {
+      "mode": "Opaque Byte Blob",
+      "description": "Shell verification treats artifacts as binary blobs. It does not attempt to parse JSON semantics. It verifies SHA-256 hashes of files against a Manifest."
+    },
+    "manifest_v1": {
+      "requirement": "Strict, line-oriented, deterministic manifest format.",
+      "hashing_rules": [
+        "LC_ALL=C for sorting",
+        "Unix style forward slashes for paths",
+        "Relative paths from project root",
+        "No metadata (mtime, owner) in hash",
+        "Strict newline handling (LF only)"
+      ]
+    },
+    "receipt_format": {
+      "policy": "Divergent",
+      "shell_mode": "Produces 'stunir_receipt.txt' (Key-Value pairs, easy to grep)",
+      "full_mode": "Produces 'stunir_receipt.json' (Canonical JSON)",
+      "interop": "A 'receipt-upgrader' tool (compiled) can convert txt -> json later."
+    }
+  },
+  "hazards_and_mitigations": {
+    "path_separators": "Force forward slashes in all manifest entries.",
+    "line_endings": "Enforce LF for all text processing in pipeline.",
+    "umask": "Explicitly set umask 0022 at script start.",
+    "zip_metadata": "Use 'zip -X -D' or equivalent to strip non-deterministic metadata."
+  },
+  "roadmap": [
+    "Step 1: Define Manifest V1 format (simple text file: 'SHA  PATH').",
+    "Step 2: Implement 'scripts/verify_manifest.sh' (pure shell).",
+    "Step 3: Implement 'scripts/discover_toolchain.sh' (generates lockfile).",
+    "Step 4: Update 'build.sh' to use Polyglot Dispatch."
+  ]
+}

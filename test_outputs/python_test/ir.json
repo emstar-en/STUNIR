@@ -1,0 +1,278 @@
+{
+  "docstring": "Simple MAVLink heartbeat message handler",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "buffer",
+          "type": "bytes"
+        },
+        {
+          "name": "len",
+          "type": "u8"
+        }
+      ],
+      "name": "parse_heartbeat",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'msg_type', 'var_type': 'u8', 'init': 'buffer[0]'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'i32', 'init': '0'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'result'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sys_id",
+          "type": "u8"
+        },
+        {
+          "name": "comp_id",
+          "type": "u8"
+        }
+      ],
+      "name": "send_heartbeat",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'status', 'var_type': 'i32', 'init': '1'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'status'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "port",
+          "type": "u16"
+        }
+      ],
+      "name": "init_mavlink",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'connection_fd', 'var_type': 'i32', 'init': '-1'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'comment', 'text': 'Open serial/UDP connection'}",
+          "kind": "comment"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'connection_fd'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "compid",
+          "type": "u8"
+        }
+      ],
+      "name": "arm_vehicle",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'comment', 'text': 'Send MAV_CMD_COMPONENT_ARM_DISARM'}",
+          "kind": "comment"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'success'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "compid",
+          "type": "u8"
+        }
+      ],
+      "name": "disarm_vehicle",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'success'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "mode",
+          "type": "u8"
+        }
+      ],
+      "name": "set_mode",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'result'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "altitude",
+          "type": "i32"
+        }
+      ],
+      "name": "send_takeoff_cmd",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'success'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        }
+      ],
+      "name": "send_land_cmd",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'success'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        }
+      ],
+      "name": "get_position",
+      "return_type": "Position",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'pos_lat', 'var_type': 'i32', 'init': '0'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'pos_lon', 'var_type': 'i32', 'init': '0'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'pos_alt', 'var_type': 'i32', 'init': '0'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'Position{pos_lat, pos_lon, pos_alt}'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        }
+      ],
+      "name": "get_battery_status",
+      "return_type": "u8",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'battery_pct', 'var_type': 'u8', 'init': '100'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'battery_pct'}",
+          "kind": "return"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "compid",
+          "type": "u8"
+        }
+      ],
+      "name": "request_heartbeat",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'status', 'var_type': 'i32', 'init': '0'}",
+          "kind": "var_decl"
+        },
+        {
+          "data": "{'type': 'return', 'value': 'status'}",
+          "kind": "return"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T22:03:01.440432Z",
+  "ir_version": "v1",
+  "module_name": "mavlink_handler",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

@@ -1,0 +1,145 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "serial_driver",
+  "description": "8250 UART Serial Driver for x86 COM1 (STUNIR minimal OS)",
+  "target": {
+    "architecture": "x86",
+    "format": "c",
+    "standard": "c89"
+  },
+  "constants": [
+    {"name": "COM1_PORT", "type": "u16", "value": "0x3F8"},
+    {"name": "SERIAL_DATA", "type": "u16", "value": "0"},
+    {"name": "SERIAL_INTERRUPT_ENABLE", "type": "u16", "value": "1"},
+    {"name": "SERIAL_FIFO_CONTROL", "type": "u16", "value": "2"},
+    {"name": "SERIAL_LINE_CONTROL", "type": "u16", "value": "3"},
+    {"name": "SERIAL_MODEM_CONTROL", "type": "u16", "value": "4"},
+    {"name": "SERIAL_LINE_STATUS", "type": "u16", "value": "5"},
+    {"name": "SERIAL_BAUD_DIVISOR_LOW", "type": "u16", "value": "0"},
+    {"name": "SERIAL_BAUD_DIVISOR_HIGH", "type": "u16", "value": "1"},
+    {"name": "BAUD_115200_DIVISOR", "type": "u16", "value": "1"}
+  ],
+  "types": [
+    {
+      "name": "serial_status",
+      "kind": "enum",
+      "values": ["SERIAL_OK", "SERIAL_ERROR", "SERIAL_BUSY"]
+    }
+  ],
+  "functions": [
+    {
+      "name": "outb",
+      "description": "Write byte to I/O port (inline assembly)",
+      "params": [
+        {"name": "port", "type": "u16"},
+        {"name": "value", "type": "u8"}
+      ],
+      "returns": "void",
+      "inline_asm": true,
+      "body": [
+        {"type": "asm", "code": "outb %1, %0", "outputs": [], "inputs": ["dN (port)", "a (value)"]}
+      ]
+    },
+    {
+      "name": "inb",
+      "description": "Read byte from I/O port (inline assembly)",
+      "params": [
+        {"name": "port", "type": "u16"}
+      ],
+      "returns": "u8",
+      "inline_asm": true,
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "u8", "init": "0"},
+        {"type": "asm", "code": "inb %1, %0", "outputs": ["=a (result)"], "inputs": ["dN (port)"]},
+        {"type": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "serial_init",
+      "description": "Initialize COM1 serial port at 115200 baud, 8N1",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "comment", "text": "Disable interrupts"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_INTERRUPT_ENABLE", "0x00"]},
+        {"type": "comment", "text": "Enable DLAB to set baud rate"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_LINE_CONTROL", "0x80"]},
+        {"type": "comment", "text": "Set baud rate divisor (115200)"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_BAUD_DIVISOR_LOW", "BAUD_115200_DIVISOR"]},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_BAUD_DIVISOR_HIGH", "0x00"]},
+        {"type": "comment", "text": "8 bits, no parity, 1 stop bit"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_LINE_CONTROL", "0x03"]},
+        {"type": "comment", "text": "Enable FIFO, clear, 14-byte threshold"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_FIFO_CONTROL", "0xC7"]},
+        {"type": "comment", "text": "Enable IRQs, RTS/DSR set"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_MODEM_CONTROL", "0x0B"]},
+        {"type": "comment", "text": "Test serial chip (set loopback mode)"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_MODEM_CONTROL", "0x1E"]},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_DATA", "0xAE"]},
+        {"type": "comment", "text": "Check if we get same byte back"},
+        {"type": "var_decl", "var_name": "test_byte", "var_type": "u8"},
+        {"type": "call", "func": "inb", "args": ["COM1_PORT + SERIAL_DATA"], "assign_to": "test_byte"},
+        {"type": "if", "condition": "test_byte != 0xAE", "then": [
+          {"type": "return", "value": "-1"}
+        ]},
+        {"type": "comment", "text": "Serial is working, disable loopback and enable normal mode"},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_MODEM_CONTROL", "0x0F"]},
+        {"type": "return", "value": "0"}
+      ]
+    },
+    {
+      "name": "serial_is_transmit_empty",
+      "description": "Check if transmit buffer is empty",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "status", "var_type": "u8"},
+        {"type": "call", "func": "inb", "args": ["COM1_PORT + SERIAL_LINE_STATUS"], "assign_to": "status"},
+        {"type": "return", "value": "(status & 0x20) != 0"}
+      ]
+    },
+    {
+      "name": "serial_write_char",
+      "description": "Write single character to serial port (blocking)",
+      "params": [
+        {"name": "c", "type": "char"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "while", "condition": "!serial_is_transmit_empty()", "body": []},
+        {"type": "call", "func": "outb", "args": ["COM1_PORT + SERIAL_DATA", "c"]}
+      ]
+    },
+    {
+      "name": "serial_write_string",
+      "description": "Write null-terminated string to serial port",
+      "params": [
+        {"name": "str", "type": "char*"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "while", "condition": "*str", "body": [
+          {"type": "call", "func": "serial_write_char", "args": ["*str"]},
+          {"type": "assign", "target": "str", "value": "str + 1"}
+        ]}
+      ]
+    },
+    {
+      "name": "serial_write_hex",
+      "description": "Write 32-bit value as hexadecimal",
+      "params": [
+        {"name": "value", "type": "u32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "hex_chars", "var_type": "char*", "init": "\"0123456789ABCDEF\""},
+        {"type": "var_decl", "var_name": "i", "var_type": "i32"},
+        {"type": "call", "func": "serial_write_string", "args": ["\"0x\""]},
+        {"type": "for", "init": "i = 28", "condition": "i >= 0", "increment": "i -= 4", "body": [
+          {"type": "var_decl", "var_name": "nibble", "var_type": "u8", "init": "(value >> i) & 0xF"},
+          {"type": "call", "func": "serial_write_char", "args": ["hex_chars[nibble]"]}
+        ]}
+      ]
+    }
+  ]
+}

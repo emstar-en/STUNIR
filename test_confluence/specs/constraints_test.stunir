@@ -1,0 +1,2 @@
+target: minizinc
+var 1..10: x; constraint x > 5;

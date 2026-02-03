@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/node_types_v1.json",
+  "title": "STUNIR IR Node Types",
+  "description": "All IR node type definitions",
+  "definitions": {
+    "IRNodeKind": {
+      "type": "string",
+      "enum": [
+        "module",
+        "function_decl",
+        "type_decl",
+        "const_decl",
+        "var_decl",
+        "block_stmt",
+        "expr_stmt",
+        "if_stmt",
+        "while_stmt",
+        "for_stmt",
+        "return_stmt",
+        "break_stmt",
+        "continue_stmt",
+        "var_decl_stmt",
+        "assign_stmt",
+        "integer_literal",
+        "float_literal",
+        "string_literal",
+        "bool_literal",
+        "var_ref",
+        "binary_expr",
+        "unary_expr",
+        "function_call",
+        "member_expr",
+        "array_access",
+        "cast_expr",
+        "ternary_expr",
+        "array_init",
+        "struct_init",
+        "primitive_type",
+        "array_type",
+        "pointer_type",
+        "struct_type",
+        "function_type",
+        "type_ref"
+      ]
+    },
+    "BinaryOperator": {
+      "type": "string",
+      "enum": [
+        "+", "-", "*", "/", "%",
+        "==", "!=", "<", "<=", ">", ">=",
+        "&&", "||",
+        "&", "|", "^", "<<", ">>",
+        "="
+      ]
+    },
+    "UnaryOperator": {
+      "type": "string",
+      "enum": [
+        "-", "!", "~", "++", "--", "*", "&"
+      ]
+    },
+    "StorageClass": {
+      "type": "string",
+      "enum": ["auto", "static", "extern", "register", "stack", "heap", "global"]
+    },
+    "Visibility": {
+      "type": "string",
+      "enum": ["public", "private", "protected", "internal"]
+    },
+    "Mutability": {
+      "type": "string",
+      "enum": ["mutable", "immutable", "const"]
+    },
+    "InlineHint": {
+      "type": "string",
+      "enum": ["always", "never", "hint", "none"]
+    }
+  }
+}

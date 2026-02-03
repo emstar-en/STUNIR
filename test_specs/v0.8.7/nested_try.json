@@ -1,0 +1,45 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "nested_exception_test",
+  "description": "Test nested try/catch blocks",
+  "functions": [
+    {
+      "name": "test_nested_try",
+      "params": [
+        {"name": "level", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "assign", "target": "result", "value": "0"},
+        {
+          "type": "try",
+          "try": [
+            {
+              "type": "try",
+              "try": [
+                {"type": "assign", "target": "result", "value": "level * 10"}
+              ],
+              "catch": [
+                {
+                  "exception_type": "InnerError",
+                  "body": [
+                    {"type": "throw", "type": "OuterError", "message": "Propagated from inner"}
+                  ]
+                }
+              ]
+            }
+          ],
+          "catch": [
+            {
+              "exception_type": "OuterError",
+              "body": [
+                {"type": "assign", "target": "result", "value": "-100"}
+              ]
+            }
+          ]
+        },
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

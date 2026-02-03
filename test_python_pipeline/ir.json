@@ -1,0 +1,357 @@
+{
+  "docstring": "Database operations example",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "host",
+          "type": "string"
+        },
+        {
+          "name": "port",
+          "type": "i32"
+        }
+      ],
+      "name": "connect",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "conn_id",
+          "type": "i32"
+        },
+        {
+          "name": "query",
+          "type": "string"
+        }
+      ],
+      "name": "execute_query",
+      "return_type": "string",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "conn_id",
+          "type": "i32"
+        }
+      ],
+      "name": "close",
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "func",
+          "type": "function"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "name": "map",
+      "return_type": "list",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "predicate",
+          "type": "function"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "name": "filter",
+      "return_type": "list",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "func",
+          "type": "function"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        },
+        {
+          "name": "initial",
+          "type": "i32"
+        }
+      ],
+      "name": "reduce",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "f32"
+        },
+        {
+          "name": "b",
+          "type": "f32"
+        },
+        {
+          "name": "c",
+          "type": "f32"
+        },
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "vector_add_kernel",
+      "return_type": "void",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "f32"
+        },
+        {
+          "name": "b",
+          "type": "f32"
+        },
+        {
+          "name": "c",
+          "type": "f32"
+        },
+        {
+          "name": "width",
+          "type": "i32"
+        }
+      ],
+      "name": "matrix_mul_kernel",
+      "return_type": "void",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "f64"
+        },
+        {
+          "name": "b",
+          "type": "f64"
+        },
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "matrix_multiply",
+      "return_type": "f64",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "v1",
+          "type": "f64"
+        },
+        {
+          "name": "v2",
+          "type": "f64"
+        },
+        {
+          "name": "len",
+          "type": "i32"
+        }
+      ],
+      "name": "vector_dot_product",
+      "return_type": "f64",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "matrix",
+          "type": "f64"
+        },
+        {
+          "name": "rows",
+          "type": "i32"
+        },
+        {
+          "name": "cols",
+          "type": "i32"
+        }
+      ],
+      "name": "matrix_transpose",
+      "return_type": "f64",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "i32"
+        },
+        {
+          "name": "b",
+          "type": "i32"
+        }
+      ],
+      "docstring": "Add two integers",
+      "name": "add",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "return",
+          "value": "a + b"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        },
+        {
+          "name": "y",
+          "type": "i32"
+        }
+      ],
+      "docstring": "Multiply two integers",
+      "name": "multiply",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "return",
+          "value": "x * y"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "user_id",
+          "type": "i32"
+        }
+      ],
+      "name": "get_user",
+      "return_type": "string",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string"
+        }
+      ],
+      "name": "create_user",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "user_id",
+          "type": "i32"
+        },
+        {
+          "name": "data",
+          "type": "string"
+        }
+      ],
+      "name": "update_user",
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "user_id",
+          "type": "i32"
+        }
+      ],
+      "name": "delete_user",
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "nop"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:41:10.797754Z",
+  "ir_version": "v1",
+  "module_name": "database_example",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

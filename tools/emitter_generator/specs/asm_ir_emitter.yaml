@@ -1,0 +1,74 @@
+# STUNIR Emitter Specification: ASM IR
+# Assembly-level intermediate representations
+
+category: asm_ir
+description: "Assembly IR emitter (LLVM IR, custom IR formats)"
+
+output_types:
+  - llvm_ir
+  - custom_ir
+  - ssa_form
+
+features:
+  - ssa_form
+  - type_system
+  - basic_blocks
+  - phi_nodes
+
+extension: ll
+
+config:
+  IR_Format: "String"
+  Optimization_Level: "Integer"
+  Use_SSA: "Boolean"
+
+config_defaults:
+  IR_Format: "llvm"
+  Optimization_Level: 0
+  Use_SSA: true
+
+type_map:
+  i8: "i8"
+  i16: "i16"
+  i32: "i32"
+  i64: "i64"
+  f32: "float"
+  f64: "double"
+  bool: "i1"
+  ptr: "ptr"
+
+ir_fields:
+  required:
+    - functions
+    - basic_blocks
+  optional:
+    - metadata
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+    - containers
+
+output_format: |
+  LLVM IR format.
+
+example_output: |
+  define i32 @add(i32 %a, i32 %b) {
+  entry:
+    %result = add i32 %a, %b
+    ret i32 %result
+  }
+
+architectures:
+  - any
+
+notes: |
+  - LLVM IR is the primary target
+  - SSA form for optimization
+  - Type-safe operations

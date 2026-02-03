@@ -1,0 +1,26 @@
+{
+  "schema": "stunir.env.allowlist.v1",
+  "platform": "windows",
+  "policy": "STRICT",
+  "variables": {
+    "allowed": [
+      "SystemRoot",
+      "windir",
+      "TEMP",
+      "TMP",
+      "COMSPEC"
+    ],
+    "blocked": [
+      "PATH",
+      "Path",
+      "PYTHONPATH",
+      "CLASSPATH"
+    ],
+    "required": [
+      "STUNIR_TOOL_PYTHON",
+      "STUNIR_TOOL_GIT",
+      "STUNIR_TOOL_BASH"
+    ]
+  },
+  "notes": "PATH is explicitly blocked to prevent tool shadowing. All tools must be injected via absolute paths in STUNIR_TOOL_* variables."
+}

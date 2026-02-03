@@ -1,0 +1,63 @@
+{
+  "schema": "https://stunir.dev/schemas/semantic_ir_v1_schema.json",
+  "metadata": {
+    "category": "gpu",
+    "version": "1.0.0",
+    "gpu_platform": "cuda",
+    "description": "Vector addition CUDA kernel"
+  },
+  "kernels": [
+    {
+      "name": "vector_add",
+      "grid_size": [256, 1, 1],
+      "block_size": [256, 1, 1],
+      "shared_memory": 0
+    }
+  ],
+  "functions": [
+    {
+      "name": "vector_add",
+      "parameters": [
+        {"name": "a", "type": {"name": "f32", "is_pointer": true}},
+        {"name": "b", "type": {"name": "f32", "is_pointer": true}},
+        {"name": "c", "type": {"name": "f32", "is_pointer": true}},
+        {"name": "n", "type": "i32"}
+      ],
+      "return_type": "void",
+      "is_kernel": true,
+      "body": [
+        {
+          "kind": "assignment",
+          "expressions": [
+            {"kind": "variable", "value": "idx"},
+            {"kind": "binary_op", "value": "+", "operands": [
+              {"kind": "variable", "value": "blockIdx.x"},
+              {"kind": "variable", "value": "threadIdx.x"}
+            ]}
+          ]
+        },
+        {
+          "kind": "if",
+          "expressions": [
+            {"kind": "binary_op", "value": "<", "operands": [
+              {"kind": "variable", "value": "idx"},
+              {"kind": "variable", "value": "n"}
+            ]}
+          ],
+          "statements": [
+            {
+              "kind": "assignment",
+              "expressions": [
+                {"kind": "array_access", "array": "c", "index": "idx"},
+                {"kind": "binary_op", "value": "+", "operands": [
+                  {"kind": "array_access", "array": "a", "index": "idx"},
+                  {"kind": "array_access", "array": "b", "index": "idx"}
+                ]}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+/* STUNIR: C emission (raw target) */
+/* module: {{ module_name }} */
+{% if docstring %}/* {{ docstring }} */
+{% endif %}
+
+#include <stdint.h>
+#include <stdbool.h>
+
+/* NOTE: This is a minimal, deterministic stub emitter.
+ * It preserves IR ordering and emits placeholder bodies.
+ */
+
+{% for t in types_render %}/* type: {{ t.name }} */
+typedef struct {{ t.name }} {
+{% for f in t.fields %}  {{ f.c_type }} {{ f.name }};
+{% endfor %}} {{ t.name }};
+
+{% endfor %}{% for fn in functions_render %}/* fn: {{ fn.name }} */
+{{ fn.c_ret }} {{ fn.name }}({{ fn.c_args }}) {
+{% if fn.c_body %}{{ fn.c_body }}
+{% else %}  /* TODO: implement */
+{% if fn.c_ret_void %}  return;
+{% else %}  return {{ fn.c_ret_default }};
+{% endif %}{% endif %}}
+
+{% endfor %}

@@ -1,0 +1,9 @@
+{
+  "patches": "Directory",
+  "skeletons": "Directory",
+  "ir_in_source_integration_notes_v0.md": "File",
+  "polyglot_target_implementation_plan_v0.md": "File",
+  "polyglot_target_implementation_plan_v1.md": "File",
+  "polyglot_targets_matrix.json": "File",
+  "polyglot_targets_matrix_v1.json": "File"
+}

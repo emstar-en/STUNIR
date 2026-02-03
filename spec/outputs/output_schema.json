@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "stunir.output.v1",
+  "title": "STUNIR Output Schema",
+  "description": "Schema for STUNIR pipeline output specifications",
+  "type": "object",
+  "required": ["schema", "input_id", "output_type"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "pattern": "^stunir\\.output\\.v[0-9]+$",
+      "description": "Schema version identifier"
+    },
+    "input_id": {
+      "type": "string",
+      "description": "Reference to source input spec ID"
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 hash of canonical input"
+    },
+    "output_type": {
+      "type": "string",
+      "enum": ["ir", "code", "binary", "receipt", "manifest"],
+      "description": "Type of output artifact"
+    },
+    "target": {
+      "type": "string",
+      "description": "Target language/platform"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      },
+      "description": "Generated artifacts"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "epoch": {"type": "integer"},
+        "tool_version": {"type": "string"},
+        "duration_ms": {"type": "integer"}
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": ["name", "path", "hash"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Artifact name"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path to artifact"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Size in bytes"
+        },
+        "format": {
+          "type": "string",
+          "description": "File format"
+        }
+      }
+    }
+  }
+}

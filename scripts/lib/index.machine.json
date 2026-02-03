@@ -1,0 +1,21 @@
+{
+  "compile.jq": "File",
+  "compile_provenance.sh": "File",
+  "dispatch.sh": "File",
+  "emit_bash.jq": "File",
+  "epoch.sh": "File",
+  "gen_provenance.sh": "File",
+  "gen_receipt.sh": "File",
+  "hash_strict.sh": "File",
+  "import_code.sh": "File",
+  "ir_to_lisp.sh": "File",
+  "ir_to_python.sh": "File",
+  "json_canon.sh": "File",
+  "load_toolchain.sh": "File",
+  "receipt.sh": "File",
+  "spec_to_ir.sh": "File",
+  "spec_to_ir_files.sh": "File",
+  "stunir_core.sh": "File",
+  "stunir_lib.sh": "File",
+  "toolchain.sh": "File"
+}

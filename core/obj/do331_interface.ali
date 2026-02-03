@@ -1,0 +1,218 @@
+V "GNAT Lib v12"
+A -O2
+A -gnatA
+A -g
+A -gnat2012
+A -gnatwa
+A -gnatVa
+A -gnato
+A -fstack-check=specific
+A -g
+A -mtune=generic
+A -march=x86-64
+P ZX
+
+RN
+RV NO_DIRECT_BOOLEAN_OPERATORS
+RV NO_FLOATING_POINT
+RV NO_IMPLICIT_CONDITIONALS
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+
+U do331_interface%b	do331_interface.adb	0143c3f3 NE OO PK
+Z system.fat_flt%s	s-fatflt.ads		s-fatflt.ali
+
+U do331_interface%s	do331_interface.ads	16058631 EE NE OO PK
+W do331_types%s		do331_types.adb		do331_types.ali
+
+D do331_interface.ads	20260130013514 2b19b2d3 do331_interface%s
+D do331_interface.adb	20260130013514 2a5a7120 do331_interface%b
+D do331_types.ads	20260130013444 3d1c34e2 do331_types%s
+D system.ads		20220819080952 a2da961d system%s
+D s-fatflt.ads		20220819080952 11beb392 system.fat_flt%s
+D s-fatgen.ads		20220819080952 d28c6cfe system.fat_gen%s
+G a e
+G c Z s s [transform_configIP do331_interface 41 9 none]
+G c Z s b [initialize_config do331_interface 68 14 none]
+G c Z s b [transform_to_sysml do331_interface 78 14 none]
+G c Z s b [collect_coverage do331_interface 86 14 none]
+G c Z s b [generate_traceability do331_interface 94 14 none]
+G c Z s b [add_model do331_interface 106 14 none]
+G c Z s b [add_coverage_item do331_interface 118 14 none]
+G c Z s b [add_trace_link do331_interface 129 14 none]
+G c Z s b [validate_model_completeness do331_interface 145 13 none]
+G c Z s b [meets_dal_requirements do331_interface 149 13 none]
+G c Z s b [calculate_coverage_percentage do331_interface 154 13 none]
+G c Z s b [finalize_result do331_interface 162 14 none]
+G c Z b b [copy_string do331_interface 13 14 none]
+X 1 do331_interface.ads
+16K9*DO331_Interface 166l5 166e20 2|7b14 295l5 295t20
+22N4*Max_IR_Path_Length 29r49 30r49 73r58
+23N4*Max_Output_Path_Length 33r53 34r53 74r66 90r64
+29I12*IR_Path_Index{positive} 31r38
+30I12*IR_Path_Length{natural} 43r24 2|46r29
+31A12*IR_Path_String{string}<integer> 42r24
+33I12*Output_Path_Index{positive} 35r42
+34I12*Output_Path_Length{natural} 45r24 2|49r28
+35A12*Output_Path_String{string}<integer> 44r24
+41R9*Transform_Config 50e14 52r37 69r24 79r16 95r16 2|35r24 59r16 119r16
+42a7*IR_Path{31A12} 53m7 2|45m35
+43i7*IR_Path_Len{30I12} 54m7 82r24 2|46m14
+44a7*Output_Path{35A12} 55m7 2|48m39 78r29
+45i7*Output_Len{34I12} 56m7 82r51 2|49m14 78r51
+46e7*DAL{3|16E9} 57m7 75r24 2|51m14 65r28
+47b7*Include_Cov{boolean} 58m7 2|90r17
+48b7*Include_Trace{boolean} 59m7 98r24
+49b7*Generate_XMI{boolean} 60m7
+52r4*Null_Transform_Config{41R9} 2|43r17
+68U14*Initialize_Config 69<7 70>7 71>7 72>7 2|34b14 52l8 52t25
+69r7 Config{41R9} 75r17 2|35b7 43m7 45m28 45r28 46m7 48m32 48r32 49m7 51m7
+70a7 IR_Path{string} 73r17 73r40 2|36b7 45r19
+71a7 Output_Path{string} 74r17 74r44 2|37b7 48r19
+72e7 DAL{3|16E9} 75r30 2|38b7 51r21
+78U14*Transform_To_SysML 79>7 80<7 81<7 2|58b14 96l8 96t26
+79r7 Config{41R9} 82r17 82r44 2|59b7 65r21 78r22 78r44 90r10
+80r7 Result{3|116R9} 83r43 2|60b7 64m7 65m7 85m10 86m10 91m10 94m7
+81e7 Status{3|142E9} 83r21 2|61b7 95m7
+86U14*Collect_Coverage 87>7 88=7 89<7 2|102b14 112l8 112t24
+87a7 Model_Path{string} 90r17 90r43 2|103b7 107r28
+88r7 Result{3|116R9} 91r43 2|104b7 110m7
+89e7 Status{3|142E9} 91r21 2|105b7 111m7
+94U14*Generate_Traceability 95>7 96=7 97<7 2|118b14 140l8 140t29
+95r7 Config{41R9} 98r17 2|119b7 123r28
+96r7 Result{3|116R9} 99r43 2|120b7 137m7 138m7
+97e7 Status{3|142E9} 99r21 2|121b7 139m7
+106U14*Add_Model 107=7 108>7 109>7 110>7 111<7 2|146b14 168l8 168t17
+107r7 Result{3|116R9} 114r17 115r43 115r64 2|147b7 165m7 165r29 166m7 166r21
+108a7 Name{string} 112r17 112r37 2|148b7 156r19
+109a7 Path{string} 113r17 113r37 2|149b7 159r19
+110e7 Kind{3|18E9} 2|150b7 162r17
+111e7 Status{3|142E9} 115r21 2|151b7 167m7
+118U14*Add_Coverage_Item 119=7 120>7 121>7 122>7 123<7 2|174b14 193l8 193t25
+119r7 Result{3|116R9} 125r17 126r43 126r67 2|175b7 190m7 190r32 191m7 191r29
+120a7 Element_ID{string} 124r17 124r43 2|176b7 184r19
+121e7 Kind{3|43E9} 2|177b7 186r20
+122b7 Covered{boolean} 2|178b7 187r23 188r29
+123e7 Status{3|142E9} 126r21 2|179b7 192m7
+129U14*Add_Trace_Link 130=7 131>7 132>7 133>7 134<7 2|199b14 221l8 221t22
+130r7 Result{3|116R9} 137r17 138r43 138r64 2|200b7 218m7 218r29 219m7 219r26
+131a7 Source_ID{string} 135r17 135r42 2|201b7 209r19
+132a7 Target_ID{string} 136r17 136r42 2|202b7 212r19
+133e7 Direction{3|64E9} 2|203b7 215r25
+134e7 Status{3|142E9} 138r21 2|204b7 220m7
+145V13*Validate_Model_Completeness{boolean} 146>7 2|227b13 235l8 235t35 292s29
+146r7 Result{3|116R9} 2|228b7 231r14 232r14 233r33 234r17
+149V13*Meets_DAL_Requirements{boolean} 150>7 151>7 2|241b13 258l8 258t30
+150r7 Result{3|116R9} 2|242b7 256r14 257r14
+151e7 DAL{3|16E9} 2|243b7 248r12
+154V13*Calculate_Coverage_Percentage{3|41F12} 155>7 2|264b13 281l8 281t37
+. 291s30
+155r7 Result{3|116R9} 2|265b7 269r10 273r21 275r13 280r53
+162U14*Finalize_Result 163=7 2|287b14 293l8 293t23
+163r7 Result{3|116R9} 164r17 2|288b7 291m7 291r60 292m7 292r57
+X 2 do331_interface.adb
+13U14 Copy_String 13b14 14>7 15<7 16<7 28l8 28t19 45s7 48s7 75s10 78s10 128s7
+. 131s7 156s7 159s7 184s7 209s7 212s7
+14a7 Source{string} 17r33 20r17 21r21 22r38 23r42 23r49 25r16
+15a7 Target{string} 17r16 23m10 23r17 25r37 26m10 26r17
+16i7 Length{natural} 20m7
+21i11 I{integer} 22r33 23r32 23r64
+25i11 I{integer} 26r32
+40i7 IR_Len{natural} 45m44 46r44
+41i7 Out_Len{natural} 48m52 49r47
+71r10 M{3|84R9} 75m37 75r37 76m10 78m64 78r64 79m10 81m10 82m10 83m10 86r30
+72i10 Name_Len{natural} 75m45 76r42
+73i10 Path_Len{natural} 78m72 79r42
+124r7 Link{3|66R9} 128m30 128r30 129m7 131m31 131r31 132m7 134m7 135m7 138r32
+125i7 Src_Len{natural} 128m46 129r44
+125i16 Tgt_Len{natural} 131m47 132r44
+153r7 M{3|84R9} 156m25 156r25 157m7 159m25 159r25 160m7 162m7 163m7 166r44
+154i7 Name_Len{natural} 156m33 157r39
+154i17 Path_Len{natural} 159m33 160r39
+181r7 Item{3|48R9} 184m31 184r31 185m7 186m7 187m7 188m7 191r55
+182i7 ID_Len{natural} 184m48 185r45
+206r7 Link{3|66R9} 209m30 209r30 210m7 212m30 212r30 213m7 215m7 216m7 219r49
+207i7 Src_Len{natural} 209m46 210r44
+207i16 Tgt_Len{natural} 212m46 213r44
+233i23 I{integer} 234r31
+245f7 Min_Coverage{3|41F12} 249m24 250m24 251m24 252m24 253m24 256r37
+267i7 Covered{natural} 274r33 276m13 276r24 280r36
+273i11 I{integer} 274r44 275r35
+X 3 do331_types.ads
+7K9*DO331_Types 1|14w6 14r23 3|151e16
+9N4*Max_Model_Name_Length 1|112r52
+10N4*Max_Model_Path_Length 1|113r52
+11N4*Max_Model_Count 1|114r38
+12N4*Max_Trace_Links 1|137r38
+13N4*Max_Coverage_Items 1|125r41
+14N4*Max_Element_ID_Length 1|124r64 135r62 136r62
+16E9*DAL_Level 1|46r24 72r20 151r16 2|38r20 243r16 3|16e57
+16n23*DAL_A{16E9} 2|249r15
+16n30*DAL_B{16E9} 2|250r15
+16n37*DAL_C{16E9} 1|57r24 2|251r15
+16n44*DAL_D{16E9} 2|252r15
+16n51*DAL_E{16E9} 2|253r15
+18E9*Model_Kind 1|110r16 2|150r16 3|27e5
+19n7*Block_Model{18E9} 2|81r20
+30I12*Model_Name_Length{natural} 2|76r24 157r21
+31A12*Model_Name_String{string}<integer>
+34I12*Model_Path_Length{natural} 2|79r24 160r21
+35A12*Model_Path_String{string}<integer>
+38I12*Element_ID_Length{natural} 2|129r26 132r26 185r27 210r26 213r26
+39A12*Element_ID_String{string}<integer>
+41F12*Percentage_Type{float} 1|155r37 2|245r22 265r37 280r14
+43E9*Coverage_Kind 1|121r20 2|177r20 3|46e5
+48R9*Coverage_Item 2|181r14 3|54e14
+49a7*Element_ID{39A12} 2|184m36
+50i7*Element_Len{38I12} 2|185m12
+51e7*Kind{43E9} 2|186m12
+52b7*Covered{boolean} 2|187m12 275r38
+53i7*Hit_Count{natural} 2|188m12
+56r4*Null_Coverage_Item{48R9} 2|181r31
+64E9*Trace_Direction 1|133r19 2|203r19 3|64e62
+64n29*Forward{64E9} 2|134r25
+66R9*Trace_Link 2|124r14 206r14 3|73e14
+67a7*Source_ID{39A12} 2|128m35 209m35
+68i7*Source_Len{38I12} 2|129m12 210m12
+69a7*Target_ID{39A12} 2|131m36 212m35
+70i7*Target_Len{38I12} 2|132m12 213m12
+71e7*Direction{64E9} 2|134m12 215m12
+72b7*Is_Valid{boolean} 2|135m12 216m12
+75r4*Null_Trace_Link{66R9} 2|124r28 206r28
+84R9*Model_Item 2|71r14 153r11 3|92e14
+85a7*Name{31A12} 2|75m39 156m27
+86i7*Name_Len{30I12} 2|76m12 157m9
+87a7*Path{35A12} 2|78m66 159m27
+88i7*Path_Len{34I12} 2|79m12 160m9
+89e7*Kind{18E9} 2|81m12 162m9
+90i7*Element_Count{natural} 2|82m12
+91b7*Is_Valid{boolean} 2|83m12 163m9 234r34
+94r4*Null_Model_Item{84R9} 2|71r28 153r25
+105I12*Model_Count{natural}
+106A9*Model_Array(84R9)<integer>
+109I12*Trace_Count{natural}
+110A9*Trace_Array(66R9)<integer>
+113I12*Coverage_Count{natural}
+114A9*Coverage_Array(48R9)<integer>
+116R9*DO331_Result 1|80r20 88r27 96r23 107r23 119r27 130r26 146r16 150r16
+. 155r16 163r23 2|60r20 104r27 120r23 147r23 175r27 200r26 228r16 242r16
+. 265r16 288r23 3|127e14
+117a7*Models{106A9} 2|86m17 166m14 234r24
+118i7*Model_Total{105I12} 1|114r24 115r50 115r71 2|85m17 165m14 165r36 166r28
+. 231r21 233r40
+119a7*Coverage_Items{114A9} 2|191m14 275r20
+120i7*Coverage_Total{113I12} 1|91r50 125r24 126r50 126r74 2|190m14 190r39
+. 191r36 269r17 273r28 280r60
+121f7*Coverage_Pct{41F12} 2|91m17 110m14 256r21 291m14
+122a7*Trace_Links{110A9} 2|138m14 219m14
+123i7*Trace_Total{109I12} 1|99r50 137r24 138r50 138r71 2|137m14 218m14 218r36
+. 219r33
+124e7*DAL{16E9} 2|65m14
+125b7*Success{boolean} 1|83r50 2|94m14 232r21 257r21
+126b7*Is_Complete{boolean} 1|164r24 2|292m14
+129r4*Null_DO331_Result{116R9} 2|64r17
+142E9*DO331_Status 1|81r20 89r24 97r20 111r20 123r24 134r23 2|61r20 105r24
+. 121r20 151r20 179r24 204r23 3|145e5
+143n7*Success{142E9} 1|83r30 91r30 99r30 115r30 126r30 138r30 2|95r17 111r17
+. 139r17 167r17 192r17 220r17
+

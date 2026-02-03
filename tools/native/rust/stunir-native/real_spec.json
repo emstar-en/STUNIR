@@ -1,0 +1,1 @@
+{"kind": "spec", "modules": [{"name": "hello", "lang": "python", "source": "print(\"Real Logic Works!\")"}]}

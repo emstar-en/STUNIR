@@ -1,0 +1,82 @@
+{
+  "docstring": "Scientific computing example with matrix operations",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "f64"
+        },
+        {
+          "name": "b",
+          "type": "f64"
+        },
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "matrix_multiply",
+      "return_type": "f64",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'f64', 'init': '0.0'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "v1",
+          "type": "f64"
+        },
+        {
+          "name": "v2",
+          "type": "f64"
+        },
+        {
+          "name": "len",
+          "type": "i32"
+        }
+      ],
+      "name": "vector_dot_product",
+      "return_type": "f64",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'sum', 'var_type': 'f64', 'init': '0.0'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "matrix",
+          "type": "f64"
+        },
+        {
+          "name": "rows",
+          "type": "i32"
+        },
+        {
+          "name": "cols",
+          "type": "i32"
+        }
+      ],
+      "name": "matrix_transpose",
+      "return_type": "f64",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'f64', 'init': '0.0'}",
+          "kind": "var_decl"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:09:55.459553Z",
+  "ir_version": "v1",
+  "module_name": "scientific_example",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

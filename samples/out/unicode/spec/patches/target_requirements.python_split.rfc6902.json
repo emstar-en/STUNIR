@@ -1,0 +1,34 @@
+[
+  {
+    "op": "replace",
+    "path": "/targets/python/required_contracts",
+    "value": []
+  },
+  {
+    "op": "replace",
+    "path": "/targets/python/notes",
+    "value": [
+      "Python source emission baseline (no runtime required for emission).",
+      "Use python_cpython for CPython-backed sample execution."
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/targets/python_cpython",
+    "value": {
+      "notes": [
+        "CPython-backed Python target for sample-input execution.",
+        "Requires python_runtime contract acceptance."
+      ],
+      "optional_contracts": [],
+      "required_contracts": [
+        "python_runtime"
+      ]
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/target_aliases/python3",
+    "value": "python_cpython"
+  }
+]

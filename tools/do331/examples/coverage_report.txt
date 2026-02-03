@@ -1,0 +1,71 @@
+========================================
+STUNIR DO-331 Model Coverage Report
+========================================
+
+SUMMARY
+----------------------------------------
+Total Coverage Points:  26
+Instrumented Points:    26
+Covered Points:         0
+
+COVERAGE BY TYPE
+----------------------------------------
+State Coverage:       7
+Transition Coverage:  6
+Decision Coverage:    5
+MC/DC Coverage:       0
+Entry/Exit Points:    8
+
+DAL COMPLIANCE STATUS
+----------------------------------------
+DAL A: 0/26 (0%) - INCOMPLETE
+DAL B: 0/21 (0%) - INCOMPLETE
+DAL C: 0/21 (0%) - INCOMPLETE
+DAL D: 0/8 (0%) - INCOMPLETE
+DAL E: 0/0 (100%) - PASS
+
+========================================
+Overall Status: NON-COMPLIANT
+========================================
+
+COVERAGE POINTS DETAIL
+----------------------------------------
+
+Entry Points:
+  [CP_ENTRY_checkAltitude] AltitudeMonitor::CheckAltitude - NOT COVERED
+  [CP_ENTRY_getStatus] AltitudeMonitor::GetStatus - NOT COVERED
+
+Exit Points:
+  [CP_EXIT_checkAltitude] AltitudeMonitor::CheckAltitude - NOT COVERED
+  [CP_EXIT_getStatus] AltitudeMonitor::GetStatus - NOT COVERED
+
+Decision Points:
+  [CP_DEC_1_T] AltitudeMonitor::CheckAltitude::if_1 (true) - NOT COVERED
+  [CP_DEC_1_F] AltitudeMonitor::CheckAltitude::if_1 (false) - NOT COVERED
+  [CP_DEC_2_T] AltitudeMonitor::GetStatus::if_1 (true) - NOT COVERED
+  [CP_DEC_2_F] AltitudeMonitor::GetStatus::if_1 (false) - NOT COVERED
+  [CP_DEC_3_T] AltitudeMonitor::GetStatus::if_2 (true) - NOT COVERED
+  [CP_DEC_3_F] AltitudeMonitor::GetStatus::if_2 (false) - NOT COVERED
+
+State Coverage:
+  [CP_STATE_ground] AltitudeMonitor::FlightMode::Ground - NOT COVERED
+  [CP_STATE_takeoff] AltitudeMonitor::FlightMode::Takeoff - NOT COVERED
+  [CP_STATE_climb] AltitudeMonitor::FlightMode::Climb - NOT COVERED
+  [CP_STATE_cruise] AltitudeMonitor::FlightMode::Cruise - NOT COVERED
+  [CP_STATE_descent] AltitudeMonitor::FlightMode::Descent - NOT COVERED
+  [CP_STATE_landing] AltitudeMonitor::FlightMode::Landing - NOT COVERED
+  [CP_STATE_landed] AltitudeMonitor::FlightMode::Landed - NOT COVERED
+
+Transition Coverage:
+  [CP_TRANS_1] Ground -> Takeoff - NOT COVERED
+  [CP_TRANS_2] Takeoff -> Climb - NOT COVERED
+  [CP_TRANS_3] Climb -> Cruise - NOT COVERED
+  [CP_TRANS_4] Cruise -> Descent - NOT COVERED
+  [CP_TRANS_5] Descent -> Landing - NOT COVERED
+  [CP_TRANS_6] Landing -> Landed - NOT COVERED
+
+========================================
+Note: Coverage points are instrumented in the generated SysML 2.0 model.
+Actual coverage data must be collected during model simulation/testing
+using qualified tools.
+========================================

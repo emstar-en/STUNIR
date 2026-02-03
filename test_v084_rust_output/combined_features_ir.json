@@ -1,0 +1,81 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "combined_features_test",
+  "docstring": "Test combined break/continue/switch features - v0.9.0",
+  "types": [],
+  "functions": [
+    {
+      "name": "complex_control_flow",
+      "args": [
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "op": "for",
+          "condition": "i < n",
+          "body": [
+            {
+              "op": "if",
+              "condition": "i > 10",
+              "then_block": [
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "op": "switch",
+              "expr": "i % 3",
+              "cases": [
+                {
+                  "value": 0,
+                  "body": [
+                    {
+                      "op": "assign",
+                      "target": "result",
+                      "value": "result + 1"
+                    },
+                    {
+                      "op": "break"
+                    }
+                  ]
+                },
+                {
+                  "value": 1,
+                  "body": [
+                    {
+                      "op": "continue"
+                    }
+                  ]
+                }
+              ],
+              "default": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "result + 2"
+                }
+              ]
+            }
+          ],
+          "init": "i = 0",
+          "increment": "i = i + 1"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ]
+}

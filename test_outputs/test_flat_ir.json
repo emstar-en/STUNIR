@@ -1,0 +1,125 @@
+{
+  "schema": "stunir_flat_ir_v1",
+  "ir_version": "v1",
+  "module_name": "test_control_flow",
+  "docstring": "Test module for control flow conversion",
+  "generated_at": "2026-01-31T00:00:00Z",
+  "types": [],
+  "functions": [
+    {
+      "name": "test_if_else",
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "if",
+          "condition": "x > 0",
+          "block_start": 1,
+          "block_count": 2,
+          "else_start": 3,
+          "else_count": 1
+        },
+        {
+          "op": "assign",
+          "target": "y",
+          "value": "x + 1"
+        },
+        {
+          "op": "assign",
+          "target": "z",
+          "value": "y * 2"
+        },
+        {
+          "op": "assign",
+          "target": "y",
+          "value": "0"
+        },
+        {
+          "op": "return",
+          "value": "y"
+        }
+      ]
+    },
+    {
+      "name": "test_while",
+      "args": [
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "op": "while",
+          "condition": "i < n",
+          "block_start": 3,
+          "block_count": 2
+        },
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "sum + i"
+        },
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "i + 1"
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "name": "test_for",
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "op": "for",
+          "init": "i = 0",
+          "condition": "i < max",
+          "increment": "i++",
+          "block_start": 2,
+          "block_count": 1
+        },
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "result + i"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ]
+}

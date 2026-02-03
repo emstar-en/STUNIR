@@ -1,0 +1,45 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "level3_nesting_test",
+  "description": "Test suite for v0.7.0 - 3-level nesting (if inside while inside if)",
+  "target": {
+    "architecture": "x86",
+    "format": "c",
+    "standard": "c99"
+  },
+  "functions": [
+    {
+      "name": "test_if_while_if",
+      "description": "Test if inside while inside if (3-level nesting)",
+      "params": [
+        {"name": "n", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "sum", "var_type": "i32", "init": "0"},
+        {"type": "var_decl", "var_name": "i", "var_type": "i32", "init": "0"},
+        {
+          "type": "if",
+          "condition": "n > 0",
+          "then": [
+            {
+              "type": "while",
+              "condition": "i < n",
+              "body": [
+                {
+                  "type": "if",
+                  "condition": "i % 2 == 0",
+                  "then": [
+                    {"type": "assign", "target": "sum", "value": "sum + i"}
+                  ]
+                },
+                {"type": "assign", "target": "i", "value": "i + 1"}
+              ]
+            }
+          ]
+        },
+        {"type": "return", "value": "sum"}
+      ]
+    }
+  ]
+}

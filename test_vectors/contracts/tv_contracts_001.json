@@ -1,0 +1,29 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify Profile 2 contract schema compliance",
+  "expected_hash": "1b7e1324b440813a98753ae92d98327aa53e99d920ac46a5827d7a2b05be99fb",
+  "expected_output": {
+    "profile_valid": true,
+    "schema_compliant": true,
+    "valid": true
+  },
+  "id": "tv_contracts_001",
+  "input": {
+    "contract": {
+      "epoch": 1735500000,
+      "id": "contract_p2_001",
+      "profile": "profile2",
+      "schema": "stunir.contract.profile2.v1",
+      "stages": [
+        "build"
+      ]
+    }
+  },
+  "name": "Profile 2 Contract Structure",
+  "schema": "stunir.test_vector.contracts.v1",
+  "tags": [
+    "unit",
+    "profile2",
+    "contracts"
+  ]
+}

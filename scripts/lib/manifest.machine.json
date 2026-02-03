@@ -1,0 +1,21 @@
+[
+  "compile.jq",
+  "compile_provenance.sh",
+  "dispatch.sh",
+  "emit_bash.jq",
+  "epoch.sh",
+  "gen_provenance.sh",
+  "gen_receipt.sh",
+  "hash_strict.sh",
+  "import_code.sh",
+  "ir_to_lisp.sh",
+  "ir_to_python.sh",
+  "json_canon.sh",
+  "load_toolchain.sh",
+  "receipt.sh",
+  "spec_to_ir.sh",
+  "spec_to_ir_files.sh",
+  "stunir_core.sh",
+  "stunir_lib.sh",
+  "toolchain.sh"
+]

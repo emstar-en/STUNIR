@@ -1,0 +1,82 @@
+{
+  "docstring": "Web API example with REST endpoints",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "user_id",
+          "type": "i32"
+        }
+      ],
+      "name": "get_user",
+      "return_type": "string",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'user_data', 'var_type': 'string', 'init': '\"\"'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string"
+        }
+      ],
+      "name": "create_user",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'new_id', 'var_type': 'i32', 'init': '0'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "user_id",
+          "type": "i32"
+        },
+        {
+          "name": "data",
+          "type": "string"
+        }
+      ],
+      "name": "update_user",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'success', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "user_id",
+          "type": "i32"
+        }
+      ],
+      "name": "delete_user",
+      "return_type": "bool",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'deleted', 'var_type': 'bool', 'init': 'false'}",
+          "kind": "var_decl"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:09:55.843403Z",
+  "ir_version": "v1",
+  "module_name": "web_example",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

@@ -1,0 +1,12 @@
+{
+  "asp": "Directory",
+  "c": "Directory",
+  "datalog": "Directory",
+  "elixir": "Directory",
+  "erlang": "Directory",
+  "go": "Directory",
+  "haskell": "Directory",
+  "minizinc": "Directory",
+  "prolog": "Directory",
+  "rust": "Directory"
+}

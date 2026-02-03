@@ -1,0 +1,36 @@
+{
+  "schema": "https://stunir.dev/schemas/semantic_ir_v1_schema.json",
+  "metadata": {
+    "category": "wasm",
+    "version": "1.0.0",
+    "wasm_version": "mvp",
+    "description": "Simple WebAssembly add function"
+  },
+  "exports": [
+    {
+      "name": "add",
+      "type": "function"
+    }
+  ],
+  "functions": [
+    {
+      "name": "add",
+      "parameters": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "return_type": "i32",
+      "body": [
+        {
+          "kind": "return",
+          "expressions": [
+            {"kind": "binary_op", "value": "+", "operands": [
+              {"kind": "variable", "value": "a"},
+              {"kind": "variable", "value": "b"}
+            ]}
+          ]
+        }
+      ]
+    }
+  ]
+}

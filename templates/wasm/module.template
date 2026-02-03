@@ -1,0 +1,11 @@
+;; STUNIR: wasm emission (raw target) in WAT (.wat)
+;; module: {{ module_name }}
+
+(module
+  (memory (export "memory") 1)
+
+{% for fn in functions_render %}  (func ${{ fn.name }} (export "{{ fn.name }}"){{ fn.wat_params }}{{ fn.wat_results }}
+{% if fn.wat_body %}    {{ fn.wat_body }}
+{% endif %}  )
+
+{% endfor %})

@@ -1,0 +1,17 @@
+{
+  "module": "while_test",
+  "description": "Test while loop",
+  "functions": [
+    {
+      "name": "sum_to_n",
+      "params": [{"name": "n", "type": "i32"}],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "sum", "init": "0"},
+        {"type": "var_decl", "var_name": "i", "init": "0"},
+        {"type": "while", "condition": "i < n", "body": [{"type": "assign", "target": "sum", "value": "sum + i"}, {"type": "assign", "target": "i", "value": "i + 1"}]},
+        {"type": "return", "value": "sum"}
+      ]
+    }
+  ]
+}

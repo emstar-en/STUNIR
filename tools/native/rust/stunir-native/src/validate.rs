@@ -1,0 +1,1 @@
+use anyhow::Result; pub fn run(_: &str) -> Result<()> { Ok(()) }

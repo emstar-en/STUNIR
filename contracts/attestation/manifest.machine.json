@@ -1,0 +1,9 @@
+{
+  "schema": "stunir.manifest.v1",
+  "directory": "contracts/attestation",
+  "files": [
+    "attestation_contract_v1.json",
+    "attestation_pipeline.schema.json"
+  ],
+  "status": "complete"
+}

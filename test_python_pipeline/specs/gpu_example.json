@@ -1,0 +1,32 @@
+{
+  "module": "gpu_example",
+  "description": "GPU computing example with CUDA-style kernels",
+  "functions": [
+    {
+      "name": "vector_add_kernel",
+      "params": [
+        {"name": "a", "type": "f32"},
+        {"name": "b", "type": "f32"},
+        {"name": "c", "type": "f32"},
+        {"name": "n", "type": "i32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "tid", "var_type": "i32", "init": "threadIdx.x"}
+      ]
+    },
+    {
+      "name": "matrix_mul_kernel",
+      "params": [
+        {"name": "a", "type": "f32"},
+        {"name": "b", "type": "f32"},
+        {"name": "c", "type": "f32"},
+        {"name": "width", "type": "i32"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "var_decl", "var_name": "row", "var_type": "i32", "init": "blockIdx.y * blockDim.y + threadIdx.y"}
+      ]
+    }
+  ]
+}

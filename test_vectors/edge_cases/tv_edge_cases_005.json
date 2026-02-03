@@ -1,0 +1,46 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify detection of circular module references",
+  "expected_hash": "7ab806c51632b76764acfb0c0669a9b74c10ebec5bcae474c2fbeb75db3c9030",
+  "expected_output": {
+    "circular_detected": true,
+    "cycle": [
+      "A",
+      "B",
+      "C",
+      "A"
+    ],
+    "error": "Circular dependency detected"
+  },
+  "id": "tv_edge_cases_005",
+  "input": {
+    "modules": [
+      {
+        "imports": [
+          "B"
+        ],
+        "name": "A"
+      },
+      {
+        "imports": [
+          "C"
+        ],
+        "name": "B"
+      },
+      {
+        "imports": [
+          "A"
+        ],
+        "name": "C"
+      }
+    ],
+    "operation": "analyze_dependencies"
+  },
+  "name": "Circular Reference Detection",
+  "schema": "stunir.test_vector.edge_cases.v1",
+  "tags": [
+    "edge_case",
+    "circular",
+    "dependency"
+  ]
+}

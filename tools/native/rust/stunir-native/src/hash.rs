@@ -1,0 +1,1 @@
+pub fn sha256_hex(_: &[u8]) -> String { String::new() }

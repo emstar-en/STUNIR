@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.profile4.pipeline.v1.schema.json",
+  "title": "STUNIR Profile 4 Pipeline Stage Schema",
+  "description": "Schema for Profile 4 strict shell verification pipeline stage",
+  "type": "object",
+  "required": ["stage_id", "profile_contract", "verifier_script", "input_artifacts"],
+  "properties": {
+    "stage_id": {
+      "const": "profile4_verification"
+    },
+    "profile_contract": {
+      "type": "string",
+      "const": "stunir.contract.profile4.v1"
+    },
+    "input_artifacts": {
+      "type": "object",
+      "required": ["root_attestation", "pack_manifest", "ir_manifest", "objects"],
+      "properties": {
+        "root_attestation": {
+          "type": "string"
+        },
+        "pack_manifest": {
+          "type": "string"
+        },
+        "ir_manifest": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        }
+      }
+    },
+    "verifier_script": {
+      "type": "string"
+    },
+    "strict_mode": {
+      "type": "boolean",
+      "default": true
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "exit_code": {"type": "integer"},
+        "verified_count": {"type": "integer"},
+        "manifest_valid": {"type": "boolean"},
+        "extra_files_found": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

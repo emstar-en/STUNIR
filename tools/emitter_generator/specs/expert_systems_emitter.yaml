@@ -1,0 +1,71 @@
+# STUNIR Emitter Specification: Expert Systems
+# Rule-based expert system languages
+
+category: expert_systems
+description: "Expert system rule emitter (CLIPS, Jess, Drools)"
+
+output_types:
+  - clips
+  - jess
+  - drools
+  - rules
+
+features:
+  - forward_chaining
+  - backward_chaining
+  - fact_base
+  - conflict_resolution
+
+extension: clp
+
+config:
+  Engine: "String"
+  Strategy: "String"
+  Use_Templates: "Boolean"
+
+config_defaults:
+  Engine: "clips"
+  Strategy: "depth"
+  Use_Templates: true
+
+type_map:
+  i32: "INTEGER"
+  i64: "INTEGER"
+  f32: "FLOAT"
+  f64: "FLOAT"
+  bool: "SYMBOL"
+  string: "STRING"
+
+ir_fields:
+  required:
+    - rules
+    - facts
+  optional:
+    - templates
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::collections
+  haskell:
+    - text
+
+output_format: |
+  CLIPS rule format.
+
+example_output: |
+  (defrule example
+    (fact (value ?x))
+    =>
+    (assert (result ?x)))
+
+architectures:
+  - any
+
+notes: |
+  - CLIPS is the primary target
+  - Support for template definitions
+  - Fact assertions and retractions

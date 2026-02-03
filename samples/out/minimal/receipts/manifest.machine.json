@@ -1,0 +1,14 @@
+[
+  "README.md",
+  "ir_bundle_manifest.json",
+  "ir_manifest.json",
+  "lisp_portable.json",
+  "lisp_portable_manifest.json",
+  "prov_emit.json",
+  "python_portable.json",
+  "python_portable_manifest.json",
+  "requirements.json",
+  "smt_portable.json",
+  "smt_portable_manifest.json",
+  "spec_ir.json"
+]

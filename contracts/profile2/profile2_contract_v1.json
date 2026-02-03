@@ -1,0 +1,66 @@
+{
+  "schema": "stunir.contract.profile2.v1",
+  "contract_id": "stunir-profile2-binary-verifier-v1",
+  "profile_name": "profile2",
+  "stage_type": "verification",
+  "description": "Portable verifier binary profile (no Python required)",
+  "verification_mode": "binary_portable",
+  "binary_verifier": {
+    "name": "stunir-verify",
+    "implementation_languages": ["go", "rust"],
+    "preferred_language": "rust",
+    "distribution": "single_static_binary"
+  },
+  "capabilities": {
+    "dcbor_decode": true,
+    "sha256_verify": true,
+    "structure_validation": true,
+    "receipt_parsing": true,
+    "dsse_verify": {
+      "supported": true,
+      "required": false
+    },
+    "in_toto_verify": {
+      "supported": true,
+      "required": false
+    }
+  },
+  "verification_targets": {
+    "root_attestation": {
+      "format": "dcbor",
+      "file": "root_attestation.dcbor",
+      "required": true
+    },
+    "ir_manifest": {
+      "format": "json",
+      "file": "receipts/ir_manifest.json",
+      "required": true
+    },
+    "object_store": {
+      "directory": "objects/sha256/",
+      "required": true
+    }
+  },
+  "cli_interface": {
+    "verify_command": "stunir-verify verify",
+    "flags": {
+      "strict": "--strict",
+      "verbose": "--verbose",
+      "json_output": "--output-json"
+    }
+  },
+  "success_criteria": {
+    "exit_code": 0,
+    "all_digests_valid": true,
+    "structure_valid": true
+  },
+  "failure_semantics": {
+    "invalid_dcbor": "hard_fail",
+    "hash_mismatch": "hard_fail",
+    "missing_artifact": "hard_fail"
+  },
+  "references": {
+    "verification_profiles": "docs/verification_profiles.md",
+    "binary_spec": "docs/stunir_verify_binary.md"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "stunir.do330.config_index.v1",
+  "tool_name": "verify_build",
+  "tool_version": "1.0.0",
+  "qualification_date": "2026-01-29",
+  "tql_level": "TQL-4",
+  "baseline_id": "BL-verify_build-1.0.0",
+  "items": [
+    {
+      "item_id": "CI-001",
+      "type": "source_code",
+      "description": "verify_build.py",
+      "version": "1.0.0",
+      "sha256": "placeholder_hash_001"
+    },
+    {
+      "item_id": "CI-002",
+      "type": "document",
+      "description": "TOR.md",
+      "version": "1.0",
+      "sha256": "placeholder_hash_002"
+    },
+    {
+      "item_id": "CI-003",
+      "type": "document",
+      "description": "TQP.md",
+      "version": "1.0",
+      "sha256": "placeholder_hash_003"
+    },
+    {
+      "item_id": "CI-004",
+      "type": "document",
+      "description": "TAS.md",
+      "version": "1.0",
+      "sha256": "placeholder_hash_004"
+    },
+    {
+      "item_id": "CI-005",
+      "type": "test_data",
+      "description": "test_cases.json",
+      "version": "1.0",
+      "sha256": "placeholder_hash_005"
+    }
+  ]
+}

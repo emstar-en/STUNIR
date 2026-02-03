@@ -1,0 +1,8 @@
+{
+  "src": "Directory",
+  "stunir-native": "Directory",
+  "target": "Directory",
+  "Cargo.lock": "File",
+  "Cargo.toml": "File",
+  "build.rs": "File"
+}

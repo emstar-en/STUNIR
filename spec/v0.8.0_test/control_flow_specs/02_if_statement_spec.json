@@ -1,0 +1,17 @@
+{
+  "module": "if_test",
+  "description": "Test if statement",
+  "functions": [
+    {
+      "name": "max",
+      "params": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "if", "condition": "x > y", "then": [{"type": "return", "value": "x"}], "else": [{"type": "return", "value": "y"}]}
+      ]
+    }
+  ]
+}

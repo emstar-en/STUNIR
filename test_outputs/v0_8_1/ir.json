@@ -1,0 +1,103 @@
+{
+  "docstring": "Test spec with single-level control flow for v0.8.1",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "i32"
+        }
+      ],
+      "name": "test_simple_if",
+      "return_type": "i32",
+      "steps": [
+        {
+          "condition": "x > 0",
+          "op": "if",
+          "then_block": []
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "n",
+          "type": "i32"
+        }
+      ],
+      "name": "test_simple_while",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "body": [
+            {
+              "op": "assign",
+              "target": "sum",
+              "value": "sum + i"
+            },
+            {
+              "op": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ],
+          "condition": "i < n",
+          "op": "while"
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "max",
+          "type": "i32"
+        }
+      ],
+      "name": "test_simple_for",
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "product",
+          "value": "1"
+        },
+        {
+          "body": [
+            {
+              "op": "assign",
+              "target": "product",
+              "value": "product * i"
+            }
+          ],
+          "condition": "i < max",
+          "increment": "i = i + 1",
+          "init": "i = 0",
+          "op": "for"
+        },
+        {
+          "op": "return",
+          "value": "product"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T03:05:39.263831Z",
+  "ir_version": "v1",
+  "module_name": "single_level_control_flow_test",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

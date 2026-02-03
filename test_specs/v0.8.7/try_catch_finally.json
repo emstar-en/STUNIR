@@ -1,0 +1,50 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "full_exception_test",
+  "description": "Test complete try/catch/finally handling",
+  "functions": [
+    {
+      "name": "test_full_exception",
+      "params": [
+        {"name": "input", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "assign", "target": "result", "value": "0"},
+        {
+          "type": "try",
+          "try": [
+            {"type": "assign", "target": "result", "value": "input / 2"},
+            {
+              "type": "if",
+              "condition": "input < 0",
+              "then": [
+                {"type": "throw", "type": "ValueError", "message": "Negative input"}
+              ]
+            }
+          ],
+          "catch": [
+            {
+              "exception_type": "ValueError",
+              "var": "err",
+              "body": [
+                {"type": "assign", "target": "result", "value": "-1"}
+              ]
+            },
+            {
+              "exception_type": "*",
+              "var": "e",
+              "body": [
+                {"type": "assign", "target": "result", "value": "-999"}
+              ]
+            }
+          ],
+          "finally": [
+            {"type": "call", "func": "cleanup", "args": []}
+          ]
+        },
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "docstring": "Functional programming example with higher-order functions",
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "func",
+          "type": "function"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "name": "map",
+      "return_type": "list",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'list', 'init': '[]'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "predicate",
+          "type": "function"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "name": "filter",
+      "return_type": "list",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'result', 'var_type': 'list', 'init': '[]'}",
+          "kind": "var_decl"
+        }
+      ]
+    },
+    {
+      "args": [
+        {
+          "name": "func",
+          "type": "function"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        },
+        {
+          "name": "initial",
+          "type": "i32"
+        }
+      ],
+      "name": "reduce",
+      "return_type": "i32",
+      "steps": [
+        {
+          "data": "{'type': 'var_decl', 'var_name': 'accumulator', 'var_type': 'i32', 'init': 'initial'}",
+          "kind": "var_decl"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-01-31T10:09:54.669648Z",
+  "ir_version": "v1",
+  "module_name": "functional_example",
+  "schema": "stunir_ir_v1",
+  "types": []
+}

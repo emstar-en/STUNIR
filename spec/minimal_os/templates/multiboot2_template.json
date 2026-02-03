@@ -1,0 +1,108 @@
+{
+  "$schema": "../schemas/multiboot2_schema.json",
+  "template_name": "multiboot2_template",
+  "version": "1.0.0",
+  "description": "Multiboot2 bootloader header specification template",
+  "target_architectures": ["i386", "x86_64"],
+  "do178c_compliance": "Level A",
+  
+  "multiboot2_config": {
+    "architecture": "i386",
+    "entry_point": "_start",
+    "stack_size": 16384,
+    "syntax": "intel"
+  },
+  
+  "header": {
+    "magic": "0xE85250D6",
+    "architecture": 0,
+    "header_length": "calculated",
+    "checksum": "calculated"
+  },
+  
+  "tags": [
+    {
+      "type": "information_request",
+      "type_id": 1,
+      "flags": 0,
+      "required_tags": [
+        {"tag_type": 6, "name": "memory_map"},
+        {"tag_type": 1, "name": "boot_command_line"},
+        {"tag_type": 2, "name": "boot_loader_name"}
+      ]
+    },
+    {
+      "type": "framebuffer",
+      "type_id": 5,
+      "flags": 0,
+      "enabled": false,
+      "width": 800,
+      "height": 600,
+      "depth": 32
+    },
+    {
+      "type": "module_alignment",
+      "type_id": 6,
+      "flags": 0,
+      "enabled": true
+    },
+    {
+      "type": "end_tag",
+      "type_id": 0,
+      "flags": 0,
+      "size": 8
+    }
+  ],
+  
+  "boot_info_tags": {
+    "comment": "Tags provided by bootloader at runtime",
+    "expected_tags": [
+      {"type": 1, "name": "MULTIBOOT_TAG_TYPE_CMDLINE"},
+      {"type": 2, "name": "MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME"},
+      {"type": 3, "name": "MULTIBOOT_TAG_TYPE_MODULE"},
+      {"type": 4, "name": "MULTIBOOT_TAG_TYPE_BASIC_MEMINFO"},
+      {"type": 5, "name": "MULTIBOOT_TAG_TYPE_BOOTDEV"},
+      {"type": 6, "name": "MULTIBOOT_TAG_TYPE_MMAP"},
+      {"type": 8, "name": "MULTIBOOT_TAG_TYPE_FRAMEBUFFER"},
+      {"type": 9, "name": "MULTIBOOT_TAG_TYPE_ELF_SECTIONS"},
+      {"type": 10, "name": "MULTIBOOT_TAG_TYPE_APM"},
+      {"type": 14, "name": "MULTIBOOT_TAG_TYPE_ACPI_OLD"},
+      {"type": 15, "name": "MULTIBOOT_TAG_TYPE_ACPI_NEW"}
+    ]
+  },
+  
+  "linker_script_template": {
+    "entry_point": "_start",
+    "load_address": "0x100000",
+    "sections": [
+      {
+        "name": ".multiboot2",
+        "address": "0x100000",
+        "flags": "ALLOC"
+      },
+      {
+        "name": ".text",
+        "flags": "ALLOC EXEC"
+      },
+      {
+        "name": ".rodata",
+        "flags": "ALLOC"
+      },
+      {
+        "name": ".data",
+        "flags": "ALLOC WRITE"
+      },
+      {
+        "name": ".bss",
+        "flags": "ALLOC WRITE"
+      }
+    ]
+  },
+  
+  "generation_options": {
+    "emit_header": true,
+    "emit_boot_entry": true,
+    "emit_linker_script": true,
+    "output_format": "nasm"
+  }
+}

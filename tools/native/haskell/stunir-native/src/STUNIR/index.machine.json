@@ -1,0 +1,7 @@
+{
+  "IR": "Directory",
+  "CheckToolchain.hs": "File",
+  "GenProvenance.hs": "File",
+  "Spec.hs": "File",
+  "SpecToIr.hs": "File"
+}

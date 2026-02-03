@@ -1,0 +1,35 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify handling of deeply nested structures",
+  "expected_hash": "f48cbef0ceefb19c00dbdffc5d5ffb7d193fe975b57a9422af2b4a20e2bbfd6a",
+  "expected_output": {
+    "depth_detected": 5,
+    "flattened": true,
+    "within_limit": true
+  },
+  "id": "tv_edge_cases_006",
+  "input": {
+    "max_depth": 10,
+    "operation": "flatten",
+    "spec": {
+      "level1": {
+        "level2": {
+          "level3": {
+            "level4": {
+              "level5": {
+                "value": "deep"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Deep Nesting Handling",
+  "schema": "stunir.test_vector.edge_cases.v1",
+  "tags": [
+    "edge_case",
+    "nesting",
+    "structure"
+  ]
+}

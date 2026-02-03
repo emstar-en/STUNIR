@@ -1,0 +1,66 @@
+{
+  "schema": "https://stunir.dev/schemas/semantic_ir_v1_schema.json",
+  "metadata": {
+    "category": "lisp",
+    "version": "1.0.0",
+    "dialect": "common-lisp",
+    "description": "Simple Common Lisp factorial function"
+  },
+  "packages": [
+    {
+      "name": "factorial-example",
+      "use": ["COMMON-LISP"]
+    }
+  ],
+  "forms": [
+    {
+      "name": "factorial",
+      "params": ["n"],
+      "body": "(if (<= n 1) 1 (* n (factorial (- n 1))))"
+    }
+  ],
+  "macros": [
+    {
+      "name": "while",
+      "params": ["condition", "body"],
+      "expansion": "(loop while condition do body)"
+    }
+  ],
+  "functions": [
+    {
+      "name": "factorial",
+      "parameters": [
+        {"name": "n", "type": "integer"}
+      ],
+      "return_type": "integer",
+      "body": [
+        {
+          "kind": "if",
+          "expressions": [
+            {"kind": "binary_op", "value": "<=", "operands": [
+              {"kind": "variable", "value": "n"},
+              {"kind": "literal", "value": 1}
+            ]}
+          ],
+          "statements": [
+            {"kind": "return", "expressions": [{"kind": "literal", "value": 1}]}
+          ]
+        },
+        {
+          "kind": "return",
+          "expressions": [
+            {"kind": "binary_op", "value": "*", "operands": [
+              {"kind": "variable", "value": "n"},
+              {"kind": "call", "function": "factorial", "args": [
+                {"kind": "binary_op", "value": "-", "operands": [
+                  {"kind": "variable", "value": "n"},
+                  {"kind": "literal", "value": 1}
+                ]}
+              ]}
+            ]}
+          ]
+        }
+      ]
+    }
+  ]
+}

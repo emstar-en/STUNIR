@@ -1,0 +1,33 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "exception_test",
+  "description": "Test basic try/catch exception handling",
+  "functions": [
+    {
+      "name": "test_try_catch",
+      "params": [
+        {"name": "value", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {
+          "type": "try",
+          "try": [
+            {"type": "assign", "target": "result", "value": "value * 2"},
+            {"type": "return", "value": "result"}
+          ],
+          "catch": [
+            {
+              "exception_type": "*",
+              "var": "e",
+              "body": [
+                {"type": "assign", "target": "result", "value": "-1"},
+                {"type": "return", "value": "result"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

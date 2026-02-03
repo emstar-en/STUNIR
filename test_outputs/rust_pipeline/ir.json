@@ -1,0 +1,64 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "mavlink_handler",
+  "docstring": "Simple MAVLink heartbeat message handler",
+  "types": [],
+  "functions": [
+    {
+      "name": "parse_heartbeat",
+      "args": [
+        {
+          "name": "buffer",
+          "type": "byte[]"
+        },
+        {
+          "name": "len",
+          "type": "u8"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "msg_type",
+          "value": "buffer[0]"
+        },
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "name": "send_heartbeat",
+      "args": [
+        {
+          "name": "sys_id",
+          "type": "u8"
+        },
+        {
+          "name": "comp_id",
+          "type": "u8"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "status",
+          "value": "1"
+        },
+        {
+          "op": "return",
+          "value": "status"
+        }
+      ]
+    }
+  ]
+}

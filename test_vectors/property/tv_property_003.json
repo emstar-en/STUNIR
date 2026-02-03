@@ -1,0 +1,37 @@
+{
+  "created_epoch": 1735500000,
+  "description": "Verify deserialize(serialize(x)) == x",
+  "expected_hash": "02351e78cf94898141055560f193b953e4ac67722789e12045bfe37c0e30168d",
+  "expected_output": {
+    "data_preserved": true,
+    "property_holds": true,
+    "roundtrip_successful": true
+  },
+  "id": "tv_property_003",
+  "input": {
+    "data": {
+      "id": "roundtrip_test",
+      "profile": "profile3",
+      "schema": "stunir.spec.v1",
+      "values": [
+        1,
+        2.5,
+        true,
+        "text",
+        null
+      ]
+    },
+    "operations": [
+      "serialize",
+      "deserialize"
+    ],
+    "property": "invertibility"
+  },
+  "name": "Serialize-Deserialize Roundtrip",
+  "schema": "stunir.test_vector.property.v1",
+  "tags": [
+    "property",
+    "invertibility",
+    "roundtrip"
+  ]
+}

@@ -1,0 +1,2 @@
+target: swi-prolog
+rule: parent(X, Y) :- father(X, Y).

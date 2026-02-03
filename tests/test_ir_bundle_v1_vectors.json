@@ -1,0 +1,36 @@
+{
+  "id": "stunir.ir_bundle.v1",
+  "schema": "stunir.test_vectors.v1",
+  "vectors": [
+    {
+      "cir_units": [
+        {
+          "kind": "example",
+          "payload": {
+            "a": 1,
+            "b": [
+              "x",
+              "y"
+            ],
+            "nfc": "é"
+          },
+          "unit_id": "u1"
+        },
+        {
+          "kind": "example",
+          "payload": {
+            "big": 18446744073709551616,
+            "neg": -1
+          },
+          "unit_id": "u2"
+        }
+      ],
+      "expected": {
+        "cir_sha256": "b306796febb00cac2bf5531ea6dd274c443bcadfaf2dc423e41d6f53980beb11",
+        "ir_bundle_bytes_hex": "82737374756e69722e69725f62756e646c652e763182a3646b696e64676578616d706c65677061796c6f6164a361610161628261786179636e666362c3a967756e69745f6964627531a3646b696e64676578616d706c65677061796c6f6164a263626967c249010000000000000000636e65672067756e69745f6964627532",
+        "ir_bundle_sha256": "f09d84977bf1938394478111c7e933e1d2728e3a7da7f2118be2f0bbd56dc0d7"
+      },
+      "name": "sample_01"
+    }
+  ]
+}

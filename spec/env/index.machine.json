@@ -1,0 +1,5 @@
+{
+  "host_env_allowlist.windows.discovery.json": "File",
+  "host_env_allowlist.windows.json": "File",
+  "host_env_allowlist.windows.runtime.json": "File"
+}

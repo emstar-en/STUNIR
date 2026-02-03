@@ -1,0 +1,38 @@
+{
+  "category": "native",
+  "count": 5,
+  "entries": [
+    {
+      "file": "tv_native_001.json",
+      "hash": "7f43b00dde002938531f30f7254251f0cb768a2541adec692300b35212fca900",
+      "id": "tv_native_001",
+      "name": "Haskell Manifest Generation"
+    },
+    {
+      "file": "tv_native_002.json",
+      "hash": "83c021d13f644dd950c5f3d23bd6a42aa7e442b42b0a0a86bef916e637b08e0b",
+      "id": "tv_native_002",
+      "name": "Haskell Provenance Generation"
+    },
+    {
+      "file": "tv_native_003.json",
+      "hash": "125a90b551b9b0eb461a6345cb7b1f3d1fd49405534e615603d2ee4a4fe33e2b",
+      "id": "tv_native_003",
+      "name": "Rust Tool Compilation"
+    },
+    {
+      "file": "tv_native_004.json",
+      "hash": "730e8ab0a08d8050bfe8023eb1fcc4101b123ce15274adb6d912c99da489f80c",
+      "id": "tv_native_004",
+      "name": "Native Tool Version Check"
+    },
+    {
+      "file": "tv_native_005.json",
+      "hash": "72fe0a2552cc67ac9dae889eab6b427810c3152dec5b33f3698f21c0f437d295",
+      "id": "tv_native_005",
+      "name": "Native Tool Determinism"
+    }
+  ],
+  "epoch": 1735500000,
+  "schema": "stunir.test_vectors.native.manifest.v1"
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.profile2.pipeline.v1.schema.json",
+  "title": "STUNIR Profile 2 Pipeline Stage Schema",
+  "description": "Schema for Profile 2 binary verifier pipeline stage",
+  "type": "object",
+  "required": ["stage_id", "profile_contract", "verifier_binary"],
+  "properties": {
+    "stage_id": {
+      "const": "profile2_verification"
+    },
+    "profile_contract": {
+      "type": "string",
+      "const": "stunir.contract.profile2.v1"
+    },
+    "verifier_binary": {
+      "type": "object",
+      "required": ["path", "platform"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to stunir-verify binary"
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["linux-amd64", "linux-arm64", "darwin-amd64", "darwin-arm64", "windows-amd64"]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA256 hash of the verifier binary"
+        }
+      }
+    },
+    "input_artifacts": {
+      "type": "object",
+      "required": ["root_attestation", "objects"],
+      "properties": {
+        "root_attestation": {
+          "type": "string"
+        },
+        "ir_manifest": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        }
+      }
+    },
+    "flags": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "exit_code": {"type": "integer"},
+        "json_report": {"type": "object"},
+        "verified_count": {"type": "integer"}
+      }
+    }
+  }
+}

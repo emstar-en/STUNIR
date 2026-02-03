@@ -1,0 +1,31 @@
+--  STUNIR Phase 4 Test Project File
+--  Copyright (C) 2026 STUNIR Project
+--  SPDX-License-Identifier: Apache-2.0
+
+with "../stunir_phase4.gpr";
+
+project Test_Phase4 is
+
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   for Main use ("test_phase4.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use (
+         "-gnat2012",
+         "-gnatwa",
+         "-g",
+         "-O2"
+      );
+   end Compiler;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-j0", "-g");
+   end Builder;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-E");
+   end Binder;
+
+end Test_Phase4;

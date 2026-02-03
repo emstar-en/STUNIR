@@ -1,0 +1,35 @@
+# STUNIR Phase 3 SPARK Migration Makefile
+# Test Infrastructure Components
+
+.PHONY: all build test prove clean
+
+GPRBUILD = gprbuild
+GNATPROVE = gnatprove
+GPRCLEAN = gprclean
+
+PHASE3_GPR = stunir_phase3.gpr
+TEST_GPR = tests/test_phase3.gpr
+
+all: build test
+
+build:
+	@echo "=== Building Phase 3 Test Infrastructure ==="
+	$(GPRBUILD) -P $(PHASE3_GPR) -p
+	@echo "✅ Phase 3 build complete"
+
+test: build
+	@echo "=== Building and Running Phase 3 Tests ==="
+	$(GPRBUILD) -P $(TEST_GPR) -p
+	./tests/bin/test_phase3
+	@echo "✅ Phase 3 tests complete"
+
+prove:
+	@echo "=== Running SPARK Proofs ==="
+	$(GNATPROVE) -P $(PHASE3_GPR) --level=2 --timeout=60
+	@echo "✅ Phase 3 proofs complete"
+
+clean:
+	$(GPRCLEAN) -P $(PHASE3_GPR) 2>/dev/null || true
+	$(GPRCLEAN) -P $(TEST_GPR) 2>/dev/null || true
+	rm -rf obj lib tests/obj tests/bin
+	@echo "✅ Clean complete"

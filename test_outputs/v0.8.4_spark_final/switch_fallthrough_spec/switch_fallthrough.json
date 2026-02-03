@@ -1,0 +1,46 @@
+{
+  "module": "switch_fallthrough_test",
+  "description": "Test switch/case with fall-through behavior - v0.9.0",
+  "functions": [
+    {
+      "name": "handle_command",
+      "returns": "i32",
+      "params": [
+        {"name": "cmd", "type": "i32"}
+      ],
+      "body": [
+        {"type": "assign", "target": "status", "value": "0"},
+        {
+          "type": "switch",
+          "expr": "cmd",
+          "cases": [
+            {
+              "value": 1,
+              "body": [
+                {"type": "assign", "target": "status", "value": "status + 1"}
+              ]
+            },
+            {
+              "value": 2,
+              "body": [
+                {"type": "assign", "target": "status", "value": "status + 10"},
+                {"type": "break"}
+              ]
+            },
+            {
+              "value": 3,
+              "body": [
+                {"type": "assign", "target": "status", "value": "100"},
+                {"type": "break"}
+              ]
+            }
+          ],
+          "default": [
+            {"type": "assign", "target": "status", "value": "-1"}
+          ]
+        },
+        {"type": "return", "value": "status"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "module": "web_example",
+  "description": "Web API example with REST endpoints",
+  "functions": [
+    {
+      "name": "get_user",
+      "params": [
+        {"name": "user_id", "type": "i32"}
+      ],
+      "returns": "string",
+      "body": [
+        {"type": "var_decl", "var_name": "user_data", "var_type": "string", "init": "\"\""}
+      ]
+    },
+    {
+      "name": "create_user",
+      "params": [
+        {"name": "name", "type": "string"},
+        {"name": "email", "type": "string"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "new_id", "var_type": "i32", "init": "0"}
+      ]
+    },
+    {
+      "name": "update_user",
+      "params": [
+        {"name": "user_id", "type": "i32"},
+        {"name": "data", "type": "string"}
+      ],
+      "returns": "bool",
+      "body": [
+        {"type": "var_decl", "var_name": "success", "var_type": "bool", "init": "false"}
+      ]
+    },
+    {
+      "name": "delete_user",
+      "params": [
+        {"name": "user_id", "type": "i32"}
+      ],
+      "returns": "bool",
+      "body": [
+        {"type": "var_decl", "var_name": "deleted", "var_type": "bool", "init": "false"}
+      ]
+    }
+  ]
+}

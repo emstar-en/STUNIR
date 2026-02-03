@@ -1,0 +1,17 @@
+{
+  "patches": "Directory",
+  "targets": "Directory",
+  "README.txt": "File",
+  "README_\u00fcn\u00ef\u00e7\u00f8d\u00e9.txt": "File",
+  "comprehensive-consolidation.rfc6902.json": "File",
+  "core-simple-m_of_n.rfc6902.json": "File",
+  "entity-autonomy-ecc-delta.rfc6902.json": "File",
+  "generalized-provenance-accounting.rfc6902.json": "File",
+  "io-discrete.rfc6902.json": "File",
+  "ld-namespacing.comprehensive.rfc6902.json": "File",
+  "pipeline-to-nld.rfc6902.json": "File",
+  "quorum-arming.rfc6902.json": "File",
+  "robot-safety-stub.rfc6902.json": "File",
+  "schema_fix_catalog.json": "File",
+  "stunir_machine_plan.json": "File"
+}

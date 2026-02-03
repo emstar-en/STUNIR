@@ -1,0 +1,17 @@
+{
+  "design": "Directory",
+  "examples": "Directory",
+  "policy": "Directory",
+  "root": "Directory",
+  "targets": "Directory",
+  "code_emission.md": "File",
+  "dependencies.txt": "File",
+  "ir_bundle_v1.md": "File",
+  "receipt_policy_blurb.txt": "File",
+  "receipt_storage_policy.md": "File",
+  "relayout_report.md": "File",
+  "requirements.txt": "File",
+  "toolchain_contracts.md": "File",
+  "verification.md": "File",
+  "verification_profiles.md": "File"
+}

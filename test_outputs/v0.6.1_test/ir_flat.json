@@ -1,0 +1,290 @@
+{
+  "schema": "stunir_flat_ir_v1",
+  "ir_version": "v1",
+  "module_name": "mavlink_handler",
+  "docstring": "Simple MAVLink heartbeat message handler",
+  "types": [],
+  "functions": [
+    {
+      "name": "parse_heartbeat",
+      "args": [
+        {
+          "name": "buffer",
+          "type": "byte[]"
+        },
+        {
+          "name": "len",
+          "type": "u8"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "msg_type",
+          "value": "buffer[0]"
+        },
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "name": "send_heartbeat",
+      "args": [
+        {
+          "name": "sys_id",
+          "type": "u8"
+        },
+        {
+          "name": "comp_id",
+          "type": "u8"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "status",
+          "value": "1"
+        },
+        {
+          "op": "return",
+          "value": "status"
+        }
+      ]
+    },
+    {
+      "name": "init_mavlink",
+      "args": [
+        {
+          "name": "port",
+          "type": "u16"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "connection_fd",
+          "value": "-1"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "return",
+          "value": "connection_fd"
+        }
+      ]
+    },
+    {
+      "name": "arm_vehicle",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "compid",
+          "type": "u8"
+        }
+      ],
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "success",
+          "value": "false"
+        },
+        {
+          "op": "nop"
+        },
+        {
+          "op": "return",
+          "value": "success"
+        }
+      ]
+    },
+    {
+      "name": "disarm_vehicle",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "compid",
+          "type": "u8"
+        }
+      ],
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "success",
+          "value": "false"
+        },
+        {
+          "op": "return",
+          "value": "success"
+        }
+      ]
+    },
+    {
+      "name": "set_mode",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "mode",
+          "type": "u8"
+        }
+      ],
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "false"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "name": "send_takeoff_cmd",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "altitude",
+          "type": "i32"
+        }
+      ],
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "success",
+          "value": "false"
+        },
+        {
+          "op": "return",
+          "value": "success"
+        }
+      ]
+    },
+    {
+      "name": "send_land_cmd",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        }
+      ],
+      "return_type": "bool",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "success",
+          "value": "false"
+        },
+        {
+          "op": "return",
+          "value": "success"
+        }
+      ]
+    },
+    {
+      "name": "get_position",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        }
+      ],
+      "return_type": "Position",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "pos_lat",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "pos_lon",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "pos_alt",
+          "value": "0"
+        },
+        {
+          "op": "return",
+          "value": "Position{pos_lat, pos_lon, pos_alt}"
+        }
+      ]
+    },
+    {
+      "name": "get_battery_status",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        }
+      ],
+      "return_type": "u8",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "battery_pct",
+          "value": "100"
+        },
+        {
+          "op": "return",
+          "value": "battery_pct"
+        }
+      ]
+    },
+    {
+      "name": "request_heartbeat",
+      "args": [
+        {
+          "name": "sysid",
+          "type": "u8"
+        },
+        {
+          "name": "compid",
+          "type": "u8"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "status",
+          "value": "0"
+        },
+        {
+          "op": "return",
+          "value": "status"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-02-01T01:10:37.027309Z"
+}

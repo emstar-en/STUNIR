@@ -1,0 +1,57 @@
+--  STUNIR Phase 2 SPARK Library
+--  Build System & Configuration
+--  GNAT Project File
+
+with "stunir_core";
+
+project Stunir_Phase2 is
+
+   --  Source directories
+   for Source_Dirs use (
+      "build_system",
+      "config_manager",
+      "dependency_resolver",
+      "toolchain_discovery",
+      "receipt_manager",
+      "epoch_manager"
+   );
+
+   --  Object and library directories
+   for Object_Dir use "obj/phase2";
+   for Library_Dir use "lib";
+   for Library_Name use "stunir_phase2";
+   for Library_Kind use "static";
+
+   --  Ada 2012 with SPARK support
+   for Languages use ("Ada");
+
+   --  Compiler settings
+   package Compiler is
+      for Default_Switches ("Ada") use (
+         "-gnat2012",        --  Ada 2012 standard
+         "-gnata",           --  Enable assertions
+         "-gnatwa",          --  All warnings
+         "-gnatVa",          --  All validity checks
+         "-gnato13",         --  Overflow checks
+         "-gnatf"            --  Full errors
+      );
+   end Compiler;
+
+   --  Binder settings
+   package Binder is
+      for Default_Switches ("Ada") use (
+         "-E"                --  Store tracebacks in exceptions
+      );
+   end Binder;
+
+   --  SPARK Prove settings
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "--level=2",        --  Medium proof effort
+         "--timeout=60",     --  60 seconds per VC
+         "--prover=all",     --  Use all available provers
+         "--warnings=error"  --  Treat warnings as errors
+      );
+   end Prove;
+
+end Stunir_Phase2;

@@ -1,0 +1,50 @@
+{
+  "category": "property",
+  "count": 7,
+  "entries": [
+    {
+      "file": "tv_property_001.json",
+      "hash": "29b34ab6cdeb6b7aaf3ae1da169bcb008b9b89041c66efb5b4fddc68ea574ee1",
+      "id": "tv_property_001",
+      "name": "Canonicalization Idempotence"
+    },
+    {
+      "file": "tv_property_002.json",
+      "hash": "069035cdc03f2a4b4b7523907e4e65e99bf61358ea61e3925d7a99fc2cb7ba94",
+      "id": "tv_property_002",
+      "name": "Hash Order Independence"
+    },
+    {
+      "file": "tv_property_003.json",
+      "hash": "6a8b76d0e121c8cd9975521e33d89442b79f654ff81727fe690f28b4462b12ad",
+      "id": "tv_property_003",
+      "name": "Serialize-Deserialize Roundtrip"
+    },
+    {
+      "file": "tv_property_004.json",
+      "hash": "6279d399cea64451f5c5c0d11218f2b50b83c789cfc5d9a16e350b7bcb45fcd1",
+      "id": "tv_property_004",
+      "name": "Epoch Monotonicity"
+    },
+    {
+      "file": "tv_property_005.json",
+      "hash": "5b17aa06d9008a540754fbcc1bae266f740d6e6b2215f0757e908ce92b9854e1",
+      "id": "tv_property_005",
+      "name": "Dependency Transitivity"
+    },
+    {
+      "file": "tv_property_006.json",
+      "hash": "4e0991c3670fcf9b695252f21ce181236432c488f9362fcc1422ddb8aaaee5fb",
+      "id": "tv_property_006",
+      "name": "Pipeline Determinism"
+    },
+    {
+      "file": "tv_property_007.json",
+      "hash": "ccd3a0bf544d52f2990e0a19791f76b8c162aaf747d1cd8dee6e15b81744554e",
+      "id": "tv_property_007",
+      "name": "Manifest Merge Associativity"
+    }
+  ],
+  "epoch": 1735500000,
+  "schema": "stunir.test_vectors.property.manifest.v1"
+}

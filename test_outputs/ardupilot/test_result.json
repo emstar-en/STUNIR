@@ -1,0 +1,24 @@
+{
+  "test_id": "ardupilot_test",
+  "status": "completed",
+  "runtime": "python",
+  "is_primary_implementation": false,
+  "steps": [
+    {
+      "step": "create_spec",
+      "status": "success",
+      "file": "/home/ubuntu/stunir_repo/spec/ardupilot_test/mavlink_handler.json"
+    },
+    {
+      "step": "generate_ir",
+      "status": "success",
+      "runtime": "python"
+    },
+    {
+      "step": "emit_embedded_c",
+      "status": "success",
+      "runtime": "python"
+    }
+  ],
+  "warning": "Test ran with Python REFERENCE implementation. For production, use Ada SPARK."
+}

@@ -1,0 +1,95 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "switch_simple_test",
+  "docstring": "Test simple switch/case statement - v0.9.0",
+  "types": [],
+  "functions": [
+    {
+      "name": "get_day_type",
+      "args": [
+        {
+          "name": "day",
+          "type": "i32"
+        }
+      ],
+      "return_type": "i32",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "0"
+        },
+        {
+          "op": "switch",
+          "expr": "day",
+          "cases": [
+            {
+              "value": 1,
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "1"
+                },
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "value": 2,
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "1"
+                },
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "value": 6,
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "2"
+                },
+                {
+                  "op": "break"
+                }
+              ]
+            },
+            {
+              "value": 7,
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "2"
+                },
+                {
+                  "op": "break"
+                }
+              ]
+            }
+          ],
+          "default": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ]
+}

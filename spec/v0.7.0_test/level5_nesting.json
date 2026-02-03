@@ -1,0 +1,61 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "level5_nesting_test",
+  "description": "Test suite for v0.7.0 - 5-level nesting (maximum depth)",
+  "target": {
+    "architecture": "x86",
+    "format": "c",
+    "standard": "c99"
+  },
+  "functions": [
+    {
+      "name": "test_5level_max_depth",
+      "description": "Test 5-level nested control flow (maximum allowed depth)",
+      "params": [
+        {"name": "n", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "i32", "init": "0"},
+        {
+          "type": "if",
+          "condition": "n > 0",
+          "then": [
+            {
+              "type": "while",
+              "condition": "n > 0",
+              "body": [
+                {
+                  "type": "if",
+                  "condition": "n % 2 == 0",
+                  "then": [
+                    {
+                      "type": "for",
+                      "init": "int i = 0",
+                      "condition": "i < 5",
+                      "increment": "i++",
+                      "body": [
+                        {
+                          "type": "if",
+                          "condition": "i > 2",
+                          "then": [
+                            {"type": "assign", "target": "result", "value": "result + i"}
+                          ],
+                          "else": [
+                            {"type": "assign", "target": "result", "value": "result - i"}
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {"type": "assign", "target": "n", "value": "n - 1"}
+              ]
+            }
+          ]
+        },
+        {"type": "return", "value": "result"}
+      ]
+    }
+  ]
+}

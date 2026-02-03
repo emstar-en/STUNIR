@@ -1,0 +1,273 @@
+[
+  {
+    "op": "add",
+    "path": "/targets/c89",
+    "value": {
+      "notes": [
+        "c89 source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Variant is selected by language standard level."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/c99",
+    "value": {
+      "notes": [
+        "c99 source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Variant is selected by language standard level."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/c11",
+    "value": {
+      "notes": [
+        "c11 source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Variant is selected by language standard level."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/c17",
+    "value": {
+      "notes": [
+        "c17 source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Variant is selected by language standard level."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/c23",
+    "value": {
+      "notes": [
+        "c23 source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Variant is selected by language standard level."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/rust",
+    "value": {
+      "notes": [
+        "rust source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Baseline is Rust 2021 edition."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/go",
+    "value": {
+      "notes": [
+        "go source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Baseline is a Go module layout."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/haskell",
+    "value": {
+      "notes": [
+        "haskell source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Baseline is a Cabal project layout."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/erlang",
+    "value": {
+      "notes": [
+        "erlang source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Baseline is an Erlang/Rebar3 project layout."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/elixir",
+    "value": {
+      "notes": [
+        "elixir source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Baseline is an Elixir/Mix project layout."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/prolog",
+    "value": {
+      "notes": [
+        "prolog source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "ISO-leaning baseline; dialect-specific variants may be added later."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/datalog",
+    "value": {
+      "notes": [
+        "datalog source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "Souffl\u00e9-flavored baseline; engine-specific variants may be added later."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/asp",
+    "value": {
+      "notes": [
+        "asp source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "clingo-flavored baseline; solver-specific variants may be added later."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/targets/minizinc",
+    "value": {
+      "notes": [
+        "minizinc source-emission target (v0 planning).",
+        "Required contracts: none (source emission only).",
+        "Compiled/runtime/solver execution is out of scope for v0.",
+        "MiniZinc model emission only; solver selection is out of scope for v0."
+      ],
+      "optional_contracts": [],
+      "required_contracts": []
+    }
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/c",
+    "value": "c11"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/ansi_c",
+    "value": "c89"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/c90",
+    "value": "c89"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/c1999",
+    "value": "c99"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/c2011",
+    "value": "c11"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/c2017",
+    "value": "c17"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/c2023",
+    "value": "c23"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/rs",
+    "value": "rust"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/golang",
+    "value": "go"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/hs",
+    "value": "haskell"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/erl",
+    "value": "erlang"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/ex",
+    "value": "elixir"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/pl",
+    "value": "prolog"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/dl",
+    "value": "datalog"
+  },
+  {
+    "op": "add",
+    "path": "/target_aliases/mzn",
+    "value": "minizinc"
+  }
+]

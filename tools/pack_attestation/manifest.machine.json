@@ -1,0 +1,5 @@
+[
+  "Attestation.hs",
+  "generate_root.sh",
+  "pack-attestation.cabal"
+]

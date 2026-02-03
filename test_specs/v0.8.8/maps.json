@@ -1,0 +1,39 @@
+{
+  "module": "maps_test",
+  "description": "v0.8.8 Map/dictionary operations test",
+  "types": [
+    {
+      "name": "Config",
+      "fields": [
+        {"name": "settings", "type": {"kind": "map", "key_type": "string", "value_type": "i32"}}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "test_map_operations",
+      "params": [],
+      "returns": "i32",
+      "body": [
+        {"type": "map_new", "target": "config", "key_type": "string", "value_type": "i32"},
+        {"type": "map_set", "target": "config", "key": "timeout", "value": "30"},
+        {"type": "map_set", "target": "config", "key": "retry", "value": "3"},
+        {"type": "map_get", "target": "val", "source": "config", "key": "timeout"},
+        {"type": "map_has", "target": "exists", "source": "config", "key": "missing"},
+        {"type": "map_delete", "target": "config", "key": "retry"},
+        {"type": "return", "value": "val"}
+      ]
+    },
+    {
+      "name": "test_map_keys",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "map_new", "target": "m", "key_type": "string", "value_type": "i32"},
+        {"type": "map_set", "target": "m", "key": "a", "value": "1"},
+        {"type": "map_set", "target": "m", "key": "b", "value": "2"},
+        {"type": "map_keys", "target": "keys", "source": "m"}
+      ]
+    }
+  ]
+}

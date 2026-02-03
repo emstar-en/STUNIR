@@ -1,0 +1,5 @@
+{
+  "build_integration.machine.json": "Issue native/haskell/1201 [Deps: ]",
+  "error_handling.machine.json": "Issue native/haskell/1203 [Deps: ]",
+  "compiler_determinism.machine.json": "Issue native/haskell/1204 [Deps: ]"
+}

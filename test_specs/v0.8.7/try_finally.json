@@ -1,0 +1,25 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "finally_test",
+  "description": "Test try/finally without catch",
+  "functions": [
+    {
+      "name": "test_try_finally",
+      "params": [
+        {"name": "resource", "type": "i32"}
+      ],
+      "returns": "void",
+      "body": [
+        {
+          "type": "try",
+          "try": [
+            {"type": "call", "func": "use_resource", "args": ["resource"]}
+          ],
+          "finally": [
+            {"type": "call", "func": "release_resource", "args": ["resource"]}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,614 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "imu_health_monitor",
+  "version": "1.0.0",
+  "certification": {
+    "standard": "DO-178C",
+    "level": "A",
+    "dal": "DAL_A",
+    "catastrophic_failure_condition": true
+  },
+  "description": "Safety-critical IMU Health Monitor for Ardupilot flight controllers. Monitors accelerometer and gyroscope sensors for anomalies, performs cross-validation between redundant sensors, and triggers failsafe conditions when sensor health degrades below acceptable thresholds.",
+  "target": {
+    "architecture": "ARM_Cortex_M4",
+    "processor": "STM32F427",
+    "clock_mhz": 168,
+    "fpu": true,
+    "memory": {
+      "flash_kb": 2048,
+      "ram_kb": 256,
+      "stack_size_bytes": 4096,
+      "heap_prohibited": true
+    }
+  },
+  "timing_constraints": {
+    "max_execution_time_us": 100,
+    "update_rate_hz": 400,
+    "deadline_us": 2500,
+    "wcet_margin_percent": 20,
+    "deterministic": true
+  },
+  "safety_properties": {
+    "no_dynamic_allocation": true,
+    "no_recursion": true,
+    "bounded_loops": true,
+    "max_loop_iterations": 6,
+    "no_floating_point_comparison": true,
+    "integer_overflow_checks": true,
+    "division_by_zero_checks": true,
+    "array_bounds_checks": true
+  },
+  "constants": [
+    {
+      "name": "MAX_IMU_COUNT",
+      "type": "u8",
+      "value": 3,
+      "description": "Maximum number of redundant IMU sensors"
+    },
+    {
+      "name": "ACCEL_HEALTHY_THRESHOLD",
+      "type": "i32",
+      "value": 100,
+      "description": "Accelerometer variance threshold (mm/s^2)^2 scaled x1000"
+    },
+    {
+      "name": "GYRO_HEALTHY_THRESHOLD",
+      "type": "i32",
+      "value": 50,
+      "description": "Gyroscope variance threshold (mrad/s)^2 scaled x1000"
+    },
+    {
+      "name": "CROSS_VALIDATION_TOLERANCE",
+      "type": "i32",
+      "value": 200,
+      "description": "Maximum acceptable difference between redundant sensors"
+    },
+    {
+      "name": "HEALTH_HISTORY_SIZE",
+      "type": "u8",
+      "value": 8,
+      "description": "Number of samples in health history buffer"
+    },
+    {
+      "name": "MIN_HEALTHY_SAMPLES",
+      "type": "u8",
+      "value": 6,
+      "description": "Minimum healthy samples required in history"
+    },
+    {
+      "name": "FAILSAFE_TRIGGER_COUNT",
+      "type": "u8",
+      "value": 3,
+      "description": "Consecutive failures before failsafe activation"
+    },
+    {
+      "name": "GRAVITY_MAGNITUDE",
+      "type": "i32",
+      "value": 9810,
+      "description": "Expected gravity magnitude (mm/s^2)"
+    },
+    {
+      "name": "GRAVITY_TOLERANCE",
+      "type": "i32",
+      "value": 500,
+      "description": "Acceptable gravity deviation (mm/s^2)"
+    }
+  ],
+  "types": [
+    {
+      "name": "IMU_Status",
+      "kind": "enum",
+      "values": ["HEALTHY", "DEGRADED", "FAILED", "UNCALIBRATED", "NOT_PRESENT"]
+    },
+    {
+      "name": "Failsafe_Action",
+      "kind": "enum",
+      "values": ["NONE", "WARN", "SWITCH_IMU", "LAND_IMMEDIATELY", "TERMINATE"]
+    },
+    {
+      "name": "Axis",
+      "kind": "enum",
+      "values": ["X", "Y", "Z"]
+    },
+    {
+      "name": "Vector3_I32",
+      "kind": "struct",
+      "fields": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"},
+        {"name": "z", "type": "i32"}
+      ]
+    },
+    {
+      "name": "IMU_Reading",
+      "kind": "struct",
+      "fields": [
+        {"name": "accel", "type": "Vector3_I32"},
+        {"name": "gyro", "type": "Vector3_I32"},
+        {"name": "timestamp_us", "type": "u32"},
+        {"name": "valid", "type": "bool"}
+      ]
+    },
+    {
+      "name": "IMU_Health_State",
+      "kind": "struct",
+      "fields": [
+        {"name": "status", "type": "IMU_Status"},
+        {"name": "accel_variance", "type": "i32"},
+        {"name": "gyro_variance", "type": "i32"},
+        {"name": "consecutive_failures", "type": "u8"},
+        {"name": "health_history", "type": "u8[8]"},
+        {"name": "history_index", "type": "u8"},
+        {"name": "last_update_us", "type": "u32"}
+      ]
+    },
+    {
+      "name": "Monitor_State",
+      "kind": "struct",
+      "fields": [
+        {"name": "imu_health", "type": "IMU_Health_State[3]"},
+        {"name": "primary_imu", "type": "u8"},
+        {"name": "active_imu_count", "type": "u8"},
+        {"name": "system_healthy", "type": "bool"},
+        {"name": "failsafe_active", "type": "bool"},
+        {"name": "pending_action", "type": "Failsafe_Action"},
+        {"name": "total_cycles", "type": "u32"},
+        {"name": "error_count", "type": "u32"}
+      ]
+    },
+    {
+      "name": "Diagnostic_Report",
+      "kind": "struct",
+      "fields": [
+        {"name": "imu_index", "type": "u8"},
+        {"name": "status", "type": "IMU_Status"},
+        {"name": "accel_magnitude", "type": "i32"},
+        {"name": "gyro_magnitude", "type": "i32"},
+        {"name": "deviation_from_primary", "type": "i32"},
+        {"name": "uptime_us", "type": "u32"}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "imu_monitor_init",
+      "description": "Initialize IMU health monitor state. Must be called once before first update.",
+      "params": [
+        {"name": "state", "type": "Monitor_State*", "direction": "out"}
+      ],
+      "returns": "i32",
+      "timing": {"wcet_us": 15},
+      "preconditions": ["state != NULL"],
+      "postconditions": [
+        "state->primary_imu == 0",
+        "state->active_imu_count == 0",
+        "state->system_healthy == false",
+        "state->failsafe_active == false"
+      ],
+      "body": [
+        {"type": "comment", "text": "Initialize all IMU health states to NOT_PRESENT"},
+        {
+          "type": "for_bounded",
+          "var": "i",
+          "start": 0,
+          "end": "MAX_IMU_COUNT",
+          "body": [
+            {"type": "assign", "target": "state->imu_health[i].status", "value": "NOT_PRESENT"},
+            {"type": "assign", "target": "state->imu_health[i].accel_variance", "value": "0"},
+            {"type": "assign", "target": "state->imu_health[i].gyro_variance", "value": "0"},
+            {"type": "assign", "target": "state->imu_health[i].consecutive_failures", "value": "0"},
+            {"type": "assign", "target": "state->imu_health[i].history_index", "value": "0"},
+            {
+              "type": "for_bounded",
+              "var": "j",
+              "start": 0,
+              "end": "HEALTH_HISTORY_SIZE",
+              "body": [
+                {"type": "assign", "target": "state->imu_health[i].health_history[j]", "value": "0"}
+              ]
+            }
+          ]
+        },
+        {"type": "assign", "target": "state->primary_imu", "value": "0"},
+        {"type": "assign", "target": "state->active_imu_count", "value": "0"},
+        {"type": "assign", "target": "state->system_healthy", "value": "false"},
+        {"type": "assign", "target": "state->failsafe_active", "value": "false"},
+        {"type": "assign", "target": "state->pending_action", "value": "NONE"},
+        {"type": "assign", "target": "state->total_cycles", "value": "0"},
+        {"type": "assign", "target": "state->error_count", "value": "0"},
+        {"type": "return", "value": "0"}
+      ]
+    },
+    {
+      "name": "compute_magnitude_squared",
+      "description": "Compute squared magnitude of 3D vector. Uses fixed-point to avoid sqrt.",
+      "params": [
+        {"name": "vec", "type": "Vector3_I32*", "direction": "in"}
+      ],
+      "returns": "i32",
+      "timing": {"wcet_us": 5},
+      "preconditions": ["vec != NULL"],
+      "postconditions": ["result >= 0"],
+      "safety_notes": "Uses 64-bit intermediate to prevent overflow",
+      "body": [
+        {"type": "var_decl", "var_name": "x64", "var_type": "i64", "init": "vec->x"},
+        {"type": "var_decl", "var_name": "y64", "var_type": "i64", "init": "vec->y"},
+        {"type": "var_decl", "var_name": "z64", "var_type": "i64", "init": "vec->z"},
+        {"type": "var_decl", "var_name": "sum", "var_type": "i64", "init": "x64*x64 + y64*y64 + z64*z64"},
+        {"type": "comment", "text": "Scale down to prevent i32 overflow"},
+        {"type": "var_decl", "var_name": "result", "var_type": "i32", "init": "(i32)(sum / 1000)"},
+        {"type": "if", "condition": "result < 0", "then": [
+          {"type": "assign", "target": "result", "value": "INT32_MAX"}
+        ]},
+        {"type": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "validate_accel_reading",
+      "description": "Validate accelerometer reading against gravity check and range limits.",
+      "params": [
+        {"name": "reading", "type": "IMU_Reading*", "direction": "in"}
+      ],
+      "returns": "bool",
+      "timing": {"wcet_us": 8},
+      "preconditions": ["reading != NULL"],
+      "body": [
+        {"type": "if", "condition": "!reading->valid", "then": [
+          {"type": "return", "value": "false"}
+        ]},
+        {"type": "var_decl", "var_name": "mag_sq", "var_type": "i32", "init": "compute_magnitude_squared(&reading->accel)"},
+        {"type": "comment", "text": "Check if magnitude is near expected gravity (scaled)"},
+        {"type": "var_decl", "var_name": "expected_sq", "var_type": "i32", "init": "(GRAVITY_MAGNITUDE * GRAVITY_MAGNITUDE) / 1000"},
+        {"type": "var_decl", "var_name": "diff", "var_type": "i32", "init": "0"},
+        {"type": "if", "condition": "mag_sq > expected_sq", "then": [
+          {"type": "assign", "target": "diff", "value": "mag_sq - expected_sq"}
+        ], "else": [
+          {"type": "assign", "target": "diff", "value": "expected_sq - mag_sq"}
+        ]},
+        {"type": "var_decl", "var_name": "tolerance_sq", "var_type": "i32", "init": "(GRAVITY_TOLERANCE * GRAVITY_TOLERANCE) / 1000"},
+        {"type": "return", "value": "diff <= tolerance_sq"}
+      ]
+    },
+    {
+      "name": "validate_gyro_reading",
+      "description": "Validate gyroscope reading against bias and noise limits.",
+      "params": [
+        {"name": "reading", "type": "IMU_Reading*", "direction": "in"}
+      ],
+      "returns": "bool",
+      "timing": {"wcet_us": 6},
+      "preconditions": ["reading != NULL"],
+      "body": [
+        {"type": "if", "condition": "!reading->valid", "then": [
+          {"type": "return", "value": "false"}
+        ]},
+        {"type": "var_decl", "var_name": "mag_sq", "var_type": "i32", "init": "compute_magnitude_squared(&reading->gyro)"},
+        {"type": "comment", "text": "At rest, gyro should be near zero with small noise"},
+        {"type": "var_decl", "var_name": "max_stationary", "var_type": "i32", "init": "GYRO_HEALTHY_THRESHOLD * 100"},
+        {"type": "return", "value": "mag_sq <= max_stationary"}
+      ]
+    },
+    {
+      "name": "cross_validate_imus",
+      "description": "Cross-validate readings between two IMU sensors.",
+      "params": [
+        {"name": "reading1", "type": "IMU_Reading*", "direction": "in"},
+        {"name": "reading2", "type": "IMU_Reading*", "direction": "in"}
+      ],
+      "returns": "i32",
+      "timing": {"wcet_us": 12},
+      "preconditions": ["reading1 != NULL", "reading2 != NULL"],
+      "postconditions": ["result >= 0"],
+      "body": [
+        {"type": "if", "condition": "!reading1->valid || !reading2->valid", "then": [
+          {"type": "return", "value": "INT32_MAX"}
+        ]},
+        {"type": "var_decl", "var_name": "diff_x", "var_type": "i32", "init": "reading1->accel.x - reading2->accel.x"},
+        {"type": "var_decl", "var_name": "diff_y", "var_type": "i32", "init": "reading1->accel.y - reading2->accel.y"},
+        {"type": "var_decl", "var_name": "diff_z", "var_type": "i32", "init": "reading1->accel.z - reading2->accel.z"},
+        {"type": "if", "condition": "diff_x < 0", "then": [{"type": "assign", "target": "diff_x", "value": "-diff_x"}]},
+        {"type": "if", "condition": "diff_y < 0", "then": [{"type": "assign", "target": "diff_y", "value": "-diff_y"}]},
+        {"type": "if", "condition": "diff_z < 0", "then": [{"type": "assign", "target": "diff_z", "value": "-diff_z"}]},
+        {"type": "var_decl", "var_name": "total_diff", "var_type": "i32", "init": "diff_x + diff_y + diff_z"},
+        {"type": "return", "value": "total_diff"}
+      ]
+    },
+    {
+      "name": "update_health_history",
+      "description": "Update circular health history buffer for an IMU.",
+      "params": [
+        {"name": "health", "type": "IMU_Health_State*", "direction": "inout"},
+        {"name": "healthy", "type": "bool", "direction": "in"}
+      ],
+      "returns": "void",
+      "timing": {"wcet_us": 4},
+      "preconditions": ["health != NULL"],
+      "body": [
+        {"type": "assign", "target": "health->health_history[health->history_index]", "value": "healthy ? 1 : 0"},
+        {"type": "assign", "target": "health->history_index", "value": "(health->history_index + 1) % HEALTH_HISTORY_SIZE"}
+      ]
+    },
+    {
+      "name": "count_healthy_samples",
+      "description": "Count healthy samples in history buffer.",
+      "params": [
+        {"name": "health", "type": "IMU_Health_State*", "direction": "in"}
+      ],
+      "returns": "u8",
+      "timing": {"wcet_us": 5},
+      "preconditions": ["health != NULL"],
+      "postconditions": ["result <= HEALTH_HISTORY_SIZE"],
+      "body": [
+        {"type": "var_decl", "var_name": "count", "var_type": "u8", "init": "0"},
+        {
+          "type": "for_bounded",
+          "var": "i",
+          "start": 0,
+          "end": "HEALTH_HISTORY_SIZE",
+          "body": [
+            {"type": "if", "condition": "health->health_history[i] != 0", "then": [
+              {"type": "assign", "target": "count", "value": "count + 1"}
+            ]}
+          ]
+        },
+        {"type": "return", "value": "count"}
+      ]
+    },
+    {
+      "name": "determine_imu_status",
+      "description": "Determine overall IMU status based on health metrics.",
+      "params": [
+        {"name": "health", "type": "IMU_Health_State*", "direction": "in"}
+      ],
+      "returns": "IMU_Status",
+      "timing": {"wcet_us": 8},
+      "preconditions": ["health != NULL"],
+      "body": [
+        {"type": "if", "condition": "health->status == NOT_PRESENT", "then": [
+          {"type": "return", "value": "NOT_PRESENT"}
+        ]},
+        {"type": "var_decl", "var_name": "healthy_count", "var_type": "u8", "init": "count_healthy_samples(health)"},
+        {"type": "if", "condition": "healthy_count >= MIN_HEALTHY_SAMPLES", "then": [
+          {"type": "return", "value": "HEALTHY"}
+        ]},
+        {"type": "if", "condition": "healthy_count >= (MIN_HEALTHY_SAMPLES / 2)", "then": [
+          {"type": "return", "value": "DEGRADED"}
+        ]},
+        {"type": "return", "value": "FAILED"}
+      ]
+    },
+    {
+      "name": "select_primary_imu",
+      "description": "Select best available IMU as primary sensor.",
+      "params": [
+        {"name": "state", "type": "Monitor_State*", "direction": "inout"}
+      ],
+      "returns": "u8",
+      "timing": {"wcet_us": 10},
+      "preconditions": ["state != NULL"],
+      "postconditions": ["result < MAX_IMU_COUNT || result == 255"],
+      "body": [
+        {"type": "var_decl", "var_name": "best", "var_type": "u8", "init": "255"},
+        {"type": "var_decl", "var_name": "best_score", "var_type": "i32", "init": "0"},
+        {
+          "type": "for_bounded",
+          "var": "i",
+          "start": 0,
+          "end": "MAX_IMU_COUNT",
+          "body": [
+            {"type": "if", "condition": "state->imu_health[i].status == HEALTHY", "then": [
+              {"type": "var_decl", "var_name": "score", "var_type": "i32", "init": "count_healthy_samples(&state->imu_health[i])"},
+              {"type": "if", "condition": "score > best_score", "then": [
+                {"type": "assign", "target": "best", "value": "i"},
+                {"type": "assign", "target": "best_score", "value": "score"}
+              ]}
+            ]}
+          ]
+        },
+        {"type": "if", "condition": "best == 255", "then": [
+          {"type": "comment", "text": "No healthy IMU, try degraded"},
+          {
+            "type": "for_bounded",
+            "var": "i",
+            "start": 0,
+            "end": "MAX_IMU_COUNT",
+            "body": [
+              {"type": "if", "condition": "state->imu_health[i].status == DEGRADED", "then": [
+                {"type": "assign", "target": "best", "value": "i"},
+                {"type": "break"}
+              ]}
+            ]
+          }
+        ]},
+        {"type": "return", "value": "best"}
+      ]
+    },
+    {
+      "name": "determine_failsafe_action",
+      "description": "Determine appropriate failsafe action based on system state.",
+      "params": [
+        {"name": "state", "type": "Monitor_State*", "direction": "in"}
+      ],
+      "returns": "Failsafe_Action",
+      "timing": {"wcet_us": 6},
+      "preconditions": ["state != NULL"],
+      "body": [
+        {"type": "var_decl", "var_name": "healthy_count", "var_type": "u8", "init": "0"},
+        {"type": "var_decl", "var_name": "degraded_count", "var_type": "u8", "init": "0"},
+        {
+          "type": "for_bounded",
+          "var": "i",
+          "start": 0,
+          "end": "MAX_IMU_COUNT",
+          "body": [
+            {"type": "if", "condition": "state->imu_health[i].status == HEALTHY", "then": [
+              {"type": "assign", "target": "healthy_count", "value": "healthy_count + 1"}
+            ]},
+            {"type": "if", "condition": "state->imu_health[i].status == DEGRADED", "then": [
+              {"type": "assign", "target": "degraded_count", "value": "degraded_count + 1"}
+            ]}
+          ]
+        },
+        {"type": "if", "condition": "healthy_count >= 2", "then": [
+          {"type": "return", "value": "NONE"}
+        ]},
+        {"type": "if", "condition": "healthy_count == 1", "then": [
+          {"type": "return", "value": "WARN"}
+        ]},
+        {"type": "if", "condition": "degraded_count >= 1", "then": [
+          {"type": "return", "value": "LAND_IMMEDIATELY"}
+        ]},
+        {"type": "return", "value": "TERMINATE"}
+      ]
+    },
+    {
+      "name": "imu_monitor_update",
+      "description": "Main update function. Called at 400Hz to process new IMU readings.",
+      "params": [
+        {"name": "state", "type": "Monitor_State*", "direction": "inout"},
+        {"name": "readings", "type": "IMU_Reading[3]", "direction": "in"},
+        {"name": "imu_count", "type": "u8", "direction": "in"},
+        {"name": "current_time_us", "type": "u32", "direction": "in"}
+      ],
+      "returns": "Failsafe_Action",
+      "timing": {"wcet_us": 85},
+      "preconditions": ["state != NULL", "imu_count <= MAX_IMU_COUNT"],
+      "body": [
+        {"type": "assign", "target": "state->total_cycles", "value": "state->total_cycles + 1"},
+        {"type": "assign", "target": "state->active_imu_count", "value": "imu_count"},
+        {
+          "type": "for_bounded",
+          "var": "i",
+          "start": 0,
+          "end": "MAX_IMU_COUNT",
+          "body": [
+            {"type": "if", "condition": "i >= imu_count", "then": [
+              {"type": "assign", "target": "state->imu_health[i].status", "value": "NOT_PRESENT"},
+              {"type": "continue"}
+            ]},
+            {"type": "if", "condition": "state->imu_health[i].status == NOT_PRESENT", "then": [
+              {"type": "assign", "target": "state->imu_health[i].status", "value": "UNCALIBRATED"}
+            ]},
+            {"type": "var_decl", "var_name": "accel_ok", "var_type": "bool", "init": "validate_accel_reading(&readings[i])"},
+            {"type": "var_decl", "var_name": "gyro_ok", "var_type": "bool", "init": "validate_gyro_reading(&readings[i])"},
+            {"type": "var_decl", "var_name": "sample_healthy", "var_type": "bool", "init": "accel_ok && gyro_ok"},
+            {"type": "call", "function": "update_health_history", "args": ["&state->imu_health[i]", "sample_healthy"]},
+            {"type": "if", "condition": "!sample_healthy", "then": [
+              {"type": "assign", "target": "state->imu_health[i].consecutive_failures", "value": "state->imu_health[i].consecutive_failures + 1"},
+              {"type": "assign", "target": "state->error_count", "value": "state->error_count + 1"}
+            ], "else": [
+              {"type": "assign", "target": "state->imu_health[i].consecutive_failures", "value": "0"}
+            ]},
+            {"type": "assign", "target": "state->imu_health[i].status", "value": "determine_imu_status(&state->imu_health[i])"},
+            {"type": "assign", "target": "state->imu_health[i].last_update_us", "value": "current_time_us"}
+          ]
+        },
+        {"type": "comment", "text": "Cross-validate active IMUs"},
+        {"type": "if", "condition": "imu_count >= 2", "then": [
+          {"type": "var_decl", "var_name": "cross_diff", "var_type": "i32", "init": "cross_validate_imus(&readings[0], &readings[1])"},
+          {"type": "if", "condition": "cross_diff > CROSS_VALIDATION_TOLERANCE", "then": [
+            {"type": "comment", "text": "Mark least healthy IMU as degraded"},
+            {"type": "var_decl", "var_name": "count0", "var_type": "u8", "init": "count_healthy_samples(&state->imu_health[0])"},
+            {"type": "var_decl", "var_name": "count1", "var_type": "u8", "init": "count_healthy_samples(&state->imu_health[1])"},
+            {"type": "if", "condition": "count0 < count1", "then": [
+              {"type": "if", "condition": "state->imu_health[0].status == HEALTHY", "then": [
+                {"type": "assign", "target": "state->imu_health[0].status", "value": "DEGRADED"}
+              ]}
+            ], "else": [
+              {"type": "if", "condition": "state->imu_health[1].status == HEALTHY", "then": [
+                {"type": "assign", "target": "state->imu_health[1].status", "value": "DEGRADED"}
+              ]}
+            ]}
+          ]}
+        ]},
+        {"type": "var_decl", "var_name": "new_primary", "var_type": "u8", "init": "select_primary_imu(state)"},
+        {"type": "if", "condition": "new_primary != state->primary_imu && new_primary != 255", "then": [
+          {"type": "assign", "target": "state->primary_imu", "value": "new_primary"}
+        ]},
+        {"type": "var_decl", "var_name": "action", "var_type": "Failsafe_Action", "init": "determine_failsafe_action(state)"},
+        {"type": "assign", "target": "state->pending_action", "value": "action"},
+        {"type": "assign", "target": "state->system_healthy", "value": "action == NONE || action == WARN"},
+        {"type": "if", "condition": "action >= LAND_IMMEDIATELY", "then": [
+          {"type": "assign", "target": "state->failsafe_active", "value": "true"}
+        ]},
+        {"type": "return", "value": "action"}
+      ]
+    },
+    {
+      "name": "imu_get_diagnostic",
+      "description": "Generate diagnostic report for a specific IMU.",
+      "params": [
+        {"name": "state", "type": "Monitor_State*", "direction": "in"},
+        {"name": "imu_index", "type": "u8", "direction": "in"},
+        {"name": "reading", "type": "IMU_Reading*", "direction": "in"},
+        {"name": "report", "type": "Diagnostic_Report*", "direction": "out"}
+      ],
+      "returns": "i32",
+      "timing": {"wcet_us": 15},
+      "preconditions": ["state != NULL", "imu_index < MAX_IMU_COUNT", "report != NULL"],
+      "body": [
+        {"type": "assign", "target": "report->imu_index", "value": "imu_index"},
+        {"type": "assign", "target": "report->status", "value": "state->imu_health[imu_index].status"},
+        {"type": "if", "condition": "reading != NULL && reading->valid", "then": [
+          {"type": "assign", "target": "report->accel_magnitude", "value": "compute_magnitude_squared(&reading->accel)"},
+          {"type": "assign", "target": "report->gyro_magnitude", "value": "compute_magnitude_squared(&reading->gyro)"}
+        ], "else": [
+          {"type": "assign", "target": "report->accel_magnitude", "value": "0"},
+          {"type": "assign", "target": "report->gyro_magnitude", "value": "0"}
+        ]},
+        {"type": "assign", "target": "report->deviation_from_primary", "value": "0"},
+        {"type": "assign", "target": "report->uptime_us", "value": "state->imu_health[imu_index].last_update_us"},
+        {"type": "return", "value": "0"}
+      ]
+    },
+    {
+      "name": "imu_is_system_safe",
+      "description": "Quick check if system is safe for continued flight.",
+      "params": [
+        {"name": "state", "type": "Monitor_State*", "direction": "in"}
+      ],
+      "returns": "bool",
+      "timing": {"wcet_us": 3},
+      "preconditions": ["state != NULL"],
+      "body": [
+        {"type": "return", "value": "state->system_healthy && !state->failsafe_active"}
+      ]
+    }
+  ],
+  "traceability": {
+    "requirements": [
+      {"id": "REQ-IMU-001", "text": "System shall monitor up to 3 redundant IMU sensors", "functions": ["imu_monitor_init", "imu_monitor_update"]},
+      {"id": "REQ-IMU-002", "text": "System shall validate accelerometer readings against gravity", "functions": ["validate_accel_reading"]},
+      {"id": "REQ-IMU-003", "text": "System shall validate gyroscope readings for bias/noise", "functions": ["validate_gyro_reading"]},
+      {"id": "REQ-IMU-004", "text": "System shall cross-validate readings between redundant sensors", "functions": ["cross_validate_imus"]},
+      {"id": "REQ-IMU-005", "text": "System shall maintain health history for trend analysis", "functions": ["update_health_history", "count_healthy_samples"]},
+      {"id": "REQ-IMU-006", "text": "System shall automatically switch to backup IMU on failure", "functions": ["select_primary_imu"]},
+      {"id": "REQ-IMU-007", "text": "System shall trigger appropriate failsafe actions", "functions": ["determine_failsafe_action"]},
+      {"id": "REQ-IMU-008", "text": "System shall complete update cycle within 100us", "functions": ["imu_monitor_update"]},
+      {"id": "REQ-IMU-009", "text": "System shall not use dynamic memory allocation", "functions": ["ALL"]},
+      {"id": "REQ-IMU-010", "text": "System shall provide diagnostic reporting capability", "functions": ["imu_get_diagnostic"]}
+    ]
+  },
+  "verification": {
+    "unit_tests": [
+      "test_init_state",
+      "test_validate_accel_normal",
+      "test_validate_accel_failed",
+      "test_validate_gyro_normal",
+      "test_cross_validation",
+      "test_health_history_tracking",
+      "test_imu_selection",
+      "test_failsafe_determination",
+      "test_full_update_cycle"
+    ],
+    "static_analysis": {
+      "misra_c_2012": true,
+      "cppcheck": true,
+      "coverity": true
+    },
+    "formal_verification": {
+      "spark_proof": true,
+      "assertions_proven": true
+    }
+  }
+}

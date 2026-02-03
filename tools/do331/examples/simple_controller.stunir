@@ -1,0 +1,111 @@
+{
+  "$schema": "stunir.ir.v1",
+  "module": "altitude_monitor",
+  "version": "1.0.0",
+  "ir_epoch": 1738108800,
+  "types": [
+    {
+      "name": "altitude_t",
+      "base": "float64",
+      "unit": "feet"
+    },
+    {
+      "name": "speed_t", 
+      "base": "float64",
+      "unit": "knots"
+    },
+    {
+      "name": "status_t",
+      "variants": ["ok", "warning", "critical"]
+    }
+  ],
+  "functions": [
+    {
+      "name": "check_altitude",
+      "params": [
+        {"name": "current_alt", "type": "altitude_t"},
+        {"name": "threshold", "type": "altitude_t"}
+      ],
+      "returns": "bool",
+      "body": [
+        {
+          "if": {
+            "condition": {
+              "op": ">",
+              "left": "current_alt",
+              "right": "threshold"
+            },
+            "then": [{"return": true}],
+            "else": [{"return": false}]
+          }
+        }
+      ]
+    },
+    {
+      "name": "get_status",
+      "params": [
+        {"name": "altitude", "type": "altitude_t"},
+        {"name": "speed", "type": "speed_t"}
+      ],
+      "returns": "status_t",
+      "body": [
+        {
+          "if": {
+            "condition": {
+              "op": ">",
+              "left": "altitude",
+              "right": 40000
+            },
+            "then": [{"return": "critical"}],
+            "else": [
+              {
+                "if": {
+                  "condition": {
+                    "op": ">",
+                    "left": "altitude",
+                    "right": 35000
+                  },
+                  "then": [{"return": "warning"}],
+                  "else": [{"return": "ok"}]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "state_machine": {
+    "name": "flight_mode",
+    "initial": "ground",
+    "states": [
+      {"name": "ground", "type": "initial"},
+      {"name": "takeoff"},
+      {"name": "climb"},
+      {"name": "cruise"},
+      {"name": "descent"},
+      {"name": "landing"},
+      {"name": "landed", "type": "final"}
+    ],
+    "transitions": [
+      {"from": "ground", "to": "takeoff", "trigger": "start_engines"},
+      {"from": "takeoff", "to": "climb", "guard": "altitude > 1000"},
+      {"from": "climb", "to": "cruise", "guard": "altitude > 30000"},
+      {"from": "cruise", "to": "descent", "trigger": "begin_descent"},
+      {"from": "descent", "to": "landing", "guard": "altitude < 2000"},
+      {"from": "landing", "to": "landed", "guard": "altitude == 0"}
+    ]
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "System shall monitor altitude continuously",
+      "satisfied_by": ["check_altitude", "get_status"]
+    },
+    {
+      "id": "REQ-002",
+      "text": "System shall not exceed 45000 feet altitude",
+      "satisfied_by": ["check_altitude"]
+    }
+  ]
+}

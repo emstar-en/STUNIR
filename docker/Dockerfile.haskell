@@ -1,0 +1,8 @@
+FROM haskell:9.4.8
+RUN cabal update
+WORKDIR /stunir
+COPY . .
+RUN cd tools/native/haskell && cabal build
+RUN cd tools/ir_canonicalizer && cabal build  
+RUN cd tools/pack_attestation && cabal build
+CMD ["./scripts/full_pipeline_v1.sh"]

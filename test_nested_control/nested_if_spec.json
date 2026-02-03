@@ -1,0 +1,36 @@
+{
+  "schema": "stunir_spec_v1",
+  "module": "nested_control_test",
+  "description": "Test nested control flow",
+  "functions": [
+    {
+      "name": "nested_if_test",
+      "arguments": [
+        {"name": "x", "type": "i32"},
+        {"name": "y", "type": "i32"}
+      ],
+      "return_type": "i32",
+      "body": [
+        {
+          "type": "if_statement",
+          "condition": "x > 0",
+          "then_block": [
+            {
+              "type": "if_statement",
+              "condition": "y > 0",
+              "then_block": [
+                {"type": "return", "value": "x + y"}
+              ],
+              "else_block": [
+                {"type": "return", "value": "x - y"}
+              ]
+            }
+          ],
+          "else_block": [
+            {"type": "return", "value": "0"}
+          ]
+        }
+      ]
+    }
+  ]
+}

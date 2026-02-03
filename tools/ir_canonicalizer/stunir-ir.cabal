@@ -1,0 +1,9 @@
+cabal-version: 3.10
+name: stunir-ir
+version: 0.1.0.0
+
+executable stunir-ir
+  main-is: StunirIR.hs
+  build-depends: base, aeson, cborg, cryptonite
+  ghc-options: -threaded -Wall -static
+  default-language: GHC2021

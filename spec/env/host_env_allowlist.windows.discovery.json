@@ -1,0 +1,11 @@
+{
+  "schema": "stunir.env.allowlist.v1",
+  "platform": "windows",
+  "policy": "DISCOVERY",
+  "variables": {
+    "allowed": [
+      "*"
+    ],
+    "notes": "Permissive allowlist for the discovery phase only. Allows PATH to find tools."
+  }
+}

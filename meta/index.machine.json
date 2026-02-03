@@ -1,0 +1,9 @@
+{
+  "ai_bins": "Directory",
+  "tools_original": "Directory",
+  "tools_used": "Directory",
+  "build_sh_original.sh": "File",
+  "build_sh_patch_report.json": "File",
+  "build_sh_patched.sh": "File",
+  "run_index.json": "File"
+}

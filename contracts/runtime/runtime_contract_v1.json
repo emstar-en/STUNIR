@@ -1,0 +1,66 @@
+{
+  "schema": "stunir.contract.runtime.v1",
+  "contract_id": "stunir-runtime-v1",
+  "stage_type": "runtime",
+  "description": "Contract for STUNIR runtime execution constraints and verification",
+  "runtime_constraints": {
+    "deterministic_execution": {
+      "required": true,
+      "description": "All runtime operations must be deterministic"
+    },
+    "no_network_access": {
+      "required": true,
+      "description": "Runtime must not access network"
+    },
+    "time_bounded": {
+      "required": true,
+      "max_duration_seconds": 3600
+    },
+    "resource_isolated": {
+      "required": true,
+      "description": "Runtime must be isolated from host resources"
+    }
+  },
+  "resource_limits": {
+    "max_memory_mb": 512,
+    "max_cpu_seconds": 60,
+    "max_disk_mb": 1024,
+    "max_processes": 10,
+    "max_file_descriptors": 256
+  },
+  "execution_environment": {
+    "sandbox_type": ["container", "vm", "seccomp", "chroot"],
+    "required_capabilities": [],
+    "forbidden_syscalls": ["network", "ptrace", "mount"]
+  },
+  "verification_integration": {
+    "supported_profiles": ["profile2", "profile3", "profile4"],
+    "pre_execution_verification": true,
+    "post_execution_verification": true
+  },
+  "input_validation": {
+    "schema_validation": true,
+    "hash_verification": true,
+    "size_limits": {
+      "max_input_mb": 100,
+      "max_spec_kb": 1024
+    }
+  },
+  "output_requirements": {
+    "deterministic_output": true,
+    "canonical_format": true,
+    "receipt_generation": true
+  },
+  "error_handling": {
+    "on_timeout": "abort",
+    "on_resource_exceeded": "abort",
+    "on_verification_failure": "abort",
+    "error_reporting": "structured_json"
+  },
+  "audit_logging": {
+    "enabled": true,
+    "log_inputs": true,
+    "log_outputs": true,
+    "log_resource_usage": true
+  }
+}

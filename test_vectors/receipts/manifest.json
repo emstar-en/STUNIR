@@ -1,0 +1,38 @@
+{
+  "category": "receipts",
+  "count": 5,
+  "entries": [
+    {
+      "file": "tv_receipts_001.json",
+      "hash": "4b45cac4221586696fcd2109177cba274aa881c2a4f64267d5f0fe6becf33b5f",
+      "id": "tv_receipts_001",
+      "name": "Basic Receipt Structure"
+    },
+    {
+      "file": "tv_receipts_002.json",
+      "hash": "bb29a67e7eb41177f248cf535323fe811f7facca4baa1096253bf4910720011f",
+      "id": "tv_receipts_002",
+      "name": "Receipt Missing Hash"
+    },
+    {
+      "file": "tv_receipts_003.json",
+      "hash": "41ec8e9e295765bcb48e2aab9295c397c512ea5ce822ab81ebd238e929677819",
+      "id": "tv_receipts_003",
+      "name": "Receipt Hash Verification"
+    },
+    {
+      "file": "tv_receipts_004.json",
+      "hash": "3df11d048a5353e9bf1cc36ef10696830a5192ebdaeac3993abeff52db35d9ed",
+      "id": "tv_receipts_004",
+      "name": "Receipt Manifest Generation"
+    },
+    {
+      "file": "tv_receipts_005.json",
+      "hash": "c2a7a2eed6feb6816dbb20bb068799d1c4c8f0227840feae1644471c224c0b7a",
+      "id": "tv_receipts_005",
+      "name": "Receipt Epoch Validation"
+    }
+  ],
+  "epoch": 1735500000,
+  "schema": "stunir.test_vectors.receipts.manifest.v1"
+}

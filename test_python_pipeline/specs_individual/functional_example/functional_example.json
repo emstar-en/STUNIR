@@ -1,0 +1,40 @@
+{
+  "module": "functional_example",
+  "description": "Functional programming example with higher-order functions",
+  "functions": [
+    {
+      "name": "map",
+      "params": [
+        {"name": "func", "type": "function"},
+        {"name": "list", "type": "list"}
+      ],
+      "returns": "list",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "list", "init": "[]"}
+      ]
+    },
+    {
+      "name": "filter",
+      "params": [
+        {"name": "predicate", "type": "function"},
+        {"name": "list", "type": "list"}
+      ],
+      "returns": "list",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "list", "init": "[]"}
+      ]
+    },
+    {
+      "name": "reduce",
+      "params": [
+        {"name": "func", "type": "function"},
+        {"name": "list", "type": "list"},
+        {"name": "initial", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "accumulator", "var_type": "i32", "init": "initial"}
+      ]
+    }
+  ]
+}

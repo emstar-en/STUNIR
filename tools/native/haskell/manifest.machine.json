@@ -1,0 +1,9 @@
+[
+  "src",
+  "stunir-native",
+  "test_vectors",
+  "Setup.hs",
+  "StunirNative.hs",
+  "cabal.project",
+  "stunir-native.cabal"
+]

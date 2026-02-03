@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://stunir.org/schemas/semantic_ir_v1.json",
+  "title": "STUNIR Semantic IR Schema",
+  "description": "JSON Schema for STUNIR Semantic Intermediate Reference v1.0",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["schema_version", "ir_version", "root"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version for validation"
+    },
+    "ir_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic IR version"
+    },
+    "root": {
+      "$ref": "modules.json#/definitions/Module",
+      "description": "Root module of the compilation unit"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "source_file": {"type": "string"},
+        "timestamp": {"type": "string", "format": "date-time"},
+        "generator": {"type": "string"},
+        "target_categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "embedded", "realtime", "safety_critical", "gpu", "wasm",
+              "native", "jit", "interpreter", "functional", "logic",
+              "constraint", "dataflow", "reactive", "quantum", "neuromorphic",
+              "biocomputing", "molecular", "optical", "reversible", "analog",
+              "stochastic", "fuzzy", "approximate", "probabilistic"
+            ]
+          }
+        },
+        "safety_level": {
+          "type": "string",
+          "enum": ["DO-178C_Level_A", "DO-178C_Level_B", "DO-178C_Level_C", "DO-178C_Level_D", "None"]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "NodeBase": {
+      "type": "object",
+      "required": ["node_id", "kind"],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^n_[a-zA-Z0-9_]+$",
+          "description": "Unique node identifier"
+        },
+        "kind": {
+          "type": "string",
+          "description": "Node type discriminator"
+        },
+        "location": {
+          "$ref": "#/definitions/SourceLocation"
+        },
+        "type": {
+          "$ref": "type_system.json#/definitions/TypeReference"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Additional metadata"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Structural hash of this node"
+        }
+      }
+    },
+    "SourceLocation": {
+      "type": "object",
+      "required": ["file", "line", "column"],
+      "properties": {
+        "file": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1},
+        "column": {"type": "integer", "minimum": 1},
+        "length": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

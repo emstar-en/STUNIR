@@ -1,0 +1,76 @@
+# STUNIR Emitter Specification: Parser
+# Parser generators
+
+category: parser
+description: "Parser generator for multiple languages"
+
+output_types:
+  - python_parser
+  - rust_parser
+  - c_parser
+  - table_driven
+
+features:
+  - recursive_descent
+  - lr_parsing
+  - ast_construction
+  - error_recovery
+
+extension: py
+
+config:
+  Target_Language: "String"
+  Parser_Type: "String"
+  Generate_AST: "Boolean"
+
+config_defaults:
+  Target_Language: "python"
+  Parser_Type: "recursive_descent"
+  Generate_AST: true
+
+type_map:
+  node: "ASTNode"
+  rule: "Rule"
+
+ir_fields:
+  required:
+    - grammar
+    - rules
+  optional:
+    - ast_types
+
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+    - dataclasses
+  rust:
+    - std::collections
+  haskell:
+    - text
+    - parsec
+
+output_format: |
+  Python parser implementation.
+
+example_output: |
+  from dataclasses import dataclass
+  from typing import List, Union
+  
+  @dataclass
+  class ASTNode:
+      pass
+  
+  class Parser:
+      def parse_expr(self):
+          # ... parser implementation
+          pass
+
+architectures:
+  - any
+
+notes: |
+  - Recursive descent is primary strategy
+  - Support for operator precedence
+  - AST node generation

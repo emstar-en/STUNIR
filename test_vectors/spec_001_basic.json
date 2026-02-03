@@ -1,0 +1,9 @@
+{
+  "schema": "stunir.spec.v1",
+  "id": "spec_001",
+  "profile": "profile3",
+  "stages": [
+    "build",
+    "test"
+  ]
+}

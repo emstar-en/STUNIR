@@ -1,0 +1,13 @@
+{
+  "$schema": "stunir.do330.do331_integration.v1",
+  "tool": "verify_build",
+  "version": "1.0.0",
+  "generated_date": "2026-01-29",
+  "available": true,
+  "model_count": 15,
+  "total_coverage": 97.5,
+  "traceability_links": 234,
+  "sysml_exports": 8,
+  "xmi_exports": 8,
+  "data_valid": true
+}

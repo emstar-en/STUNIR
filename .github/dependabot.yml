@@ -1,0 +1,109 @@
+# STUNIR Dependency Update Configuration
+# Automated dependency updates via Dependabot
+
+version: 2
+
+registries:
+  # PyPI for Python packages
+  pypi:
+    type: python-index
+    url: https://pypi.org/simple
+
+updates:
+  # Python dependencies (pyproject.toml)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "stunir/core-team"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps(python):"
+    groups:
+      dev-dependencies:
+        patterns:
+          - "pytest*"
+          - "black"
+          - "ruff"
+          - "mypy*"
+        update-types:
+          - "minor"
+          - "patch"
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Rust dependencies (Cargo.toml)
+  - package-ecosystem: "cargo"
+    directory: "/tools/native/rust/stunir-native"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "stunir/core-team"
+    labels:
+      - "dependencies"
+      - "rust"
+    commit-message:
+      prefix: "deps(rust):"
+    groups:
+      serde-ecosystem:
+        patterns:
+          - "serde*"
+      testing:
+        patterns:
+          - "criterion*"
+          - "proptest*"
+          - "quickcheck*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Rust conformance dependencies
+  - package-ecosystem: "cargo"
+    directory: "/tools/conformance/rust_stunir_native"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "rust"
+      - "conformance"
+    commit-message:
+      prefix: "deps(rust-conformance):"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "stunir/core-team"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci:"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"

@@ -1,0 +1,67 @@
+[
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/provenance/ModelLineageReceipt@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/provenance/OrchestrationTraceReceipt@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/provenance/DeterministicProcessReceipt@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/schemas/-",
+    "value": "spec-pack/schemas/provenance/ContributionShareReceipt@v1.schema.json"
+  },
+  {
+    "op": "add",
+    "path": "/policies/-",
+    "value": "spec-pack/policies/studio/contribution-accounting.json"
+  },
+  {
+    "op": "add",
+    "path": "/policies/-",
+    "value": "spec-pack/policies/healthcare/data-provenance-accounting.json"
+  },
+  {
+    "op": "add",
+    "path": "/policies/-",
+    "value": "spec-pack/policies/defense/data-provenance-accounting.json"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/model_lineage.py"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/orchestration_trace.py"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/deterministic_process.py"
+  },
+  {
+    "op": "add",
+    "path": "/tools/-",
+    "value": "spec-pack/tools/contribution_share.py"
+  },
+  {
+    "op": "add",
+    "path": "/policies_enabled/-",
+    "value": "policy://studio/provenance-accounting@v1"
+  },
+  {
+    "op": "add",
+    "path": "/configs/-",
+    "value": "spec-pack/conformance/vectors/provenance/provenance-accounting.v1.json"
+  }
+]

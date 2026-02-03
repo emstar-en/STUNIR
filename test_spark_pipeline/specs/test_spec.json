@@ -1,0 +1,35 @@
+{
+  "name": "test_module",
+  "version": "1.0.0",
+  "docstring": "Test module for SPARK semantic IR generation",
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "i32",
+      "parameters": [
+        {
+          "name": "a",
+          "type": "i32"
+        },
+        {
+          "name": "b",
+          "type": "i32"
+        }
+      ]
+    },
+    {
+      "name": "multiply",
+      "return_type": "i32",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "i32"
+        },
+        {
+          "name": "y",
+          "type": "i32"
+        }
+      ]
+    }
+  ]
+}

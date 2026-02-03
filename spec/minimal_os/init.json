@@ -1,0 +1,89 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "init",
+  "description": "Init process - first userspace process that prints 'Hello, STUNIR OS!'",
+  "target": {
+    "architecture": "x86_64",
+    "format": "c",
+    "standard": "c89"
+  },
+  "constants": [
+    {"name": "INIT_MESSAGE", "type": "char*", "value": "\"Hello, STUNIR OS!\\n\""}
+  ],
+  "functions": [
+    {
+      "name": "init_main",
+      "description": "Init process entry point",
+      "params": [],
+      "returns": "void",
+      "body": [
+        {"type": "comment", "text": "Print welcome message"},
+        {"type": "call", "func": "sys_print", "args": ["INIT_MESSAGE"]},
+        {"type": "comment", "text": "Loop forever, yielding CPU"},
+        {"type": "while", "condition": "1", "body": [
+          {"type": "call", "func": "sys_yield"}
+        ]}
+      ]
+    },
+    {
+      "name": "kernel_main",
+      "description": "Kernel main entry point (called from bootloader)",
+      "params": [
+        {"name": "magic", "type": "u32"},
+        {"name": "mboot_info", "type": "void*"}
+      ],
+      "returns": "void",
+      "body": [
+        {"type": "comment", "text": "Initialize serial console first"},
+        {"type": "call", "func": "serial_init"},
+        {"type": "call", "func": "serial_write_string", "args": ["\"\\n=== STUNIR OS v0.1 ===\\n\""]},
+        {"type": "comment", "text": "Verify multiboot magic"},
+        {"type": "if", "condition": "magic != 0x36D76289", "then": [
+          {"type": "call", "func": "serial_write_string", "args": ["\"ERROR: Invalid multiboot magic!\\n\""]},
+          {"type": "while", "condition": "1", "body": [{"type": "asm", "code": "hlt"}]}
+        ]},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] Multiboot verified\\n\""]},
+        {"type": "comment", "text": "Initialize memory manager"},
+        {"type": "call", "func": "pmm_init", "args": ["128 * 1024 * 1024"]},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] Memory manager initialized\\n\""]},
+        {"type": "comment", "text": "Initialize interrupts"},
+        {"type": "call", "func": "idt_init"},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] IDT initialized\\n\""]},
+        {"type": "comment", "text": "Initialize timer at 100Hz"},
+        {"type": "call", "func": "timer_init", "args": ["100"]},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] Timer initialized (100Hz)\\n\""]},
+        {"type": "comment", "text": "Initialize syscalls"},
+        {"type": "call", "func": "syscall_init"},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] Syscalls initialized\\n\""]},
+        {"type": "comment", "text": "Initialize scheduler"},
+        {"type": "call", "func": "scheduler_init"},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] Scheduler initialized\\n\""]},
+        {"type": "comment", "text": "Enable interrupts"},
+        {"type": "asm", "code": "sti"},
+        {"type": "call", "func": "serial_write_string", "args": ["\"[OK] Interrupts enabled\\n\\n\""]},
+        {"type": "comment", "text": "Create init task"},
+        {"type": "call", "func": "task_create", "args": ["init_main", "\"init\""]},
+        {"type": "call", "func": "serial_write_string", "args": ["\"Starting init process...\\n\\n\""]},
+        {"type": "comment", "text": "Start scheduler - never returns"},
+        {"type": "assign", "target": "scheduler_running", "value": "1"},
+        {"type": "call", "func": "schedule"},
+        {"type": "comment", "text": "Should never reach here"},
+        {"type": "while", "condition": "1", "body": [{"type": "asm", "code": "hlt"}]}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "serial_init", "type": "function"},
+    {"name": "serial_write_string", "type": "function"},
+    {"name": "pmm_init", "type": "function"},
+    {"name": "idt_init", "type": "function"},
+    {"name": "timer_init", "type": "function"},
+    {"name": "syscall_init", "type": "function"},
+    {"name": "scheduler_init", "type": "function"},
+    {"name": "task_create", "type": "function"},
+    {"name": "schedule", "type": "function"},
+    {"name": "sys_print", "type": "function"},
+    {"name": "sys_yield", "type": "function"},
+    {"name": "scheduler_running", "type": "variable"}
+  ]
+}

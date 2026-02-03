@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stunir.contracts.runtime.pipeline.v1.schema.json",
+  "title": "STUNIR Runtime Pipeline Stage Schema",
+  "description": "Schema for runtime execution pipeline stage",
+  "type": "object",
+  "required": ["stage_id", "runtime_contract", "execution_config"],
+  "properties": {
+    "stage_id": {
+      "const": "runtime_execution"
+    },
+    "runtime_contract": {
+      "type": "string",
+      "const": "stunir.contract.runtime.v1"
+    },
+    "execution_config": {
+      "type": "object",
+      "required": ["sandbox_type", "resource_limits"],
+      "properties": {
+        "sandbox_type": {
+          "type": "string",
+          "enum": ["container", "vm", "seccomp", "chroot", "none"]
+        },
+        "resource_limits": {
+          "type": "object",
+          "properties": {
+            "memory_mb": {"type": "integer", "maximum": 512},
+            "cpu_seconds": {"type": "integer", "maximum": 60},
+            "disk_mb": {"type": "integer", "maximum": 1024}
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        }
+      }
+    },
+    "verification_profile": {
+      "type": "string",
+      "enum": ["profile2", "profile3", "profile4"]
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "spec_file": {"type": "string"},
+        "ir_bundle": {"type": "string"}
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "exit_code": {"type": "integer"},
+        "output_artifacts": {"type": "array", "items": {"type": "string"}},
+        "receipt": {"type": "object"},
+        "resource_usage": {
+          "type": "object",
+          "properties": {
+            "memory_peak_mb": {"type": "number"},
+            "cpu_time_seconds": {"type": "number"},
+            "wall_time_seconds": {"type": "number"}
+          }
+        }
+      }
+    }
+  }
+}

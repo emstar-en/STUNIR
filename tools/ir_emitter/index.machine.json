@@ -1,0 +1,4 @@
+{
+  "ir_haskell.machine.json": "IR\u2192Haskell emitter (spec\u2192code)",
+  "tools_ir.machine.json": "Complete tools \u2192 ir_emitter pipeline stage"
+}

@@ -1,0 +1,1 @@
+{"contract_name":"dotnet_sdk","description":"dotnet SDK toolchain. Initial contract is identity-only (no determinism test) to avoid accidental network restores in probe.","identity":{"accept_exit_codes":[0],"commands":[["{tool}","--version"],["{tool}","--info"]]},"tests":[],"tool_locator":{"candidates":["dotnet"],"kind":"path_or_command"}}

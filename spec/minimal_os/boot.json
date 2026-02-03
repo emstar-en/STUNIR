@@ -1,0 +1,91 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "multiboot_boot",
+  "description": "Multiboot2 bootloader entry point for STUNIR minimal OS",
+  "target": {
+    "architecture": "x86_64",
+    "format": "assembly",
+    "syntax": "nasm"
+  },
+  "constants": [
+    {
+      "name": "MULTIBOOT2_MAGIC",
+      "type": "u32",
+      "value": "0xE85250D6"
+    },
+    {
+      "name": "MULTIBOOT2_ARCHITECTURE",
+      "type": "u32",
+      "value": "0",
+      "comment": "i386 protected mode"
+    },
+    {
+      "name": "MULTIBOOT2_HEADER_LENGTH",
+      "type": "u32",
+      "value": "16"
+    },
+    {
+      "name": "KERNEL_STACK_SIZE",
+      "type": "u32",
+      "value": "16384"
+    }
+  ],
+  "sections": [
+    {
+      "name": ".multiboot",
+      "type": "data",
+      "align": 8,
+      "content": [
+        {"type": "dd", "value": "MULTIBOOT2_MAGIC"},
+        {"type": "dd", "value": "MULTIBOOT2_ARCHITECTURE"},
+        {"type": "dd", "value": "MULTIBOOT2_HEADER_LENGTH"},
+        {"type": "dd", "value": "-(MULTIBOOT2_MAGIC + MULTIBOOT2_ARCHITECTURE + MULTIBOOT2_HEADER_LENGTH)", "comment": "checksum"},
+        {"type": "dw", "value": "0"},
+        {"type": "dw", "value": "0"},
+        {"type": "dd", "value": "8", "comment": "end tag"}
+      ]
+    },
+    {
+      "name": ".bss",
+      "type": "bss",
+      "symbols": [
+        {"name": "stack_bottom", "size": "KERNEL_STACK_SIZE", "align": 16},
+        {"name": "stack_top", "size": 0}
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "_start",
+      "type": "entry",
+      "global": true,
+      "section": ".text",
+      "description": "Bootloader entry point - sets up stack and calls kernel_main",
+      "body": [
+        {"type": "comment", "text": "Set up the stack"},
+        {"type": "mov", "dest": "esp", "src": "stack_top"},
+        {"type": "comment", "text": "Reset EFLAGS"},
+        {"type": "push", "value": "0"},
+        {"type": "popf"},
+        {"type": "comment", "text": "Push multiboot info for kernel_main"},
+        {"type": "push", "value": "ebx", "comment": "Multiboot info pointer"},
+        {"type": "push", "value": "eax", "comment": "Multiboot magic"},
+        {"type": "comment", "text": "Call kernel main"},
+        {"type": "call", "func": "kernel_main"},
+        {"type": "comment", "text": "Hang if kernel_main returns"},
+        {"type": "label", "name": ".hang"},
+        {"type": "cli"},
+        {"type": "hlt"},
+        {"type": "jmp", "target": ".hang"}
+      ]
+    }
+  ],
+  "external_symbols": [
+    {"name": "kernel_main", "type": "function"}
+  ],
+  "linker_requirements": {
+    "entry_point": "_start",
+    "load_address": "0x100000",
+    "section_order": [".multiboot", ".text", ".rodata", ".data", ".bss"]
+  }
+}

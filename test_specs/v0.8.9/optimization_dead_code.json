@@ -1,0 +1,78 @@
+{
+  "name": "dead_code_test",
+  "version": "0.8.9",
+  "description": "Test spec for dead code elimination optimization",
+  "types": [],
+  "functions": [
+    {
+      "name": "unreachable_after_return",
+      "args": [{"name": "x", "type": "i32"}],
+      "return_type": "i32",
+      "body": [
+        {"op": "return", "value": "x * 2"},
+        {"op": "assign", "target": "y", "value": "x + 1"},
+        {"op": "return", "value": "y"}
+      ]
+    },
+    {
+      "name": "nop_removal",
+      "args": [],
+      "return_type": "i32",
+      "body": [
+        {"op": "nop"},
+        {"op": "assign", "target": "x", "value": 42},
+        {"op": "nop"},
+        {"op": "nop"},
+        {"op": "return", "value": "x"}
+      ]
+    },
+    {
+      "name": "dead_code_in_if",
+      "args": [{"name": "flag", "type": "bool"}],
+      "return_type": "i32",
+      "body": [
+        {"op": "if", "condition": "flag",
+          "then_block": [
+            {"op": "return", "value": 1},
+            {"op": "assign", "target": "x", "value": 999}
+          ],
+          "else_block": [
+            {"op": "nop"},
+            {"op": "return", "value": 0}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "marked_dead_code",
+      "args": [],
+      "return_type": "void",
+      "body": [
+        {"op": "assign", "target": "active", "value": 1},
+        {"op": "assign", "target": "unused", "value": 2, "optimization": {"dead_code": true}},
+        {"op": "assign", "target": "also_unused", "value": 3, "optimization": {"dead_code": true}},
+        {"op": "return", "value": "active"}
+      ]
+    },
+    {
+      "name": "nested_dead_code",
+      "args": [{"name": "n", "type": "i32"}],
+      "return_type": "i32",
+      "body": [
+        {"op": "while", "condition": "n > 0",
+          "body": [
+            {"op": "assign", "target": "n", "value": "n - 1"},
+            {"op": "if", "condition": "n == 5",
+              "then_block": [
+                {"op": "return", "value": 5},
+                {"op": "nop"},
+                {"op": "assign", "target": "x", "value": 0}
+              ]
+            }
+          ]
+        },
+        {"op": "return", "value": 0}
+      ]
+    }
+  ]
+}

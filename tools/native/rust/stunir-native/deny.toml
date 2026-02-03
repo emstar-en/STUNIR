@@ -1,0 +1,88 @@
+# STUNIR Cargo Deny Configuration
+# License and vulnerability checking for Rust dependencies
+
+[graph]
+# All platforms we support
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+    "x86_64-pc-windows-msvc",
+]
+
+# =============================================================================
+# Advisories - Security vulnerability database
+# =============================================================================
+
+[advisories]
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "deny"
+notice = "warn"
+
+# =============================================================================
+# Licenses - Allowed license types
+# =============================================================================
+
+[licenses]
+unlicensed = "deny"
+allow-osi-fsf-free = "either"
+copyleft = "warn"
+default = "deny"
+confidence-threshold = 0.8
+
+# Allowlist of licenses
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "CC0-1.0",
+    "Unlicense",
+    "MPL-2.0",  # Mozilla Public License (weak copyleft, acceptable)
+]
+
+# Specific package exceptions
+[[licenses.clarify]]
+name = "ring"
+version = "*"
+expression = "MIT AND ISC AND OpenSSL"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 },
+]
+
+# =============================================================================
+# Bans - Forbidden crates or duplicate versions
+# =============================================================================
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+# Crates we explicitly do not want
+deny = [
+    # Example: deny specific problematic crates
+    # { name = "some-problematic-crate" },
+]
+
+# Allow specific duplicates if necessary
+allow = [
+    # Example: allow duplicate if needed
+    # { name = "some-crate", version = "*" },
+]
+
+# =============================================================================
+# Sources - Allowed registries
+# =============================================================================
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

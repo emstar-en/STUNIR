@@ -1,0 +1,37 @@
+{
+  "doc_type": "stunir.declarative_frontends_matrix.v0",
+  "frontends": {
+    "asp": {
+      "baseline": "clingo-flavored syntax subset",
+      "extensions": [
+        ".lp"
+      ],
+      "phase_b1": "normalized AST IR",
+      "phase_b2": "stable-model semantics-lift subset"
+    },
+    "datalog": {
+      "baseline": "Souffle-flavored syntax subset (declarative relations)",
+      "extensions": [
+        ".dl"
+      ],
+      "phase_b1": "normalized AST IR",
+      "phase_b2": "fixed-point semantics-lift subset"
+    },
+    "minizinc": {
+      "baseline": "MiniZinc core constraint subset",
+      "extensions": [
+        ".mzn"
+      ],
+      "phase_b1": "normalized AST IR",
+      "phase_b2": "constraint-model semantics-lift subset"
+    },
+    "prolog": {
+      "baseline": "ISO-leaning Horn clause subset",
+      "extensions": [
+        ".pl"
+      ],
+      "phase_b1": "normalized AST IR",
+      "phase_b2": "Horn clauses semantics-lift subset"
+    }
+  }
+}

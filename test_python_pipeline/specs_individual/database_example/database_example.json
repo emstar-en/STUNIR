@@ -1,0 +1,38 @@
+{
+  "module": "database_example",
+  "description": "Database operations example",
+  "functions": [
+    {
+      "name": "connect",
+      "params": [
+        {"name": "host", "type": "string"},
+        {"name": "port", "type": "i32"}
+      ],
+      "returns": "i32",
+      "body": [
+        {"type": "var_decl", "var_name": "conn_id", "var_type": "i32", "init": "-1"}
+      ]
+    },
+    {
+      "name": "execute_query",
+      "params": [
+        {"name": "conn_id", "type": "i32"},
+        {"name": "query", "type": "string"}
+      ],
+      "returns": "string",
+      "body": [
+        {"type": "var_decl", "var_name": "result", "var_type": "string", "init": "\"\""}
+      ]
+    },
+    {
+      "name": "close",
+      "params": [
+        {"name": "conn_id", "type": "i32"}
+      ],
+      "returns": "bool",
+      "body": [
+        {"type": "var_decl", "var_name": "success", "var_type": "bool", "init": "true"}
+      ]
+    }
+  ]
+}
