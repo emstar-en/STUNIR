@@ -1,10 +1,37 @@
 #!/usr/bin/env python3
+"""
+STUNIR Epoch Tool - Timestamp Generation Utility
+
+Generates canonical JSON output containing the current Unix timestamp
+and ISO 8601 formatted time. Used for build reproducibility and
+versioning in the STUNIR pipeline.
+
+Output Format (Canonical JSON - RFC 8785 / JCS subset):
+    {"iso_8601":"YYYY-MM-DDTHH:MM:SSZ","source":"stunir_epoch_tool","unix_timestamp":<int>}
+
+Features:
+    - Deterministic output (sorted keys, no whitespace)
+    - UTC timestamps only
+    - No external dependencies
+
+Usage:
+    python tools/epoch.py > timestamp.json
+    python tools/epoch.py | jq .
+
+Integration:
+    Called by build scripts to embed build timestamps in generated artifacts.
+    The canonical format ensures reproducible builds when the same timestamp
+    is used across different tools and languages.
+"""
+
 import json
 import time
 import sys
 import os
 
+
 def main():
+    """Generate and output canonical JSON timestamp."""
     # Capture standard epoch data
     now = time.time()
     data = {
@@ -24,6 +51,7 @@ def main():
     # However, the user requested 'strict canonical JSON', which usually implies the raw string.
     # We will write to stdout without an extra newline from print.
     sys.stdout.flush()
+
 
 if __name__ == "__main__":
     main()
