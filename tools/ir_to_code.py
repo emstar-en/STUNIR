@@ -30,75 +30,29 @@ from typing import Any, Dict, List
 # Type mapping from IR types to C types
 # Used for generating function signatures and variable declarations
 IR_TO_C_TYPE_MAP = {
-    # Signed integers
-    "i8": "int8_t",
-    "int8": "int8_t",
-    "int8_t": "int8_t",
-    "i16": "int16_t",
-    "int16": "int16_t",
-    "int16_t": "int16_t",
-    "i32": "int32_t",
-    "int": "int32_t",
-    "int32": "int32_t",
-    "int32_t": "int32_t",
-    "i64": "int64_t",
-    "int64": "int64_t",
-    "int64_t": "int64_t",
-    # Unsigned integers
-    "u8": "uint8_t",
-    "uint8": "uint8_t",
-    "uint8_t": "uint8_t",
-    "u16": "uint16_t",
-    "uint16": "uint16_t",
-    "uint16_t": "uint16_t",
-    "u32": "uint32_t",
-    "uint32": "uint32_t",
-    "uint32_t": "uint32_t",
-    "u64": "uint64_t",
-    "uint64": "uint64_t",
-    "uint64_t": "uint64_t",
-    # Floating point
-    "f32": "float",
-    "float": "float",
-    "f64": "double",
-    "double": "double",
-    # Other primitives
-    "bool": "bool",
-    "boolean": "bool",
-    "string": "const char*",
-    "char*": "const char*",
-    "cstring": "const char*",
+    "i8": "int8_t", "int8": "int8_t", "int8_t": "int8_t",
+    "i16": "int16_t", "int16": "int16_t", "int16_t": "int16_t",
+    "i32": "int32_t", "int": "int32_t", "int32": "int32_t", "int32_t": "int32_t",
+    "i64": "int64_t", "int64": "int64_t", "int64_t": "int64_t",
+    "u8": "uint8_t", "uint8": "uint8_t", "uint8_t": "uint8_t",
+    "u16": "uint16_t", "uint16": "uint16_t", "uint16_t": "uint16_t",
+    "u32": "uint32_t", "uint32": "uint32_t", "uint32_t": "uint32_t",
+    "u64": "uint64_t", "uint64": "uint64_t", "uint64_t": "uint64_t",
+    "f32": "float", "float": "float",
+    "f64": "double", "double": "double",
+    "bool": "bool", "boolean": "bool",
+    "string": "const char*", "char*": "const char*", "cstring": "const char*",
     "void": "void",
 }
 
 
 def c_type(type_str: str) -> str:
-    """Convert IR type string to C type declaration.
-    
-    Args:
-        type_str: IR type identifier (e.g., "i32", "bool", "string")
-        
-    Returns:
-        C type string (e.g., "int32_t", "bool", "const char*")
-        
-    Note:
-        Unknown types default to "void" for safety.
-    """
+    """Convert IR type string to C type declaration."""
     return IR_TO_C_TYPE_MAP.get(type_str, "void")
 
 
 def c_default_return(type_str: str) -> str:
-    """Generate default return value for a given type.
-    
-    Used for generating stub function bodies that compile
-    but indicate unimplemented logic.
-    
-    Args:
-        type_str: IR type identifier
-        
-    Returns:
-        C literal for default value of that type
-    """
+    """Generate default return value for a given type."""
     if type_str in ("i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", 
                     "int", "int32", "int64", "uint32", "uint64"):
         return "0"
@@ -112,17 +66,7 @@ def c_default_return(type_str: str) -> str:
 
 
 def normalize_functions(ir: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Extract function list from IR module with multiple key support.
-    
-    Handles both "functions" and "ir_functions" keys for backward
-    compatibility with different IR generation tools.
-    
-    Args:
-        ir: IR module dictionary
-        
-    Returns:
-        List of function definition dictionaries
-    """
+    """Extract function list from IR module with multiple key support."""
     if "functions" in ir and isinstance(ir["functions"], list):
         return ir["functions"]
     if "ir_functions" in ir and isinstance(ir["ir_functions"], list):
@@ -131,17 +75,7 @@ def normalize_functions(ir: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def normalize_args(func: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Extract argument list from function definition.
-    
-    Handles both "args" and "params" keys for compatibility
-    with different spec formats.
-    
-    Args:
-        func: Function definition dictionary
-        
-    Returns:
-        List of argument dictionaries with "name" and "type" keys
-    """
+    """Extract argument list from function definition."""
     args = func.get("args")
     if isinstance(args, list):
         return args
@@ -152,17 +86,7 @@ def normalize_args(func: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def normalize_return_type(func: Dict[str, Any]) -> str:
-    """Extract return type from function definition.
-    
-    Handles both "return_type" and "returns" keys for compatibility.
-    Defaults to "void" if not specified.
-    
-    Args:
-        func: Function definition dictionary
-        
-    Returns:
-        IR type string for return type
-    """
+    """Extract return type from function definition."""
     if "return_type" in func:
         return str(func.get("return_type") or "void")
     if "returns" in func:
@@ -171,40 +95,14 @@ def normalize_return_type(func: Dict[str, Any]) -> str:
 
 
 def emit_c(ir: Dict[str, Any]) -> str:
-    """Generate C code from IR module.
-    
-    Generates stub implementations for all functions in the IR.
-    Each function includes:
-    - Proper C type declarations
-    - Parameter list with types
-    - TODO comment indicating unimplemented status
-    - Default return value
-    
-    Args:
-        ir: IR module dictionary containing functions
-        
-    Returns:
-        Complete C source code as string
-        
-    Note:
-        This generates stubs only. Full implementation would
-        require processing IR steps (load, store, call, etc.)
-    """
-    # Get module name for header comment
+    """Generate C code from IR module matching SPARK output format."""
     module_name = ir.get("module_name") or ir.get("ir_module") or "module"
     
     lines = [
         "/* STUNIR Generated Code",
         " * Generated by: stunir_ir_to_code_python v0.2.0",
         f" * Module: {module_name}",
-        " *",
-        " * WARNING: This is a REFERENCE IMPLEMENTATION.",
-        " * For production use, use the Ada SPARK implementation.",
         " */",
-        "",
-        "#include <stdint.h>",
-        "#include <stdbool.h>",
-        "#include <stddef.h>",
         "",
     ]
     
@@ -213,7 +111,6 @@ def emit_c(ir: Dict[str, Any]) -> str:
         ret_type = normalize_return_type(func)
         args = normalize_args(func)
         
-        # Build parameter list
         arg_parts = []
         for arg in args:
             if isinstance(arg, dict):
@@ -225,15 +122,9 @@ def emit_c(ir: Dict[str, Any]) -> str:
         
         args_str = ", ".join(arg_parts) if arg_parts else "void"
         
-        # Function signature
         lines.append(f"{c_type(ret_type)} {name}({args_str}) {{")
-        
-        # Stub body with TODO marker for downstream processing
-        lines.append("    /* TODO: Implement - stub generated from IR */")
-        
-        if c_type(ret_type) != "void":
-            lines.append(f"    return {c_default_return(ret_type)};")
-        
+        lines.append("    /* TODO: Implement */")
+        lines.append(f"    return {c_default_return(ret_type)};")
         lines.append("}")
         lines.append("")
     
@@ -241,14 +132,7 @@ def emit_c(ir: Dict[str, Any]) -> str:
 
 
 def main() -> None:
-    """CLI entry point for IR to code generation.
-    
-    Supports:
-    - --ir: Path to IR JSON file
-    - --lang: Target language (must be "c")
-    - --templates: Optional template directory (unused in Python)
-    - --out: Output directory for generated code
-    """
+    """CLI entry point for IR to code generation."""
     parser = argparse.ArgumentParser(
         description="STUNIR IR to Code Generator (Python Reference)"
     )
@@ -262,16 +146,13 @@ def main() -> None:
         print(f"Error: Language '{args.lang}' not supported. Use 'c'.", file=os.sys.stderr)
         raise SystemExit(1)
 
-    # Load IR from JSON
     with open(args.ir, "r", encoding="utf-8") as f:
         ir = json.load(f)
 
-    # Ensure output directory exists
     output_dir = args.out
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "output.c")
 
-    # Write generated code
     with open(output_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(emit_c(ir))
     
