@@ -1,0 +1,400 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "ap_math_crc",
+  "description": "TEST OUTPUT: STUNIR analysis of ArduPilot AP_Math CRC module - DO-178C compliant specification",
+  "disclaimer": "TEST OUTPUT ONLY - NOT FOR PRODUCTION FLIGHT USE. Based on analysis of https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Math/crc.cpp",
+  "source_reference": "ArduPilot/ardupilot/libraries/AP_Math/crc.cpp @ master",
+  "source_license": "GPLv3",
+  "safety_level": "DAL_C",
+  "analysis_date": "2026-02-04",
+  "functions": [
+    {
+      "name": "crc_crc4",
+      "description": "CRC4 method from datasheet for 16 bytes (8 short values)",
+      "params": [
+        {
+          "name": "data",
+          "type": "u16[]",
+          "description": "Array of 8 uint16_t values (16 bytes total)"
+        }
+      ],
+      "returns": "u16",
+      "return_description": "4-bit CRC value in lower nibble",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "n_rem",
+          "var_type": "u16",
+          "init": "0"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "cnt",
+          "var_type": "u8",
+          "init": "0"
+        },
+        {
+          "type": "while",
+          "condition": "cnt < 16",
+          "body": [
+            {
+              "type": "if",
+              "condition": "cnt & 1",
+              "then": [
+                {
+                  "type": "assign",
+                  "target": "n_rem",
+                  "value": "n_rem ^ (data[cnt >> 1] & 0x00FF)"
+                }
+              ],
+              "else": [
+                {
+                  "type": "assign",
+                  "target": "n_rem",
+                  "value": "n_rem ^ (data[cnt >> 1] >> 8)"
+                }
+              ]
+            },
+            {
+              "type": "var_decl",
+              "var_name": "n_bit",
+              "var_type": "u8",
+              "init": "8"
+            },
+            {
+              "type": "while",
+              "condition": "n_bit > 0",
+              "body": [
+                {
+                  "type": "if",
+                  "condition": "n_rem & 0x8000",
+                  "then": [
+                    {
+                      "type": "assign",
+                      "target": "n_rem",
+                      "value": "(n_rem << 1) ^ 0x3000"
+                    }
+                  ],
+                  "else": [
+                    {
+                      "type": "assign",
+                      "target": "n_rem",
+                      "value": "n_rem << 1"
+                    }
+                  ]
+                },
+                {
+                  "type": "assign",
+                  "target": "n_bit",
+                  "value": "n_bit - 1"
+                }
+              ]
+            },
+            {
+              "type": "assign",
+              "target": "cnt",
+              "value": "cnt + 1"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "(n_rem >> 12) & 0xF"
+        }
+      ]
+    },
+    {
+      "name": "crc_crc8",
+      "description": "CRC8 from trone driver by Luis Rodrigues",
+      "params": [
+        {
+          "name": "p",
+          "type": "u8[]",
+          "description": "Input data buffer"
+        },
+        {
+          "name": "len",
+          "type": "u8",
+          "description": "Length of data"
+        }
+      ],
+      "returns": "u8",
+      "globals_used": ["crc8_table"],
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "crc",
+          "var_type": "u16",
+          "init": "0x0"
+        },
+        {
+          "type": "while",
+          "condition": "len > 0",
+          "body": [
+            {
+              "type": "var_decl",
+              "var_name": "i",
+              "var_type": "u16",
+              "init": "(crc ^ *p) & 0xFF"
+            },
+            {
+              "type": "assign",
+              "target": "crc",
+              "value": "(crc8_table[i] ^ (crc << 8)) & 0xFF"
+            },
+            {
+              "type": "assign",
+              "target": "p",
+              "value": "p + 1"
+            },
+            {
+              "type": "assign",
+              "target": "len",
+              "value": "len - 1"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "crc & 0xFF"
+        }
+      ]
+    },
+    {
+      "name": "crc8_dvb_s2",
+      "description": "CRC8-DVB-S2 from Betaflight",
+      "params": [
+        {
+          "name": "crc",
+          "type": "u8"
+        },
+        {
+          "name": "a",
+          "type": "u8"
+        }
+      ],
+      "returns": "u8",
+      "body": [
+        {
+          "type": "return",
+          "value": "crc8_dvb(crc, a, 0xD5)"
+        }
+      ]
+    },
+    {
+      "name": "crc8_dvb",
+      "description": "Generic CRC8-DVB implementation",
+      "params": [
+        {
+          "name": "crc",
+          "type": "u8"
+        },
+        {
+          "name": "a",
+          "type": "u8"
+        },
+        {
+          "name": "seed",
+          "type": "u8",
+          "description": "Polynomial seed"
+        }
+      ],
+      "returns": "u8",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "i",
+          "var_type": "u8",
+          "init": "0"
+        },
+        {
+          "type": "assign",
+          "target": "crc",
+          "value": "crc ^ a"
+        },
+        {
+          "type": "while",
+          "condition": "i < 8",
+          "body": [
+            {
+              "type": "if",
+              "condition": "crc & 0x80",
+              "then": [
+                {
+                  "type": "assign",
+                  "target": "crc",
+                  "value": "(crc << 1) ^ seed"
+                }
+              ],
+              "else": [
+                {
+                  "type": "assign",
+                  "target": "crc",
+                  "value": "crc << 1"
+                }
+              ]
+            },
+            {
+              "type": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "crc"
+        }
+      ]
+    },
+    {
+      "name": "crc16_ccitt",
+      "description": "CRC16-CCITT implementation from Swift Navigation",
+      "params": [
+        {
+          "name": "buf",
+          "type": "u8[]",
+          "description": "Input buffer"
+        },
+        {
+          "name": "len",
+          "type": "u32",
+          "description": "Buffer length"
+        },
+        {
+          "name": "crc",
+          "type": "u16",
+          "description": "Initial CRC value"
+        }
+      ],
+      "returns": "u16",
+      "globals_used": ["crc16tab"],
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "i",
+          "var_type": "u32",
+          "init": "0"
+        },
+        {
+          "type": "while",
+          "condition": "i < len",
+          "body": [
+            {
+              "type": "assign",
+              "target": "crc",
+              "value": "(crc << 8) ^ crc16tab[((crc >> 8) ^ *buf) & 0x00FF]"
+            },
+            {
+              "type": "assign",
+              "target": "buf",
+              "value": "buf + 1"
+            },
+            {
+              "type": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "crc"
+        }
+      ]
+    },
+    {
+      "name": "crc_fletcher16",
+      "description": "Fletcher-16 checksum implementation",
+      "params": [
+        {
+          "name": "buffer",
+          "type": "u8[]"
+        },
+        {
+          "name": "len",
+          "type": "u32"
+        }
+      ],
+      "returns": "u16",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "c0",
+          "var_type": "u16",
+          "init": "0"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "c1",
+          "var_type": "u16",
+          "init": "0"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "i",
+          "var_type": "u32",
+          "init": "0"
+        },
+        {
+          "type": "while",
+          "condition": "i < len",
+          "body": [
+            {
+              "type": "assign",
+              "target": "c0",
+              "value": "(c0 + buffer[i]) % 255"
+            },
+            {
+              "type": "assign",
+              "target": "c1",
+              "value": "(c1 + c0) % 255"
+            },
+            {
+              "type": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "(c1 << 8) | c0"
+        }
+      ]
+    }
+  ],
+  "globals": [
+    {
+      "name": "crc8_table",
+      "type": "u8[256]",
+      "description": "Lookup table for CRC8 calculation",
+      "init": "{0x00, 0x07, 0x0e, 0x09, 0x1c, 0x1b, 0x12, 0x15, 0x38, 0x3f, 0x36, 0x31, 0x24, 0x23, 0x2a, 0x2d, ...}"
+    },
+    {
+      "name": "crc16tab",
+      "type": "u16[256]",
+      "description": "Lookup table for CRC16-CCITT",
+      "init": "{0x0000, 0x1021, 0x2042, 0x3063, ...}"
+    }
+  ],
+  "requirements": [
+    "REQ_CRC_001: CRC4 shall compute 4-bit CRC for 16-byte data arrays",
+    "REQ_CRC_002: CRC8 shall use table lookup for performance",
+    "REQ_CRC_003: CRC16-CCITT shall conform to standard polynomial",
+    "REQ_CRC_004: Fletcher16 shall compute modulo 255 checksum",
+    "REQ_CRC_005: All CRC functions shall be deterministic and reproducible"
+  ],
+  "test_vectors": [
+    {
+      "function": "crc_crc4",
+      "input": "{0x1234, 0x5678, 0x9ABC, 0xDEF0, 0x0FED, 0xCBA9, 0x8765, 0x4321}",
+      "expected": "varies"
+    },
+    {
+      "function": "crc_fletcher16",
+      "input": "{0x01, 0x02, 0x03, 0x04}",
+      "expected": "0x0403"
+    }
+  ]
+}

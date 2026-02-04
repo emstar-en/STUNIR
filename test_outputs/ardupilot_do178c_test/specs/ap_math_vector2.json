@@ -1,0 +1,444 @@
+{
+  "schema": "stunir.spec.v1",
+  "module": "ap_math_vector2",
+  "description": "TEST OUTPUT: STUNIR analysis of ArduPilot AP_Math Vector2 module - DO-178C compliant specification",
+  "disclaimer": "TEST OUTPUT ONLY - NOT FOR PRODUCTION FLIGHT USE. Based on analysis of https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Math/vector2.cpp",
+  "source_reference": "ArduPilot/ardupilot/libraries/AP_Math/vector2.cpp @ master",
+  "source_license": "GPLv3",
+  "safety_level": "DAL_C",
+  "analysis_date": "2026-02-04",
+  "functions": [
+    {
+      "name": "vector2_length_squared",
+      "description": "Calculate squared length of 2D vector",
+      "params": [
+        {
+          "name": "x",
+          "type": "f32"
+        },
+        {
+          "name": "y",
+          "type": "f32"
+        }
+      ],
+      "returns": "f32",
+      "body": [
+        {
+          "type": "return",
+          "value": "x*x + y*y"
+        }
+      ]
+    },
+    {
+      "name": "vector2_length",
+      "description": "Calculate length (magnitude) of 2D vector",
+      "params": [
+        {
+          "name": "x",
+          "type": "f32"
+        },
+        {
+          "name": "y",
+          "type": "f32"
+        }
+      ],
+      "returns": "f32",
+      "body": [
+        {
+          "type": "return",
+          "value": "sqrt(x*x + y*y)"
+        }
+      ]
+    },
+    {
+      "name": "vector2_limit_length",
+      "description": "Limit vector to maximum length",
+      "params": [
+        {
+          "name": "x",
+          "type": "f32",
+          "direction": "inout"
+        },
+        {
+          "name": "y",
+          "type": "f32",
+          "direction": "inout"
+        },
+        {
+          "name": "max_length",
+          "type": "f32"
+        }
+      ],
+      "returns": "bool",
+      "return_description": "true if vector was limited",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "len",
+          "var_type": "f32",
+          "init": "vector2_length(x, y)"
+        },
+        {
+          "type": "if",
+          "condition": "len > max_length && len > 0",
+          "then": [
+            {
+              "type": "assign",
+              "target": "x",
+              "value": "x * (max_length / len)"
+            },
+            {
+              "type": "assign",
+              "target": "y",
+              "value": "y * (max_length / len)"
+            },
+            {
+              "type": "return",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "name": "vector2_dot_product",
+      "description": "Calculate dot product of two 2D vectors",
+      "params": [
+        {
+          "name": "x1",
+          "type": "f32"
+        },
+        {
+          "name": "y1",
+          "type": "f32"
+        },
+        {
+          "name": "x2",
+          "type": "f32"
+        },
+        {
+          "name": "y2",
+          "type": "f32"
+        }
+      ],
+      "returns": "f32",
+      "body": [
+        {
+          "type": "return",
+          "value": "x1*x2 + y1*y2"
+        }
+      ]
+    },
+    {
+      "name": "vector2_cross_product",
+      "description": "Calculate 2D cross product (scalar result)",
+      "params": [
+        {
+          "name": "x1",
+          "type": "f32"
+        },
+        {
+          "name": "y1",
+          "type": "f32"
+        },
+        {
+          "name": "x2",
+          "type": "f32"
+        },
+        {
+          "name": "y2",
+          "type": "f32"
+        }
+      ],
+      "returns": "f32",
+      "body": [
+        {
+          "type": "return",
+          "value": "x1*y2 - y1*x2"
+        }
+      ]
+    },
+    {
+      "name": "vector2_angle_between",
+      "description": "Calculate angle between two vectors",
+      "params": [
+        {
+          "name": "x1",
+          "type": "f32"
+        },
+        {
+          "name": "y1",
+          "type": "f32"
+        },
+        {
+          "name": "x2",
+          "type": "f32"
+        },
+        {
+          "name": "y2",
+          "type": "f32"
+        }
+      ],
+      "returns": "f32",
+      "return_description": "Angle in radians",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "len",
+          "var_type": "f32",
+          "init": "vector2_length(x1, y1) * vector2_length(x2, y2)"
+        },
+        {
+          "type": "if",
+          "condition": "len <= 0",
+          "then": [
+            {
+              "type": "return",
+              "value": "0.0"
+            }
+          ]
+        },
+        {
+          "type": "var_decl",
+          "var_name": "cosv",
+          "var_type": "f32",
+          "init": "vector2_dot_product(x1, y1, x2, y2) / len"
+        },
+        {
+          "type": "if",
+          "condition": "cosv >= 1.0",
+          "then": [
+            {
+              "type": "return",
+              "value": "0.0"
+            }
+          ]
+        },
+        {
+          "type": "if",
+          "condition": "cosv <= -1.0",
+          "then": [
+            {
+              "type": "return",
+              "value": "3.14159265"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "acos(cosv)"
+        }
+      ]
+    },
+    {
+      "name": "vector2_normalize",
+      "description": "Normalize vector to unit length",
+      "params": [
+        {
+          "name": "x",
+          "type": "f32",
+          "direction": "inout"
+        },
+        {
+          "name": "y",
+          "type": "f32",
+          "direction": "inout"
+        }
+      ],
+      "returns": "void",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "len",
+          "var_type": "f32",
+          "init": "vector2_length(x, y)"
+        },
+        {
+          "type": "if",
+          "condition": "len > 0",
+          "then": [
+            {
+              "type": "assign",
+              "target": "x",
+              "value": "x / len"
+            },
+            {
+              "type": "assign",
+              "target": "y",
+              "value": "y / len"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vector2_segment_intersection",
+      "description": "Find intersection of two line segments",
+      "params": [
+        {
+          "name": "seg1_start_x",
+          "type": "f32"
+        },
+        {
+          "name": "seg1_start_y",
+          "type": "f32"
+        },
+        {
+          "name": "seg1_end_x",
+          "type": "f32"
+        },
+        {
+          "name": "seg1_end_y",
+          "type": "f32"
+        },
+        {
+          "name": "seg2_start_x",
+          "type": "f32"
+        },
+        {
+          "name": "seg2_start_y",
+          "type": "f32"
+        },
+        {
+          "name": "seg2_end_x",
+          "type": "f32"
+        },
+        {
+          "name": "seg2_end_y",
+          "type": "f32"
+        },
+        {
+          "name": "out_x",
+          "type": "f32",
+          "direction": "out"
+        },
+        {
+          "name": "out_y",
+          "type": "f32",
+          "direction": "out"
+        }
+      ],
+      "returns": "bool",
+      "return_description": "true if segments intersect",
+      "body": [
+        {
+          "type": "var_decl",
+          "var_name": "r1_x",
+          "var_type": "f32",
+          "init": "seg1_end_x - seg1_start_x"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "r1_y",
+          "var_type": "f32",
+          "init": "seg1_end_y - seg1_start_y"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "r2_x",
+          "var_type": "f32",
+          "init": "seg2_end_x - seg2_start_x"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "r2_y",
+          "var_type": "f32",
+          "init": "seg2_end_y - seg2_start_y"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "r1xr2",
+          "var_type": "f32",
+          "init": "r1_x * r2_y - r1_y * r2_x"
+        },
+        {
+          "type": "if",
+          "condition": "r1xr2 == 0",
+          "then": [
+            {
+              "type": "return",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "type": "var_decl",
+          "var_name": "ss2_ss1_x",
+          "var_type": "f32",
+          "init": "seg2_start_x - seg1_start_x"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "ss2_ss1_y",
+          "var_type": "f32",
+          "init": "seg2_start_y - seg1_start_y"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "t",
+          "var_type": "f32",
+          "init": "(ss2_ss1_x * r2_y - ss2_ss1_y * r2_x) / r1xr2"
+        },
+        {
+          "type": "var_decl",
+          "var_name": "u",
+          "var_type": "f32",
+          "init": "(ss2_ss1_x * r1_y - ss2_ss1_y * r1_x) / r1xr2"
+        },
+        {
+          "type": "if",
+          "condition": "u >= 0 && u <= 1 && t >= 0 && t <= 1",
+          "then": [
+            {
+              "type": "assign",
+              "target": "out_x",
+              "value": "seg1_start_x + r1_x * t"
+            },
+            {
+              "type": "assign",
+              "target": "out_y",
+              "value": "seg1_start_y + r1_y * t"
+            },
+            {
+              "type": "return",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "type": "return",
+          "value": "false"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    "REQ_VEC_001: Vector length shall be computed as sqrt(x² + y²)",
+    "REQ_VEC_002: Dot product shall be x1*x2 + y1*y2",
+    "REQ_VEC_003: Cross product shall be x1*y2 - y1*x2",
+    "REQ_VEC_004: Angle between vectors shall handle edge cases (zero, parallel)",
+    "REQ_VEC_005: Normalization shall handle zero-length vectors gracefully",
+    "REQ_VEC_006: Segment intersection shall use robust line intersection algorithm"
+  ],
+  "test_vectors": [
+    {
+      "function": "vector2_length",
+      "input": "x=3, y=4",
+      "expected": "5.0"
+    },
+    {
+      "function": "vector2_dot_product",
+      "input": "(1,0) dot (0,1)",
+      "expected": "0.0"
+    },
+    {
+      "function": "vector2_cross_product",
+      "input": "(1,0) cross (0,1)",
+      "expected": "1.0"
+    }
+  ]
+}
