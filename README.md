@@ -260,26 +260,31 @@ STUNIR exists because "model-written code" becomes practical only when the **mod
 STUNIR implements a **standardized, deterministic sequence of steps** from inputs → IR → outputs, ensuring the process is replayable and verifiable.
 This repo encodes that sequence explicitly (see `scripts/build.sh`).
 
-### Hash Uniqueness (Current Implementation)
-**⚠️ IMPORTANT**: STUNIR currently uses hash-based manifests for determinism, NOT true semantic IR.
+### Hash Uniqueness (Foundation Layer)
 
-For the current stage, STUNIR uses **hash uniqueness** as the determinism/equivalence layer:
+STUNIR uses **hash uniqueness** as the determinism/equivalence foundation:
 * Canonicalization produces stable byte-level representations
 * Commitments/hashes bind artifacts to those representations
 * Verification stays cheap (re-hash + compare)
 
 Concretely, this repo normalizes JSON into canonical bytes (sorted keys, stable separators), so "same structure" ⇒ "same bytes" ⇒ "same sha256" (see `tools/spark/src/stunir_spec_to_ir.adb` for the primary SPARK implementation).
 
-**⚠️ LIMITATION**: This is NOT true semantic equivalence. Different syntactic representations of semantically identical code will produce different hashes.
+**Note**: Hash-based equivalence ensures syntactic identity. For semantic equivalence, see Semantic IR below.
 
-### Future: Semantic IR (Planned)
-The TRUE goal of STUNIR is to implement **Semantic IR** (AST-based intermediate representation) that:
+### Semantic IR (Implemented)
+
+STUNIR now implements **Semantic IR** (AST-based intermediate representation) that:
 * Preserves semantic meaning, not just syntactic structure
 * Allows different syntactic forms to normalize to the same semantic IR
 * Enables true semantic equivalence checking
 * Supports sophisticated code transformations
 
-This will be implemented in upcoming releases. See `docs/SEMANTIC_IR_SPECIFICATION.md` for the design.
+The Semantic IR system is available in `tools/rust/semantic_ir/` and provides:
+* Canonical AST representation with semantic-preserving transformations
+* Language-agnostic semantic analysis
+* Cross-language equivalence verification
+
+See `docs/SEMANTIC_IR_SPECIFICATION.md` for detailed design documentation.
 
 ### Future: Church-Rosser Confluence (CRIR Project)
 Full Church–Rosser confluence properties will be implemented in the upcoming **CRIR (Church-Rosser Intermediate Reference)** utility—a separate project that will provide formal confluence guarantees across transformation pipelines.
@@ -304,7 +309,7 @@ So the workflow became:
 3. Generate one or more language outputs from the IR.
 4. Cross-check via hash-based receipts so determinism and auditability are built in.
 
-The current implementation uses hash-based determinism as an efficient foundation. The roadmap includes semantic IR and eventually formal confluence properties (via the separate CRIR project).
+The current implementation uses hash-based determinism as an efficient foundation with Semantic IR for semantic equivalence. The roadmap includes formal confluence properties (via the separate CRIR project).
 ## What STUNIR is (and is not)
 ### STUNIR is
 * A repeatable way to compile **spec → IR → artifacts** under strict determinism controls.
