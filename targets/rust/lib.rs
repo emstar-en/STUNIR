@@ -35,6 +35,7 @@ pub mod beam;
 pub mod asp;
 pub mod json;
 pub mod asm_ir;
+pub mod c;
 
 // Re-export common types
 pub use types::*;

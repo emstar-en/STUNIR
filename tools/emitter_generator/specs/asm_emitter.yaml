@@ -1,0 +1,54 @@
+# STUNIR Emitter Specification: ASM
+# Raw assembly emitter
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: asm
+description: "Raw assembly emitter"
+output_types:
+  - asm
+features:
+  - labels
+  - directives
+extension: asm
+config:
+  Syntax: "String"
+config_defaults:
+  Syntax: "intel"
+type_map:
+  i32: "dword"
+  i64: "qword"
+  f32: "single"
+  f64: "double"
+  bool: "byte"
+  string: "byteptr"
+ir_fields:
+  required:
+    - functions
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Raw assembly text format.
+example_input:
+  module: "example"
+  functions:
+    - name: "noop"
+      return_type: "void"
+      params: []
+example_output: |
+  noop:
+      ret
+architectures:
+  - any
+notes: |
+  - Emit labels and directives consistently
+  - Respect syntax selection

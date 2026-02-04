@@ -127,7 +127,7 @@ def register_specialized_emitters():
         ("beam", "semantic_ir.emitters.specialized.beam", "BEAMEmitter", "BEAMEmitterConfig"),
         ("asp", "semantic_ir.emitters.specialized.asp", "ASPEmitter", "ASPEmitterConfig"),
     ]
-    
+
     for name, module_path, class_name, config_name in specialized_modules:
         try:
             module = __import__(module_path, fromlist=[class_name, config_name])
@@ -138,13 +138,107 @@ def register_specialized_emitters():
             pass
 
 
+def _normalize_op(op: str) -> str:
+    """Normalize operation name to standard form."""
+    if op == "noop":
+        return "nop"
+    if op == "generic_call":
+        return "call"
+    return op
+
+
+def _steps_to_statements(steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Convert flat steps to nested statements with proper control flow structure."""
+    total = len(steps)
+    processed = set()
+
+    def mark_range(start: int, count: int) -> None:
+        if start <= 0 or count <= 0:
+            return
+        for idx in range(start, start + count):
+            if 1 <= idx <= total:
+                processed.add(idx)
+
+    def build_block(start: int, count: int) -> List[Dict[str, Any]]:
+        if start <= 0 or count <= 0:
+            return []
+        end = min(start + count - 1, total)
+        out: List[Dict[str, Any]] = []
+        i = start
+        while i <= end:
+            if i in processed:
+                i += 1
+                continue
+            step = steps[i - 1]
+            op = _normalize_op(step.get("op", ""))
+            stmt: Dict[str, Any] = {"type": op}
+            if op == "if":
+                stmt["condition"] = step.get("condition", "")
+                then_start = int(step.get("block_start", 0) or 0)
+                then_count = int(step.get("block_count", 0) or 0)
+                else_start = int(step.get("else_start", 0) or 0)
+                else_count = int(step.get("else_count", 0) or 0)
+                if then_start and then_count:
+                    mark_range(then_start, then_count)
+                    stmt["then"] = build_block(then_start, then_count)
+                if else_start and else_count:
+                    mark_range(else_start, else_count)
+                    stmt["else"] = build_block(else_start, else_count)
+            elif op == "while":
+                stmt["condition"] = step.get("condition", "")
+                body_start = int(step.get("block_start", 0) or 0)
+                body_count = int(step.get("block_count", 0) or 0)
+                if body_start and body_count:
+                    mark_range(body_start, body_count)
+                    stmt["body"] = build_block(body_start, body_count)
+            elif op == "for":
+                stmt["init"] = step.get("init", "")
+                stmt["condition"] = step.get("condition", "")
+                stmt["increment"] = step.get("increment", "")
+                body_start = int(step.get("block_start", 0) or 0)
+                body_count = int(step.get("block_count", 0) or 0)
+                if body_start and body_count:
+                    mark_range(body_start, body_count)
+                    stmt["body"] = build_block(body_start, body_count)
+            elif op == "switch":
+                stmt["expr"] = step.get("expr", step.get("value", ""))
+                cases = []
+                for case in step.get("cases", []) or []:
+                    case_start = int(case.get("block_start", 0) or 0)
+                    case_count = int(case.get("block_count", 0) or 0)
+                    case_body = []
+                    if case_start and case_count:
+                        mark_range(case_start, case_count)
+                        case_body = build_block(case_start, case_count)
+                    cases.append({"value": case.get("value"), "body": case_body})
+                if cases:
+                    stmt["cases"] = cases
+                default_start = int(step.get("default_start", 0) or 0)
+                default_count = int(step.get("default_count", 0) or 0)
+                if default_start and default_count:
+                    mark_range(default_start, default_count)
+                    stmt["default"] = build_block(default_start, default_count)
+            else:
+                if "target" in step:
+                    stmt["target"] = step.get("target")
+                if "value" in step:
+                    stmt["value"] = step.get("value")
+                if "cast_type" in step:
+                    stmt["cast_type"] = step.get("cast_type")
+            out.append(stmt)
+            i += 1
+        return out
+
+    return build_block(1, total)
+
+
 def json_to_ir_module(json_data: Dict[str, Any]) -> 'IRModule':
     """Convert JSON IR to IRModule object."""
     # Extract module info
     module_name = json_data.get("module_name") or json_data.get("ir_module") or "module"
     ir_version = json_data.get("ir_version", "1.0")
     docstring = json_data.get("docstring")
-    
+
     # Convert types
     types = []
     for type_data in json_data.get("types", []):
@@ -160,7 +254,7 @@ def json_to_ir_module(json_data: Dict[str, Any]) -> 'IRModule':
             fields=fields,
             docstring=type_data.get("docstring")
         ))
-    
+
     # Convert functions
     functions = []
     funcs_data = json_data.get("ir_functions", json_data.get("functions", []))
@@ -177,15 +271,38 @@ def json_to_ir_module(json_data: Dict[str, Any]) -> 'IRModule':
                     name=arg_data.get("name", ""),
                     param_type=param_type
                 ))
-        
+
         # Convert statements
         statements = []
         stmts_data = func_data.get("statements", func_data.get("body", []))
+        if not stmts_data and func_data.get("steps"):
+            stmts_data = _steps_to_statements(func_data.get("steps", []))
         for stmt_data in stmts_data:
             if isinstance(stmt_data, dict):
+                # IR uses "type" field, not "kind"
+                stmt_type_str = stmt_data.get("type", stmt_data.get("kind", "nop"))
+                # Map IR statement types to IRStatementType enum values
+                stmt_type_map = {
+                    "while": "loop",
+                    "for": "loop",
+                    "if": "if",
+                    "assign": "assign",
+                    "return": "return",
+                    "var_decl": "var_decl",
+                    "call": "call",
+                    "nop": "nop",
+                    "add": "add",
+                    "sub": "sub",
+                    "mul": "mul",
+                    "div": "div",
+                    "break": "break",
+                    "continue": "continue",
+                    "block": "block",
+                }
+                mapped_type = stmt_type_map.get(stmt_type_str, stmt_type_str)
                 statements.append(IRStatement(
-                    stmt_type=IRStatementType(stmt_data.get("kind", "nop")),
-                    data_type=_parse_type(stmt_data.get("type", "void")),
+                    stmt_type=IRStatementType(mapped_type),
+                    data_type=_parse_type(stmt_data.get("data_type", stmt_data.get("var_type", "void"))),
                     target=stmt_data.get("target"),
                     value=stmt_data.get("value"),
                     left_op=stmt_data.get("left"),
@@ -337,6 +454,179 @@ def default_return(type_str: str, lang: str) -> str:
     return defaults.get(lang, {}).get(type_str.lower(), "0")
 
 
+def emit_statement(stmt: Dict[str, Any], lang: str, indent: int = 0) -> List[str]:
+    """Emit a single IR statement to target language code.
+
+    Args:
+        stmt: IR statement dictionary
+        lang: Target language
+        indent: Indentation level
+
+    Returns:
+        List of code lines
+    """
+    lines = []
+    indent_str = "    " * indent
+
+    stmt_type = stmt.get("type", "")
+
+    if stmt_type == "var_decl":
+        var_name = stmt.get("var_name", "")
+        var_type = stmt.get("var_type", "")
+        init = stmt.get("init", None)
+
+        mapped_type = map_type(var_type, lang)
+
+        if lang == "c":
+            if init is not None:
+                lines.append(f"{indent_str}{mapped_type} {var_name} = {init};")
+            else:
+                lines.append(f"{indent_str}{mapped_type} {var_name};")
+        elif lang == "rust":
+            if init is not None:
+                lines.append(f"{indent_str}let {var_name}: {mapped_type} = {init};")
+            else:
+                lines.append(f"{indent_str}let {var_name}: {mapped_type};")
+        elif lang == "python":
+            if init is not None:
+                lines.append(f"{indent_str}{var_name} = {init}")
+            else:
+                lines.append(f"{indent_str}{var_name} = None")
+        elif lang == "ada":
+            if init is not None:
+                lines.append(f"{indent_str}{var_name} : {mapped_type} := {init};")
+            else:
+                lines.append(f"{indent_str}{var_name} : {mapped_type};")
+
+    elif stmt_type == "assign":
+        target = stmt.get("target", "")
+        value = stmt.get("value", "")
+
+        if lang == "python":
+            lines.append(f"{indent_str}{target} = {value}")
+        else:
+            lines.append(f"{indent_str}{target} = {value};")
+
+    elif stmt_type == "return":
+        value = stmt.get("value", None)
+        if value is not None:
+            if lang == "python":
+                lines.append(f"{indent_str}return {value}")
+            else:
+                lines.append(f"{indent_str}return {value};")
+        else:
+            if lang == "python":
+                lines.append(f"{indent_str}return")
+            else:
+                lines.append(f"{indent_str}return;")
+
+    elif stmt_type == "if":
+        condition = stmt.get("condition", "")
+        then_body = stmt.get("then", [])
+        else_body = stmt.get("else", [])
+
+        if lang == "python":
+            lines.append(f"{indent_str}if {condition}:")
+            if then_body:
+                for s in then_body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+            else:
+                lines.append(f"{indent_str}    pass")
+            if else_body:
+                lines.append(f"{indent_str}else:")
+                for s in else_body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+        else:
+            lines.append(f"{indent_str}if ({condition}) {{")
+            for s in then_body:
+                lines.extend(emit_statement(s, lang, indent + 1))
+            if else_body:
+                lines.append(f"{indent_str}}} else {{")
+                for s in else_body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+            lines.append(f"{indent_str}}}")
+
+    elif stmt_type == "while" or stmt_type == "loop":
+        condition = stmt.get("condition", "")
+        body = stmt.get("body", [])
+
+        if lang == "python":
+            lines.append(f"{indent_str}while {condition}:")
+            if body:
+                for s in body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+            else:
+                lines.append(f"{indent_str}    pass")
+        else:
+            lines.append(f"{indent_str}while ({condition}) {{")
+            for s in body:
+                lines.extend(emit_statement(s, lang, indent + 1))
+            lines.append(f"{indent_str}}}")
+
+    return lines
+
+    elif stmt_type == "if":
+        condition = stmt.get("condition", "")
+        then_body = stmt.get("then", [])
+        else_body = stmt.get("else", [])
+
+        if lang == "python":
+            lines.append(f"{indent_str}if {condition}:")
+            if then_body:
+                for s in then_body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+            else:
+                lines.append(f"{indent_str}    pass")
+            if else_body:
+                lines.append(f"{indent_str}else:")
+                for s in else_body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+        else:
+            lines.append(f"{indent_str}if ({condition}) {{")
+            for s in then_body:
+                lines.extend(emit_statement(s, lang, indent + 1))
+            if else_body:
+                lines.append(f"{indent_str}}} else {{")
+                for s in else_body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+            lines.append(f"{indent_str}}}")
+
+    elif stmt_type == "while":
+        condition = stmt.get("condition", "")
+        body = stmt.get("body", [])
+
+        if lang == "python":
+            lines.append(f"{indent_str}while {condition}:")
+            if body:
+                for s in body:
+                    lines.extend(emit_statement(s, lang, indent + 1))
+            else:
+                lines.append(f"{indent_str}    pass")
+        else:
+            lines.append(f"{indent_str}while ({condition}) {{")
+            for s in body:
+                lines.extend(emit_statement(s, lang, indent + 1))
+            lines.append(f"{indent_str}}}")
+
+    return lines
+
+
+def emit_function_body(body: List[Dict[str, Any]], lang: str) -> List[str]:
+    """Emit function body from IR statements.
+
+    Args:
+        body: List of IR statement dictionaries
+        lang: Target language
+
+    Returns:
+        List of code lines
+    """
+    lines = []
+    for stmt in body:
+        lines.extend(emit_statement(stmt, lang, indent=1))
+    return lines
+
+
 def emit_general_language(ir_module: 'IRModule', lang: str) -> str:
     """Generate code for a general-purpose language from IRModule."""
     lines = []
@@ -430,14 +720,36 @@ def emit_general_language(ir_module: 'IRModule', lang: str) -> str:
         else:  # c
             lines.append(f"{ret_type} {func.name}({args_str}) {{")
 
-        # Generate body
-        if lang == "python":
-            lines.append("    # TODO: Implement")
+        # Generate body from IR statements
+        body_dicts = []
+        if hasattr(func, 'statements') and func.statements:
+            # Convert IRStatement objects to dicts for emit_function_body
+            for stmt in func.statements:
+                stmt_dict = {"type": stmt.stmt_type.value if hasattr(stmt.stmt_type, 'value') else str(stmt.stmt_type)}
+                if stmt.target:
+                    stmt_dict["target"] = stmt.target
+                if stmt.value:
+                    stmt_dict["value"] = stmt.value
+                if stmt.left_op:
+                    stmt_dict["left"] = stmt.left_op
+                if stmt.right_op:
+                    stmt_dict["right"] = stmt.right_op
+                body_dicts.append(stmt_dict)
+
+        if body_dicts:
+            body_lines = emit_function_body(body_dicts, lang)
+            lines.extend(body_lines)
         else:
-            lines.append("    // TODO: Implement")
+            # Fallback to TODO if no body
+            if lang == "python":
+                lines.append("    # TODO: Implement")
+            else:
+                lines.append("    // TODO: Implement")
 
         if lang != "ada":
-            if func.return_type != IRDataType.VOID and ret_type not in ("", "void", "None", "()"):
+            # Only add default return if no explicit return in body
+            has_return = any(s.stmt_type == IRStatementType.RETURN for s in func.statements) if hasattr(func, 'statements') and func.statements else False
+            if not has_return and func.return_type != IRDataType.VOID and ret_type not in ("", "void", "None", "()"):
                 default = default_return(func.return_type.value, lang)
                 if lang == "python":
                     lines.append(f"    return {default}")

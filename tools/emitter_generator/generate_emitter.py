@@ -328,103 +328,113 @@ class EmitterGenerator:
         self.generated_files.append({'path': str(doc_file.relative_to(self.repo_root)), 'language': 'markdown'})
         
         print(f"    \u2705 Generated README.md")
-    
-    def update_build_systems(self, spec: Dict[str, Any]) -> None:
+
+    def update_build_systems(self, spec: Dict[str, Any], pipelines: List[str]) -> None:
         """Update build system files to include new emitter.
-        
+
         Args:
             spec: Emitter specification
+            pipelines: List of target pipelines to update
         """
         category = spec['category']
         category_title = category.title().replace('_', '')
-        
+
         print(f"  \u2699\ufe0f  Updating build systems...")
-        
+
         # Update Rust lib.rs
-        rust_lib = self.repo_root / "targets" / "rust" / "lib.rs"
-        if rust_lib.exists():
-            content = rust_lib.read_text()
-            if f"pub mod {category};" not in content:
-                # Find a good place to insert (after other pub mod declarations)
-                lines = content.split('\n')
-                insert_idx = 0
-                for i, line in enumerate(lines):
-                    if line.strip().startswith('pub mod '):
-                        insert_idx = i + 1
-                
-                lines.insert(insert_idx, f"pub mod {category};")
-                rust_lib.write_text('\n'.join(lines))
-                print(f"    \u2705 Updated Rust lib.rs")
-        
+        if 'rust' in pipelines:
+            rust_lib = self.repo_root / "targets" / "rust" / "lib.rs"
+            if rust_lib.exists():
+                content = rust_lib.read_text()
+                if f"pub mod {category};" not in content:
+                    # Find a good place to insert (after other pub mod declarations)
+                    lines = content.split('\n')
+                    insert_idx = 0
+                    for i, line in enumerate(lines):
+                        if line.strip().startswith('pub mod '):
+                            insert_idx = i + 1
+
+                    lines.insert(insert_idx, f"pub mod {category};")
+                    rust_lib.write_text('\n'.join(lines))
+                    print(f"    \u2705 Updated Rust lib.rs")
+
         # Update Haskell cabal file
-        cabal_file = self.repo_root / "targets" / "haskell" / "stunir-emitters.cabal"
-        if cabal_file.exists():
-            content = cabal_file.read_text()
-            module_name = f"STUNIR.Emitters.{category_title}"
-            if module_name not in content:
-                # Add to exposed-modules
-                lines = content.split('\n')
-                for i, line in enumerate(lines):
-                    if 'exposed-modules:' in line.lower():
-                        # Find the last module in the list
-                        j = i + 1
-                        while j < len(lines) and (lines[j].strip().startswith('STUNIR.') or not lines[j].strip()):
-                            if lines[j].strip() and not lines[j].strip().startswith('--'):
-                                j += 1
-                            else:
-                                break
-                        lines.insert(j, f"    {module_name}")
-                        break
-                
-                cabal_file.write_text('\n'.join(lines))
-                print(f"    \u2705 Updated Haskell cabal file")
-        
+        if 'haskell' in pipelines:
+            cabal_file = self.repo_root / "targets" / "haskell" / "stunir-emitters.cabal"
+            if cabal_file.exists():
+                content = cabal_file.read_text()
+                module_name = f"STUNIR.Emitters.{category_title}"
+                if module_name not in content:
+                    # Add to exposed-modules
+                    lines = content.split('\n')
+                    for i, line in enumerate(lines):
+                        if 'exposed-modules:' in line.lower():
+                            # Find the last module in the list
+                            j = i + 1
+                            while j < len(lines) and (lines[j].strip().startswith('STUNIR.') or not lines[j].strip()):
+                                if lines[j].strip() and not lines[j].strip().startswith('--'):
+                                    j += 1
+                                else:
+                                    break
+                            lines.insert(j, f"    {module_name}")
+                            break
+
+                    cabal_file.write_text('\n'.join(lines))
+                    print(f"    \u2705 Updated Haskell cabal file")
+
         print(f"    \u2705 Build systems updated")
-    
-    def validate_generated_code(self, spec: Dict[str, Any]) -> bool:
+
+    def validate_generated_code(self, spec: Dict[str, Any], pipelines: List[str]) -> bool:
         """Validate generated code compiles/parses.
-        
+
         Args:
             spec: Emitter specification
-            
+            pipelines: List of target pipelines to validate
+
         Returns:
             True if validation passed
         """
         category = spec['category']
-        
+
         print(f"  \u2699\ufe0f  Validating generated code...")
-        
+
         # Validate Python
-        python_file = self.repo_root / "targets" / category / "emitter.py"
-        if python_file.exists():
-            result = subprocess.run(
-                ['python3', '-m', 'py_compile', str(python_file)],
-                capture_output=True,
-                text=True
-            )
-            if result.returncode != 0:
-                print(f"    \u274c Python validation failed: {result.stderr}")
-                return False
-            print(f"    \u2705 Python syntax valid")
-        
+        if 'python' in pipelines:
+            python_file = self.repo_root / "targets" / category / "emitter.py"
+            if python_file.exists():
+                result = subprocess.run(
+                    ['python3', '-m', 'py_compile', str(python_file)],
+                    capture_output=True,
+                    text=True
+                )
+                if result.returncode != 0:
+                    print(f"    \u274c Python validation failed: {result.stderr}")
+                    return False
+                print(f"    \u2705 Python syntax valid")
+
         # Validate Rust (syntax check)
-        rust_file = self.repo_root / "targets" / "rust" / category / "mod.rs"
-        if rust_file.exists():
-            # Just check basic syntax without full cargo build
-            print(f"    \u2705 Rust file generated (run 'cargo check' to validate)")
-        
+        if 'rust' in pipelines:
+            rust_file = self.repo_root / "targets" / "rust" / category / "mod.rs"
+            if rust_file.exists():
+                # Just check basic syntax without full cargo build
+                print(f"    \u2705 Rust file generated (run 'cargo check' to validate)")
+
         # Note: Full SPARK and Haskell compilation would require their toolchains
-        print(f"    \u2139\ufe0f  SPARK validation requires: gprbuild -P stunir_tools.gpr")
-        print(f"    \u2139\ufe0f  Haskell validation requires: cabal build")
-        
+        if 'spark' in pipelines:
+            print(f"    \u2139\ufe0f  SPARK validation requires: gprbuild -P stunir_tools.gpr")
+
+        if 'haskell' in pipelines:
+            print(f"    \u2139\ufe0f  Haskell validation requires: cabal build")
+
         return True
     
-    def generate_manifest(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def generate_manifest(self, spec: Dict[str, Any], pipelines: List[str]) -> Dict[str, Any]:
         """Generate manifest of generated files.
-        
+
         Args:
             spec: Emitter specification
-            
+            pipelines: List of selected pipelines
+
         Returns:
             Manifest dictionary
         """
@@ -435,48 +445,57 @@ class EmitterGenerator:
             'timestamp': self.timestamp,
             'generator_version': '1.0.0',
             'files': self.generated_files,
-            'pipelines': ['spark', 'python', 'rust', 'haskell'],
+            'pipelines': pipelines,
         }
     
-    def generate(self, spec: Dict[str, Any], validate: bool = True) -> Dict[str, Any]:
-        """Generate emitter across all 4 pipelines.
-        
+    def generate(self, spec: Dict[str, Any], validate: bool = True, pipelines: Optional[List[str]] = None, skip_docs: bool = False) -> Dict[str, Any]:
+        """Generate emitter across selected pipelines.
+
         Args:
             spec: Emitter specification
             validate: Whether to validate generated code
-            
+            pipelines: List of pipelines to generate (default: all)
+            skip_docs: Whether to skip documentation generation
+
         Returns:
             Generation manifest
         """
         category = spec['category']
-        
-        print(f"\n\u2728 Generating {category.upper()} emitter across all 4 pipelines...\n")
-        
+
+        selected_pipelines = pipelines if pipelines is not None else ['spark', 'python', 'rust', 'haskell']
+
+        print(f"\n\u2728 Generating {category.upper()} emitter across selected pipelines...\n")
+
         # Prepare variables
         variables = self.prepare_variables(spec)
-        
+
         # Generate for each pipeline
         try:
-            self.generate_spark_emitter(spec, variables)
-            self.generate_python_emitter(spec, variables)
-            self.generate_rust_emitter(spec, variables)
-            self.generate_haskell_emitter(spec, variables)
-            self.generate_documentation(spec, variables)
-            self.update_build_systems(spec)
-            
+            if 'spark' in selected_pipelines:
+                self.generate_spark_emitter(spec, variables)
+            if 'python' in selected_pipelines:
+                self.generate_python_emitter(spec, variables)
+            if 'rust' in selected_pipelines:
+                self.generate_rust_emitter(spec, variables)
+            if 'haskell' in selected_pipelines:
+                self.generate_haskell_emitter(spec, variables)
+            if not skip_docs:
+                self.generate_documentation(spec, variables)
+            self.update_build_systems(spec, selected_pipelines)
+
             # Validation
             if validate:
-                self.validate_generated_code(spec)
-            
+                self.validate_generated_code(spec, selected_pipelines)
+
             # Generate manifest
-            manifest = self.generate_manifest(spec)
-            
+            manifest = self.generate_manifest(spec, selected_pipelines)
+
             print(f"\n\u2705 Successfully generated {len(self.generated_files)} files!")
             print(f"\u2139\ufe0f  Category: {category}")
-            print(f"\u2139\ufe0f  Pipelines: SPARK, Python, Rust, Haskell")
-            
+            print(f"\u2139\ufe0f  Pipelines: {', '.join([p.upper() for p in selected_pipelines])}")
+
             return manifest
-            
+
         except Exception as e:
             print(f"\n\u274c Generation failed: {e}", file=sys.stderr)
             raise
@@ -491,26 +510,26 @@ def main():
 Examples:
   # From specification file
   %(prog)s --spec=specs/json_emitter.yaml
-  
+
   # From command line arguments
   %(prog)s --category=json --description="JSON emitter" \\
            --output-types=json,schema --features=validation
-  
+
   # Without validation
   %(prog)s --spec=specs/xml_emitter.yaml --no-validate
         """
     )
-    
+
     # Specification input
     spec_group = parser.add_mutually_exclusive_group(required=True)
     spec_group.add_argument('--spec', type=Path, help='Path to emitter specification (YAML/JSON)')
     spec_group.add_argument('--category', help='Emitter category name')
-    
+
     # Command line specification
     parser.add_argument('--description', help='Emitter description')
     parser.add_argument('--output-types', help='Comma-separated output types')
     parser.add_argument('--features', help='Comma-separated feature list')
-    
+
     # Options
     parser.add_argument('--repo-root', type=Path, default=Path(__file__).parent.parent.parent,
                         help='STUNIR repository root (default: auto-detect)')
@@ -518,12 +537,14 @@ Examples:
                         help='Skip validation of generated code')
     parser.add_argument('--output-manifest', type=Path,
                         help='Write generation manifest to file')
-    
+    parser.add_argument('--pipelines', help='Comma-separated pipelines to generate (spark,python,rust,haskell)')
+    parser.add_argument('--skip-docs', action='store_true', help='Skip README generation')
+
     args = parser.parse_args()
-    
+
     # Initialize generator
     generator = EmitterGenerator(args.repo_root)
-    
+
     # Load or build specification
     if args.spec:
         print(f"\u2699\ufe0f  Loading specification from {args.spec}...")
@@ -531,23 +552,27 @@ Examples:
     else:
         if not args.description:
             parser.error("--description is required when using --category")
-        
+
         spec = {
             'category': args.category,
             'description': args.description,
             'output_types': args.output_types.split(',') if args.output_types else [args.category],
             'features': args.features.split(',') if args.features else [],
         }
-    
+
+    selected_pipelines = None
+    if args.pipelines:
+        selected_pipelines = [p.strip().lower() for p in args.pipelines.split(',') if p.strip()]
+
     # Generate emitter
     try:
-        manifest = generator.generate(spec, validate=not args.no_validate)
-        
+        manifest = generator.generate(spec, validate=not args.no_validate, pipelines=selected_pipelines, skip_docs=args.skip_docs)
+
         # Write manifest if requested
         if args.output_manifest:
             args.output_manifest.write_text(json.dumps(manifest, indent=2))
             print(f"\u2139\ufe0f  Manifest written to {args.output_manifest}")
-        
+
         print(f"\n\u2728 Next steps:")
         print(f"  1. Review generated files")
         print(f"  2. Customize implementation logic")

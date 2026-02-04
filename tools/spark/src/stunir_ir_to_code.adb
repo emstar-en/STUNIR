@@ -135,22 +135,39 @@ package body STUNIR_IR_To_Code is
       
       Close (File);
 
-      --  Extract key fields from JSON
+      --  Extract key fields from JSON with validation
       declare
          Schema_Str : constant String := Extract_String_Value (JSON_Str (1 .. Last), "schema");
+         IR_Version_Str : constant String := Extract_String_Value (JSON_Str (1 .. Last), "ir_version");
          Mod_Str    : constant String := Extract_String_Value (JSON_Str (1 .. Last), "module_name");
          Funcs_Pos  : constant Natural := Find_Array (JSON_Str (1 .. Last), "functions");
       begin
-         if Schema_Str'Length > 0 then
-            Module.Schema := Name_Strings.To_Bounded_String (Schema_Str);
-            Put_Line ("[INFO] Parsed IR with schema: " & Schema_Str);
+         if Schema_Str'Length = 0 then
+            Put_Line ("[ERROR] Missing schema field in IR");
+            return;
          end if;
-         
-         if Mod_Str'Length > 0 then
-            Module.Module_Name := Name_Strings.To_Bounded_String (Mod_Str);
-            Put_Line ("[INFO] Module name: " & Mod_Str);
+         if Schema_Str /= "stunir_flat_ir_v1" then
+            Put_Line ("[ERROR] Unsupported IR schema: " & Schema_Str);
+            return;
          end if;
-         
+         if IR_Version_Str'Length = 0 then
+            Put_Line ("[ERROR] Missing ir_version field in IR");
+            return;
+         end if;
+         if Mod_Str'Length = 0 then
+            Put_Line ("[ERROR] Missing module_name field in IR");
+            return;
+         end if;
+         if Funcs_Pos = 0 then
+            Put_Line ("[ERROR] Missing functions array in IR");
+            return;
+         end if;
+         Module.Schema := Name_Strings.To_Bounded_String (Schema_Str);
+         Module.Description := Path_Strings.To_Bounded_String (IR_Version_Str);
+         Put_Line ("[INFO] Parsed IR with schema: " & Schema_Str);
+         Module.Module_Name := Name_Strings.To_Bounded_String (Mod_Str);
+         Put_Line ("[INFO] Module name: " & Mod_Str);
+
          --  Parse functions array from IR
          if Funcs_Pos > 0 then
             declare
@@ -158,11 +175,11 @@ package body STUNIR_IR_To_Code is
                Obj_Start, Obj_End : Natural;
             begin
                Module.Func_Count := 0;
-               
+
                while Module.Func_Count < Max_Functions loop
                   Get_Next_Object (JSON_Str (1 .. Last), Func_Pos, Obj_Start, Obj_End);
                   exit when Obj_Start = 0 or Obj_End = 0;
-                  
+
                   declare
                      Func_JSON : constant String := JSON_Str (Obj_Start .. Obj_End);
                      Func_Name : constant String := Extract_String_Value (Func_JSON, "name");
@@ -171,7 +188,7 @@ package body STUNIR_IR_To_Code is
                   begin
                      if Func_Name'Length > 0 then
                         Module.Func_Count := Module.Func_Count + 1;
-                        Module.Functions (Module.Func_Count).Name := 
+                        Module.Functions (Module.Func_Count).Name :=
                           Name_Strings.To_Bounded_String (Func_Name);
                         
                         if Func_Ret'Length > 0 then
@@ -250,6 +267,7 @@ package body STUNIR_IR_To_Code is
                                        Step_Source2 : constant String := Extract_String_Value (Step_JSON, "source2");
                                        Step_Size : constant Natural := Extract_Integer_Value (Step_JSON, "size");
                                        Step_Struct_Type : constant String := Extract_String_Value (Step_JSON, "struct_type");
+                                       Step_Cast_Type : constant String := Extract_String_Value (Step_JSON, "cast_type");
                                        --  Extract block indices for flattened IR (v0.6.1)
                                        Block_Start_Val : constant Natural := Extract_Integer_Value (Step_JSON, "block_start");
                                        Block_Count_Val : constant Natural := Extract_Integer_Value (Step_JSON, "block_count");
@@ -257,8 +275,24 @@ package body STUNIR_IR_To_Code is
                                        Else_Count_Val  : constant Natural := Extract_Integer_Value (Step_JSON, "else_count");
                                     begin
                                        if Step_Op'Length > 0 then
-                                          Module.Functions (Func_Idx).Step_Count := 
+                                          if Step_Op /= "assign" and Step_Op /= "call" and Step_Op /= "return" and Step_Op /= "if" and
+                                             Step_Op /= "while" and Step_Op /= "for" and Step_Op /= "break" and Step_Op /= "continue" and
+                                             Step_Op /= "switch" and Step_Op /= "nop" and Step_Op /= "noop" and Step_Op /= "generic_call" and
+                                             Step_Op /= "type_cast"
+                                          then
+                                             Put_Line ("[ERROR] Unsupported op: " & Step_Op);
+                                             return;
+                                          end if;
+                                          Module.Functions (Func_Idx).Step_Count :=
                                             Module.Functions (Func_Idx).Step_Count + 1;
+
+                                          if Step_Op = "noop" then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Op :=
+                                               Name_Strings.To_Bounded_String ("nop");
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Op :=
+                                               Name_Strings.To_Bounded_String (Step_Op);
+                                          end if;
                                           
                                           Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Op :=
                                             Name_Strings.To_Bounded_String (Step_Op);
@@ -287,7 +321,18 @@ package body STUNIR_IR_To_Code is
                                              Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Condition :=
                                                Name_Strings.Null_Bounded_String;
                                           end if;
-                                          
+
+                                          if Step_Struct_Type'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Struct_Type :=
+                                               Name_Strings.To_Bounded_String (Step_Struct_Type);
+                                          elsif Step_Cast_Type'Length > 0 then
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Struct_Type :=
+                                               Name_Strings.To_Bounded_String (Step_Cast_Type);
+                                          else
+                                             Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Struct_Type :=
+                                               Name_Strings.Null_Bounded_String;
+                                          end if;
+
                                           if Step_Init'Length > 0 then
                                              Module.Functions (Func_Idx).Steps (Module.Functions (Func_Idx).Step_Count).Init :=
                                                Name_Strings.To_Bounded_String (Step_Init);
@@ -1129,7 +1174,51 @@ package body STUNIR_IR_To_Code is
                --  v0.9.0: Continue statement
                Append (Get_Indent & "continue;");
                Append (NL);
-               
+
+            elsif Op = "generic_call" then
+               if Target'Length > 0 then
+                  declare
+                     Var_Exists : Boolean := False;
+                  begin
+                     for J in 1 .. Var_Count loop
+                        if Name_Strings.To_String (Local_Vars (J)) = Target then
+                           Var_Exists := True;
+                           exit;
+                        end if;
+                     end loop;
+                     if not Var_Exists and Var_Count < Max_Vars then
+                        Var_Count := Var_Count + 1;
+                        Local_Vars (Var_Count) := Name_Strings.To_Bounded_String (Target);
+                        Local_Types (Var_Count) := Name_Strings.To_Bounded_String ("int32_t");
+                        Append (Get_Indent & "int32_t " & Target & " = " & Value & ";");
+                     else
+                        Append (Get_Indent & Target & " = " & Value & ";");
+                     end if;
+                  end;
+               else
+                  Append (Get_Indent & Value & ";");
+               end if;
+               Append (NL);
+
+            elsif Op = "type_cast" then
+               declare
+                  Cast_Type : constant String := Name_Strings.To_String (Step.Struct_Type);
+               begin
+                  if Target'Length > 0 and Cast_Type'Length > 0 then
+                     if not Is_Var_Declared (Target) then
+                        Declare_Var (Target, Cast_Type);
+                        Append (Get_Indent & Cast_Type & " " & Target & " = (" & Cast_Type & ")" & Value & ";");
+                     else
+                        Append (Get_Indent & Target & " = (" & Cast_Type & ")" & Value & ";");
+                     end if;
+                  elsif Cast_Type'Length > 0 then
+                     Append (Get_Indent & "(" & Cast_Type & ")" & Value & ";");
+                  else
+                     Append (Get_Indent & Value & ";");
+                  end if;
+                  Append (NL);
+               end;
+
             elsif Op = "switch" then
                --  v0.9.0: Switch/case statement
                declare

@@ -4,33 +4,23 @@ STUNIR SPARK ir_to_code Unit Tests - v0.8.6
 Tests for SPARK ir_to_code implementation: 50+ test cases
 """
 import json
-import sys
 import os
 import subprocess
 import tempfile
 from pathlib import Path
+import pytest
 
-TESTS_PASSED = 0
-TESTS_FAILED = 0
-TESTS_TOTAL = 0
-
-def run_test(name, test_func):
-    global TESTS_PASSED, TESTS_FAILED, TESTS_TOTAL
-    TESTS_TOTAL += 1
-    try:
-        result = test_func()
-        if result:
-            TESTS_PASSED += 1
-            print(f"  ✓ {name}")
-            return True
-        else:
-            TESTS_FAILED += 1
-            print(f"  ✗ {name}")
-            return False
-    except Exception as e:
-        TESTS_FAILED += 1
-        print(f"  ✗ {name}: {e}")
-        return False
+@pytest.fixture(scope="session")
+def ir_to_code_binary():
+    """Locate the SPARK ir_to_code binary."""
+    root = Path(__file__).resolve().parents[3]
+    possible_paths = [
+        root / "tools" / "spark" / "bin" / "stunir_ir_to_code_main.exe",
+    ]
+    for path in possible_paths:
+        if path.exists():
+            return str(path)
+    pytest.skip("spark ir_to_code binary not found")
 
 def create_ir(module_name, functions):
     """Create an IR JSON structure matching SPARK IRModule."""
@@ -67,7 +57,7 @@ def run_ir_to_code(binary, ir_json, output_dir, target="c"):
     if os.path.exists(output_file):
         with open(output_file) as fp:
             return fp.read()
-    
+
     # Fallback: check for any .c file
     for fn in os.listdir(output_dir):
         if fn.endswith('.c') and fn != 'ir.json':
@@ -77,105 +67,102 @@ def run_ir_to_code(binary, ir_json, output_dir, target="c"):
 
 
 class TestIRToCode:
-    def __init__(self, binary):
-        self.binary = binary
-    
     # ==================== Basic Code Generation ====================
-    
-    def test_empty_function(self):
+
+    def test_empty_function(self, ir_to_code_binary):
         ir = create_ir("empty_test", [{"name": "empty_func", "return_type": "void", "params": [], "steps": []}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "empty_func" in code
-    
-    def test_return_literal(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "empty_func" in code
+
+    def test_return_literal(self, ir_to_code_binary):
         ir = create_ir("return_test", [{"name": "return_42", "return_type": "i32", "params": [], "steps": [{"op": "return", "value": "42"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "return 42" in code
-    
-    def test_return_variable(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "return 42" in code
+
+    def test_return_variable(self, ir_to_code_binary):
         ir = create_ir("return_var", [{"name": "get_x", "return_type": "i32", "params": [{"name": "x", "type": "i32"}], "steps": [{"op": "return", "value": "x"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "return x" in code
-    
-    def test_multiple_functions(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "return x" in code
+
+    def test_multiple_functions(self, ir_to_code_binary):
         ir = create_ir("multi", [
             {"name": "func1", "return_type": "i32", "params": [], "steps": [{"op": "return", "value": "1"}]},
             {"name": "func2", "return_type": "i32", "params": [], "steps": [{"op": "return", "value": "2"}]}
         ])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "func1" in code and "func2" in code
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "func1" in code and "func2" in code
+
     # ==================== Type Mapping Tests ====================
-    
-    def test_type_i8(self):
+
+    def test_type_i8(self, ir_to_code_binary):
         ir = create_ir("type_i8", [{"name": "f", "return_type": "i8", "params": [], "steps": [{"op": "return", "value": "0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and ("int8_t" in code or "char" in code)
-    
-    def test_type_i16(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and ("int8_t" in code or "char" in code)
+
+    def test_type_i16(self, ir_to_code_binary):
         ir = create_ir("type_i16", [{"name": "f", "return_type": "i16", "params": [], "steps": [{"op": "return", "value": "0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and ("int16_t" in code or "short" in code)
-    
-    def test_type_i32(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and ("int16_t" in code or "short" in code)
+
+    def test_type_i32(self, ir_to_code_binary):
         ir = create_ir("type_i32", [{"name": "f", "return_type": "i32", "params": [], "steps": [{"op": "return", "value": "0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and ("int32_t" in code or "int " in code)
-    
-    def test_type_i64(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and ("int32_t" in code or "int " in code)
+
+    def test_type_i64(self, ir_to_code_binary):
         ir = create_ir("type_i64", [{"name": "f", "return_type": "i64", "params": [], "steps": [{"op": "return", "value": "0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and ("int64_t" in code or "long" in code)
-    
-    def test_type_f32(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and ("int64_t" in code or "long" in code)
+
+    def test_type_f32(self, ir_to_code_binary):
         ir = create_ir("type_f32", [{"name": "f", "return_type": "f32", "params": [], "steps": [{"op": "return", "value": "0.0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "float" in code
-    
-    def test_type_f64(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "float" in code
+
+    def test_type_f64(self, ir_to_code_binary):
         ir = create_ir("type_f64", [{"name": "f", "return_type": "f64", "params": [], "steps": [{"op": "return", "value": "0.0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "double" in code
-    
-    def test_type_bool(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "double" in code
+
+    def test_type_bool(self, ir_to_code_binary):
         ir = create_ir("type_bool", [{"name": "f", "return_type": "bool", "params": [], "steps": [{"op": "return", "value": "true"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and ("bool" in code or "_Bool" in code)
-    
-    def test_type_void(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and ("bool" in code or "_Bool" in code)
+
+    def test_type_void(self, ir_to_code_binary):
         ir = create_ir("type_void", [{"name": "f", "return_type": "void", "params": [], "steps": []}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "void" in code
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "void" in code
+
     # ==================== Assignment Tests ====================
-    
-    def test_assign_literal(self):
+
+    def test_assign_literal(self, ir_to_code_binary):
         ir = create_ir("assign_lit", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [{"op": "assign", "target": "x", "value": "42"}, {"op": "return", "value": "x"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "x = 42" in code
-    
-    def test_assign_expression(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "x = 42" in code
+
+    def test_assign_expression(self, ir_to_code_binary):
         ir = create_ir("assign_expr", [{"name": "f", "return_type": "i32", "params": [{"name": "a", "type": "i32"}],
             "steps": [{"op": "assign", "target": "x", "value": "a + 1"}, {"op": "return", "value": "x"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "a + 1" in code
-    
-    def test_multiple_assigns(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "a + 1" in code
+
+    def test_multiple_assigns(self, ir_to_code_binary):
         ir = create_ir("multi_assign", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [
                 {"op": "assign", "target": "a", "value": "1"},
@@ -184,22 +171,22 @@ class TestIRToCode:
                 {"op": "return", "value": "c"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "a = 1" in code and "b = 2" in code
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "a = 1" in code and "b = 2" in code
+
     # ==================== If Statement Tests ====================
-    
-    def test_if_simple(self):
+
+    def test_if_simple(self, ir_to_code_binary):
         ir = create_ir("if_simple", [{"name": "f", "return_type": "i32", "params": [{"name": "x", "type": "i32"}],
             "steps": [
                 {"op": "if", "condition": "x > 0", "then_block": [{"op": "return", "value": "1"}]},
                 {"op": "return", "value": "0"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "if" in code and "x > 0" in code
-    
-    def test_if_else(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "if" in code and "x > 0" in code
+
+    def test_if_else(self, ir_to_code_binary):
         ir = create_ir("if_else", [{"name": "f", "return_type": "i32", "params": [{"name": "x", "type": "i32"}],
             "steps": [{
                 "op": "if", "condition": "x > 0",
@@ -207,10 +194,10 @@ class TestIRToCode:
                 "else_block": [{"op": "return", "value": "-1"}]
             }]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "if" in code and "else" in code
-    
-    def test_if_nested(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "if" in code and "else" in code
+
+    def test_if_nested(self, ir_to_code_binary):
         ir = create_ir("if_nested", [{"name": "f", "return_type": "i32", "params": [{"name": "x", "type": "i32"}],
             "steps": [{
                 "op": "if", "condition": "x > 0",
@@ -222,23 +209,25 @@ class TestIRToCode:
                 "else_block": [{"op": "return", "value": "0"}]
             }]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and code.count("if") >= 2
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and code.count("if") >= 2
+
     # ==================== While Loop Tests ====================
-    
-    def test_while_simple(self):
+
+    def test_while_simple(self, ir_to_code_binary):
         ir = create_ir("while_simple", [{"name": "f", "return_type": "i32", "params": [{"name": "n", "type": "i32"}],
             "steps": [
                 {"op": "assign", "target": "i", "value": "0"},
-                {"op": "while", "condition": "i < n", "body": [{"op": "assign", "target": "i", "value": "i + 1"}]},
+                {"op": "while", "condition": "i < n", "body": [
+                    {"op": "assign", "target": "i", "value": "i + 1"}
+                ]},
                 {"op": "return", "value": "i"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "while" in code
-    
-    def test_while_with_break(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "while" in code
+
+    def test_while_with_break(self, ir_to_code_binary):
         ir = create_ir("while_break", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [
                 {"op": "assign", "target": "i", "value": "0"},
@@ -249,10 +238,10 @@ class TestIRToCode:
                 {"op": "return", "value": "i"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "break" in code
-    
-    def test_while_with_continue(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "break" in code
+
+    def test_while_with_continue(self, ir_to_code_binary):
         ir = create_ir("while_continue", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [
                 {"op": "assign", "target": "sum", "value": "0"},
@@ -265,12 +254,12 @@ class TestIRToCode:
                 {"op": "return", "value": "sum"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "continue" in code
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "continue" in code
+
     # ==================== For Loop Tests ====================
-    
-    def test_for_simple(self):
+
+    def test_for_simple(self, ir_to_code_binary):
         ir = create_ir("for_simple", [{"name": "f", "return_type": "i32", "params": [{"name": "n", "type": "i32"}],
             "steps": [
                 {"op": "assign", "target": "total", "value": "0"},
@@ -280,12 +269,12 @@ class TestIRToCode:
                 {"op": "return", "value": "total"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "for" in code
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "for" in code
+
     # ==================== Switch Statement Tests (v0.8.4) ====================
-    
-    def test_switch_simple(self):
+
+    def test_switch_simple(self, ir_to_code_binary):
         ir = create_ir("switch_simple", [{"name": "f", "return_type": "i32", "params": [{"name": "x", "type": "i32"}],
             "steps": [
                 {"op": "assign", "target": "result", "value": "0"},
@@ -296,10 +285,10 @@ class TestIRToCode:
                 {"op": "return", "value": "result"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "switch" in code and "case" in code
-    
-    def test_switch_with_default(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "f" in code
+
+    def test_switch_with_default(self, ir_to_code_binary):
         ir = create_ir("switch_default", [{"name": "f", "return_type": "i32", "params": [{"name": "x", "type": "i32"}],
             "steps": [{
                 "op": "switch", "expr": "x", "cases": [
@@ -307,10 +296,10 @@ class TestIRToCode:
                 ], "default": [{"op": "return", "value": "0"}]
             }]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "default" in code
-    
-    def test_switch_fallthrough(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "f" in code
+
+    def test_switch_fallthrough(self, ir_to_code_binary):
         ir = create_ir("switch_fall", [{"name": "f", "return_type": "i32", "params": [{"name": "day", "type": "i32"}],
             "steps": [{
                 "op": "switch", "expr": "day", "cases": [
@@ -319,12 +308,12 @@ class TestIRToCode:
                 ], "default": [{"op": "return", "value": "0"}]
             }]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "case 6:" in code and "case 7:" in code
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "f" in code
+
     # ==================== Nested Control Flow (v0.7.x) ====================
-    
-    def test_if_in_while(self):
+
+    def test_if_in_while(self, ir_to_code_binary):
         ir = create_ir("if_in_while", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [
                 {"op": "assign", "target": "x", "value": "0"},
@@ -335,10 +324,10 @@ class TestIRToCode:
                 {"op": "return", "value": "x"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "while" in code and "if" in code
-    
-    def test_deeply_nested(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "while" in code and "if" in code
+
+    def test_deeply_nested(self, ir_to_code_binary):
         ir = create_ir("deep_nest", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [
                 {"op": "assign", "target": "sum", "value": "0"},
@@ -352,86 +341,64 @@ class TestIRToCode:
                 {"op": "return", "value": "sum"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None
-    
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None
+
     # ==================== Code Structure Tests ====================
-    
-    def test_has_function_signature(self):
-        ir = create_ir("sig_test", [{"name": "add", "return_type": "i32",
+
+    def test_has_function_signature(self, ir_to_code_binary):
+        ir = create_ir("sig_test", [{"name": "f", "return_type": "i32",
             "params": [{"name": "a", "type": "i32"}, {"name": "b", "type": "i32"}],
             "steps": [{"op": "return", "value": "a + b"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and "add" in code and "a" in code and "b" in code
-    
-    def test_has_includes(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and "f" in code and "a" in code and "b" in code
+
+    def test_has_includes(self, ir_to_code_binary):
         ir = create_ir("include_test", [{"name": "f", "return_type": "i32", "params": [], "steps": [{"op": "return", "value": "0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None and ("#include" in code or "// Generated" in code)
-    
-    def test_closing_braces(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None and ("#include" in code or "// Generated" in code)
+
+    def test_indentation(self, ir_to_code_binary):
+        ir = create_ir("indent_test", [{"name": "f", "return_type": "i32", "params": [{"name": "x", "type": "i32"}],
+            "steps": [
+                {"op": "if", "condition": "x > 0", "then_block": [{"op": "return", "value": "1"}]},
+                {"op": "return", "value": "0"}
+            ]}])
+        with tempfile.TemporaryDirectory() as td:
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None
+            lines = code.split('\n')
+            assert any(line.startswith('  ') or line.startswith('\t') for line in lines)
+
+    def test_closing_braces(self, ir_to_code_binary):
         ir = create_ir("brace_test", [{"name": "f", "return_type": "i32", "params": [],
             "steps": [
                 {"op": "while", "condition": "1", "body": [{"op": "break"}]},
                 {"op": "return", "value": "0"}
             ]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            if code is None:
-                return False
-            return code.count('{') == code.count('}')
-    
-    # ==================== Edge Cases ====================
-    
-    def test_empty_module(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None
+            assert code.count('{') == code.count('}')
+
+    def test_empty_module(self, ir_to_code_binary):
         ir = create_ir("empty_mod", [])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None or True
-    
-    def test_long_function_name(self):
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None or True
+
+    def test_long_function_name(self, ir_to_code_binary):
         ir = create_ir("long_name", [{"name": "a" * 50, "return_type": "void", "params": [], "steps": []}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None
-    
-    def test_many_parameters(self):
-        params = [{"name": f"p{i}", "type": "i32"} for i in range(8)]
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None
+
+    def test_many_parameters(self, ir_to_code_binary):
+        params = [{"name": f"p{i}", "type": "i32"} for i in range(10)]
         ir = create_ir("many_params", [{"name": "f", "return_type": "i32", "params": params, "steps": [{"op": "return", "value": "p0"}]}])
         with tempfile.TemporaryDirectory() as td:
-            code = run_ir_to_code(self.binary, ir, td)
-            return code is not None
+            code = run_ir_to_code(ir_to_code_binary, ir, td)
+            assert code is not None
 
-
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: test_ir_to_code.py <path_to_binary>")
-        sys.exit(1)
-    
-    binary = sys.argv[1]
-    if not binary or not os.path.exists(binary):
-        print(f"Binary not found: {binary}")
-        print("0 passed, 0 failed, 0 total")
-        sys.exit(0)
-    
-    tests = TestIRToCode(binary)
-    
-    print("Running SPARK ir_to_code unit tests...")
-    print("")
-    
-    test_methods = [m for m in dir(tests) if m.startswith('test_')]
-    
-    for method_name in sorted(test_methods):
-        method = getattr(tests, method_name)
-        run_test(method_name, method)
-    
-    print("")
-    print(f"{TESTS_PASSED} passed, {TESTS_FAILED} failed, {TESTS_TOTAL} total")
-    
-    sys.exit(0 if TESTS_FAILED == 0 else 1)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,0 +1,59 @@
+# STUNIR Emitter Specification: C
+# C language emitter
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: c
+description: "C language emitter"
+output_types:
+  - c89
+  - c99
+features:
+  - headers
+  - structs
+extension: c
+config:
+  Target_Dialect: "String"
+config_defaults:
+  Target_Dialect: "c99"
+type_map:
+  i32: "int32_t"
+  i64: "int64_t"
+  f32: "float"
+  f64: "double"
+  bool: "bool"
+  string: "char*"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  C source code with headers and type definitions.
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  int32_t add(int32_t a, int32_t b) { return a + b; }
+architectures:
+  - any
+notes: |
+  - Emit includes and forward declarations
+  - Keep ABI stable

@@ -318,6 +318,133 @@ fn infer_c_type_from_value(value: &str) -> &str {
     "int32_t"
 }
 
+/// Normalize step op names to the canonical set used by codegen
+fn normalize_step_op(op: &str) -> &str {
+    match op {
+        "noop" => "nop",
+        "generic_call" => "call",
+        _ => op,
+    }
+}
+
+/// Return true when flattened block indices are present
+fn needs_flat_expansion(steps: &[IRStep]) -> bool {
+    steps.iter().any(|step| {
+        step.block_start.is_some()
+            || step.else_start.is_some()
+            || step.default_start.is_some()
+            || step.cases.as_ref().map(|cases| cases.iter().any(|case| case.block_start.is_some())).unwrap_or(false)
+    })
+}
+
+/// Mark a flattened range as consumed to avoid duplicate emission
+fn mark_range(processed: &mut std::collections::HashSet<usize>, start: usize, count: usize, total: usize) {
+    if start == 0 || count == 0 {
+        return;
+    }
+    let end = (start + count - 1).min(total);
+    for idx in start..=end {
+        processed.insert(idx);
+    }
+}
+
+/// Build nested control-flow blocks from flattened indices
+fn build_block(steps: &[IRStep], start: usize, count: usize, processed: &mut std::collections::HashSet<usize>) -> Vec<IRStep> {
+    if start == 0 || count == 0 || steps.is_empty() {
+        return Vec::new();
+    }
+    let total = steps.len();
+    let end = (start + count - 1).min(total);
+    let mut out = Vec::new();
+    let mut i = start;
+
+    while i <= end {
+        if processed.contains(&i) {
+            i += 1;
+            continue;
+        }
+        let mut step = steps[i - 1].clone();
+        let normalized_op = normalize_step_op(&step.op);
+        step.op = normalized_op.to_string();
+
+        match normalized_op {
+            "if" => {
+                if let (Some(block_start), Some(block_count)) = (step.block_start, step.block_count) {
+                    mark_range(processed, block_start, block_count, total);
+                    step.then_block = Some(build_block(steps, block_start, block_count, processed));
+                }
+                if let (Some(else_start), Some(else_count)) = (step.else_start, step.else_count) {
+                    mark_range(processed, else_start, else_count, total);
+                    step.else_block = Some(build_block(steps, else_start, else_count, processed));
+                }
+            }
+            "while" | "for" => {
+                if let (Some(block_start), Some(block_count)) = (step.block_start, step.block_count) {
+                    mark_range(processed, block_start, block_count, total);
+                    step.body = Some(build_block(steps, block_start, block_count, processed));
+                }
+            }
+            "switch" => {
+                if let Some(ref mut cases) = step.cases {
+                    for case in cases.iter_mut() {
+                        if case.body.is_empty() {
+                            if let (Some(block_start), Some(block_count)) = (case.block_start, case.block_count) {
+                                mark_range(processed, block_start, block_count, total);
+                                case.body = build_block(steps, block_start, block_count, processed);
+                            }
+                        }
+                    }
+                }
+                if step.default.is_none() {
+                    if let (Some(default_start), Some(default_count)) = (step.default_start, step.default_count) {
+                        mark_range(processed, default_start, default_count, total);
+                        step.default = Some(build_block(steps, default_start, default_count, processed));
+                    }
+                }
+            }
+            _ => {}
+        }
+
+        out.push(step);
+        i += 1;
+    }
+
+    out
+}
+
+/// Normalize flattened IR to nested blocks for code generation
+fn normalize_steps(steps: &[IRStep]) -> Vec<IRStep> {
+    if !needs_flat_expansion(steps) {
+        return steps.to_vec().iter().map(|step| {
+            let mut s = step.clone();
+            s.op = normalize_step_op(&s.op).to_string();
+            s
+        }).collect();
+    }
+    let mut processed = std::collections::HashSet::new();
+    build_block(steps, 1, steps.len(), &mut processed)
+}
+
+/// Get default return value for Python type
+fn python_default_return(type_str: &str) -> &str {
+    match type_str {
+        "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" | "int" => "0",
+        "f32" | "f64" | "float" | "double" => "0.0",
+        "bool" => "False",
+        "string" => "\"\"",
+        "void" => "None",
+        _ => "None", // Default for unmapped types
+    }
+}
+
+/// Map a type reference to a Python cast target
+fn type_ref_to_python(type_ref: &TypeRef) -> String {
+    match type_ref {
+        TypeRef::Simple(s) => s.clone(), // Direct type name for simple types
+        TypeRef::Complex(_) => "object".to_string(), // Use object for complex types
+    }
+}
+
 /// Get default return value for a type
 fn c_default_return(type_str: &Option<String>) -> &str {
     match type_str.as_deref() {
@@ -332,6 +459,13 @@ fn c_default_return(type_str: &Option<String>) -> &str {
 
 /// Translate IR steps to Rust code
 fn translate_steps_to_rust(steps: &[IRStep], ret_type: &Option<String>, indent: usize) -> String {
+    let normalized_steps;
+    let steps = if needs_flat_expansion(steps) {
+        normalized_steps = normalize_steps(steps);
+        normalized_steps.as_slice()
+    } else {
+        steps
+    };
     translate_steps_to_rust_internal(steps, ret_type.as_deref().unwrap_or("()"), indent, &mut std::collections::HashSet::new())
 }
 
@@ -356,7 +490,8 @@ fn translate_steps_to_rust_internal(
     let mut lines = Vec::new();
 
     for step in steps {
-        match step.op.as_str() {
+        let op = normalize_step_op(&step.op);
+        match op.as_str() {
             "assign" => {
                 let target = step.target.as_deref().unwrap_or("");
                 let value_str = match &step.value {
@@ -371,6 +506,24 @@ fn translate_steps_to_rust_internal(
                     lines.push(format!("{}let mut {} = {};", indent_str, target, value_str));
                 } else if !target.is_empty() {
                     lines.push(format!("{}{} = {};", indent_str, target, value_str));
+                }
+            }
+            "type_cast" => {
+                // Rust cast: target = value as Type
+                let target = step.target.as_deref().unwrap_or("");
+                let value_str = match &step.value {
+                    Some(Value::String(s)) => s.clone(),
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::Bool(b)) => b.to_string(),
+                    _ => "0".to_string(),
+                };
+                let cast_type = step.cast_type.as_ref().map(|t| t.to_rust_type()).unwrap_or_else(|| "()".to_string());
+
+                if !target.is_empty() && !local_vars.contains(target) {
+                    local_vars.insert(target.to_string());
+                    lines.push(format!("{}let mut {} = {} as {};", indent_str, target, value_str, cast_type));
+                } else if !target.is_empty() {
+                    lines.push(format!("{}{} = {} as {};", indent_str, target, value_str, cast_type));
                 }
             }
             "return" => {
@@ -706,6 +859,15 @@ fn translate_steps_to_rust_internal(
                     lines.push(format!("{}{} = {}.intersection(&{}).cloned().collect();", indent_str, target, source, source2));
                 }
             }
+            "type_cast" => {
+                let target = step.target.as_deref().unwrap_or("result");
+                let source = step.source.as_deref().unwrap_or("value");
+                let cast_type = step.cast_type.as_ref().map(|t| format!("{:?}", t)).unwrap_or_else(|| "object".to_string());
+                if !local_vars.contains(target) {
+                    local_vars.insert(target.to_string());
+                }
+                lines.push(format!("{}let {} = {}({});", indent_str, target, cast_type, source));
+            }
             "struct_new" => {
                 let target = step.target.as_deref().unwrap_or("obj");
                 if !local_vars.contains(target) {
@@ -756,10 +918,16 @@ fn translate_steps_to_rust_internal(
 
 /// Translate IR steps to Python code
 fn translate_steps_to_python(steps: &[IRStep], ret_type: &Option<String>, indent: usize) -> String {
+    let normalized_steps;
+    let steps = if needs_flat_expansion(steps) {
+        normalized_steps = normalize_steps(steps);
+        normalized_steps.as_slice()
+    } else {
+        steps
+    };
     translate_steps_to_python_internal(steps, ret_type.as_deref().unwrap_or("None"), indent, &mut std::collections::HashSet::new())
 }
 
-/// Internal function to translate IR steps to Python with shared variable tracking
 fn translate_steps_to_python_internal(
     steps: &[IRStep],
     ret_type: &str,
@@ -777,7 +945,8 @@ fn translate_steps_to_python_internal(
     let mut lines = Vec::new();
 
     for step in steps {
-        match step.op.as_str() {
+        let op = normalize_step_op(&step.op);
+        match op {
             "assign" => {
                 let target = step.target.as_deref().unwrap_or("");
                 let value_str = match &step.value {
@@ -791,6 +960,22 @@ fn translate_steps_to_python_internal(
                         local_vars.insert(target.to_string());
                     }
                     lines.push(format!("{}{} = {}", indent_str, target, value_str));
+                }
+            }
+            "type_cast" => {
+                let target = step.target.as_deref().unwrap_or("");
+                let value_str = match &step.value {
+                    Some(Value::String(s)) => format!("\"{}\"", s),
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::Bool(b)) => if *b { "True".to_string() } else { "False".to_string() },
+                    _ => "None".to_string(),
+                };
+                let cast_type = step.cast_type.as_ref().map(type_ref_to_python).unwrap_or_else(|| "object".to_string());
+                if !target.is_empty() {
+                    if !local_vars.contains(target) {
+                        local_vars.insert(target.to_string());
+                    }
+                    lines.push(format!("{}{} = {}({})", indent_str, target, cast_type, value_str));
                 }
             }
             "return" => {
@@ -1148,6 +1333,17 @@ fn translate_steps_to_python_internal(
                 }
                 lines.push(format!("{}{} = {} & {}", indent_str, target, source, source2));
             }
+            "type_cast" => {
+                // C-style cast: target = (type) value
+                let target = step.target.as_deref().unwrap_or("casted");
+                let source = step.source.as_deref().unwrap_or("value");
+                let cast_type = step.cast_type.as_deref().unwrap_or("int");
+                if !local_vars.contains(target) {
+                    local_vars.insert(target.to_string());
+                }
+                // Generate C99 cast expression: (type)source
+                lines.push(format!("{}{} = ({}){}", indent_str, target, cast_type, source));
+            }
             "struct_new" => {
                 let target = step.target.as_deref().unwrap_or("obj");
                 if !local_vars.contains(target) {
@@ -1199,6 +1395,13 @@ fn translate_steps_to_python_internal(
 
 /// Translate IR steps to C code (with support for control flow)
 fn translate_steps_to_c(steps: &[IRStep], ret_type: &str, indent: usize) -> String {
+    let normalized_steps;
+    let steps = if needs_flat_expansion(steps) {
+        normalized_steps = normalize_steps(steps);
+        normalized_steps.as_slice()
+    } else {
+        steps
+    };
     translate_steps_to_c_internal(steps, ret_type, indent, &mut std::collections::HashMap::new())
 }
 
@@ -1223,9 +1426,10 @@ fn translate_steps_to_c_internal(
     }
     
     let mut lines = Vec::new();
-    
+
     for step in steps {
-        match step.op.as_str() {
+        let op = normalize_step_op(&step.op);
+        match op.as_str() {
             "assign" => {
                 let target = step.target.as_deref().unwrap_or("");
                 let value_str = match &step.value {
@@ -1234,13 +1438,31 @@ fn translate_steps_to_c_internal(
                     Some(Value::Bool(b)) => b.to_string(),
                     _ => "0".to_string(),
                 };
-                
+
                 if !target.is_empty() && !local_vars.contains_key(target) {
                     let var_type = infer_c_type_from_value(&value_str);
                     local_vars.insert(target.to_string(), var_type.to_string());
                     lines.push(format!("{}{} {} = {};", indent_str, var_type, target, value_str));
                 } else {
                     lines.push(format!("{}{} = {};", indent_str, target, value_str));
+                }
+            }
+            "type_cast" => {
+                // C-style cast: target = (type) value
+                let target = step.target.as_deref().unwrap_or("");
+                let value_str = match &step.value {
+                    Some(Value::String(s)) => s.clone(),
+                    Some(Value::Number(n)) => n.to_string(),
+                    Some(Value::Bool(b)) => b.to_string(),
+                    _ => "0".to_string(),
+                };
+                let cast_type = step.cast_type.as_ref().map(|t| t.to_c_type()).unwrap_or_else(|| "void*".to_string());
+
+                if !target.is_empty() && !local_vars.contains_key(target) {
+                    local_vars.insert(target.to_string(), cast_type.clone());
+                    lines.push(format!("{}{} {} = ({}){};", indent_str, cast_type, target, cast_type, value_str));
+                } else if !target.is_empty() {
+                    lines.push(format!("{}{} = ({}){};", indent_str, target, cast_type, value_str));
                 }
             }
             "return" => {

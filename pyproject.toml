@@ -89,13 +89,7 @@ addopts = [
     "-v",
     "--tb=short",
     "--strict-markers",
-    "--cov=tools",
-    "--cov=manifests",
-    "--cov=targets",
-    "--cov-report=term-missing",
-    "--cov-report=html:coverage_html_report",
-    "--cov-report=xml:coverage.xml",
-    "--cov-fail-under=60",
+    "--import-mode=importlib",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",

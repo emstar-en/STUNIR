@@ -1,0 +1,60 @@
+# STUNIR Emitter Specification: OOP
+# Object-oriented emitter (Java/C#/C++)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: oop
+description: "Object-oriented emitter"
+output_types:
+  - java
+  - csharp
+  - cpp
+features:
+  - classes
+  - inheritance
+  - interfaces
+extension: java
+config:
+  Target_Language: "String"
+config_defaults:
+  Target_Language: "java"
+type_map:
+  i32: "int"
+  i64: "long"
+  f32: "float"
+  f64: "double"
+  bool: "boolean"
+  string: "String"
+ir_fields:
+  required:
+    - classes
+    - functions
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Object-oriented code with classes and methods.
+example_input:
+  module: "example"
+  classes:
+    - name: "Point"
+      fields:
+        - name: "x"
+          type: "i32"
+        - name: "y"
+          type: "i32"
+example_output: |
+  class Point { int x; int y; }
+architectures:
+  - any
+notes: |
+  - Emit class structures and method signatures
+  - Respect inheritance hierarchy

@@ -1,0 +1,61 @@
+# STUNIR Emitter Specification: Functional
+# Functional language emitter (Haskell/OCaml/F#)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: functional
+description: "Functional language emitter"
+output_types:
+  - haskell
+  - ocaml
+  - fsharp
+features:
+  - immutability
+  - pattern_matching
+extension: hs
+config:
+  Use_Immutable_Data: "Boolean"
+config_defaults:
+  Use_Immutable_Data: true
+type_map:
+  i32: "Int"
+  i64: "Int"
+  f32: "Float"
+  f64: "Double"
+  bool: "Bool"
+  string: "String"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Functional language syntax with immutable data structures.
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  add :: Int -> Int -> Int
+  add a b = a + b
+architectures:
+  - any
+notes: |
+  - Prefer immutable constructs
+  - Use pattern matching where applicable
