@@ -1,5 +1,71 @@
 # STUNIR - MADE BY AI FOR AI
 
+##  Quick Start (For Humans Who Just Want This To Work)
+### **Step 1: Get STUNIR**
+**[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
+### **Step 2: Give It To Your AI**
+You have two options:
+#### **Option A: Upload the ZIP**
+* Just drag and drop the ZIP file into your AI chat (ChatGPT, Claude, etc.)
+* Tell it: _"Use this STUNIR pack for my project"_
+#### **Option B: Share the URL** (if your AI has internet access)
+* Paste this into your chat: `https://github.com/emstar-en/STUNIR`
+* Most cloud AI models can read it directly
+### **Step 3: Talk To Your AI**
+Just tell the model what you want to do with it.
+It will lead to more questions you have to answer and you can ask questions about those questions.
+The AI can tell you if what you're asking for is possible or not and will find the clear path(s) to your goal.
+Can you understand code/mark-up?  If not, lean on the AI.
+### WARNING: This isn't magic, you still have to put effort into it.
+You just don't need to know any specific programming languages.
+### CAUTION: You DO have to be open to learning programming and systems archetecture, though.
+The AI can teach you there.  These wretched bundles of math are good for something healthy.
+### **What Can You Do With This?**
+If you've ever:
+*  **Asked AI to generate a program** and got something that _almost_ works
+*  **Needed to translate code** between languages (Python → Rust, JavaScript → Go, etc.)
+*  **Had working code in one language** and wanted it in another (just paste your code/snippets as input!)
+*  **Knew exactly what implementation you wanted** but only knew how to write it in one language
+*  **Wanted the same code in multiple languages** without copy-pasting and praying
+*  **Crashed out debugging boilerplate** that should've been automated
+*  **Needed verifiable, reproducible builds** (so you can prove your code does what it says)
+*  **Wanted AI-generated code that doesn't randomly change** every time you regenerate it
+*  **Needed to ship the same logic** as a web app, CLI tool, and WASM module
+*  **Wanted receipts/proofs** that your build pipeline is legit
+...then STUNIR is for you.
+### **What STUNIR Actually Does**
+Think of it as a **safety harness for AI code generation**:
+1. You (or your AI) provide input:
+* A **spec** (what you want the program to do), OR
+* **Existing code/snippets** (in any language you know)
+1. STUNIR turns that into a **canonical reference** (the "true meaning" of your program)
+2. STUNIR generates **actual code** in whatever languages you need (Python, Rust, JavaScript, Assembly, WASM, etc.)
+3. STUNIR gives you **receipts** (cryptographic proof that everything was built correctly and reproducibly)
+**The key difference:** Your AI can _suggest_ code, but STUNIR's deterministic tools are what actually _produce_ it. This means:
+* No more "it worked yesterday but not today"
+* No more "I swear I didn't change anything"
+* No more guessing if AI hallucinated part of your build
+**And if your inputs are no good?** You're using AI, so the model tells you exactly what you need to change in your spec/code. It's the future now.
+### **Who Is This For?**
+* **Vibe-coders** who want their vibes to compile reliably
+* **People who know the implementation** but only in one language
+* **Code translators** who are tired of manual porting
+* **Hackathon heroes** who need multi-language output _fast_
+* **People who got a link at a convention** and were told "just use this"
+* **Anyone who's tired of AI code that's 90% perfect and 10% chaos**
+* **Developers who need audit trails** for generated code
+* **Teams shipping AI-generated code to production** (and need to sleep at night)
+### **TL;DR**
+1. Download the pack
+2. Upload it to your AI or give your AI the repo URL
+3. Tell your AI what you want to build (or paste your existing code)
+4. Get deterministic, verifiable, multi-language code
+5. If something's wrong, the AI tells you exactly what to fix
+6. Stop crashing out over boilerplate
+---
+**Below this point:** Technical deep-dive for people who want to understand how the sausage is made. If you just want to _use_ STUNIR, you're already done. Go forth and "code" responsibly.
+---
+
 ## Ada SPARK is the Default Implementation Language
 
 **STUNIR uses Ada SPARK as its DEFAULT implementation language for all tools.**
@@ -70,72 +136,6 @@ Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a fully func
 
 **Both pipelines produce identical IR output** - choose based on your verification and workflow needs.
 
----
-
-##  Quick Start (For Humans Who Just Want This To Work)
-### **Step 1: Get STUNIR**
-**[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
-### **Step 2: Give It To Your AI**
-You have two options:
-#### **Option A: Upload the ZIP**
-* Just drag and drop the ZIP file into your AI chat (ChatGPT, Claude, etc.)
-* Tell it: _"Use this STUNIR pack for my project"_
-#### **Option B: Share the URL** (if your AI has internet access)
-* Paste this into your chat: `https://github.com/emstar-en/STUNIR`
-* Most cloud AI models can read it directly
-### **Step 3: Talk To Your AI**
-Just tell the model what you want to do with it.
-It will lead to more questions you have to answer and you can ask questions about those questions.
-The AI can tell you if what you're asking for is possible or not and will find the clear path(s) to your goal.
-Can you understand code/mark-up?  If not, lean on the AI.
-### WARNING: This isn't magic, you still have to put effort into it.
-You just don't need to know any specific programming languages.
-### CAUTION: You DO have to be open to learning programming and systems archetecture, though.
-The AI can teach you there.  These wretched bundles of math are good for something healthy.
-### **What Can You Do With This?**
-If you've ever:
-*  **Asked AI to generate a program** and got something that _almost_ works
-*  **Needed to translate code** between languages (Python → Rust, JavaScript → Go, etc.)
-*  **Had working code in one language** and wanted it in another (just paste your code/snippets as input!)
-*  **Knew exactly what implementation you wanted** but only knew how to write it in one language
-*  **Wanted the same code in multiple languages** without copy-pasting and praying
-*  **Crashed out debugging boilerplate** that should've been automated
-*  **Needed verifiable, reproducible builds** (so you can prove your code does what it says)
-*  **Wanted AI-generated code that doesn't randomly change** every time you regenerate it
-*  **Needed to ship the same logic** as a web app, CLI tool, and WASM module
-*  **Wanted receipts/proofs** that your build pipeline is legit
-...then STUNIR is for you.
-### **What STUNIR Actually Does**
-Think of it as a **safety harness for AI code generation**:
-1. You (or your AI) provide input:
-* A **spec** (what you want the program to do), OR
-* **Existing code/snippets** (in any language you know)
-1. STUNIR turns that into a **canonical reference** (the "true meaning" of your program)
-2. STUNIR generates **actual code** in whatever languages you need (Python, Rust, JavaScript, Assembly, WASM, etc.)
-3. STUNIR gives you **receipts** (cryptographic proof that everything was built correctly and reproducibly)
-**The key difference:** Your AI can _suggest_ code, but STUNIR's deterministic tools are what actually _produce_ it. This means:
-* No more "it worked yesterday but not today"
-* No more "I swear I didn't change anything"
-* No more guessing if AI hallucinated part of your build
-**And if your inputs are no good?** You're using AI, so the model tells you exactly what you need to change in your spec/code. It's the future now.
-### **Who Is This For?**
-* **Vibe-coders** who want their vibes to compile reliably
-* **People who know the implementation** but only in one language
-* **Code translators** who are tired of manual porting
-* **Hackathon heroes** who need multi-language output _fast_
-* **People who got a link at a convention** and were told "just use this"
-* **Anyone who's tired of AI code that's 90% perfect and 10% chaos**
-* **Developers who need audit trails** for generated code
-* **Teams shipping AI-generated code to production** (and need to sleep at night)
-### **TL;DR**
-1. Download the pack
-2. Upload it to your AI or give your AI the repo URL
-3. Tell your AI what you want to build (or paste your existing code)
-4. Get deterministic, verifiable, multi-language code
-5. If something's wrong, the AI tells you exactly what to fix
-6. Stop crashing out over boilerplate
----
-**Below this point:** Technical deep-dive for people who want to understand how the sausage is made. If you just want to _use_ STUNIR, you're already done. Go forth and "code" responsibly.
 ---
 
 ## Getting Started with SPARK Tools (For Developers)
