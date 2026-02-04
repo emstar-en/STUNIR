@@ -1,0 +1,12 @@
+{
+  "inputs": {
+    "spec_count": 2,
+    "spec_root": "test_outputs/ardupilot_do178c_test/specs",
+    "timestamp": "2026-02-04T08:43:17.961196Z"
+  },
+  "outputs": {
+    "ardupilot_ir.json": "b23cae552cb66e6ce40ac22e17d5afab2483393baea80e8b6d5e0dfdd2bebc09"
+  },
+  "tool": "stunir_spec_to_ir",
+  "version": "0.2.0"
+}
