@@ -35,9 +35,11 @@ project STUNIR_Tools is
    end Binder;
 
    package Linker is
-      for Default_Switches ("Ada") use 
-        ("-g",                          -- Debug info
-         "-Wl,-z,stacksize=16777216");  -- 16MB stack size
+      for Default_Switches ("Ada") use
+        ("-g");  -- Debug info
+      -- Note: Stack size set via Binder -d32m option (works on all platforms)
+      -- Linux: -Wl,-z,stacksize=16777216
+      -- Windows: --stack=0x1000000 (set in Builder package)
    end Linker;
 
    package Prove is

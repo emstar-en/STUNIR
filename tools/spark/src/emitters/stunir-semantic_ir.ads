@@ -135,6 +135,9 @@ package STUNIR.Semantic_IR is
       Statements  : Statement_Array (1 .. Max_Statements);
       Arg_Cnt     : Natural range 0 .. Max_Args := 0;
       Stmt_Cnt    : Natural range 0 .. Max_Statements := 0;
+      --  v0.8.9: Type parameters for generic functions
+      Type_Params : Type_Param_Array (1 .. Max_Type_Params);
+      Type_Param_Cnt : Natural range 0 .. Max_Type_Params := 0;
    end record
    with Dynamic_Predicate =>
      Arg_Cnt <= Max_Args and Stmt_Cnt <= Max_Statements;

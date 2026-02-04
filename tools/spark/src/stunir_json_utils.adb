@@ -985,6 +985,38 @@ package body STUNIR_JSON_Utils is
                    
                    when Stmt_Nop =>
                       Append_To_Buffer (Output, """op"":""noop""");
+
+                   when Stmt_Generic_Call =>
+                      -- v0.8.9: Generic function call
+                      Append_To_Buffer (Output, """op"":""generic_call""");
+                      if Code_Buffers.Length (Stmt.Value) > 0 then
+                         Append_To_Buffer (Output, ",""value"":""" & Code_Buffers.To_String (Stmt.Value) & """");
+                      end if;
+                      if Name_Strings.Length (Stmt.Target) > 0 then
+                         Append_To_Buffer (Output, ",""target"":""" & Name_Strings.To_String (Stmt.Target) & """");
+                      end if;
+                      -- Emit type arguments
+                      if Stmt.Type_Arg_Cnt > 0 then
+                         Append_To_Buffer (Output, ",""type_args"":[");
+                         for Type_Idx in 1 .. Stmt.Type_Arg_Cnt loop
+                            if Type_Idx > 1 then
+                               Append_To_Buffer (Output, ",");
+                            end if;
+                            Append_To_Buffer (Output, """" &
+                                              Type_Strings.To_String (Stmt.Type_Args (Type_Idx)) & """");
+                         end loop;
+                         Append_To_Buffer (Output, "]");
+                      end if;
+
+                   when Stmt_Type_Cast =>
+                      -- v0.8.9: Type cast expression
+                      Append_To_Buffer (Output, """op"":""type_cast""");
+                      if Code_Buffers.Length (Stmt.Value) > 0 then
+                         Append_To_Buffer (Output, ",""value"":""" & Code_Buffers.To_String (Stmt.Value) & """");
+                      end if;
+                      if Type_Strings.Length (Stmt.Cast_Type) > 0 then
+                         Append_To_Buffer (Output, ",""cast_type"":""" & Type_Strings.To_String (Stmt.Cast_Type) & """");
+                      end if;
                 end case;
                 
                 Append_To_Buffer (Output, "}");
