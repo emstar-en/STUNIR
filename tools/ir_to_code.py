@@ -565,51 +565,6 @@ def emit_statement(stmt: Dict[str, Any], lang: str, indent: int = 0) -> List[str
 
     return lines
 
-    elif stmt_type == "if":
-        condition = stmt.get("condition", "")
-        then_body = stmt.get("then", [])
-        else_body = stmt.get("else", [])
-
-        if lang == "python":
-            lines.append(f"{indent_str}if {condition}:")
-            if then_body:
-                for s in then_body:
-                    lines.extend(emit_statement(s, lang, indent + 1))
-            else:
-                lines.append(f"{indent_str}    pass")
-            if else_body:
-                lines.append(f"{indent_str}else:")
-                for s in else_body:
-                    lines.extend(emit_statement(s, lang, indent + 1))
-        else:
-            lines.append(f"{indent_str}if ({condition}) {{")
-            for s in then_body:
-                lines.extend(emit_statement(s, lang, indent + 1))
-            if else_body:
-                lines.append(f"{indent_str}}} else {{")
-                for s in else_body:
-                    lines.extend(emit_statement(s, lang, indent + 1))
-            lines.append(f"{indent_str}}}")
-
-    elif stmt_type == "while":
-        condition = stmt.get("condition", "")
-        body = stmt.get("body", [])
-
-        if lang == "python":
-            lines.append(f"{indent_str}while {condition}:")
-            if body:
-                for s in body:
-                    lines.extend(emit_statement(s, lang, indent + 1))
-            else:
-                lines.append(f"{indent_str}    pass")
-        else:
-            lines.append(f"{indent_str}while ({condition}) {{")
-            for s in body:
-                lines.extend(emit_statement(s, lang, indent + 1))
-            lines.append(f"{indent_str}}}")
-
-    return lines
-
 
 def emit_function_body(body: List[Dict[str, Any]], lang: str) -> List[str]:
     """Emit function body from IR statements.

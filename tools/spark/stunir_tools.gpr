@@ -15,7 +15,12 @@ project STUNIR_Tools is
    for Object_Dir use "obj";
    for Exec_Dir use "bin";
 
-   for Main use ("stunir_spec_to_ir_main.adb", "stunir_ir_to_code_main.adb");
+   for Main use ("stunir_spec_to_ir_main.adb",
+                 "stunir_ir_to_code_main.adb",
+                 "stunir_code_index_main.adb",
+                 "stunir_code_slice_main.adb",
+                 "stunir_spec_assemble_main.adb",
+                 "stunir_receipt_link_main.adb");
 
    package Compiler is
       for Default_Switches ("Ada") use
