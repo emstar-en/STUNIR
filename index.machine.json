@@ -44,5 +44,10 @@
   "test_harness": "Directory",
   "test_vectors": "Test data for verification",
   "tests": "Test suites",
-  "tools": "Deterministic tools (Python/Native)"
+  "tools": "Deterministic tools (Python/Native)",
+  "tools/spark": "SPARK Ada tools for code indexing and slicing",
+  "tools/spark/bin": "Compiled SPARK tool executables",
+  "tools/spark/src": "SPARK Ada source code",
+  "tools/spark/stunir_tools.gpr": "GNAT project file for SPARK tools",
+  "tools/spark/index.machine.json": "Machine index of SPARK source files"
 }

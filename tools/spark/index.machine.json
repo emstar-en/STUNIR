@@ -1,0 +1,440 @@
+{
+  "kind": "stunir.code_index.v1",
+  "root_path": "tools/spark/src",
+  "generated_at": "2026-02-04T17:42:27.966415",
+  "file_count": 108,
+  "files": [
+    {
+      "path": "emitters/stunir-emitters-asm_ir.adb",
+      "size": 3122
+    },
+    {
+      "path": "emitters/stunir-emitters-asm_ir.ads",
+      "size": 1721
+    },
+    {
+      "path": "emitters/stunir-emitters-asp.adb",
+      "size": 2755
+    },
+    {
+      "path": "emitters/stunir-emitters-asp.ads",
+      "size": 1692
+    },
+    {
+      "path": "emitters/stunir-emitters-assembly.adb",
+      "size": 8984
+    },
+    {
+      "path": "emitters/stunir-emitters-assembly.ads",
+      "size": 2116
+    },
+    {
+      "path": "emitters/stunir-emitters-beam.adb",
+      "size": 5490
+    },
+    {
+      "path": "emitters/stunir-emitters-beam.ads",
+      "size": 1726
+    },
+    {
+      "path": "emitters/stunir-emitters-business.adb",
+      "size": 7303
+    },
+    {
+      "path": "emitters/stunir-emitters-business.ads",
+      "size": 2887
+    },
+    {
+      "path": "emitters/stunir-emitters-bytecode.adb",
+      "size": 3372
+    },
+    {
+      "path": "emitters/stunir-emitters-bytecode.ads",
+      "size": 1842
+    },
+    {
+      "path": "emitters/stunir-emitters-codegen.adb",
+      "size": 2372
+    },
+    {
+      "path": "emitters/stunir-emitters-codegen.ads",
+      "size": 1887
+    },
+    {
+      "path": "emitters/stunir-emitters-constraints.adb",
+      "size": 6857
+    },
+    {
+      "path": "emitters/stunir-emitters-constraints.ads",
+      "size": 2499
+    },
+    {
+      "path": "emitters/stunir-emitters-embedded.adb",
+      "size": 10564
+    },
+    {
+      "path": "emitters/stunir-emitters-embedded.ads",
+      "size": 2768
+    },
+    {
+      "path": "emitters/stunir-emitters-expert.adb",
+      "size": 8884
+    },
+    {
+      "path": "emitters/stunir-emitters-expert.ads",
+      "size": 2723
+    },
+    {
+      "path": "emitters/stunir-emitters-fpga.adb",
+      "size": 8922
+    },
+    {
+      "path": "emitters/stunir-emitters-fpga.ads",
+      "size": 2941
+    },
+    {
+      "path": "emitters/stunir-emitters-functional.adb",
+      "size": 14098
+    },
+    {
+      "path": "emitters/stunir-emitters-functional.ads",
+      "size": 2785
+    },
+    {
+      "path": "emitters/stunir-emitters-gpu.adb",
+      "size": 9160
+    },
+    {
+      "path": "emitters/stunir-emitters-gpu.ads",
+      "size": 2289
+    },
+    {
+      "path": "emitters/stunir-emitters-grammar.adb",
+      "size": 7278
+    },
+    {
+      "path": "emitters/stunir-emitters-grammar.ads",
+      "size": 2790
+    },
+    {
+      "path": "emitters/stunir-emitters-lexer.adb",
+      "size": 5855
+    },
+    {
+      "path": "emitters/stunir-emitters-lexer.ads",
+      "size": 2184
+    },
+    {
+      "path": "emitters/stunir-emitters-lisp.adb",
+      "size": 28623
+    },
+    {
+      "path": "emitters/stunir-emitters-lisp.ads",
+      "size": 3916
+    },
+    {
+      "path": "emitters/stunir-emitters-lisp.ali",
+      "size": 15200
+    },
+    {
+      "path": "emitters/stunir-emitters-mobile.adb",
+      "size": 2165
+    },
+    {
+      "path": "emitters/stunir-emitters-mobile.ads",
+      "size": 1719
+    },
+    {
+      "path": "emitters/stunir-emitters-oop.adb",
+      "size": 5028
+    },
+    {
+      "path": "emitters/stunir-emitters-oop.ads",
+      "size": 2305
+    },
+    {
+      "path": "emitters/stunir-emitters-parser.adb",
+      "size": 5948
+    },
+    {
+      "path": "emitters/stunir-emitters-parser.ads",
+      "size": 2395
+    },
+    {
+      "path": "emitters/stunir-emitters-planning.adb",
+      "size": 2522
+    },
+    {
+      "path": "emitters/stunir-emitters-planning.ads",
+      "size": 1747
+    },
+    {
+      "path": "emitters/stunir-emitters-polyglot.adb",
+      "size": 15742
+    },
+    {
+      "path": "emitters/stunir-emitters-polyglot.ads",
+      "size": 2403
+    },
+    {
+      "path": "emitters/stunir-emitters-prolog.adb",
+      "size": 18009
+    },
+    {
+      "path": "emitters/stunir-emitters-prolog.ads",
+      "size": 4187
+    },
+    {
+      "path": "emitters/stunir-emitters-prolog.ali",
+      "size": 13044
+    },
+    {
+      "path": "emitters/stunir-emitters-scientific.adb",
+      "size": 2346
+    },
+    {
+      "path": "emitters/stunir-emitters-scientific.ads",
+      "size": 1857
+    },
+    {
+      "path": "emitters/stunir-emitters-systems.adb",
+      "size": 4832
+    },
+    {
+      "path": "emitters/stunir-emitters-systems.ads",
+      "size": 1807
+    },
+    {
+      "path": "emitters/stunir-emitters-visitor.adb",
+      "size": 1919
+    },
+    {
+      "path": "emitters/stunir-emitters-visitor.ads",
+      "size": 1691
+    },
+    {
+      "path": "emitters/stunir-emitters-wasm.adb",
+      "size": 8181
+    },
+    {
+      "path": "emitters/stunir-emitters-wasm.ads",
+      "size": 1776
+    },
+    {
+      "path": "emitters/stunir-emitters.adb",
+      "size": 966
+    },
+    {
+      "path": "emitters/stunir-emitters.ads",
+      "size": 1943
+    },
+    {
+      "path": "emitters/stunir-emitters.ali",
+      "size": 3502
+    },
+    {
+      "path": "emitters/stunir-semantic_ir.adb",
+      "size": 496
+    },
+    {
+      "path": "emitters/stunir-semantic_ir.ads",
+      "size": 7447
+    },
+    {
+      "path": "emitters/stunir-semantic_ir.ali",
+      "size": 24655
+    },
+    {
+      "path": "emitters/stunir.ads",
+      "size": 256
+    },
+    {
+      "path": "emitters/stunir.ali",
+      "size": 256
+    },
+    {
+      "path": "semantic_ir/semantic_ir-declarations.adb",
+      "size": 535
+    },
+    {
+      "path": "semantic_ir/semantic_ir-declarations.ads",
+      "size": 2543
+    },
+    {
+      "path": "semantic_ir/semantic_ir-expressions.adb",
+      "size": 454
+    },
+    {
+      "path": "semantic_ir/semantic_ir-expressions.ads",
+      "size": 2149
+    },
+    {
+      "path": "semantic_ir/semantic_ir-modules.adb",
+      "size": 1728
+    },
+    {
+      "path": "semantic_ir/semantic_ir-modules.ads",
+      "size": 3015
+    },
+    {
+      "path": "semantic_ir/semantic_ir-nodes.adb",
+      "size": 1008
+    },
+    {
+      "path": "semantic_ir/semantic_ir-nodes.ads",
+      "size": 4940
+    },
+    {
+      "path": "semantic_ir/semantic_ir-statements.adb",
+      "size": 447
+    },
+    {
+      "path": "semantic_ir/semantic_ir-statements.ads",
+      "size": 2784
+    },
+    {
+      "path": "semantic_ir/semantic_ir-types.adb",
+      "size": 2263
+    },
+    {
+      "path": "semantic_ir/semantic_ir-types.ads",
+      "size": 6878
+    },
+    {
+      "path": "semantic_ir/semantic_ir-validation.adb",
+      "size": 5853
+    },
+    {
+      "path": "semantic_ir/semantic_ir-validation.ads",
+      "size": 2061
+    },
+    {
+      "path": "semantic_ir/semantic_ir.ads",
+      "size": 1392
+    },
+    {
+      "path": "stunir.ads",
+      "size": 676
+    },
+    {
+      "path": "stunir_code_index.adb",
+      "size": 11857
+    },
+    {
+      "path": "stunir_code_index.ads",
+      "size": 2576
+    },
+    {
+      "path": "stunir_code_index_main.adb",
+      "size": 539
+    },
+    {
+      "path": "stunir_code_slice.adb",
+      "size": 11733
+    },
+    {
+      "path": "stunir_code_slice.ads",
+      "size": 2325
+    },
+    {
+      "path": "stunir_code_slice_main.adb",
+      "size": 539
+    },
+    {
+      "path": "stunir_ir_to_code.adb",
+      "size": 101235
+    },
+    {
+      "path": "stunir_ir_to_code.adb.backup",
+      "size": 38907
+    },
+    {
+      "path": "stunir_ir_to_code.ads",
+      "size": 7613
+    },
+    {
+      "path": "stunir_ir_to_code_main.adb",
+      "size": 539
+    },
+    {
+      "path": "stunir_json.adb",
+      "size": 4634
+    },
+    {
+      "path": "stunir_json.ads",
+      "size": 1597
+    },
+    {
+      "path": "stunir_json_utils.adb",
+      "size": 63706
+    },
+    {
+      "path": "stunir_json_utils.adb.backup",
+      "size": 31369
+    },
+    {
+      "path": "stunir_json_utils.ads",
+      "size": 2882
+    },
+    {
+      "path": "stunir_optimizer.adb",
+      "size": 19913
+    },
+    {
+      "path": "stunir_optimizer.ads",
+      "size": 4367
+    },
+    {
+      "path": "stunir_receipt_link.adb",
+      "size": 8627
+    },
+    {
+      "path": "stunir_receipt_link.ads",
+      "size": 2294
+    },
+    {
+      "path": "stunir_receipt_link_main.adb",
+      "size": 553
+    },
+    {
+      "path": "stunir_spec_assemble.adb",
+      "size": 11422
+    },
+    {
+      "path": "stunir_spec_assemble.ads",
+      "size": 3319
+    },
+    {
+      "path": "stunir_spec_assemble_main.adb",
+      "size": 560
+    },
+    {
+      "path": "stunir_spec_to_ir.adb",
+      "size": 16880
+    },
+    {
+      "path": "stunir_spec_to_ir.adb.manifest_version",
+      "size": 11141
+    },
+    {
+      "path": "stunir_spec_to_ir.ads",
+      "size": 3767
+    },
+    {
+      "path": "stunir_spec_to_ir_main.adb",
+      "size": 539
+    },
+    {
+      "path": "stunir_spec_to_ir_v2.adb",
+      "size": 12355
+    },
+    {
+      "path": "stunir_string_builder.adb",
+      "size": 1892
+    },
+    {
+      "path": "stunir_string_builder.ads",
+      "size": 2345
+    }
+  ]
+}
