@@ -9,10 +9,7 @@
 //! - Confluence with SPARK, Python, and Haskell implementations
 //! - Zero-copy optimizations where possible
 
-use anyhow::{Context, Result};
-use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
 
 pub mod types;
 pub mod hash;
@@ -20,6 +17,18 @@ pub mod ir;
 pub mod optimizer;
 
 /// Compute SHA-256 hash of bytes
+///
+/// # Arguments
+/// * `data` - The byte slice to hash
+///
+/// # Returns
+/// A hex-encoded SHA-256 hash string
+///
+/// # Examples
+/// ```
+/// let hash = sha256_bytes(b"hello world");
+/// assert_eq!(hash.len(), 64); // SHA-256 produces 32 bytes = 64 hex chars
+/// ```
 pub fn sha256_bytes(data: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(data);
@@ -27,14 +36,59 @@ pub fn sha256_bytes(data: &[u8]) -> String {
 }
 
 /// Canonicalize JSON object for deterministic hashing
-pub fn canonicalize_json(value: &serde_json::Value) -> String {
+///
+/// Converts a JSON value to a canonical string representation with:
+/// - Sorted object keys (lexicographic order)
+/// - No insignificant whitespace
+/// - Consistent number formatting
+///
+/// This ensures that semantically equivalent JSON produces identical
+/// byte sequences for cryptographic hashing.
+///
+/// # Arguments
+/// * `value` - The JSON value to canonicalize
+///
+/// # Returns
+/// * `Ok(String)` - The canonicalized JSON string with trailing newline
+/// * `Err(serde_json::Error)` - If serialization fails
+///
+/// # Examples
+/// ```
+/// use serde_json::json;
+/// let value = json!({"b": 1, "a": 2});
+/// let canonical = canonicalize_json(&value).unwrap();
+/// assert_eq!(canonical, r#"{"a":2,"b":1}"#);
+/// ```
+///
+/// # Errors
+/// Returns an error if the JSON value contains non-string keys in maps,
+/// which cannot be represented in standard JSON.
+pub fn canonicalize_json(value: &serde_json::Value) -> Result<String, serde_json::Error> {
     // Use serde_json's to_string which sorts keys by default
-    serde_json::to_string(value).expect("JSON canonicalization failed") + "\n"
+    serde_json::to_string(value).map(|s| s + "\n")
 }
 
 /// Compute SHA-256 of canonicalized JSON
-pub fn sha256_json(value: &serde_json::Value) -> String {
-    sha256_bytes(canonicalize_json(value).as_bytes())
+///
+/// Convenience function that canonicalizes JSON and returns its hash.
+/// Useful for creating deterministic content hashes.
+///
+/// # Arguments
+/// * `value` - The JSON value to hash
+///
+/// # Returns
+/// * `Ok(String)` - The hex-encoded SHA-256 hash
+/// * `Err(serde_json::Error)` - If JSON canonicalization fails
+///
+/// # Examples
+/// ```
+/// use serde_json::json;
+/// let value = json!({"key": "value"});
+/// let hash = sha256_json(&value).unwrap();
+/// assert_eq!(hash.len(), 64);
+/// ```
+pub fn sha256_json(value: &serde_json::Value) -> Result<String, serde_json::Error> {
+    canonicalize_json(value).map(|json| sha256_bytes(json.as_bytes()))
 }
 
 #[cfg(test)]

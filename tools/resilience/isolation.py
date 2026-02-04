@@ -142,23 +142,23 @@ class DependencyIsolator:
             with self._lock:
                 self._active_futures -= 1
     
-    def isolate(self, timeout: Optional[float] = None):
+    def isolate(self, timeout: Optional[float] = None) -> Callable[[Callable[..., T]], Callable[..., T]]:
         """Decorator for isolating function execution."""
-        def decorator(func: Callable) -> Callable:
+        def decorator(func: Callable[..., T]) -> Callable[..., T]:
             @wraps(func)
-            def wrapper(*args, **kwargs):
+            def wrapper(*args: Any, **kwargs: Any) -> T:
                 return self.execute(func, *args, timeout=timeout, **kwargs)
             return wrapper
         return decorator
-    
+
     def shutdown(self, wait: bool = True) -> None:
         """Shutdown the thread pool."""
         self._executor.shutdown(wait=wait)
 
 
-def timeout(seconds: float):
+def timeout(seconds: float) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """Decorator to add timeout to synchronous functions.
-    
+
     Example:
         @timeout(5.0)
         def slow_operation():
@@ -166,7 +166,7 @@ def timeout(seconds: float):
     """
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
-        def wrapper(*args, **kwargs) -> T:
+        def wrapper(*args: Any, **kwargs: Any) -> T:
             executor = ThreadPoolExecutor(max_workers=1)
             future = executor.submit(func, *args, **kwargs)
             try:
@@ -179,11 +179,11 @@ def timeout(seconds: float):
     return decorator
 
 
-def async_timeout(seconds: float):
+def async_timeout(seconds: float) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator to add timeout to async functions."""
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
             try:
                 return await asyncio.wait_for(
                     func(*args, **kwargs),

@@ -100,7 +100,7 @@ fn emit_c99(module: &IRModule) -> Result<String> {
             if i > 0 {
                 code.push_str(", ");
             }
-            code.push_str(&format!("{} {}", map_type_to_c(&arg.arg_type), arg.name));
+            code.push_str(&format!("{} {}", map_type_to_c(&Some(arg.arg_type.clone())), arg.name));
         }
         
         if func.args.is_empty() {
@@ -111,9 +111,9 @@ fn emit_c99(module: &IRModule) -> Result<String> {
         
         // Generate function body from steps
         if let Some(steps) = &func.steps {
-            let body = translate_steps_to_c(steps, &func.return_type, 1);
+            let body = translate_steps_to_c(steps, func.return_type.as_deref().unwrap_or("void"), 1);
             code.push_str(&body);
-            code.push_str("\n");
+            code.push('\n');
         } else {
             // No steps - generate stub
             let c_ret = map_type_to_c(&func.return_type);
@@ -145,26 +145,24 @@ fn emit_rust(module: &IRModule) -> Result<String> {
         let return_type = map_type_to_rust(&func.return_type);
         code.push_str("pub fn ");
         code.push_str(&func.name);
-        code.push_str("(");
+        code.push('(');
 
         for (i, arg) in func.args.iter().enumerate() {
             if i > 0 {
                 code.push_str(", ");
             }
-            code.push_str(&format!("{}: {}", arg.name, map_type_to_rust(&arg.arg_type)));
+            code.push_str(&format!("{}: {}", arg.name, map_type_to_rust(&Some(arg.arg_type.clone()))));
         }
 
         code.push_str(&format!(") -> {} {{\n", return_type));
         if let Some(steps) = &func.steps {
             let body = translate_steps_to_rust(steps, &func.return_type, 1);
             code.push_str(&body);
-            code.push_str("\n");
+            code.push('\n');
+        } else if return_type == "()" {
+            code.push_str("    return;\n");
         } else {
-            if return_type == "()" {
-                code.push_str("    return;\n");
-            } else {
-                code.push_str(&format!("    return {};\n", rust_default_return(&func.return_type)));
-            }
+            code.push_str(&format!("    return {};\n", rust_default_return(&func.return_type)));
         }
         code.push_str("}\n\n");
     }
@@ -210,56 +208,57 @@ fn emit_python(module: &IRModule) -> Result<String> {
 }
 
 /// Map IR type string to C type
-fn map_type_to_c(type_str: &str) -> String {
-    match type_str {
-        "i8" => "int8_t".to_string(),
-        "i16" => "int16_t".to_string(),
-        "i32" => "int32_t".to_string(),
-        "i64" => "int64_t".to_string(),
-        "u8" => "uint8_t".to_string(),
-        "u16" => "uint16_t".to_string(),
-        "u32" => "uint32_t".to_string(),
-        "u64" => "uint64_t".to_string(),
-        "f32" => "float".to_string(),
-        "f64" => "double".to_string(),
-        "bool" => "bool".to_string(),
-        "string" => "char*".to_string(),
-        "byte[]" => "const uint8_t*".to_string(),
-        "void" => "void".to_string(),
+fn map_type_to_c(type_str: &Option<String>) -> String {
+    match type_str.as_deref() {
+        Some("i8") => "int8_t".to_string(),
+        Some("i16") => "int16_t".to_string(),
+        Some("i32") => "int32_t".to_string(),
+        Some("i64") => "int64_t".to_string(),
+        Some("u8") => "uint8_t".to_string(),
+        Some("u16") => "uint16_t".to_string(),
+        Some("u32") => "uint32_t".to_string(),
+        Some("u64") => "uint64_t".to_string(),
+        Some("f32") => "float".to_string(),
+        Some("f64") => "double".to_string(),
+        Some("bool") => "bool".to_string(),
+        Some("string") => "char*".to_string(),
+        Some("byte[]") => "const uint8_t*".to_string(),
+        Some("void") => "void".to_string(),
         // Pass through unknown types (e.g., custom structs, pointers)
         // This handles struct pointers correctly
-        _ => type_str.to_string(),
+        Some(s) => s.to_string(),
+        None => "void".to_string(),
     }
 }
 
 /// Map IR type string to Rust type
-fn map_type_to_rust(type_str: &str) -> &str {
-    match type_str {
-        "i8" => "i8",
-        "i16" => "i16",
-        "i32" => "i32",
-        "i64" => "i64",
-        "u8" => "u8",
-        "u16" => "u16",
-        "u32" => "u32",
-        "u64" => "u64",
-        "f32" => "f32",
-        "f64" => "f64",
-        "bool" => "bool",
-        "string" => "String",
-        "void" => "()",
+fn map_type_to_rust(type_str: &Option<String>) -> &str {
+    match type_str.as_deref() {
+        Some("i8") => "i8",
+        Some("i16") => "i16",
+        Some("i32") => "i32",
+        Some("i64") => "i64",
+        Some("u8") => "u8",
+        Some("u16") => "u16",
+        Some("u32") => "u32",
+        Some("u64") => "u64",
+        Some("f32") => "f32",
+        Some("f64") => "f64",
+        Some("bool") => "bool",
+        Some("string") => "String",
+        Some("void") => "()",
         _ => "()",
     }
 }
 
 /// Get default return value for Rust type
-fn rust_default_return(type_str: &str) -> &str {
-    match type_str {
-        "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" | "int" => "0",
-        "f32" | "f64" | "float" | "double" => "0.0",
-        "bool" => "false",
-        "string" => "String::new()",
-        "void" => "()",
+fn rust_default_return(type_str: &Option<String>) -> &str {
+    match type_str.as_deref() {
+        Some("i8") | Some("i16") | Some("i32") | Some("i64") | Some("u8") | Some("u16") | Some("u32") | Some("u64") | Some("int") => "0",
+        Some("f32") | Some("f64") | Some("float") | Some("double") => "0.0",
+        Some("bool") => "false",
+        Some("string") => "String::new()",
+        Some("void") => "()",
         _ => "()",
     }
 }
@@ -320,20 +319,20 @@ fn infer_c_type_from_value(value: &str) -> &str {
 }
 
 /// Get default return value for a type
-fn c_default_return(type_str: &str) -> &str {
-    match type_str {
-        "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" => "0",
-        "f32" | "f64" | "float" | "double" => "0.0",
-        "bool" => "false",
-        "string" | "char*" => "NULL",
-        "void" => "",
+fn c_default_return(type_str: &Option<String>) -> &str {
+    match type_str.as_deref() {
+        Some("i8") | Some("i16") | Some("i32") | Some("i64") | Some("u8") | Some("u16") | Some("u32") | Some("u64") => "0",
+        Some("f32") | Some("f64") | Some("float") | Some("double") => "0.0",
+        Some("bool") => "false",
+        Some("string") | Some("char*") => "NULL",
+        Some("void") => "",
         _ => "0",
     }
 }
 
 /// Translate IR steps to Rust code
-fn translate_steps_to_rust(steps: &[IRStep], ret_type: &str, indent: usize) -> String {
-    translate_steps_to_rust_internal(steps, ret_type, indent, &mut std::collections::HashSet::new())
+fn translate_steps_to_rust(steps: &[IRStep], ret_type: &Option<String>, indent: usize) -> String {
+    translate_steps_to_rust_internal(steps, ret_type.as_deref().unwrap_or("()"), indent, &mut std::collections::HashSet::new())
 }
 
 /// Internal function to translate IR steps to Rust with shared variable tracking
@@ -348,10 +347,10 @@ fn translate_steps_to_rust_internal(
     let indent_str = "    ".repeat(indent);
 
     if steps.is_empty() {
-        if map_type_to_rust(ret_type) == "()" {
+        if map_type_to_rust(&Some(ret_type.to_string())) == "()" {
             return format!("{}return;", indent_str);
         }
-        return format!("{}return {};", indent_str, rust_default_return(ret_type));
+        return format!("{}return {};", indent_str, rust_default_return(&Some(ret_type.to_string())));
     }
 
     let mut lines = Vec::new();
@@ -383,10 +382,10 @@ fn translate_steps_to_rust_internal(
                 };
                 if !value_str.is_empty() {
                     lines.push(format!("{}return {};", indent_str, value_str));
-                } else if map_type_to_rust(ret_type) == "()" {
+                } else if map_type_to_rust(&Some(ret_type.to_string())) == "()" {
                     lines.push(format!("{}return;", indent_str));
                 } else {
-                    lines.push(format!("{}return {};", indent_str, rust_default_return(ret_type)));
+                    lines.push(format!("{}return {};", indent_str, rust_default_return(&Some(ret_type.to_string()))));
                 }
             }
             "call" => {
@@ -745,10 +744,10 @@ fn translate_steps_to_rust_internal(
     }
 
     if indent == 1 && !lines.iter().any(|line| line.contains("return")) {
-        if map_type_to_rust(ret_type) == "()" {
+        if map_type_to_rust(&Some(ret_type.to_string())) == "()" {
             lines.push(format!("{}return;", indent_str));
         } else {
-            lines.push(format!("{}return {};", indent_str, rust_default_return(ret_type)));
+            lines.push(format!("{}return {};", indent_str, rust_default_return(&Some(ret_type.to_string()))));
         }
     }
 
@@ -756,8 +755,8 @@ fn translate_steps_to_rust_internal(
 }
 
 /// Translate IR steps to Python code
-fn translate_steps_to_python(steps: &[IRStep], ret_type: &str, indent: usize) -> String {
-    translate_steps_to_python_internal(steps, ret_type, indent, &mut std::collections::HashSet::new())
+fn translate_steps_to_python(steps: &[IRStep], ret_type: &Option<String>, indent: usize) -> String {
+    translate_steps_to_python_internal(steps, ret_type.as_deref().unwrap_or("None"), indent, &mut std::collections::HashSet::new())
 }
 
 /// Internal function to translate IR steps to Python with shared variable tracking
@@ -1215,11 +1214,11 @@ fn translate_steps_to_c_internal(
     let indent_str = "    ".repeat(indent);
     
     if steps.is_empty() {
-        let c_ret = map_type_to_c(ret_type);
+        let c_ret = map_type_to_c(&Some(ret_type.to_string()));
         if c_ret == "void" {
             return format!("{}/* Empty function body */\n{}return;", indent_str, indent_str);
         } else {
-            return format!("{}/* Empty function body */\n{}return {};", indent_str, indent_str, c_default_return(ret_type));
+            return format!("{}/* Empty function body */\n{}return {};", indent_str, indent_str, c_default_return(&Some(ret_type.to_string())));
         }
     }
     
@@ -1251,14 +1250,14 @@ fn translate_steps_to_c_internal(
                     Some(Value::Bool(b)) => b.to_string(),
                     _ => String::new(),
                 };
-                
-                let c_ret = map_type_to_c(ret_type);
+
+                let c_ret = map_type_to_c(&Some(ret_type.to_string()));
                 if !value_str.is_empty() {
                     lines.push(format!("{}return {};", indent_str, value_str));
                 } else if c_ret == "void" {
                     lines.push(format!("{}return;", indent_str));
                 } else {
-                    lines.push(format!("{}return {};", indent_str, c_default_return(ret_type)));
+                    lines.push(format!("{}return {};", indent_str, c_default_return(&Some(ret_type.to_string()))));
                 }
             }
             "call" => {
@@ -1700,13 +1699,339 @@ fn translate_steps_to_c_internal(
     // If no return statement was generated, add a default one
     // Only add at the top level (indent == 1)
     if indent == 1 && !lines.iter().any(|line| line.contains("return")) {
-        let c_ret = map_type_to_c(ret_type);
+        let c_ret = map_type_to_c(&Some(ret_type.to_string()));
         if c_ret == "void" {
             lines.push(format!("{}return;", indent_str));
         } else {
-            lines.push(format!("{}return {};", indent_str, c_default_return(ret_type)));
+            lines.push(format!("{}return {};", indent_str, c_default_return(&Some(ret_type.to_string()))));
         }
     }
     
     lines.join("\n")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_test_module() -> IRModule {
+        IRModule {
+            kind: "ir".to_string(),
+            generator: "test".to_string(),
+            ir_version: "v1".to_string(),
+            module_name: "test_module".to_string(),
+            functions: vec![],
+            types: None,
+            generic_types: None,
+            imports: None,
+        }
+    }
+
+    fn create_test_function(name: &str) -> IRFunction {
+        IRFunction {
+            name: name.to_string(),
+            parameters: vec![],
+            return_type: None,
+            steps: None,
+            type_params: None,
+            generic_instantiations: None,
+            optimization: None,
+        }
+    }
+
+    #[test]
+    fn test_emit_c99_empty_module() {
+        let module = create_test_module();
+        let result = emit_c99(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("STUNIR Generated Code"));
+        assert!(code.contains("#include <stdint.h>"));
+    }
+
+    #[test]
+    fn test_emit_c99_simple_function() {
+        let mut module = create_test_module();
+        let mut func = create_test_function("add");
+        func.parameters = vec![
+            Parameter {
+                name: "a".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+            Parameter {
+                name: "b".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+        ];
+        func.return_type = Some(TypeRef::Simple("i32".to_string()));
+        func.steps = Some(vec![IRStep {
+            op: "return".to_string(),
+            target: None,
+            value: Some(serde_json::Value::String("a + b".to_string())),
+            condition: None,
+            then_block: None,
+            else_block: None,
+            body: None,
+            args: None,
+            fields: None,
+            error: None,
+            catch_blocks: None,
+            finally_block: None,
+            try_block: None,
+            throw_value: None,
+            exception_type: None,
+            exception_var: None,
+            optimization: None,
+        }]);
+        module.functions.push(func);
+
+        let result = emit_c99(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("int32_t add(int32_t a, int32_t b)"));
+        assert!(code.contains("return a + b;"));
+    }
+
+    #[test]
+    fn test_emit_rust_empty_module() {
+        let module = create_test_module();
+        let result = emit_rust(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("STUNIR Generated Code"));
+        assert!(code.contains("// Module: test_module"));
+    }
+
+    #[test]
+    fn test_emit_rust_simple_function() {
+        let mut module = create_test_module();
+        let mut func = create_test_function("add");
+        func.parameters = vec![
+            Parameter {
+                name: "a".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+            Parameter {
+                name: "b".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+        ];
+        func.return_type = Some(TypeRef::Simple("i32".to_string()));
+        func.steps = Some(vec![IRStep {
+            op: "return".to_string(),
+            target: None,
+            value: Some(serde_json::Value::String("a + b".to_string())),
+            condition: None,
+            then_block: None,
+            else_block: None,
+            body: None,
+            args: None,
+            fields: None,
+            error: None,
+            catch_blocks: None,
+            finally_block: None,
+            try_block: None,
+            throw_value: None,
+            exception_type: None,
+            exception_var: None,
+            optimization: None,
+        }]);
+        module.functions.push(func);
+
+        let result = emit_rust(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("fn add(a: i32, b: i32) -> i32"));
+        assert!(code.contains("a + b"));
+    }
+
+    #[test]
+    fn test_emit_python_empty_module() {
+        let module = create_test_module();
+        let result = emit_python(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("STUNIR Generated Code"));
+        assert!(code.contains("# Module: test_module"));
+    }
+
+    #[test]
+    fn test_emit_python_simple_function() {
+        let mut module = create_test_module();
+        let mut func = create_test_function("add");
+        func.parameters = vec![
+            Parameter {
+                name: "a".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+            Parameter {
+                name: "b".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+        ];
+        func.return_type = Some(TypeRef::Simple("i32".to_string()));
+        func.steps = Some(vec![IRStep {
+            op: "return".to_string(),
+            target: None,
+            value: Some(serde_json::Value::String("a + b".to_string())),
+            condition: None,
+            then_block: None,
+            else_block: None,
+            body: None,
+            args: None,
+            fields: None,
+            error: None,
+            catch_blocks: None,
+            finally_block: None,
+            try_block: None,
+            throw_value: None,
+            exception_type: None,
+            exception_var: None,
+            optimization: None,
+        }]);
+        module.functions.push(func);
+
+        let result = emit_python(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("def add(a, b):"));
+        assert!(code.contains("return a + b"));
+    }
+
+    #[test]
+    fn test_map_type_to_c() {
+        assert_eq!(map_type_to_c(&Some("i32".to_string())), "int32_t");
+        assert_eq!(map_type_to_c(&Some("i64".to_string())), "int64_t");
+        assert_eq!(map_type_to_c(&Some("f32".to_string())), "float");
+        assert_eq!(map_type_to_c(&Some("f64".to_string())), "double");
+        assert_eq!(map_type_to_c(&Some("bool".to_string())), "bool");
+        assert_eq!(map_type_to_c(&Some("void".to_string())), "void");
+        assert_eq!(map_type_to_c(&None), "void");
+    }
+
+    #[test]
+    fn test_map_type_to_rust() {
+        assert_eq!(map_type_to_rust(&Some("i32".to_string())), "i32");
+        assert_eq!(map_type_to_rust(&Some("i64".to_string())), "i64");
+        assert_eq!(map_type_to_rust(&Some("f32".to_string())), "f32");
+        assert_eq!(map_type_to_rust(&Some("f64".to_string())), "f64");
+        assert_eq!(map_type_to_rust(&Some("bool".to_string())), "bool");
+        assert_eq!(map_type_to_rust(&Some("void".to_string())), "()");
+        assert_eq!(map_type_to_rust(&None), "()");
+    }
+
+    #[test]
+    fn test_emit_code_unsupported_target() {
+        let module = create_test_module();
+        let result = emit_code(&module, "java");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("Unsupported target"));
+    }
+
+    #[test]
+    fn test_emit_c99_with_types() {
+        let mut module = create_test_module();
+        let mut type_def = IRType::default();
+        type_def.name = "Point".to_string();
+        type_def.kind = "struct".to_string();
+        type_def.fields = Some(vec![
+            Field {
+                name: "x".to_string(),
+                field_type: TypeRef::Simple("f64".to_string()),
+            },
+            Field {
+                name: "y".to_string(),
+                field_type: TypeRef::Simple("f64".to_string()),
+            },
+        ]);
+        module.types = Some(vec![type_def]);
+
+        let result = emit_c99(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("typedef struct"));
+        assert!(code.contains("Point"));
+    }
+
+    #[test]
+    fn test_emit_c99_control_flow() {
+        let mut module = create_test_module();
+        let mut func = create_test_function("max");
+        func.parameters = vec![
+            Parameter {
+                name: "a".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+            Parameter {
+                name: "b".to_string(),
+                param_type: TypeRef::Simple("i32".to_string()),
+            },
+        ];
+        func.return_type = Some(TypeRef::Simple("i32".to_string()));
+        func.steps = Some(vec![
+            IRStep {
+                op: "if".to_string(),
+                target: None,
+                value: None,
+                condition: Some("a > b".to_string()),
+                then_block: Some(vec![IRStep {
+                    op: "return".to_string(),
+                    target: None,
+                    value: Some(serde_json::Value::String("a".to_string())),
+                    condition: None,
+                    then_block: None,
+                    else_block: None,
+                    body: None,
+                    args: None,
+                    fields: None,
+                    error: None,
+                    catch_blocks: None,
+                    finally_block: None,
+                    try_block: None,
+                    throw_value: None,
+                    exception_type: None,
+                    exception_var: None,
+                    optimization: None,
+                }]),
+                else_block: Some(vec![IRStep {
+                    op: "return".to_string(),
+                    target: None,
+                    value: Some(serde_json::Value::String("b".to_string())),
+                    condition: None,
+                    then_block: None,
+                    else_block: None,
+                    body: None,
+                    args: None,
+                    fields: None,
+                    error: None,
+                    catch_blocks: None,
+                    finally_block: None,
+                    try_block: None,
+                    throw_value: None,
+                    exception_type: None,
+                    exception_var: None,
+                    optimization: None,
+                }]),
+                body: None,
+                args: None,
+                fields: None,
+                error: None,
+                catch_blocks: None,
+                finally_block: None,
+                try_block: None,
+                throw_value: None,
+                exception_type: None,
+                exception_var: None,
+                optimization: None,
+            },
+        ]);
+        module.functions.push(func);
+
+        let result = emit_c99(&module);
+        assert!(result.is_ok());
+        let code = result.unwrap();
+        assert!(code.contains("if (a > b)"));
+        assert!(code.contains("return a;"));
+        assert!(code.contains("return b;"));
+    }
 }

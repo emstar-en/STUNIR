@@ -51,21 +51,21 @@ impl BytecodeEmitter {
     fn generate_code(&self, ir_module: &IRModule) -> Result<String, EmitterError> {
         let mut content = String::new();
 
-        writeln!(content, "# STUNIR Generated {:?} Code", self.config.variant).unwrap();
-        writeln!(content, "# DO-178C Level A Compliant\n").unwrap();
+        writeln!(content, "# STUNIR Generated {:?} Code", self.config.variant)?;
+        writeln!(content, "# DO-178C Level A Compliant\n")?;
 
         // Module/namespace
-        writeln!(content, "# Module: {}", ir_module.module_name).unwrap();
-        writeln!(content).unwrap();
+        writeln!(content, "# Module: {}", ir_module.module_name)?;
+        writeln!(content)?;
 
         // Functions
         for function in &ir_module.functions {
             if let Some(ref doc) = function.docstring {
-                writeln!(content, "# {}", doc).unwrap();
+                writeln!(content, "# {}", doc)?;
             }
-            writeln!(content, "# Function: {}", function.name).unwrap();
+            writeln!(content, "# Function: {}", function.name)?;
             self.generate_function(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         Ok(content)
@@ -77,15 +77,15 @@ impl BytecodeEmitter {
         content: &mut String,
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
-        writeln!(content, "# Generated function: {}", function.name).unwrap();
+        writeln!(content, "# Generated function: {}", function.name)?;
 
         // Variant-specific generation
         match self.config.variant {
             BytecodeVariant::JVM => {
-                writeln!(content, "# {:?} specific code", self.config.variant).unwrap();
+                writeln!(content, "# {:?} specific code", self.config.variant)?;
             }
             _ => {
-                writeln!(content, "# Generic code for {:?}", self.config.variant).unwrap();
+                writeln!(content, "# Generic code for {:?}", self.config.variant)?;
             }
         }
 

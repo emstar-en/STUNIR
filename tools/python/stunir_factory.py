@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+"""Factory pipeline runner for the minimal STUNIR toolchain."""
 import os
 import sys
 import json
 import subprocess
 import platform
 from datetime import datetime, timezone
-from typing import Dict, Optional, Any
+from typing import Any, Dict
 
 # Import the core logic from minimal (Code Reuse)
 # In a real package structure, this would be `from . import stunir_minimal`
@@ -18,16 +19,20 @@ except ImportError:
     import stunir_minimal
 
 class StunirFactory:
-    def __init__(self, workspace_root: str):
+    """Run a minimal end-to-end STUNIR pipeline in a workspace."""
+
+    def __init__(self, workspace_root: str) -> None:
         self.root = workspace_root
         self.build_dir = os.path.join(self.root, "build")
         self.lockfile = os.path.join(self.build_dir, "local_toolchain.lock.json")
         os.makedirs(self.build_dir, exist_ok=True)
 
-    def log(self, msg: str):
+    def log(self, msg: str) -> None:
+        """Print a factory-prefixed log message."""
         print(f"[STUNIR:FACTORY] {msg}")
 
     def discover_toolchain(self) -> Dict[str, Any]:
+        """Discover minimal tools and write a lockfile."""
         self.log("Running Toolchain Discovery (Python-Railed)...")
 
         tools = {}
@@ -55,7 +60,8 @@ class StunirFactory:
         self.log(f"Toolchain locked at {self.lockfile}")
         return lock_data
 
-    def run_pipeline(self, spec_path: str):
+    def run_pipeline(self, spec_path: str) -> None:
+        """Run spec-to-IR and provenance steps for a spec file."""
         self.log(f"Starting Factory Pipeline for {spec_path}")
 
         # 1. Discovery
@@ -85,7 +91,8 @@ class StunirFactory:
         self.log("Factory Pipeline Complete.")
         self.log(f"Artifacts: {ir_path}, {prov_path}")
 
-def main():
+def main() -> None:
+    """Run the factory pipeline from the command line."""
     if len(sys.argv) < 2:
         print("Usage: stunir_factory.py <spec_file>")
         sys.exit(1)

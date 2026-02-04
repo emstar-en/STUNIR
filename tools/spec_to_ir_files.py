@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+"""Emit mock IR files and manifests for a spec root."""
 import argparse, json
 from pathlib import Path
 
-def main():
+
+def main() -> None:
+    """Parse CLI arguments and generate dummy IR outputs."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--spec-root")
     ap.add_argument("--out-root")

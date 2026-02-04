@@ -70,9 +70,9 @@ impl PrologEmitter {
         let mut content = String::new();
 
         // Header comment
-        writeln!(content, "% STUNIR Generated Prolog Code").unwrap();
-        writeln!(content, "% DO-178C Level A Compliant").unwrap();
-        writeln!(content, "% Dialect: {:?}\\n", self.config.dialect).unwrap();
+        writeln!(content, "% STUNIR Generated Prolog Code")?;
+        writeln!(content, "% DO-178C Level A Compliant")?;
+        writeln!(content, "% Dialect: {:?}\\n", self.config.dialect)?;
 
         // Module declaration (dialect-specific)
         self.generate_module_decl(&mut content, ir_module)?;
@@ -88,7 +88,7 @@ impl PrologEmitter {
         // Predicate definitions (from functions)
         for function in &ir_module.functions {
             self.generate_predicate(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         Ok(content)
@@ -102,16 +102,16 @@ impl PrologEmitter {
     ) -> Result<(), EmitterError> {
         match self.config.dialect {
             PrologDialect::SWI | PrologDialect::YAP => {
-                writeln!(content, ":- module({}, []).", ir_module.module_name).unwrap();
-                writeln!(content).unwrap();
+                writeln!(content, ":- module({}, []).", ir_module.module_name)?;
+                writeln!(content)?;
             }
             PrologDialect::SICStus | PrologDialect::Ciao => {
-                writeln!(content, ":- module({}, []).", ir_module.module_name).unwrap();
-                writeln!(content).unwrap();
+                writeln!(content, ":- module({}, []).", ir_module.module_name)?;
+                writeln!(content)?;
             }
             _ => {
-                writeln!(content, "% Module: {}", ir_module.module_name).unwrap();
-                writeln!(content).unwrap();
+                writeln!(content, "% Module: {}", ir_module.module_name)?;
+                writeln!(content)?;
             }
         }
         Ok(())
@@ -119,17 +119,17 @@ impl PrologEmitter {
 
     /// Generate directives
     fn generate_directives(&self, content: &mut String) -> Result<(), EmitterError> {
-        writeln!(content, "% Directives").unwrap();
+        writeln!(content, "% Directives")?;
         match self.config.dialect {
             PrologDialect::SWI => {
-                writeln!(content, ":- set_prolog_flag(double_quotes, codes).").unwrap();
+                writeln!(content, ":- set_prolog_flag(double_quotes, codes).")?;
             }
             PrologDialect::ECLiPSe => {
-                writeln!(content, ":- lib(ic).").unwrap();
+                writeln!(content, ":- lib(ic).")?;
             }
             _ => {}
         }
-        writeln!(content).unwrap();
+        writeln!(content)?;
         Ok(())
     }
 
@@ -139,9 +139,9 @@ impl PrologEmitter {
         content: &mut String,
         ir_type: &crate::types::IRType,
     ) -> Result<(), EmitterError> {
-        writeln!(content, "% Type: {}", ir_type.name).unwrap();
+        writeln!(content, "% Type: {}", ir_type.name)?;
         if let Some(ref doc) = ir_type.docstring {
-            writeln!(content, "% {}", doc).unwrap();
+            writeln!(content, "% {}", doc)?;
         }
 
         // Generate facts for each field
@@ -153,7 +153,7 @@ impl PrologEmitter {
             )
             .unwrap();
         }
-        writeln!(content).unwrap();
+        writeln!(content)?;
         Ok(())
     }
 
@@ -164,16 +164,16 @@ impl PrologEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "% {}", doc).unwrap();
+            writeln!(content, "% {}", doc)?;
         }
 
         // Predicate head
         let params = self.format_params(&function.parameters);
-        writeln!(content, "{}({}) :-", function.name, params).unwrap();
+        writeln!(content, "{}({}) :-", function.name, params)?;
 
         // Predicate body
         if function.statements.is_empty() {
-            writeln!(content, "    true.").unwrap();
+            writeln!(content, "    true.")?;
         } else {
             for (i, stmt) in function.statements.iter().enumerate() {
                 let is_last = i == function.statements.len() - 1;
@@ -197,12 +197,12 @@ impl PrologEmitter {
             IRStatementType::VarDecl => {
                 let var_name = stmt.target.as_deref().unwrap_or("V");
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "    {} = {}{}", var_name, value, terminator).unwrap();
+                writeln!(content, "    {} = {}{}", var_name, value, terminator)?;
             }
             IRStatementType::Assign => {
                 let target = stmt.target.as_deref().unwrap_or("V");
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "    {} = {}{}", target, value, terminator).unwrap();
+                writeln!(content, "    {} = {}{}", target, value, terminator)?;
             }
             IRStatementType::Add => {
                 let target = stmt.target.as_deref().unwrap_or("Result");
@@ -212,8 +212,7 @@ impl PrologEmitter {
                     content,
                     "    {} is {} + {}{}",
                     target, left, right, terminator
-                )
-                .unwrap();
+                )?;
             }
             IRStatementType::Sub => {
                 let target = stmt.target.as_deref().unwrap_or("Result");
@@ -223,8 +222,7 @@ impl PrologEmitter {
                     content,
                     "    {} is {} - {}{}",
                     target, left, right, terminator
-                )
-                .unwrap();
+                )?;
             }
             IRStatementType::Mul => {
                 let target = stmt.target.as_deref().unwrap_or("Result");
@@ -234,8 +232,7 @@ impl PrologEmitter {
                     content,
                     "    {} is {} * {}{}",
                     target, left, right, terminator
-                )
-                .unwrap();
+                )?;
             }
             IRStatementType::Div => {
                 let target = stmt.target.as_deref().unwrap_or("Result");
@@ -245,16 +242,15 @@ impl PrologEmitter {
                     content,
                     "    {} is {} / {}{}",
                     target, left, right, terminator
-                )
-                .unwrap();
+                )?;
             }
             IRStatementType::Call => {
                 let func = stmt.target.as_deref().unwrap_or("call");
                 let args = stmt.value.as_deref().unwrap_or("");
-                writeln!(content, "    {}({}){}", func, args, terminator).unwrap();
+                writeln!(content, "    {}({}){}", func, args, terminator)?;
             }
             _ => {
-                writeln!(content, "    % {:?}{}", stmt.stmt_type, terminator).unwrap();
+                writeln!(content, "    % {:?}{}", stmt.stmt_type, terminator)?;
             }
         }
 
@@ -308,7 +304,7 @@ mod tests {
 
     #[test]
     fn test_prolog_swi() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = PrologConfig::new(base_config, PrologDialect::SWI);
         let emitter = PrologEmitter::new(config);
@@ -327,7 +323,7 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
     }
 }

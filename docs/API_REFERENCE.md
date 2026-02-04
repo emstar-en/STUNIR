@@ -1,714 +1,480 @@
 # STUNIR API Reference
 
-Complete reference documentation for all STUNIR public APIs.
+## Version 0.8.9
 
----
+Complete API reference for STUNIR tools and libraries.
 
 ## Table of Contents
 
-- [Python Tools](#python-tools)
-  - [IR Emitter](#ir-emitter)
-  - [Validators](#validators)
-  - [Manifest Generators](#manifest-generators)
-  - [Security Module](#security-module)
-  - [Error System](#error-system)
-- [Rust Native Tools](#rust-native-tools)
-  - [Crypto Module](#crypto-module)
-  - [Canonical Module](#canonical-module)
-  - [IR Module](#ir-module)
-  - [Receipt Module](#receipt-module)
-- [Haskell Native Tools](#haskell-native-tools)
-  - [Manifest Module](#manifest-module)
-  - [Provenance Module](#provenance-module)
-- [CLI Commands](#cli-commands)
+1. [Command-Line Tools](#command-line-tools)
+2. [Python API](#python-api)
+3. [Rust API](#rust-api)
+4. [Ada SPARK API](#ada-spark-api)
+5. [IR Format](#ir-format)
+6. [Specification Format](#specification-format)
 
 ---
 
-## Python Tools
+## Command-Line Tools
 
-### IR Emitter
+### spec_to_ir
 
-**Module**: `tools.ir_emitter.emit_ir`
+Convert specification files to Intermediate Representation (IR).
 
-Converts STUNIR spec files to deterministic Intermediate Representation.
+**Ada SPARK (Primary)**
+```bash
+stunir_spec_to_ir_main --spec-root <dir> --out <file> [options]
+```
+
+**Python (Reference)**
+```bash
+python tools/spec_to_ir.py --spec-root <dir> --out <file> [options]
+```
+
+**Options:**
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--spec-root` | Directory containing spec JSON files | Required |
+| `--out` | Output IR JSON file path | Required |
+| `--emit-comments` | Include docstrings and comments | False |
+| `--emit-receipt` | Generate verification receipt | False |
+
+**Example:**
+```bash
+stunir_spec_to_ir_main \
+  --spec-root specs/ \
+  --out output.ir.json \
+  --emit-comments \
+  --emit-receipt
+```
+
+### ir_to_code
+
+Convert IR to target language code.
+
+**Ada SPARK (Primary)**
+```bash
+stunir_ir_to_code_main --ir <file> --target <lang> --out <dir> [options]
+```
+
+**Python (Reference)**
+```bash
+python tools/ir_to_code.py --ir <file> --target <lang> --out <dir> [options]
+```
+
+**Options:**
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--ir` | Input IR JSON file | Required |
+| `--target` | Target language (rust, c, python, js, zig, go, ada) | Required |
+| `--out` | Output directory | Required |
+| `--package` | Package/module name | Derived from IR |
+
+**Example:**
+```bash
+stunir_ir_to_code_main \
+  --ir output.ir.json \
+  --target rust \
+  --out generated/ \
+  --package my_module
+```
+
+### ir_optimize
+
+Optimize IR using SPARK-verified passes.
+
+**Ada SPARK (Primary)**
+```bash
+stunir_ir_optimize_main --ir <file> --out <file> [options]
+```
+
+**Options:**
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--ir` | Input IR JSON file | Required |
+| `--out` | Output optimized IR file | Required |
+| `--level` | Optimization level (0-3) | 2 |
+| `--passes` | Comma-separated pass list | All |
+
+**Optimization Passes:**
+- `constant-folding`: Fold constant expressions
+- `constant-propagation`: Propagate constants through code
+- `dead-code-elimination`: Remove unreachable code
+- `unreachable-code-elimination`: Remove unreachable branches
+
+**Example:**
+```bash
+stunir_ir_optimize_main \
+  --ir input.ir.json \
+  --out optimized.ir.json \
+  --level 3 \
+  --passes constant-folding,dead-code-elimination
+```
+
+---
+
+## Python API
+
+### spec_to_ir Module
+
+**Location:** `tools/spec_to_ir.py`
 
 #### Functions
 
-##### `canonical_json(data: Any) -> str`
+##### `convert_spec_to_ir(specs, emit_comments=True)`
 
-Generate RFC 8785 / JCS subset canonical JSON.
-
-```python
-from tools.ir_emitter.emit_ir import canonical_json
-
-data = {"z": 1, "a": 2, "m": 3}
-result = canonical_json(data)
-# Result: '{"a":2,"m":3,"z":1}'
-```
+Convert specification(s) to IR.
 
 **Parameters:**
-- `data`: Any JSON-serializable Python object
+- `specs` (List[Dict]): List of specification dictionaries
+- `emit_comments` (bool): Include documentation comments
 
-**Returns:** Canonical JSON string with sorted keys and no extra whitespace
+**Returns:**
+- `Dict[str, Any]`: IR module with keys:
+  - `ir_functions`: List of function definitions
+  - `ir_types`: List of type definitions
+  - `ir_imports`: List of imports
+  - `ir_exports`: List of exports
+
+**Example:**
+```python
+from tools.spec_to_ir import convert_spec_to_ir, load_spec_dir
+
+specs = load_spec_dir("specs/")
+ir = convert_spec_to_ir(specs, emit_comments=True)
+```
+
+##### `load_spec_dir(spec_root)`
+
+Load all JSON specs from directory.
+
+**Parameters:**
+- `spec_root` (str): Root directory containing spec files
+
+**Returns:**
+- `List[Dict[str, Any]]`: List of parsed specifications
+
+**Raises:**
+- `FileNotFoundError`: If directory doesn't exist
+
+##### `convert_type(type_str)`
+
+Map specification types to IR types.
+
+**Parameters:**
+- `type_str` (str): Type string from spec
+
+**Returns:**
+- `str`: IR type string
+
+**Supported Types:**
+- Primitives: `u8`, `u16`, `u32`, `u64`, `i8`, `i16`, `i32`, `i64`, `f32`, `f64`, `bool`, `string`, `void`
+- Arrays: `byte[]`
+- Complex: Arrays, maps, sets, optionals, generics
 
 ---
 
-##### `compute_sha256(data: Union[bytes, str]) -> str`
+## Rust API
 
-Compute SHA-256 hash of provided data.
+### stunir Crate
 
-```python
-from tools.ir_emitter.emit_ir import compute_sha256
+**Location:** `src/lib.rs`
 
-hash_value = compute_sha256("hello world")
-# Result: 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
-```
+#### Core Types
 
-**Parameters:**
-- `data`: Bytes or string to hash
+##### `IRModule`
 
-**Returns:** Hex-encoded SHA-256 hash
+Intermediate representation module.
 
----
-
-##### `spec_to_ir(spec_data: Dict) -> Dict`
-
-Transform a spec dictionary into an IR dictionary.
-
-```python
-from tools.ir_emitter.emit_ir import spec_to_ir
-
-spec = {
-    "module": "example",
-    "functions": [{"name": "main", "body": [...]}]
+```rust
+pub struct IRModule {
+    pub ir_functions: Vec<IRFunction>,
+    pub ir_types: Vec<IRType>,
+    pub ir_imports: Vec<IRImport>,
+    pub ir_exports: Vec<IRExport>,
 }
-ir = spec_to_ir(spec)
 ```
 
-**Parameters:**
-- `spec_data`: Parsed spec JSON as dictionary
+##### `IRFunction`
 
-**Returns:** IR dictionary with normalized structure
+Function definition in IR.
 
----
-
-### Validators
-
-**Module**: `tools.security.validation`
-
-Input validation and sanitization utilities.
-
-#### Classes
-
-##### `InputValidator`
-
-Comprehensive input validator for STUNIR operations.
-
-```python
-from tools.security.validation import InputValidator
-
-validator = InputValidator(
-    max_file_size=1024*1024,  # 1MB
-    max_json_depth=50,
-    base_dir="/project",
-    allow_symlinks=False
-)
-
-# Validate a file
-result = validator.validate_file("input.json")
-if result.valid:
-    print(f"Safe path: {result.value}")
-else:
-    print(f"Errors: {result.errors}")
-
-# Validate JSON file
-result = validator.validate_json_file("config.json")
-if result.valid:
-    config = result.value  # Parsed JSON
+```rust
+pub struct IRFunction {
+    pub name: String,
+    pub docstring: Option<String>,
+    pub params: Vec<IRParam>,
+    pub return_type: String,
+    pub body: Vec<IRStatement>,
+}
 ```
-
-**Constructor Parameters:**
-- `max_file_size`: Maximum allowed file size in bytes (default: 100MB)
-- `max_json_depth`: Maximum JSON nesting depth (default: 50)
-- `base_dir`: Base directory for path validation (optional)
-- `allow_symlinks`: Whether to allow symlinks (default: False)
-
-**Methods:**
-- `validate_file(path)` → `ValidationResult`
-- `validate_json_file(path)` → `ValidationResult`
-- `validate_directory(path)` → `ValidationResult`
-
----
-
-##### `ValidationResult`
-
-Result of a validation operation.
-
-```python
-@dataclass
-class ValidationResult:
-    valid: bool
-    value: Optional[Any] = None
-    errors: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-```
-
-**Attributes:**
-- `valid`: Whether validation passed
-- `value`: Sanitized value (if valid)
-- `errors`: List of validation errors
-- `warnings`: List of non-critical warnings
-
----
 
 #### Functions
 
-##### `sanitize_path(path, base_dir=None, allow_absolute=False, allow_symlinks=False)`
+##### `parse_ir(json: &str) -> Result<IRModule, ParseError>`
 
-Sanitize a file path to prevent security issues.
+Parse IR from JSON string.
 
-```python
-from tools.security.validation import sanitize_path
-
-# Basic usage
-result = sanitize_path("config/settings.json")
-if result.valid:
-    safe_path = result.value
-
-# With base directory constraint
-result = sanitize_path("../etc/passwd", base_dir="/project")
-# result.valid = False
-# result.errors = ['Path escapes base directory']
-
-# Allow absolute paths
-result = sanitize_path("/tmp/data.json", allow_absolute=True)
-```
-
-**Parameters:**
-- `path`: The path to sanitize
-- `base_dir`: If provided, ensure path is within this directory
-- `allow_absolute`: Whether to allow absolute paths (default: False)
-- `allow_symlinks`: Whether to allow symlinks (default: False)
-
-**Returns:** `ValidationResult`
-
----
-
-##### `validate_identifier(name, max_length=256, allow_dots=False)`
-
-Validate an identifier (module name, function name, etc.).
-
-```python
-from tools.security.validation import validate_identifier
-
-# Valid identifiers
-validate_identifier("my_module").valid  # True
-validate_identifier("_private").valid   # True
-validate_identifier("CamelCase").valid  # True
-
-# Invalid identifiers
-validate_identifier("123start").valid   # False (starts with number)
-validate_identifier("with-dash").valid  # False (contains dash)
-validate_identifier("").valid           # False (empty)
-
-# Allow dots for qualified names
-validate_identifier("module.submodule", allow_dots=True).valid  # True
-```
-
-**Parameters:**
-- `name`: The identifier to validate
-- `max_length`: Maximum allowed length (default: 256)
-- `allow_dots`: Whether to allow dots (default: False)
-
-**Returns:** `ValidationResult`
-
----
-
-##### `validate_json_input(data, max_size=100MB, max_depth=50, schema=None)`
-
-Validate JSON input for safety and conformance.
-
-```python
-from tools.security.validation import validate_json_input
-
-# Validate JSON string
-result = validate_json_input('{"key": "value"}')
-if result.valid:
-    parsed = result.value
-
-# Validate with size limit
-result = validate_json_input(large_json, max_size=1024*1024)
-
-# Validate bytes
-result = validate_json_input(b'{"key": "value"}')
-```
-
-**Parameters:**
-- `data`: JSON string, bytes, or already-parsed dict
-- `max_size`: Maximum size in bytes (default: 100MB)
-- `max_depth`: Maximum nesting depth (default: 50)
-- `schema`: Optional JSON schema for validation
-
-**Returns:** `ValidationResult`
-
----
-
-### Manifest Generators
-
-**Module**: `manifests`
-
-Deterministic manifest generation and verification.
-
-#### Base Classes
-
-##### `BaseManifestGenerator`
-
-Abstract base class for manifest generators.
-
-```python
-from manifests.base import BaseManifestGenerator
-
-class CustomManifestGenerator(BaseManifestGenerator):
-    def __init__(self, source_dir: str, output_path: str):
-        super().__init__(
-            manifest_type="custom",
-            source_dir=source_dir,
-            output_path=output_path
-        )
-    
-    def _collect_entries(self) -> List[Dict]:
-        # Override to collect entries
-        entries = []
-        for path in self.scan_directory(self.source_dir):
-            entries.append({
-                "name": path.name,
-                "path": str(path),
-                "hash": self.compute_file_hash(path),
-            })
-        return entries
-```
-
-**Methods:**
-- `generate()` → Generate manifest and write to output
-- `_collect_entries()` → Override to collect manifest entries
-- `scan_directory(dir_path)` → Scan directory for files
-- `compute_file_hash(path)` → Compute SHA-256 hash
-
-##### `BaseManifestVerifier`
-
-Abstract base class for manifest verifiers.
-
-```python
-from manifests.base import BaseManifestVerifier
-
-class CustomManifestVerifier(BaseManifestVerifier):
-    def _verify_entries(self, entries: List[Dict]) -> Tuple[bool, List[str]]:
-        errors = []
-        for entry in entries:
-            if not os.path.exists(entry["path"]):
-                errors.append(f"Missing: {entry['path']}")
-        return len(errors) == 0, errors
-```
-
----
-
-### Error System
-
-**Module**: `tools.errors`
-
-Comprehensive error handling with codes and suggestions.
-
-#### Error Classes
-
-##### `StunirError`
-
-Base class for all STUNIR errors.
-
-```python
-from tools.errors import StunirError
-
-try:
-    risky_operation()
-except StunirError as e:
-    print(f"Error {e.code}: {e.message}")
-    print(f"Category: {e.category}")
-    print(f"Suggestion: {e.suggestion}")
-    print(f"Recoverable: {e.is_recoverable}")
-```
-
-**Attributes:**
-- `code`: Error code (e.g., "E3001")
-- `message`: Human-readable message
-- `context`: Additional context dict
-- `suggestion`: Actionable fix suggestion
-- `cause`: Original exception
-
-**Methods:**
-- `to_dict()` → Convert to dictionary
-- `to_json()` → Convert to JSON string
-
-##### Specialized Error Classes
-
-```python
-from tools.errors import (
-    IOError,          # E1xxx - File system errors
-    JSONError,        # E2xxx - JSON parsing errors
-    ValidationError,  # E3xxx - Input validation errors
-    VerificationError,# E4xxx - Verification failures
-    SecurityError,    # E6xxx - Security violations
-    UsageError,       # E5xxx - CLI usage errors
-    ConfigError,      # E7xxx - Configuration errors
-)
-
-# Creating errors with context
-raise ValidationError(
-    "E3001",
-    "Invalid module name",
-    field="spec.modules[0].name",
-    value="",
-    expected="non-empty identifier"
-)
-
-raise IOError("E1001", "Config file not found", path="/missing/file")
-
-raise VerificationError(
-    "E4001",
-    "Hash mismatch",
-    expected_hash="abc123...",
-    actual_hash="def456...",
-    path="output.json"
-)
-```
-
-#### Error Handler
-
-```python
-from tools.errors import ErrorHandler
-
-handler = ErrorHandler(verbose=True, json_output=False)
-
-try:
-    process_files()
-except StunirError as e:
-    handler.handle(e, exit_code=1)
-
-# Batch error collection
-for file in files:
-    try:
-        process(file)
-    except StunirError as e:
-        handler.collect(e)
-
-if handler.has_errors():
-    handler.report()
-```
-
----
-
-## Rust Native Tools
-
-### Crypto Module
-
-**Module**: `stunir_native::crypto`
-
-Cryptographic hashing for files and directories.
-
-#### Functions
-
-##### `hash_file(path: &Path) -> Result<String>`
-
-Compute SHA-256 hash of a file.
-
+**Example:**
 ```rust
-use stunir_native::crypto::hash_file;
-use std::path::Path;
+use stunir::parse_ir;
 
-let hash = hash_file(Path::new("input.json"))?;
-println!("SHA-256: {}", hash);
+let ir = parse_ir(json_content)?;
 ```
 
-**Security:**
-- Validates file size (max 1GB)
-- Rejects symlinks
-- Uses streaming for large files
+##### `emit_rust(ir: &IRModule, package: &str) -> String`
 
----
+Generate Rust code from IR.
 
-##### `hash_directory(path: &Path, depth: usize) -> Result<String>`
-
-Compute Merkle tree hash of a directory.
-
+**Example:**
 ```rust
-use stunir_native::crypto::hash_directory;
-use std::path::Path;
+use stunir::emit_rust;
 
-let hash = hash_directory(Path::new("./src"), 0)?;
-println!("Directory hash: {}", hash);
-```
-
-**Security:**
-- Maximum depth limit (100 levels)
-- Deterministic ordering (sorted paths)
-- No symlink following
-
----
-
-##### `hash_path(path: &Path) -> Result<String>`
-
-Hash a path, auto-detecting file or directory.
-
-```rust
-use stunir_native::crypto::hash_path;
-
-let hash = hash_path(Path::new("target"))?;
+let code = emit_rust(&ir, "my_module");
 ```
 
 ---
 
-### Canonical Module
+## Ada SPARK API
 
-**Module**: `stunir_native::canonical`
+### STUNIR.Semantic_IR Package
 
-JSON canonicalization (RFC 8785 subset).
-
-#### Functions
-
-##### `normalize(json_str: &str) -> Result<String>`
-
-Normalize JSON to canonical form.
-
-```rust
-use stunir_native::canonical::normalize;
-
-let input = r#"{"z": 1, "a": 2}"#;
-let canonical = normalize(input)?;
-assert_eq!(canonical, r#"{"a":2,"z":1}"#);
-```
-
----
-
-##### `normalize_and_hash(json_str: &str) -> Result<String>`
-
-Normalize JSON and compute SHA-256 hash.
-
-```rust
-use stunir_native::canonical::normalize_and_hash;
-
-let hash = normalize_and_hash(r#"{"key": "value"}"#)?;
-```
-
----
-
-##### `json_equal(json_a: &str, json_b: &str) -> Result<bool>`
-
-Check if two JSON strings are semantically equivalent.
-
-```rust
-use stunir_native::canonical::json_equal;
-
-assert!(json_equal(
-    r#"{"x": 1, "y": 2}"#,
-    r#"{"y":2,"x":1}"#
-)?);
-```
-
----
-
-### IR Module
-
-**Module**: `stunir_native::ir_v1`
-
-Intermediate Representation data structures.
+**Location:** `tools/spark/src/emitters/stunir-semantic_ir.ads`
 
 #### Types
 
-##### `Spec`
+##### `IR_Function`
 
-Input specification format.
+Function record with SPARK contracts.
 
-```rust
-use stunir_native::ir_v1::Spec;
-
-let spec: Spec = serde_json::from_str(json)?;
-assert_eq!(spec.kind, "spec");
+```ada
+type IR_Function is record
+   Name        : IR_Name_String;
+   Docstring   : IR_Doc_String;
+   Args        : Arg_Array (1 .. Max_Args);
+   Return_Type : IR_Type_String;
+   Statements  : Statement_Array (1 .. Max_Statements);
+   Arg_Cnt     : Natural range 0 .. Max_Args := 0;
+   Stmt_Cnt    : Natural range 0 .. Max_Statements := 0;
+end record
+with Dynamic_Predicate =>
+  Arg_Cnt <= Max_Args and Stmt_Cnt <= Max_Statements;
 ```
 
-**Fields:**
-- `kind: String` - Always "spec"
-- `modules: Vec<SpecModule>` - Source modules
-- `metadata: HashMap<String, String>` - Optional metadata
+##### `IR_Statement`
 
-##### `IrV1`
+Statement variant record.
 
-Intermediate Representation version 1.
-
-```rust
-use stunir_native::ir_v1::IrV1;
-
-let ir = IrV1::new("my_module");
-ir.add_function(func);
-ir.validate()?;
+```ada
+type IR_Statement (Kind : Statement_Kind := Stmt_Nop) is record
+   case Kind is
+      when Stmt_Assign =>
+         Target : IR_Name_String;
+         Value  : Code_Buffer;
+      when Stmt_Return =>
+         Return_Value : Code_Buffer;
+      when Stmt_If =>
+         Condition    : Code_Buffer;
+         Block_Start  : Positive;
+         Block_End    : Positive;
+      when Stmt_While =>
+         While_Condition : Code_Buffer;
+         While_Start     : Positive;
+         While_End       : Positive;
+      when others =>
+         null;
+   end case;
+end record;
 ```
 
-**Fields:**
-- `kind: String` - Always "ir"
-- `generator: String` - Generator identifier
-- `ir_version: String` - "v1"
-- `module_name: String` - Primary module name
-- `functions: Vec<IrFunction>` - Function definitions
-- `modules: Vec<IrModule>` - External dependencies
-- `metadata: IrMetadata` - Preserved metadata
+### STUNIR.Optimizer Package
+
+**Location:** `tools/spark/src/optimizer/stunir-optimizer.ads`
+
+#### Functions
+
+##### `Is_Constant_Value`
+
+Check if a value is a compile-time constant.
+
+```ada
+function Is_Constant_Value (Value : Code_Buffer) return Boolean
+  with Global => null,
+       Post => (if Is_Constant_Value'Result then
+                  Is_Numeric (Value) or Is_Boolean (Value));
+```
+
+##### `Fold_Constant`
+
+Fold constant expressions.
+
+```ada
+procedure Fold_Constant (
+   Expr   : in out Code_Buffer;
+   Folded : out Boolean
+) with
+  Pre  => Is_Constant_Value (Expr),
+  Post => Folded = Is_Constant_Value (Expr);
+```
+
+##### `Eliminate_Dead_Code`
+
+Remove dead code from function.
+
+```ada
+procedure Eliminate_Dead_Code (
+   Func       : in out IR_Function;
+   Eliminated : out Natural
+) with
+  Pre  => Func.Stmt_Cnt <= Max_Statements,
+  Post => Func.Stmt_Cnt <= Max_Statements and
+          Eliminated <= Func.Stmt_Cnt'Old;
+```
 
 ---
 
-### Receipt Module
+## IR Format
 
-**Module**: `stunir_native::receipt`
+### Version 2 Specification
 
-Build receipt management.
+#### Top-Level Structure
 
-#### Types
+```json
+{
+  "ir_version": "2.0",
+  "ir_functions": [...],
+  "ir_types": [...],
+  "ir_imports": [...],
+  "ir_exports": [...]
+}
+```
 
-##### `Receipt`
+#### IRFunction
 
-Build receipt linking inputs to outputs.
+```json
+{
+  "name": "function_name",
+  "docstring": "Documentation comment",
+  "params": [...],
+  "return_type": "i32",
+  "body": [...]
+}
+```
 
-```rust
-use stunir_native::receipt::Receipt;
+#### IRStatement
 
-let receipt = Receipt::new("build-001")
-    .add_tool("stunir-native", "0.1.0")
-    .add_tool("rustc", "1.75.0")
-    .with_timestamp("2026-01-28T12:00:00Z");
+Assignment:
+```json
+{
+  "kind": "assign",
+  "target": "variable_name",
+  "value": "expression"
+}
+```
 
-receipt.add_input("input.json", "abc123...");
-receipt.add_output("output.bin", "def456...");
+Return:
+```json
+{
+  "kind": "return",
+  "value": "expression"
+}
+```
 
-// Verify against actual files
-if receipt.verify()? {
-    println!("Build verified!");
+If:
+```json
+{
+  "kind": "if",
+  "condition": "boolean_expression",
+  "block_start": 1,
+  "block_end": 3
+}
+```
+
+While:
+```json
+{
+  "kind": "while",
+  "condition": "boolean_expression",
+  "block_start": 1,
+  "block_end": 5
 }
 ```
 
 ---
 
-## Haskell Native Tools
+## Specification Format
 
-### Manifest Module
+### Version 2 Specification
 
-**Module**: `Stunir.Manifest`
+#### Function Specification
 
-Deterministic IR bundle manifest generation.
-
-#### Functions
-
-##### `generateIrManifest :: FilePath -> IO IrManifest`
-
-Generate manifest from IR directory.
-
-```haskell
-import Stunir.Manifest
-
-manifest <- generateIrManifest "asm/ir"
-writeIrManifest manifest "receipts/ir_manifest.json"
+```json
+{
+  "name": "add",
+  "docstring": "Add two integers",
+  "params": [
+    {"name": "a", "type": "i32"},
+    {"name": "b", "type": "i32"}
+  ],
+  "return_type": "i32",
+  "body": "return a + b;"
+}
 ```
 
-##### `computeFileHash :: FilePath -> IO Text`
+#### Type Definition
 
-Compute SHA-256 hash of a file.
-
-```haskell
-hash <- computeFileHash "asm/ir/module.dcbor"
+```json
+{
+  "name": "Point",
+  "kind": "struct",
+  "fields": [
+    {"name": "x", "type": "f64"},
+    {"name": "y", "type": "f64"}
+  ]
+}
 ```
 
----
+#### Complex Types
 
-### Provenance Module
-
-**Module**: `Stunir.Provenance`
-
-Build provenance tracking and C header generation.
-
-#### Functions
-
-##### `generateCHeader :: Provenance -> Text`
-
-Generate minimal C header.
-
-```haskell
-import Stunir.Provenance
-
-let prov = Provenance { prov_epoch = 1234, ... }
-let header = generateCHeader prov
-writeFile "provenance.h" header
+Array:
+```json
+{
+  "kind": "array",
+  "element_type": "i32",
+  "size": 10
+}
 ```
 
-##### `generateCHeaderExtended :: Provenance -> Text`
-
-Generate comprehensive C header with all fields.
-
----
-
-## CLI Commands
-
-### stunir-native
-
-```bash
-# Hash a file or directory
-stunir-native hash <path>
-
-# Canonicalize JSON
-stunir-native canon <input.json> [output.json]
-
-# Verify receipts
-stunir-native verify <manifest.json>
-
-# Generate IR manifest
-stunir-native gen-ir-manifest --ir-dir asm/ir --out receipts/ir_manifest.json
-
-# Generate provenance
-stunir-native gen-provenance --extended
+Map:
+```json
+{
+  "kind": "map",
+  "key_type": "string",
+  "value_type": "i32"
+}
 ```
 
-### Python Tools
-
-```bash
-# Emit IR from spec
-python -m tools.ir_emitter.emit_ir spec.json output.json
-
-# Generate manifest
-python -m manifests.ir.gen_ir_manifest --ir-dir asm/ir --output manifest.json
-
-# Verify manifest
-python -m manifests.ir.verify_ir_manifest manifest.json --ir-dir asm/ir
-
-# Validate input
-python -m tools.security.validation
+Optional:
+```json
+{
+  "kind": "optional",
+  "inner": "string"
+}
 ```
 
 ---
 
-## Error Codes Quick Reference
+## Error Codes
 
-| Code | Category | Description |
-|------|----------|-------------|
-| E1xxx | IO | File system errors |
-| E2xxx | JSON | JSON parsing errors |
-| E3xxx | Validation | Input validation errors |
-| E4xxx | Verification | Hash/signature mismatches |
-| E5xxx | Usage | CLI usage errors |
-| E6xxx | Security | Security violations |
-| E7xxx | Config | Configuration errors |
-
----
-
-## See Also
-
-- [User Guide](USER_GUIDE.md) - Getting started tutorial
-- [Architecture](ARCHITECTURE.md) - System design documentation
-- [Contributing](../CONTRIBUTING.md) - Development guidelines
-- [Deployment](DEPLOYMENT.md) - Production deployment guide
+| Code | Description | Resolution |
+|------|-------------|------------|
+| E001 | Spec file not found | Check path and file existence |
+| E002 | Invalid JSON format | Validate JSON syntax |
+| E003 | Missing required field | Add required field to spec |
+| E004 | Type not supported | Use supported type or custom type |
+| E005 | IR version mismatch | Update tools or regenerate IR |
+| E006 | Target not supported | Use supported target language |
 
 ---
 
-*Generated for STUNIR v0.1.0*
+Last updated: 2026-02-03

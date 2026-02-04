@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema": "stunir_ir_v1",
   "ir_version": "1.0.0",
   "root": {
     "node_id": "n_mod_lisp",
@@ -12,7 +12,9 @@
     },
     "hash": "sha256:ace0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc",
     "imports": [],
-    "exports": ["factorial"],
+    "exports": [
+      "factorial"
+    ],
     "declarations": [
       {
         "node_id": "n_func_factorial",
@@ -128,7 +130,9 @@
       }
     ],
     "metadata": {
-      "target_categories": ["functional"],
+      "target_categories": [
+        "functional"
+      ],
       "safety_level": "None"
     }
   },
@@ -136,6 +140,15 @@
     "source_file": "factorial.spec",
     "generator": "STUNIR Spec-to-IR v1.0",
     "timestamp": "2026-01-30T12:00:00Z",
-    "target_categories": ["functional"]
-  }
+    "target_categories": [
+      "functional"
+    ]
+  },
+  "module_name": "factorial",
+  "functions": [
+    {
+      "name": "factorial",
+      "return_type": "i32"
+    }
+  ]
 }

@@ -199,8 +199,9 @@ class TestEmitterConfluence:
 
     def test_confluence_directory_structure(self):
         """Test that Python emitters match SPARK structure."""
-        python_dir = Path("/home/ubuntu/stunir_repo/tools/semantic_ir/emitters")
-        spark_dir = Path("/home/ubuntu/stunir_repo/targets/spark")
+        repo_root = Path(__file__).parent.parent.parent.parent
+        python_dir = repo_root / "tools" / "semantic_ir" / "emitters"
+        spark_dir = repo_root / "targets" / "spark"
         
         # Both should exist
         assert python_dir.exists()

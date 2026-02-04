@@ -25,15 +25,18 @@ HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def die(msg: str) -> None:
+    """Print an error message and exit with a nonzero code."""
     print(f"ERROR: {msg}", file=sys.stderr)
     raise SystemExit(2)
 
 
 def sha256_bytes(b: bytes) -> str:
+    """Compute a SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
 
 
 def sha256_file(p: Path) -> str:
+    """Compute a SHA-256 digest for a file path."""
     h = hashlib.sha256()
     with p.open('rb') as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
@@ -42,23 +45,26 @@ def sha256_file(p: Path) -> str:
 
 
 def canon_bytes(obj: Any) -> bytes:
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
 
 
 def safe_relpath(p: str) -> Path:
+    """Validate a relative path string and return a normalized Path."""
     if not isinstance(p, str) or not p:
         die("path/uri must be non-empty string")
     pp = Path(p)
     if pp.is_absolute():
         die(f"absolute paths forbidden in uri: {p}")
     norm = Path(os.path.normpath(p))
-    norm_s = str(norm).replace('\\\\', '/')
+    norm_s = str(norm).replace('\\', '/')
     if norm_s == '..' or norm_s.startswith('../') or '/..' in norm_s:
         die(f"path traversal forbidden in uri: {p}")
     return norm
 
 
 def strip_comment_wrappers(line: str, comment_styles: List[str]) -> str:
+    """Strip comment wrappers and return the content starting at STUNIR marker."""
     s = line.lstrip()
     mpos = s.find('STUNIR_IR_')
     if mpos != -1:
@@ -85,6 +91,7 @@ def strip_comment_wrappers(line: str, comment_styles: List[str]) -> str:
 
 
 def parse_markers_matrix(path: Path) -> Dict[str, Any]:
+    """Load the markers matrix JSON document."""
     try:
         obj = json.loads(path.read_text(encoding='utf-8'))
     except Exception as e:
@@ -95,6 +102,7 @@ def parse_markers_matrix(path: Path) -> Dict[str, Any]:
 
 
 def extract_record_from_lines(lines: List[str]) -> Dict[str, Any]:
+    """Extract STUNIR IR markers from lines and validate them."""
     sha_lines: List[str] = []
     ref_uri: Optional[str] = None
 
@@ -178,6 +186,7 @@ def extract_record_from_lines(lines: List[str]) -> Dict[str, Any]:
 
 
 def ingest_from_source_file(path: Path, markers_matrix: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract STUNIR IR marker records from a source file."""
     comment_styles: List[str] = []
     try:
         for _lang, ld in (markers_matrix.get('languages') or {}).items():
@@ -208,6 +217,7 @@ def ingest_from_source_file(path: Path, markers_matrix: Dict[str, Any]) -> Dict[
 
 
 def main() -> int:
+    """Resolve IR bundle bytes from markers or direct input and emit metadata."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--repo-root', default='.')
     ap.add_argument('--markers-matrix', required=True)

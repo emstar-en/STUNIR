@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-# STUNIR: Import Code Tool
-# Scans inputs/ and creates spec/imported/ specs.
+"""Import source code files into STUNIR spec JSON documents."""
+
 from __future__ import annotations
 import argparse, json, os
 from pathlib import Path
 
 def _w(p: Path, s: str) -> None:
+    """Write text to a file path, creating parent directories as needed."""
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(s, encoding="utf-8", newline="\n")
 
 def main() -> int:
+    """Scan input root for source files and emit spec JSON outputs."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--input-root", required=True)
     ap.add_argument("--out-root", required=True)

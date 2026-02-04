@@ -263,7 +263,7 @@ class SemanticIRValidator:
         return "\n".join(report)
 
 
-def main():
+def main() -> int:
     """CLI entry point for validator."""
     import argparse
     

@@ -3,6 +3,9 @@
 import os
 from pathlib import Path
 
+# Get project root relative to this script
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
+
 # Emitter categories (same as Python)
 EMITTERS = {
     "core": [
@@ -37,7 +40,7 @@ EMITTERS = {
     ],
 }
 
-def generate_rust_emitter(category: str, snake_name: str, class_name: str, description: str):
+def generate_rust_emitter(category: str, snake_name: str, class_name: str, description: str) -> None:
     """Generate a single Rust emitter module."""
     
     # Determine file extension
@@ -160,7 +163,7 @@ impl {class_name}Emitter {{
             "c",
         );
 
-        format!("{} {{{{\\n    /* Implementation */\\n}}}}", signature)
+        format!("{{}} {{{{\\n    /* Implementation */\\n}}}}", signature)
     }}
 }}
 
@@ -203,7 +206,7 @@ pub fn emit_{snake_name}(
 '''
     
     # Write file
-    output_dir = Path("/home/ubuntu/stunir_repo/tools/rust/semantic_ir/emitters/src") / category
+    output_dir = PROJECT_ROOT / "tools" / "rust" / "semantic_ir" / "emitters" / "src" / category
     output_dir.mkdir(parents=True, exist_ok=True)
     
     output_file = output_dir / f"{snake_name}.rs"
@@ -211,7 +214,7 @@ pub fn emit_{snake_name}(
     
     print(f"✓ Generated {category}/{snake_name}.rs")
 
-def main():
+def main() -> None:
     """Generate all Rust emitters."""
     print("Generating STUNIR Rust Semantic IR Emitters...")
     

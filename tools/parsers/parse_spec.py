@@ -10,6 +10,7 @@ Usage:
 
 import json
 import sys
+from typing import Any, Dict, List, Tuple
 
 # Required fields for spec files
 SPEC_REQUIRED_FIELDS = [
@@ -26,9 +27,9 @@ SPEC_OPTIONAL_FIELDS = [
     "description"
 ]
 
-def parse_spec(spec_data, strict=False):
+def parse_spec(spec_data: Dict[str, Any], strict: bool = False) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
     """Parse and validate spec data.
-    
+
     Returns:
         tuple: (is_valid, errors, warnings, normalized_spec)
     """
@@ -78,7 +79,8 @@ def parse_spec(spec_data, strict=False):
     is_valid = len(errors) == 0
     return is_valid, errors, warnings, normalized
 
-def main():
+def main() -> None:
+    """Parse a spec JSON file via CLI and print results."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <spec.json> [--strict]", file=sys.stderr)
         print("\nSTUNIR Spec Parser - Parses and validates spec JSON files.", file=sys.stderr)

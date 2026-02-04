@@ -150,8 +150,9 @@ def atomic_write(filepath: Union[str, Path], mode: str = 'w',
                 yield f
         # Atomic rename
         os.replace(tmp_path, filepath)
-    except:
-        # Cleanup temp file on error
+    except Exception:
+        # Cleanup temp file on any error to avoid leaving stale files.
+        # Catches all exceptions to ensure cleanup runs before re-raising.
         try:
             os.unlink(tmp_path)
         except OSError:

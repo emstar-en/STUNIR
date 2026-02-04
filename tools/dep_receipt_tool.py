@@ -7,6 +7,7 @@ from pathlib import Path
 
 
 def main() -> int:
+    """Load a dependency acceptance receipt and report tool path or status."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--receipt', required=True)
     ap.add_argument('--require-accepted', action='store_true')

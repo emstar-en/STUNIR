@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-# STUNIR: Compile Provenance Tool
-# Compiles tools/prov_emit.c if available, or emits a skipped receipt.
+"""Compile provenance helper for the STUNIR toolchain."""
+
 from __future__ import annotations
 import argparse, json, subprocess, shutil, sys
 from pathlib import Path
 
 def _w(p: Path, s: str) -> None:
+    """Write text to a file path, creating parent directories as needed."""
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(s, encoding="utf-8", newline="\n")
 
 def main() -> int:
+    """Compile provenance emitter if possible and write a receipt."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--epoch", required=True)
     ap.add_argument("--epoch-json", required=True)

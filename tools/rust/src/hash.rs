@@ -2,7 +2,6 @@
 
 use crate::{sha256_bytes, sha256_json};
 use serde_json::Value;
-use std::collections::BTreeMap;
 
 /// Compute deterministic hash for IR manifest
 pub fn hash_ir_manifest(manifest: &Value) -> String {

@@ -86,6 +86,7 @@ def parse_args(argv):
     return args
 
 def main():
+    """Emit a receipt JSON document based on CLI arguments."""
     args = parse_args(sys.argv)
     
     if not args['target']:

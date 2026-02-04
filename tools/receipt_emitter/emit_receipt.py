@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Emit build receipts as canonical JSON output."""
 import json
 import sys
 import time
@@ -6,7 +7,8 @@ import os
 
 # STUNIR Receipt Emitter (Python Fallback)
 
-def main():
+def main() -> None:
+    """Parse CLI arguments and emit a receipt JSON payload."""
     # Usage: emit_receipt.py <target> <status> <epoch> <tool_name> <tool_path> <tool_hash> <tool_ver> [args...]
     if len(sys.argv) < 8:
         print("Usage: emit_receipt.py <target> <status> <epoch> <tool_name> <tool_path> <tool_hash> <tool_ver> [args...]")

@@ -57,8 +57,9 @@ package STUNIR.Semantic_IR is
 
    -- Statement (expanded for v0.9.0: added break, continue, switch/case)
    type IR_Statement_Kind is
-     (Stmt_Assign, Stmt_Call, Stmt_Return, Stmt_If, Stmt_While, Stmt_For, 
-      Stmt_Break, Stmt_Continue, Stmt_Switch, Stmt_Nop);
+     (Stmt_Assign, Stmt_Call, Stmt_Return, Stmt_If, Stmt_While, Stmt_For,
+      Stmt_Break, Stmt_Continue, Stmt_Switch, Stmt_Nop,
+      Stmt_Generic_Call, Stmt_Type_Cast);  -- v0.8.9: Generic calls and type casting
 
    -- Switch case entry (v0.9.0)
    type Switch_Case_Entry is record
@@ -66,9 +67,13 @@ package STUNIR.Semantic_IR is
       Block_Start : Natural := 0;    -- 1-based index of case block start
       Block_Count : Natural := 0;    -- Number of statements in case block
    end record;
-   
+
    Max_Cases : constant := 10;  -- Maximum cases per switch (bounded for SPARK)
    type Case_Array is array (Positive range <>) of Switch_Case_Entry;
+
+   -- Type argument for generic calls (v0.8.9)
+   Max_Type_Args : constant := 4;
+   type Type_Arg_Array is array (Positive range <>) of IR_Type_String;
 
    type IR_Statement is record
       Kind        : IR_Statement_Kind := Stmt_Nop;
@@ -89,7 +94,31 @@ package STUNIR.Semantic_IR is
       -- For switch/case statements (v0.9.0)
       Case_Cnt    : Natural range 0 .. Max_Cases := 0;
       Cases       : Case_Array (1 .. Max_Cases);
+      -- v0.8.9: Generic calls and type casting
+      Type_Args   : Type_Arg_Array (1 .. Max_Type_Args);  -- Type arguments for generic calls
+      Type_Arg_Cnt: Natural range 0 .. Max_Type_Args := 0;
+      Cast_Type   : IR_Type_String;  -- Target type for type casting
    end record;
+
+   -- Type parameter for generic functions (v0.8.9)
+   type IR_Type_Param is record
+      Name       : IR_Name_String;
+      Constraint : IR_Type_String;  -- Type constraint (empty if none)
+   end record;
+
+   Max_Type_Params : constant := 4;
+   type Type_Param_Array is array (Positive range <>) of IR_Type_Param;
+
+   -- Generic instantiation (v0.8.9)
+   type IR_Generic_Inst is record
+      Name      : IR_Name_String;     -- Instantiated function name
+      Base_Type : IR_Name_String;     -- Base generic function name
+      Type_Args : Type_Arg_Array (1 .. Max_Type_Args);
+      Type_Arg_Cnt : Natural range 0 .. Max_Type_Args := 0;
+   end record;
+
+   Max_Generic_Insts : constant := 10;
+   type Generic_Inst_Array is array (Positive range <>) of IR_Generic_Inst;
 
    -- Function definition
    --  v0.8.6: Reduced limits to prevent stack overflow
@@ -117,13 +146,16 @@ package STUNIR.Semantic_IR is
    type Function_Array is array (Positive range <>) of IR_Function;
 
    type IR_Module is record
-      IR_Version  : String (1 .. 2) := "v1";
-      Module_Name : IR_Name_String;
-      Docstring   : IR_Doc_String;
-      Types       : Type_Array (1 .. Max_Types);
-      Functions   : Function_Array (1 .. Max_Functions);
-      Type_Cnt    : Natural range 0 .. Max_Types := 0;
-      Func_Cnt    : Natural range 0 .. Max_Functions := 0;
+      IR_Version            : String (1 .. 2) := "v1";
+      Module_Name           : IR_Name_String;
+      Docstring             : IR_Doc_String;
+      Types                 : Type_Array (1 .. Max_Types);
+      Functions             : Function_Array (1 .. Max_Functions);
+      Type_Cnt              : Natural range 0 .. Max_Types := 0;
+      Func_Cnt              : Natural range 0 .. Max_Functions := 0;
+      -- v0.8.9: Generic instantiations
+      Generic_Insts         : Generic_Inst_Array (1 .. Max_Generic_Insts);
+      Generic_Inst_Cnt      : Natural range 0 .. Max_Generic_Insts := 0;
    end record
    with Dynamic_Predicate =>
      Type_Cnt <= Max_Types and Func_Cnt <= Max_Functions;

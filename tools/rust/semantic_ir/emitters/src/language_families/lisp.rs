@@ -80,21 +80,18 @@ impl LispEmitter {
             content,
             "{} STUNIR Generated Lisp Code",
             self.comment_prefix()
-        )
-        .unwrap();
+        )?;
         writeln!(
             content,
             "{} DO-178C Level A Compliant",
             self.comment_prefix()
-        )
-        .unwrap();
+        )?;
         writeln!(
             content,
-            "{} Dialect: {:?}\\n",
+            "{} Dialect: {:?}\n",
             self.comment_prefix(),
             self.config.dialect
-        )
-        .unwrap();
+        )?;
 
         // Dialect-specific preamble
         self.generate_preamble(&mut content)?;
@@ -110,7 +107,7 @@ impl LispEmitter {
         // Function definitions
         for function in &ir_module.functions {
             self.generate_function(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         // Dialect-specific postamble
@@ -131,10 +128,10 @@ impl LispEmitter {
     fn generate_preamble(&self, content: &mut String) -> Result<(), EmitterError> {
         match self.config.dialect {
             LispDialect::Racket => {
-                writeln!(content, "#lang racket\\n").unwrap();
+                writeln!(content, "#lang racket\\n")?;
             }
             LispDialect::Hy => {
-                writeln!(content, "#!/usr/bin/env hy\\n").unwrap();
+                writeln!(content, "#!/usr/bin/env hy\\n")?;
             }
             _ => {}
         }
@@ -149,14 +146,14 @@ impl LispEmitter {
     ) -> Result<(), EmitterError> {
         match self.config.dialect {
             LispDialect::CommonLisp => {
-                writeln!(content, "(defpackage :{}", ir_module.module_name).unwrap();
-                writeln!(content, "  (:use :cl)").unwrap();
-                writeln!(content, "  (:export))\\n").unwrap();
-                writeln!(content, "(in-package :{})\\n", ir_module.module_name).unwrap();
+                writeln!(content, "(defpackage :{}", ir_module.module_name)?;
+                writeln!(content, "  (:use :cl)")?;
+                writeln!(content, "  (:export))\\n")?;
+                writeln!(content, "(in-package :{})\\n", ir_module.module_name)?;
             }
             LispDialect::Clojure => {
-                writeln!(content, "(ns {})", ir_module.module_name).unwrap();
-                writeln!(content).unwrap();
+                writeln!(content, "(ns {})", ir_module.module_name)?;
+                writeln!(content)?;
             }
             LispDialect::Scheme => {
                 writeln!(
@@ -164,9 +161,8 @@ impl LispEmitter {
                     "{} Module: {}",
                     self.comment_prefix(),
                     ir_module.module_name
-                )
-                .unwrap();
-                writeln!(content).unwrap();
+                )?;
+                writeln!(content)?;
             }
             _ => {}
         }
@@ -200,7 +196,7 @@ impl LispEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "{} {}", self.comment_prefix(), doc).unwrap();
+            writeln!(content, "{} {}", self.comment_prefix(), doc)?;
         }
 
         match self.config.dialect {
@@ -210,13 +206,12 @@ impl LispEmitter {
                     "(defun {} ({})",
                     function.name,
                     self.format_params(&function.parameters)
-                )
-                .unwrap();
+                )?;
                 if let Some(ref doc) = function.docstring {
-                    writeln!(content, "  \\\"{}\\\"", doc).unwrap();
+                    writeln!(content, "  \\\"{}\\\"", doc)?;
                 }
                 self.generate_statements(content, &function.statements, 1)?;
-                writeln!(content, ")").unwrap();
+                writeln!(content, ")")?;
             }
             LispDialect::Scheme | LispDialect::Guile | LispDialect::Racket => {
                 writeln!(
@@ -224,10 +219,9 @@ impl LispEmitter {
                     "(define ({} {})",
                     function.name,
                     self.format_params(&function.parameters)
-                )
-                .unwrap();
+                )?;
                 self.generate_statements(content, &function.statements, 1)?;
-                writeln!(content, ")").unwrap();
+                writeln!(content, ")")?;
             }
             LispDialect::Clojure => {
                 writeln!(
@@ -235,13 +229,12 @@ impl LispEmitter {
                     "(defn {} [{}]",
                     function.name,
                     self.format_params(&function.parameters)
-                )
-                .unwrap();
+                )?;
                 if let Some(ref doc) = function.docstring {
-                    writeln!(content, "  \\\"{}\\\"", doc).unwrap();
+                    writeln!(content, "  \\\"{}\\\"", doc)?;
                 }
                 self.generate_statements(content, &function.statements, 1)?;
-                writeln!(content, ")").unwrap();
+                writeln!(content, ")")?;
             }
             LispDialect::EmacsLisp => {
                 writeln!(
@@ -249,13 +242,12 @@ impl LispEmitter {
                     "(defun {} ({})",
                     function.name,
                     self.format_params(&function.parameters)
-                )
-                .unwrap();
+                )?;
                 if let Some(ref doc) = function.docstring {
-                    writeln!(content, "  \\\"{}\\\"", doc).unwrap();
+                    writeln!(content, "  \\\"{}\\\"", doc)?;
                 }
                 self.generate_statements(content, &function.statements, 1)?;
-                writeln!(content, ")").unwrap();
+                writeln!(content, ")")?;
             }
             LispDialect::Hy => {
                 writeln!(
@@ -263,10 +255,9 @@ impl LispEmitter {
                     "(defn {} [{}]",
                     function.name,
                     self.format_params(&function.parameters)
-                )
-                .unwrap();
+                )?;
                 self.generate_statements(content, &function.statements, 1)?;
-                writeln!(content, ")").unwrap();
+                writeln!(content, ")")?;
             }
             LispDialect::Janet => {
                 writeln!(
@@ -274,10 +265,9 @@ impl LispEmitter {
                     "(defn {} [{}]",
                     function.name,
                     self.format_params(&function.parameters)
-                )
-                .unwrap();
+                )?;
                 self.generate_statements(content, &function.statements, 1)?;
-                writeln!(content, ")").unwrap();
+                writeln!(content, ")")?;
             }
         }
 
@@ -309,27 +299,27 @@ impl LispEmitter {
         match stmt.stmt_type {
             IRStatementType::Return => {
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{}", indent, value).unwrap();
+                writeln!(content, "{}{}", indent, value)?;
             }
             IRStatementType::Add => {
                 let left = stmt.left_op.as_deref().unwrap_or("0");
                 let right = stmt.right_op.as_deref().unwrap_or("0");
-                writeln!(content, "{}(+ {} {})", indent, left, right).unwrap();
+                writeln!(content, "{}(+ {} {})", indent, left, right)?;
             }
             IRStatementType::Sub => {
                 let left = stmt.left_op.as_deref().unwrap_or("0");
                 let right = stmt.right_op.as_deref().unwrap_or("0");
-                writeln!(content, "{}(- {} {})", indent, left, right).unwrap();
+                writeln!(content, "{}(- {} {})", indent, left, right)?;
             }
             IRStatementType::Mul => {
                 let left = stmt.left_op.as_deref().unwrap_or("0");
                 let right = stmt.right_op.as_deref().unwrap_or("0");
-                writeln!(content, "{}(* {} {})", indent, left, right).unwrap();
+                writeln!(content, "{}(* {} {})", indent, left, right)?;
             }
             IRStatementType::Div => {
                 let left = stmt.left_op.as_deref().unwrap_or("0");
                 let right = stmt.right_op.as_deref().unwrap_or("0");
-                writeln!(content, "{}(/ {} {})", indent, left, right).unwrap();
+                writeln!(content, "{}(/ {} {})", indent, left, right)?;
             }
             _ => {
                 writeln!(
@@ -338,8 +328,7 @@ impl LispEmitter {
                     indent,
                     self.comment_prefix(),
                     stmt.stmt_type
-                )
-                .unwrap();
+                )?;
             }
         }
 
@@ -400,7 +389,7 @@ mod tests {
 
     #[test]
     fn test_lisp_common_lisp() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = LispConfig::new(base_config, LispDialect::CommonLisp);
         let emitter = LispEmitter::new(config);
@@ -419,13 +408,13 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
     }
 
     #[test]
     fn test_lisp_clojure() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = LispConfig::new(base_config, LispDialect::Clojure);
         let emitter = LispEmitter::new(config);
@@ -438,7 +427,7 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
     }
 }

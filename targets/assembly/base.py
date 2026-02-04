@@ -6,7 +6,7 @@ with architecture-specific customization for x86 and ARM.
 
 Usage:
     from base import AssemblyEmitterBase
-    
+
     class X86Emitter(AssemblyEmitterBase):
         ARCH = 'x86'
 """
@@ -16,14 +16,15 @@ import hashlib
 import time
 from pathlib import Path
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Union
 
 
-def canonical_json(data):
+def canonical_json(data: Any) -> str:
     """Generate RFC 8785 / JCS subset canonical JSON."""
     return json.dumps(data, sort_keys=True, separators=(',', ':'))
 
 
-def compute_sha256(content):
+def compute_sha256(content: Union[str, bytes]) -> str:
     """Compute SHA256 hash of content."""
     if isinstance(content, str):
         content = content.encode('utf-8')
@@ -32,11 +33,11 @@ def compute_sha256(content):
 
 class AssemblyEmitterBase(ABC):
     """Base class for assembly code emitters (x86, ARM, etc.)."""
-    
+
     ARCH = 'generic'  # Override in subclass: 'x86', 'x86_64', 'arm', 'arm64'
-    
+
     # Architecture-specific settings
-    ARCH_CONFIG = {
+    ARCH_CONFIG: Dict[str, Dict[str, Any]] = {
         'x86': {
             'syntax': 'intel',  # or 'att'
             'registers': ['eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp'],
@@ -74,10 +75,10 @@ class AssemblyEmitterBase(ABC):
             'extension': 's',
         },
     }
-    
-    def __init__(self, ir_data, out_dir, options=None):
+
+    def __init__(self, ir_data: Dict[str, Any], out_dir: Union[str, Path], options: Optional[Dict[str, Any]] = None) -> None:
         """Initialize assembly emitter.
-        
+
         Args:
             ir_data: Dictionary containing IR data
             out_dir: Output directory path
@@ -87,10 +88,10 @@ class AssemblyEmitterBase(ABC):
         self.out_dir = Path(out_dir)
         self.options = options or {}
         self.config = self.ARCH_CONFIG.get(self.ARCH, self.ARCH_CONFIG['x86'])
-        self.generated_files = []
+        self.generated_files: List[Dict[str, Any]] = []
         self.epoch = int(time.time())
-    
-    def _write_file(self, path, content):
+
+    def _write_file(self, path: Union[str, Path], content: str) -> Path:
         """Write content to file, creating directories as needed."""
         full_path = self.out_dir / path
         full_path.parent.mkdir(parents=True, exist_ok=True)
@@ -101,38 +102,38 @@ class AssemblyEmitterBase(ABC):
             'size': len(content.encode('utf-8'))
         })
         return full_path
-    
-    def _emit_comment(self, text):
+
+    def _emit_comment(self, text: str) -> str:
         """Emit a comment in assembly syntax."""
         return f'; {text}'
     
     @abstractmethod
-    def _emit_function_prologue(self, name):
+    def _emit_function_prologue(self, name: str) -> List[str]:
         """Emit function prologue (architecture-specific)."""
         pass
-    
+
     @abstractmethod
-    def _emit_function_epilogue(self):
+    def _emit_function_epilogue(self) -> List[str]:
         """Emit function epilogue (architecture-specific)."""
         pass
-    
+
     @abstractmethod
-    def _emit_return(self, value=None):
+    def _emit_return(self, value: Optional[str] = None) -> List[str]:
         """Emit return instruction (architecture-specific)."""
         pass
-    
-    def _emit_function(self, func):
+
+    def _emit_function(self, func: Dict[str, Any]) -> List[str]:
         """Emit an assembly function."""
         name = func.get('name', 'unnamed')
         params = func.get('params', [])
         body = func.get('body', [])
-        
-        lines = []
+
+        lines: List[str] = []
         lines.append(self._emit_comment(f'Function: {name}'))
         lines.append(f'global {name}')
         lines.append(f'{name}:')
         lines.extend(self._emit_function_prologue(name))
-        
+
         # Function body
         for stmt in body:
             if isinstance(stmt, dict):
@@ -140,16 +141,16 @@ class AssemblyEmitterBase(ABC):
                 lines.extend(stmt_lines)
             elif isinstance(stmt, str):
                 lines.append(f'    {stmt}')
-        
+
         lines.extend(self._emit_function_epilogue())
         lines.append('')
         return lines
-    
-    def _emit_statement(self, stmt):
+
+    def _emit_statement(self, stmt: Dict[str, Any]) -> List[str]:
         """Emit a statement as assembly. Override for architecture-specific."""
-        lines = []
+        lines: List[str] = []
         stmt_type = stmt.get('type', 'nop')
-        
+
         if stmt_type == 'return':
             value = stmt.get('value', '0')
             lines.extend(self._emit_return(value))
@@ -161,16 +162,16 @@ class AssemblyEmitterBase(ABC):
             lines.append('    nop')
         else:
             lines.append(self._emit_comment(f'Unknown statement type: {stmt_type}'))
-        
+
         return lines
-    
-    def emit(self):
+
+    def emit(self) -> str:
         """Emit all assembly files."""
         module_name = self.ir_data.get('ir_module', self.ir_data.get('module', 'module'))
         functions = self.ir_data.get('ir_functions', self.ir_data.get('functions', []))
-        
+
         ext = self.config['extension']
-        
+
         # Assembly header
         lines = [
             self._emit_comment(f'STUNIR Generated {self.ARCH.upper()} Assembly'),
@@ -182,32 +183,32 @@ class AssemblyEmitterBase(ABC):
             f'section {self.config["text_section"]}',
             '',
         ]
-        
+
         # Function implementations
         for func in functions:
             lines.extend(self._emit_function(func))
-        
+
         asm_content = '\n'.join(lines)
-        
+
         # Write assembly file
         self._write_file(f'{module_name}.{ext}', asm_content)
-        
+
         # Generate build script
         build_script = self._emit_build_script(module_name)
         self._write_file('build.sh', build_script)
-        
+
         # Generate README
         readme = self._emit_readme(module_name)
         self._write_file('README.md', readme)
-        
+
         return asm_content
     
     @abstractmethod
-    def _emit_build_script(self, module_name):
+    def _emit_build_script(self, module_name: str) -> str:
         """Generate build script (architecture-specific)."""
         pass
-    
-    def _emit_readme(self, module_name):
+
+    def _emit_readme(self, module_name: str) -> str:
         """Generate README for the assembly project."""
         return f"""# {module_name} ({self.ARCH.upper()} Assembly)
 
@@ -236,8 +237,8 @@ chmod +x build.sh
 
 stunir.target.{self.ARCH}.v1
 """
-    
-    def emit_manifest(self):
+
+    def emit_manifest(self) -> Dict[str, Any]:
         """Generate target manifest."""
         return {
             'schema': f'stunir.target.{self.ARCH}.manifest.v1',
@@ -246,8 +247,8 @@ stunir.target.{self.ARCH}.v1
             'files': sorted(self.generated_files, key=lambda f: f['path']),
             'file_count': len(self.generated_files)
         }
-    
-    def emit_receipt(self):
+
+    def emit_receipt(self) -> Dict[str, Any]:
         """Generate target receipt."""
         manifest = self.emit_manifest()
         manifest_json = canonical_json(manifest)

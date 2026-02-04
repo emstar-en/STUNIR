@@ -8,6 +8,7 @@ import os
 
 
 def sha256_file(path: str) -> str:
+    """Compute the SHA-256 digest for a file path."""
     h = hashlib.sha256()
     with open(path, 'rb') as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
@@ -16,19 +17,23 @@ def sha256_file(path: str) -> str:
 
 
 def load_json(path: str):
+    """Load JSON from a file path."""
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
 def canon_bytes(obj) -> bytes:
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
 
 
 def sha256_bytes(b: bytes) -> str:
+    """Compute the SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
 
 
 def guess_kind(obj):
+    """Guess attestation kind from a parsed JSON object."""
     if isinstance(obj, dict):
         if obj.get('spdxVersion') is not None:
             return 'spdx'
@@ -43,7 +48,8 @@ def guess_kind(obj):
     return 'unknown_json'
 
 
-def main():
+def main() -> None:
+    """Inspect attestation files and emit a canonical summary."""
     ap = argparse.ArgumentParser()
     ap.add_argument('paths', nargs='+')
     ap.add_argument('--out', required=True)

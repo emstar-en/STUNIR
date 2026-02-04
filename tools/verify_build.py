@@ -56,11 +56,13 @@ REQUIRED_DIGEST_ALGS_DEFAULT = ["sha256"]
 
 
 def die(msg: str) -> None:
+    """Exit with an error message."""
     print(f"ERROR: {msg}", file=sys.stderr)
     raise SystemExit(2)
 
 
 def read_bytes(path: Path) -> bytes:
+    """Read a file as bytes or exit on failure."""
     try:
         return path.read_bytes()
     except Exception as e:
@@ -68,6 +70,7 @@ def read_bytes(path: Path) -> bytes:
 
 
 def parse_json_bytes(b: bytes, where: str) -> Any:
+    """Parse UTF-8 JSON bytes or exit on failure."""
     try:
         return json.loads(b.decode("utf-8"))
     except Exception as e:
@@ -84,6 +87,7 @@ def parse_json_bytes(b: bytes, where: str) -> Any:
 # NOTE: This is not RFC8785; it's fully specified by this function.
 
 def _check_no_floats(x: Any, where: str = "$") -> None:
+    """Validate that JSON data contains no floats and only supported types."""
     if isinstance(x, float):
         die(f"floats forbidden for canonicalization (at {where})")
 
@@ -106,12 +110,14 @@ def _check_no_floats(x: Any, where: str = "$") -> None:
 
 
 def canonical_json_bytes(obj: Any) -> bytes:
+    """Serialize JSON data to canonical UTF-8 bytes."""
     _check_no_floats(obj)
     s = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return s.encode("utf-8")
 
 
 def file_is_canonical_json(path: Path) -> None:
+    """Ensure a JSON file is in canonical form, allowing a trailing newline."""
     b = read_bytes(path)
     obj = parse_json_bytes(b, where=str(path))
     c = canonical_json_bytes(obj)
@@ -125,6 +131,7 @@ def file_is_canonical_json(path: Path) -> None:
 # ---------------- DSSE v1 ----------------
 
 def pae(payload_type: str, payload: bytes) -> bytes:
+    """Compute DSSE pre-auth encoding for a payload."""
     pt = payload_type.encode("utf-8")
     return (
         b"DSSEv1 "
@@ -145,6 +152,7 @@ class TrustedKey:
 
 
 def verify_signature_cryptography(public_key_pem: bytes, sig_b64: str, msg: bytes) -> None:
+    """Verify a signature using the cryptography library."""
     # Optional dependency; preferred if available.
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import ec, ed25519, padding, rsa
@@ -173,6 +181,7 @@ def verify_signature_cryptography(public_key_pem: bytes, sig_b64: str, msg: byte
 
 
 def verify_signature_openssl(public_key_pem_path: Path, sig_b64: str, msg: bytes, tmp_dir: Path) -> None:
+    """Verify a signature using openssl as a fallback."""
     # Fallback via openssl if cryptography isn't available.
     msg_path = tmp_dir / "_dsse_msg.bin"
     sig_path = tmp_dir / "_dsse_sig.bin"
@@ -198,6 +207,7 @@ def verify_signature_openssl(public_key_pem_path: Path, sig_b64: str, msg: bytes
 
 
 def load_trusted_keys(trust_args: List[str]) -> Dict[str, TrustedKey]:
+    """Load trusted public keys from KEYID=PATH arguments."""
     keys: Dict[str, TrustedKey] = {}
     for t in trust_args:
         if "=" not in t:
@@ -214,6 +224,7 @@ def verify_dsse_envelope(
     tmp_dir: Path,
     require_canonical_payload: bool = True,
 ) -> Tuple[bytes, Dict[str, Any]]:
+    """Verify a DSSE envelope and return the payload bytes and statement."""
     payload_type = envelope.get("payloadType")
     payload_b64 = envelope.get("payload")
     sigs = envelope.get("signatures")
@@ -268,12 +279,14 @@ def verify_dsse_envelope(
 # ---------------- Digests (DSSE mode) ----------------
 
 def normalize_alg(name: str) -> str:
+    """Normalize digest algorithm names to canonical identifiers."""
     n = name.strip().lower()
     n = re.sub(r"[^a-z0-9\-]", "", n)
     return ALG_ALIASES.get(n, n)
 
 
 def digest_file(alg: str, path: Path) -> str:
+    """Compute a digest for a file using a supported algorithm."""
     a = normalize_alg(alg)
     if a in ("sha256", "sha512"):
         h = hashlib.new(a)
@@ -293,6 +306,7 @@ def digest_file(alg: str, path: Path) -> str:
 
 
 def verify_digest_map(path: Path, expected: Dict[str, str], required_algs: List[str]) -> None:
+    """Verify that a file matches expected digests for required algorithms."""
     if not isinstance(expected, dict) or not expected:
         die(f"missing/invalid digest map for {path}")
 
@@ -317,6 +331,7 @@ def verify_digest_map(path: Path, expected: Dict[str, str], required_algs: List[
 # ---------------- Paths / closure (DSSE mode) ----------------
 
 def safe_relpath(p: str) -> Path:
+    """Normalize and validate a relative path, rejecting traversal."""
     if not isinstance(p, str) or not p:
         die("path/uri must be non-empty string")
     pp = Path(p)
@@ -333,6 +348,7 @@ def safe_relpath(p: str) -> Path:
 
 
 def find_manifest_material(predicate: Dict[str, Any]) -> Tuple[str, Dict[str, str]]:
+    """Find the input manifest material entry in a DSSE predicate."""
     spec_closure = predicate.get("specClosure") or {}
     manifest = (spec_closure.get("manifest") or {})
     uri = manifest.get("uri")
@@ -361,6 +377,7 @@ def find_manifest_material(predicate: Dict[str, Any]) -> Tuple[str, Dict[str, st
 
 
 def verify_input_manifest(repo: Path, manifest_uri: str, manifest_digest: Dict[str, str], required_algs: List[str]) -> None:
+    """Verify an input manifest and its referenced files."""
     manifest_path = repo / safe_relpath(manifest_uri)
     if not manifest_path.exists():
         die(f"missing input manifest: {manifest_uri}")
@@ -393,6 +410,7 @@ def verify_input_manifest(repo: Path, manifest_uri: str, manifest_digest: Dict[s
 # ---------------- Rebuild + compare (DSSE mode) ----------------
 
 def run_cmd(cmd: Any, cwd: Path, env: Dict[str, str]) -> None:
+    """Run a command for rebuild verification and exit on failure."""
     if not isinstance(cmd, list) or not cmd or not all(isinstance(x, str) and x for x in cmd):
         die(f"rebuild command must be a non-empty string list, got: {cmd}")
 
@@ -402,6 +420,7 @@ def run_cmd(cmd: Any, cwd: Path, env: Dict[str, str]) -> None:
 
 
 def setup_env(build_policy: Dict[str, Any]) -> Dict[str, str]:
+    """Build a reproducible environment for rebuild commands."""
     env = os.environ.copy()
     env.setdefault("TZ", "UTC")
     env.setdefault("LC_ALL", "C")
@@ -461,7 +480,7 @@ def sha256_file(path: Path) -> Optional[str]:
 
 
 def sha256_of_dir_legacy(root: Path) -> str:
-    """Match legacy helper behavior used by some tools: sorted(root.rglob('*'))"""
+    """Compute a legacy directory hash with sorted traversal."""
     if not root.exists():
         return "0" * 64
     h = hashlib.sha256()
@@ -475,7 +494,7 @@ def sha256_of_dir_legacy(root: Path) -> str:
 
 
 def sha256_of_dir_posix(root: Path) -> str:
-    """More explicit traversal ordering: sort by relative posix path."""
+    """Compute a directory hash using sorted posix paths."""
     if not root.exists():
         return "0" * 64
     h = hashlib.sha256()
@@ -490,6 +509,7 @@ def sha256_of_dir_posix(root: Path) -> str:
 
 
 def map_local_path(repo: Path, *, receipts_dir: Path, build_dir: Path, asm_dir: Path, bin_dir: Path, rel: str) -> Path:
+    """Map a receipt-relative path to a local filesystem path."""
     p = safe_relpath(rel)
     s = p.as_posix()
 
@@ -508,6 +528,7 @@ def map_local_path(repo: Path, *, receipts_dir: Path, build_dir: Path, asm_dir: 
 
 
 def verify_tool_identity(tool_obj: Dict[str, Any], strict: bool) -> None:
+    """Verify tool path and sha256 information in a receipt."""
     if not isinstance(tool_obj, dict):
         die("receipt.tool must be object")
     p = tool_obj.get("path")
@@ -540,6 +561,7 @@ def verify_tool_identity(tool_obj: Dict[str, Any], strict: bool) -> None:
 
 
 def compute_receipt_core_id(receipt: Dict[str, Any]) -> str:
+    """Compute the receipt core ID digest from canonical fields."""
     core = {
         "schema": receipt.get("schema"),
         "target": receipt.get("target"),
@@ -565,6 +587,7 @@ def verify_build_receipt(
     epoch_json: Dict[str, Any],
     strict: bool,
 ) -> Dict[str, Any]:
+    """Verify a build receipt against files and epoch metadata."""
     if not receipt_path.exists():
         die(f"missing receipt: {receipt_path}")
 
@@ -692,6 +715,7 @@ def verify_build_receipt(
 
 
 def verify_ir_manifest(manifest_path: Path, repo: Path, *, asm_dir: Path, strict: bool) -> None:
+    """Verify an IR manifest against actual IR files."""
     if not manifest_path.exists():
         die(f"missing ir manifest: {manifest_path}")
 
@@ -735,6 +759,7 @@ def verify_ir_manifest(manifest_path: Path, repo: Path, *, asm_dir: Path, strict
 
 
 def verify_ir_bundle_manifest(bundle_manifest_path: Path, repo: Path, *, asm_dir: Path) -> None:
+    """Verify an IR bundle manifest against the bundle and IR files."""
     if not bundle_manifest_path.exists():
         die(f"missing ir bundle manifest: {bundle_manifest_path}")
 
@@ -832,6 +857,7 @@ def verify_output_manifest(manifest_path: Path, repo: Path, *, strict: bool) -> 
             die(f"output manifest set mismatch (strict) for {root_rel}: missing={missing} extra={extra}")
 
 def verify_provenance(build_dir: Path, repo: Path, *, spec_dir: Path, asm_dir: Path, tmp_dir: Path, strict: bool) -> None:
+    """Verify provenance outputs and reproducibility."""
     prov_json = build_dir / "provenance.json"
     prov_h = build_dir / "provenance.h"
 
@@ -906,6 +932,7 @@ def verify_local(
     tmp_dir: Path,
     strict: bool,
 ) -> None:
+    """Verify local build outputs and receipts."""
     # Epoch manifest used by receipts
     epoch_path = build_dir / "epoch.json"
     if not epoch_path.exists():
@@ -1024,6 +1051,7 @@ receipts_dir / "lisp_portable.json",
 # ---------------- Main ----------------
 
 def main() -> int:
+    """CLI entry point for build receipt verification."""
     ap = argparse.ArgumentParser()
 
     # Mode selection

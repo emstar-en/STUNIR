@@ -303,6 +303,7 @@ def print_usage():
 
 
 def main():
+    """Parse arguments and dispatch code emission for a target language."""
     args = parse_args(sys.argv)
     
     if args.get('help'):

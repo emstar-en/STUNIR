@@ -27,10 +27,12 @@ class ValidationError(Exception):
 
 class _NoDupesObjectPairs:
     def __init__(self, pairs: List[Tuple[str, Any]]):
+        """Store JSON object pairs for duplicate detection."""
         self.pairs = pairs
 
 
 def _nfc(s: str) -> str:
+    """Normalize a string to NFC and validate code points."""
     if not isinstance(s, str):
         raise ValidationError(f"expected string, got {type(s).__name__}")
     for ch in s:
@@ -123,10 +125,12 @@ def normalize_json_value(v: Any) -> Any:
 
 
 def sha256_hex(data: bytes) -> str:
+    """Compute a SHA-256 digest for bytes."""
     return hashlib.sha256(data).hexdigest()
 
 
 def _encode_major_int(major: int, value: int) -> bytes:
+    """Encode an unsigned integer value for a CBOR major type."""
     if value < 0:
         raise ValidationError("internal error: negative additional integer")
 
@@ -149,19 +153,23 @@ def _encode_major_int(major: int, value: int) -> bytes:
 
 
 def _encode_uint(n: int) -> bytes:
+    """Encode a non-negative integer as CBOR unsigned integer."""
     return _encode_major_int(0, n)
 
 
 def _encode_nint(n: int) -> bytes:
+    """Encode a negative integer as CBOR negative integer."""
     return _encode_major_int(1, (-1 - n))
 
 
 def _encode_bytes(b: bytes) -> bytes:
+    """Encode a bytes value as CBOR byte string."""
     b = bytes(b)
     return _encode_major_int(2, len(b)) + b
 
 
 def _encode_text(s: str) -> bytes:
+    """Encode a string as CBOR text with NFC normalization."""
     s = _nfc(s)
     try:
         b = s.encode("utf-8")
@@ -171,6 +179,7 @@ def _encode_text(s: str) -> bytes:
 
 
 def _encode_array(items: List[Any]) -> bytes:
+    """Encode a list as a CBOR array."""
     out = bytearray()
     out += _encode_major_int(4, len(items))
     for x in items:
@@ -179,11 +188,13 @@ def _encode_array(items: List[Any]) -> bytes:
 
 
 def _canonical_map_sort_key(encoded_key: bytes):
+    """Return the canonical map sort key for an encoded CBOR key."""
     # RFC 8949 canonical order: sort by length then lexicographic bytes of *encoded key*.
     return (len(encoded_key), encoded_key)
 
 
 def _encode_map(m: Dict[str, Any]) -> bytes:
+    """Encode a dict as a CBOR map with canonical key ordering."""
     encoded_items: List[Tuple[bytes, bytes]] = []
 
     for k, v in m.items():
@@ -204,10 +215,12 @@ def _encode_map(m: Dict[str, Any]) -> bytes:
 
 
 def _encode_tag(tag_num: int, tagged_bytes: bytes) -> bytes:
+    """Encode a CBOR tag and its tagged bytes."""
     return _encode_major_int(6, tag_num) + tagged_bytes
 
 
 def _encode_bignum(n: int) -> bytes:
+    """Encode an integer using CBOR bignum tags 2 or 3."""
     # RFC 8949: tag(2) for positive bignum, tag(3) for negative bignum.
     if n >= 0:
         tag = 2
@@ -272,6 +285,7 @@ def dcbor_encode(v: Any) -> bytes:
 
 
 def load_cir_units_json(path: str) -> List[Dict[str, Any]]:
+    """Load and normalize CIR units from a JSON file."""
     with open(path, "r", encoding="utf-8") as f:
         raw = _json_load_no_dupes(f)
 
@@ -288,11 +302,13 @@ def load_cir_units_json(path: str) -> List[Dict[str, Any]]:
 
 
 def make_ir_bundle_bytes(cir_units: List[Dict[str, Any]]) -> bytes:
+    """Encode CIR units into IR bundle bytes."""
     bundle_value = ["stunir.ir_bundle.v1", cir_units]
     return dcbor_encode(bundle_value)
 
 
 def make_receipt(*, mode: str, engine_type: str, engine_version: str, cir_sha256: str, ir_bundle_sha256: str) -> Dict[str, Any]:
+    """Create a receipt record for an IR bundle emission."""
     return {
         "ir_bundle.mode": mode,
         "ir_bundle.id": "stunir.ir_bundle.v1",
@@ -308,6 +324,7 @@ def make_receipt(*, mode: str, engine_type: str, engine_version: str, cir_sha256
 
 
 def _main(argv: List[str] | None = None) -> int:
+    """CLI entry point for emitting an IR bundle v1 and receipt."""
     ap = argparse.ArgumentParser(description="Build STUNIR IR bundle v1 from CIR units JSON")
     ap.add_argument("--units-json", required=True, help="Path to cir_units JSON file (array of objects)")
     ap.add_argument("--out-bundle", required=True, help="Path to write IR bundle bytes")

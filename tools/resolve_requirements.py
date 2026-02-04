@@ -4,18 +4,22 @@
 import argparse
 import json
 import os
+from typing import Any, Dict, List
 
 
-def load_json(path: str):
+def load_json(path: str) -> Any:
+    """Load JSON from a file path."""
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
-def dump_canon(obj) -> bytes:
+def dump_canon(obj: Any) -> bytes:
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
 
 
-def main():
+def main() -> None:
+    """Resolve target requirements and write a requirements JSON file."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--targets', action='append', default=[])
     ap.add_argument('--map', dest='map_path', default='contracts/target_requirements.json')
@@ -66,7 +70,7 @@ def main():
             optional.append({'contract_name': c, 'reason': f'optional_for_target:{t}'})
         notes.extend(td.get('notes', []) or [])
 
-    def dedupe(lst):
+    def dedupe(lst: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         seen = set()
         out = []
         for x in lst:

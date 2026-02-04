@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema": "stunir_ir_v1",
   "ir_version": "1.0.0",
   "root": {
     "node_id": "n_mod_embedded",
@@ -12,7 +12,10 @@
     },
     "hash": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
     "imports": [],
-    "exports": ["startup", "isr_handler"],
+    "exports": [
+      "startup",
+      "isr_handler"
+    ],
     "declarations": [
       {
         "node_id": "n_func_startup",
@@ -74,7 +77,11 @@
       }
     ],
     "metadata": {
-      "target_categories": ["embedded", "realtime", "safety_critical"],
+      "target_categories": [
+        "embedded",
+        "realtime",
+        "safety_critical"
+      ],
       "safety_level": "DO-178C_Level_A"
     }
   },
@@ -82,6 +89,21 @@
     "source_file": "embedded_startup.spec",
     "generator": "STUNIR Spec-to-IR v1.0",
     "timestamp": "2026-01-30T12:00:00Z",
-    "target_categories": ["embedded", "realtime", "safety_critical"]
-  }
+    "target_categories": [
+      "embedded",
+      "realtime",
+      "safety_critical"
+    ]
+  },
+  "module_name": "embedded_startup",
+  "functions": [
+    {
+      "name": "startup",
+      "return_type": "void"
+    },
+    {
+      "name": "isr_handler",
+      "return_type": "void"
+    }
+  ]
 }

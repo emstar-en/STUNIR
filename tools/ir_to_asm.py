@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-# STUNIR: Refined Assembly Generator
-# Features: Basic build script generation
+"""Generate refined assembly outputs from IR manifests."""
+
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
 
 def _w(p: Path, s: str) -> None:
+    """Write text to a file path, creating parent directories as needed."""
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(s, encoding="utf-8", newline="\n")
 
 def main() -> int:
+    """Read an IR manifest and emit assembly files and a build script."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--variant", required=True)
     ap.add_argument("--ir-manifest", required=True)

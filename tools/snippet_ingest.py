@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# STUNIR: Snippet Ingest Tool
-# Converts a raw code snippet into a STUNIR Spec JSON
+"""Convert code snippets into STUNIR spec JSON files."""
+
 from __future__ import annotations
 import argparse, json, sys
 from pathlib import Path
 
 def main() -> int:
+    """Parse CLI arguments and emit a STUNIR spec JSON for a snippet."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="Input code file")
     ap.add_argument("--lang", required=True, help="Language of input")

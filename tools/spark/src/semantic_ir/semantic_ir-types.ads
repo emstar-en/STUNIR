@@ -1,6 +1,17 @@
--- STUNIR Semantic IR Types Package Specification
--- DO-178C Level A Compliant
--- SPARK 2014 Mode
+-------------------------------------------------------------------------------
+--  STUNIR Semantic IR Types Package Specification
+--  DO-178C Level A Compliant
+--  SPARK 2014 Mode
+--
+--  This package defines the core types used throughout the STUNIR Semantic IR
+--  system. It provides bounded string types for memory safety, primitive type
+--  enumerations, and node kind discriminators for the IR AST.
+--
+--  All types are designed for use in SPARK_Mode with formal verification.
+--
+--  Copyright (c) 2026 STUNIR Project
+--  License: MIT
+-------------------------------------------------------------------------------
 
 pragma SPARK_Mode (On);
 
@@ -10,75 +21,109 @@ package Semantic_IR.Types with
    Pure,
    SPARK_Mode => On
 is
-   -- Bounded string types for safety
-   --  v0.8.6: Reduced from 256 to 128 to lower stack usage
+   --  =========================================================================
+   --  Bounded String Types
+   --  =========================================================================
+
+   --  Maximum name length for identifiers (reduced from 256 to 128 in v0.8.6
+   --  to lower stack usage while maintaining usability)
    Max_Name_Length : constant := 128;
-   Max_Hash_Length : constant := 71; -- "sha256:" + 64 hex chars
+
+   --  Maximum hash length: "sha256:" prefix (7) + 64 hex characters
+   Max_Hash_Length : constant := 71;
+
+   --  Maximum filesystem path length
    Max_Path_Length : constant := 256;
-   
+
+   --  Bounded string packages for type-safe string handling
    package Name_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Name_Length);
    package Hash_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Hash_Length);
    package Path_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Path_Length);
-   
+
+   --  Subtypes for Semantic IR string types
    subtype IR_Name is Name_Strings.Bounded_String;
    subtype IR_Hash is Hash_Strings.Bounded_String;
    subtype IR_Path is Path_Strings.Bounded_String;
    subtype Node_ID is Name_Strings.Bounded_String;
-   
-   -- Primitive types enumeration
+
+   --  =========================================================================
+   --  Primitive Types
+   --  =========================================================================
+
+   --  Enumeration of all primitive types supported by STUNIR
    type IR_Primitive_Type is (
-      Type_Void,
-      Type_Bool,
-      Type_I8, Type_I16, Type_I32, Type_I64,
-      Type_U8, Type_U16, Type_U32, Type_U64,
-      Type_F32, Type_F64,
-      Type_String,
-      Type_Char
+      Type_Void,                    --  No return value
+      Type_Bool,                    --  Boolean (true/false)
+      Type_I8, Type_I16, Type_I32, Type_I64,   --  Signed integers
+      Type_U8, Type_U16, Type_U32, Type_U64,   --  Unsigned integers
+      Type_F32, Type_F64,           --  Floating point (32/64 bit)
+      Type_String,                  --  String type
+      Type_Char                     --  Character type
    );
-   
-   -- Node kind discriminator
+
+   --  =========================================================================
+   --  AST Node Kinds
+   --  =========================================================================
+
+   --  Discriminator for IR AST node types
    type IR_Node_Kind is (
-      -- Module
+      --  Module container
       Kind_Module,
-      -- Declarations
-      Kind_Function_Decl,
-      Kind_Type_Decl,
-      Kind_Const_Decl,
-      Kind_Var_Decl,
-      -- Statements
-      Kind_Block_Stmt,
-      Kind_Expr_Stmt,
-      Kind_If_Stmt,
-      Kind_While_Stmt,
-      Kind_For_Stmt,
-      Kind_Return_Stmt,
-      Kind_Break_Stmt,
-      Kind_Continue_Stmt,
-      Kind_Var_Decl_Stmt,
-      Kind_Assign_Stmt,
-      -- Expressions
-      Kind_Integer_Literal,
-      Kind_Float_Literal,
-      Kind_String_Literal,
-      Kind_Bool_Literal,
-      Kind_Var_Ref,
-      Kind_Binary_Expr,
-      Kind_Unary_Expr,
-      Kind_Function_Call,
-      Kind_Member_Expr,
-      Kind_Array_Access,
-      Kind_Cast_Expr,
-      Kind_Ternary_Expr,
-      Kind_Array_Init,
-      Kind_Struct_Init
+
+      --  Declarations
+      Kind_Function_Decl,           --  Function declaration
+      Kind_Type_Decl,               --  Type definition
+      Kind_Const_Decl,              --  Constant declaration
+      Kind_Var_Decl,                --  Variable declaration
+
+      --  Statements
+      Kind_Block_Stmt,              --  Block statement { ... }
+      Kind_Expr_Stmt,               --  Expression statement
+      Kind_If_Stmt,                 --  If statement
+      Kind_While_Stmt,              --  While loop
+      Kind_For_Stmt,                --  For loop
+      Kind_Return_Stmt,             --  Return statement
+      Kind_Break_Stmt,              --  Break statement
+      Kind_Continue_Stmt,           --  Continue statement
+      Kind_Var_Decl_Stmt,           --  Variable declaration statement
+      Kind_Assign_Stmt,             --  Assignment statement
+
+      --  Expressions
+      Kind_Integer_Literal,         --  Integer literal
+      Kind_Float_Literal,           --  Float literal
+      Kind_String_Literal,          --  String literal
+      Kind_Bool_Literal,            --  Boolean literal
+      Kind_Var_Ref,                 --  Variable reference
+      Kind_Binary_Expr,             --  Binary expression (a + b)
+      Kind_Unary_Expr,              --  Unary expression (-a, !b)
+      Kind_Function_Call,           --  Function call
+      Kind_Member_Expr,             --  Member access (obj.field)
+      Kind_Array_Access,            --  Array indexing (arr[i])
+      Kind_Cast_Expr,               --  Type cast
+      Kind_Ternary_Expr,            --  Ternary conditional (a ? b : c)
+      Kind_Array_Init,              --  Array initialization
+      Kind_Struct_Init              --  Struct initialization
    );
-   
-   -- Binary operators
+
+   --  =========================================================================
+   --  Operators
+   --  =========================================================================
+
+   --  Binary operators supported in IR
    type Binary_Operator is (
+      --  Arithmetic
       Op_Add, Op_Sub, Op_Mul, Op_Div, Op_Mod,
+
+      --  Comparison
       Op_Eq, Op_Neq, Op_Lt, Op_Leq, Op_Gt, Op_Geq,
+
+      --  Logical
       Op_And, Op_Or,
+
+      --  Bitwise
       Op_Bit_And, Op_Bit_Or, Op_Bit_Xor, Op_Shl, Op_Shr,
+
+      --  Assignment
       Op_Assign
    );
    

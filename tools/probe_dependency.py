@@ -17,13 +17,16 @@ import platform
 import shutil
 import subprocess
 import tempfile
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 
 def sha256_bytes(b: bytes) -> str:
+    """Compute SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
 
 
 def sha256_file(path: str) -> str:
+    """Compute SHA-256 digest for a file."""
     h = hashlib.sha256()
     with open(path, 'rb') as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
@@ -31,16 +34,19 @@ def sha256_file(path: str) -> str:
     return h.hexdigest()
 
 
-def load_json(path: str):
+def load_json(path: str) -> Any:
+    """Load JSON from a file path."""
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
-def canonical_json_bytes(obj) -> bytes:
+def canonical_json_bytes(obj: Any) -> bytes:
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
 
 
-def run_cmd(argv, cwd=None, env=None, timeout=60):
+def run_cmd(argv: Sequence[str], cwd: Optional[str] = None, env: Optional[Dict[str, str]] = None, timeout: int = 60) -> Dict[str, Any]:
+    """Run a command and return exit code and hashed outputs."""
     p = subprocess.run(
         argv,
         cwd=cwd,
@@ -51,7 +57,7 @@ def run_cmd(argv, cwd=None, env=None, timeout=60):
         check=False,
     )
     return {
-        'argv': argv,
+        'argv': list(argv),
         'exit_code': p.returncode,
         'stdout_sha256': sha256_bytes(p.stdout),
         'stderr_sha256': sha256_bytes(p.stderr),
@@ -60,7 +66,8 @@ def run_cmd(argv, cwd=None, env=None, timeout=60):
     }
 
 
-def resolve_tool(locator, explicit_tool=None):
+def resolve_tool(locator: Dict[str, Any], explicit_tool: Optional[str] = None) -> Optional[str]:
+    """Resolve a tool path using a locator or explicit tool name."""
     if explicit_tool:
         if os.path.sep in explicit_tool or (os.path.altsep and os.path.altsep in explicit_tool):
             return explicit_tool
@@ -77,7 +84,8 @@ def resolve_tool(locator, explicit_tool=None):
     return None
 
 
-def apply_placeholders(argv, mapping):
+def apply_placeholders(argv: Sequence[str], mapping: Dict[str, str]) -> List[str]:
+    """Substitute placeholders in command arguments using a mapping."""
     out = []
     for a in argv:
         for k, v in mapping.items():
@@ -86,7 +94,8 @@ def apply_placeholders(argv, mapping):
     return out
 
 
-def eval_invariants(invariants, mapping, run_record=None):
+def eval_invariants(invariants: Optional[List[Dict[str, Any]]], mapping: Dict[str, str], run_record: Optional[Dict[str, Any]] = None) -> Tuple[bool, List[Dict[str, Any]]]:
+    """Evaluate invariant checks for a dependency probe run."""
     results = []
     ok = True
 
@@ -129,7 +138,8 @@ def eval_invariants(invariants, mapping, run_record=None):
     return ok, results
 
 
-def main():
+def main() -> None:
+    """Run dependency probe and emit an acceptance receipt."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--contract', required=True)
     ap.add_argument('--tool', default=None)

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+"""Generate epoch provenance outputs for build metadata."""
+
 import argparse
 import json
 import sys
 
-def main():
+
+def main() -> None:
+    """Write epoch provenance JSON and optional header output."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--epoch", type=int, default=0)
     parser.add_argument("--epoch-source", default="UNKNOWN")

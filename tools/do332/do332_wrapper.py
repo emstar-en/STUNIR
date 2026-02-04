@@ -37,7 +37,7 @@ class DO332Analyzer:
         candidates = [
             Path(__file__).parent / "bin" / "do332_analyzer",
             Path(__file__).parent.parent.parent / "bin" / "do332_analyzer",
-            Path("/home/ubuntu/stunir_repo/tools/do332/bin/do332_analyzer"),
+            Path(__file__).parent.parent.parent.parent / "tools" / "do332" / "bin" / "do332_analyzer",
         ]
 
         for candidate in candidates:

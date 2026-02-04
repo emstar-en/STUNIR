@@ -5,33 +5,39 @@ import argparse
 import hashlib
 import json
 import os
+from typing import Any, Dict
 
 
-def load_json(path: str):
+def load_json(path: str) -> Any:
+    """Load JSON from a file path."""
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
-def canon_bytes(obj) -> bytes:
+def canon_bytes(obj: Any) -> bytes:
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
 
 
 def sha256_bytes(b: bytes) -> str:
+    """Compute SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
 
 
-def recompute_dependency_id(receipt: dict) -> str:
+def recompute_dependency_id(receipt: Dict[str, Any]) -> str:
+    """Recompute dependency_id from receipt core fields."""
     dep_core = {
         'contract_name': receipt.get('contract_name'),
         'tool': receipt.get('tool'),
         'identity': receipt.get('identity'),
-        'attestations': ((receipt.get('inputs_presented') or {}).get('attestations') or []),
-        'platform': receipt.get('platform'),
+        'tests': receipt.get('tests'),
+        'accepted': receipt.get('accepted'),
     }
     return sha256_bytes(canon_bytes(dep_core))
 
 
-def main():
+def main() -> None:
+    """Verify dependency acceptance receipts against requirements."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--requirements', required=True)
     ap.add_argument('--deps_dir', default='receipts/deps')

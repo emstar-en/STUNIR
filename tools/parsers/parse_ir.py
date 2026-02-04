@@ -11,6 +11,7 @@ Usage:
 import json
 import sys
 import hashlib
+from typing import Any, Dict, List, Tuple
 
 # Required fields for stunir.ir.v1 schema
 IR_V1_REQUIRED_FIELDS = [
@@ -27,15 +28,15 @@ IR_V1_OPTIONAL_FIELDS = [
     "ir_exports"
 ]
 
-def compute_sha256(data):
+def compute_sha256(data: Any) -> str:
     """Compute SHA-256 hash of bytes."""
     if isinstance(data, str):
         data = data.encode('utf-8')
     return hashlib.sha256(data).hexdigest()
 
-def parse_ir(ir_data, strict=False):
+def parse_ir(ir_data: Dict[str, Any], strict: bool = False) -> Tuple[bool, List[str], List[str]]:
     """Parse and validate IR data.
-    
+
     Returns:
         tuple: (is_valid, errors, warnings)
     """
@@ -86,7 +87,8 @@ def parse_ir(ir_data, strict=False):
     is_valid = len(errors) == 0
     return is_valid, errors, warnings
 
-def main():
+def main() -> None:
+    """Parse an IR JSON file via CLI and print results."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <ir.json> [--strict]", file=sys.stderr)
         print("\nSTUNIR IR Parser - Parses and validates IR JSON files.", file=sys.stderr)

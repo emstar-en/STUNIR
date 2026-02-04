@@ -11,22 +11,23 @@ Usage:
 import json
 import sys
 import hashlib
+from typing import Any
 
-def canonical_json(data):
+def canonical_json(data: Any) -> str:
     """Generate canonical JSON output."""
     return json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
 
-def compute_sha256(data):
+def compute_sha256(data: Any) -> str:
     """Compute SHA-256 hash."""
     if isinstance(data, str):
         data = data.encode('utf-8')
     return hashlib.sha256(data).hexdigest()
 
-def serialize_receipt(receipt_data):
+def serialize_receipt(receipt_data: Any) -> bytes:
     """Serialize receipt to canonical JSON bytes."""
     return canonical_json(receipt_data).encode('utf-8')
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <receipt.json> [--output=<file>]", file=sys.stderr)
         print("\nSTUNIR Receipt Serializer - Serializes receipts to canonical format.", file=sys.stderr)

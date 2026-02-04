@@ -1,7 +1,11 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# ISSUE.HASKELL.0001: Model dispatch router
+if [ "${1:-}" = "unified_analysis" ]; then
+    python3 "$(dirname "$0")/unified_analysis/unified_analysis.py"
+    exit 0
+fi
+
 ISSUE_ID=${1:?Usage: dispatch.sh ISSUE.HASKELL.0001}
 
 case $ISSUE_ID in

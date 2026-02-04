@@ -11,13 +11,16 @@ import json
 import os
 import shutil
 import subprocess
+from typing import Any, Dict, List, Optional, Sequence
 
 
 def sha256_bytes(b: bytes) -> str:
+    """Compute SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
 
 
 def sha256_file(path: str) -> str:
+    """Compute SHA-256 digest for a file."""
     h = hashlib.sha256()
     with open(path, 'rb') as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
@@ -25,26 +28,30 @@ def sha256_file(path: str) -> str:
     return h.hexdigest()
 
 
-def load_json(path: str):
+def load_json(path: str) -> Any:
+    """Load JSON from a file path."""
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
-def canon_bytes(obj) -> bytes:
+def canon_bytes(obj: Any) -> bytes:
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
 
 
-def run_cmd(argv, cwd=None, timeout=60):
+def run_cmd(argv: Sequence[str], cwd: Optional[str] = None, timeout: int = 60) -> Dict[str, Any]:
+    """Run a command and return exit code and hashed outputs."""
     p = subprocess.run(argv, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout, check=False)
     return {
-        'argv': argv,
+        'argv': list(argv),
         'exit_code': p.returncode,
         'stdout_sha256': sha256_bytes(p.stdout),
         'stderr_sha256': sha256_bytes(p.stderr),
     }
 
 
-def main():
+def main() -> None:
+    """Verify a dependency acceptance receipt against a contract."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--receipt', required=True)
     ap.add_argument('--contract', required=True)

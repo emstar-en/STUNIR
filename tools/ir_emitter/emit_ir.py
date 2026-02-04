@@ -18,21 +18,22 @@ import sys
 import hashlib
 import time
 import os
+from typing import Any, Dict
 
 # STUNIR IR Schema Version
 IR_SCHEMA_VERSION = "stunir.ir.v1"
 
-def canonical_json(data):
+def canonical_json(data: Any) -> str:
     """Generate canonical JSON output (RFC 8785 subset)."""
     return json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
 
-def compute_sha256(data):
+def compute_sha256(data: Any) -> str:
     """Compute SHA-256 hash of bytes."""
     if isinstance(data, str):
         data = data.encode('utf-8')
     return hashlib.sha256(data).hexdigest()
 
-def spec_to_ir(spec_data):
+def spec_to_ir(spec_data: Dict[str, Any]) -> Dict[str, Any]:
     """Convert spec data to IR format."""
     # Extract module info from spec
     module_name = spec_data.get('module', spec_data.get('name', 'unnamed'))
@@ -78,10 +79,11 @@ def spec_to_ir(spec_data):
     # Handle imports/exports
     ir["ir_imports"] = spec_data.get('imports', [])
     ir["ir_exports"] = spec_data.get('exports', [module_name])
-    
+
     return ir
 
-def main():
+def main() -> None:
+    """Read a spec JSON file and emit canonical IR JSON."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <spec.json> [output.json]", file=sys.stderr)
         print("\nSTUNIR IR Emitter - Converts spec to deterministic IR format.", file=sys.stderr)

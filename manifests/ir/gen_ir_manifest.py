@@ -14,19 +14,20 @@ import os
 # Add parent to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from typing import Dict, List, Any
 from base import BaseManifestGenerator, scan_directory, canonical_json
 
 
 class IRManifestGenerator(BaseManifestGenerator):
     """Generator for IR manifests."""
-    
-    def __init__(self):
+
+    def __init__(self) -> None:
         super().__init__('ir')
-    
-    def _collect_entries(self, ir_dir: str = 'asm/ir', **kwargs):
+
+    def _collect_entries(self, ir_dir: str = 'asm/ir', **kwargs: Any) -> List[Dict[str, Any]]:
         """Collect IR artifacts."""
         entries = scan_directory(ir_dir, extensions=['.dcbor', '.json'])
-        
+
         # Add IR-specific metadata
         for entry in entries:
             entry['artifact_type'] = 'ir'
@@ -34,11 +35,11 @@ class IRManifestGenerator(BaseManifestGenerator):
                 entry['format'] = 'dcbor'
             else:
                 entry['format'] = 'json'
-        
+
         return entries
 
 
-def main():
+def main() -> None:
     ir_dir = 'asm/ir'
     output = 'receipts/ir_manifest.json'
     

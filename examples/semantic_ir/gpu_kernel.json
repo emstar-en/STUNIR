@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema": "stunir_ir_v1",
   "ir_version": "1.0.0",
   "root": {
     "node_id": "n_mod_gpu",
@@ -12,7 +12,9 @@
     },
     "hash": "sha256:cafe0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab",
     "imports": [],
-    "exports": ["vector_add_kernel"],
+    "exports": [
+      "vector_add_kernel"
+    ],
     "declarations": [
       {
         "node_id": "n_func_kernel",
@@ -79,7 +81,11 @@
         "attributes": {
           "gpu": {
             "execution_model": "kernel",
-            "workgroup_size": [256, 1, 1],
+            "workgroup_size": [
+              256,
+              1,
+              1
+            ],
             "shared_memory": 0,
             "max_registers": 32
           }
@@ -88,7 +94,9 @@
       }
     ],
     "metadata": {
-      "target_categories": ["gpu"],
+      "target_categories": [
+        "gpu"
+      ],
       "safety_level": "None"
     }
   },
@@ -96,6 +104,15 @@
     "source_file": "vector_add.spec",
     "generator": "STUNIR Spec-to-IR v1.0",
     "timestamp": "2026-01-30T12:00:00Z",
-    "target_categories": ["gpu"]
-  }
+    "target_categories": [
+      "gpu"
+    ]
+  },
+  "module_name": "vector_add",
+  "functions": [
+    {
+      "name": "vector_add_kernel",
+      "return_type": "void"
+    }
+  ]
 }

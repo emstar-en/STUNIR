@@ -10,6 +10,11 @@
 //! - MIPS
 //! - AVR (ATmega, ATtiny)
 //! - x86 (32/64-bit)
+//!
+//! # Error Handling
+//! All write operations use the `?` operator to propagate errors rather than
+//! panicking with `unwrap()`. This ensures deterministic error handling
+//! required for DO-178C compliance.
 
 use crate::base::{BaseEmitter, EmitterConfig, EmitterError, EmitterResult, EmitterStatus};
 use crate::types::{
@@ -75,17 +80,17 @@ impl EmbeddedEmitter {
 
         // Include guards
         let guard = format!("STUNIR_{}_H", self.config.base.module_name.to_uppercase());
-        writeln!(content, "#ifndef {}", guard).unwrap();
-        writeln!(content, "#define {}", guard).unwrap();
-        writeln!(content).unwrap();
+        writeln!(content, "#ifndef {}", guard)?;
+        writeln!(content, "#define {}", guard)?;
+        writeln!(content)?;
 
         // Standard includes for embedded
-        writeln!(content, "/* Embedded System Includes */").unwrap();
+        writeln!(content, "/* Embedded System Includes */")?;
         if self.config.use_fixed_width_types {
-            writeln!(content, "#include <stdint.h>").unwrap();
+            writeln!(content, "#include <stdint.h>")?;
         }
-        writeln!(content, "#include <stddef.h>").unwrap();
-        writeln!(content).unwrap();
+        writeln!(content, "#include <stddef.h>")?;
+        writeln!(content)?;
 
         // Architecture info comment
         let arch_config = get_arch_config(self.config.architecture);
@@ -93,45 +98,44 @@ impl EmbeddedEmitter {
             content,
             "/* Architecture: {} */",
             arch_name(&self.config.architecture)
-        )
-        .unwrap();
-        writeln!(content, "/* Word Size: {} bits */", arch_config.word_size).unwrap();
-        writeln!(content, "/* Endianness: {:?} */", arch_config.endianness).unwrap();
-        writeln!(content, "/* Alignment: {} bytes */", arch_config.alignment).unwrap();
-        writeln!(content).unwrap();
+        )?;
+        writeln!(content, "/* Word Size: {} bits */", arch_config.word_size)?;
+        writeln!(content, "/* Endianness: {:?} */", arch_config.endianness)?;
+        writeln!(content, "/* Alignment: {} bytes */", arch_config.alignment)?;
+        writeln!(content)?;
 
         // Type definitions
         if !ir_module.types.is_empty() {
-            writeln!(content, "/* Type Definitions */").unwrap();
+            writeln!(content, "/* Type Definitions */")?;
             for ir_type in &ir_module.types {
                 if let Some(ref doc) = ir_type.docstring {
-                    writeln!(content, "/* {} */", doc).unwrap();
+                    writeln!(content, "/* {} */", doc)?;
                 }
-                writeln!(content, "typedef struct {} {{", ir_type.name).unwrap();
+                writeln!(content, "typedef struct {} {{", ir_type.name)?;
                 for field in &ir_type.fields {
-                    writeln!(content, "    {} {};", field.field_type, field.name).unwrap();
+                    writeln!(content, "    {} {};", field.field_type, field.name)?;
                 }
-                writeln!(content, "}} {};\n", ir_type.name).unwrap();
+                writeln!(content, "}} {};\n", ir_type.name)?;
             }
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         // Function declarations
         if !ir_module.functions.is_empty() {
-            writeln!(content, "/* Function Declarations */").unwrap();
+            writeln!(content, "/* Function Declarations */")?;
             for function in &ir_module.functions {
                 if let Some(ref doc) = function.docstring {
-                    writeln!(content, "/* {} */", doc).unwrap();
+                    writeln!(content, "/* {} */", doc)?;
                 }
                 let ret_type = map_ir_type_to_c(function.return_type);
                 let params = self.format_parameters(&function.parameters);
-                writeln!(content, "{} {}({});", ret_type, function.name, params).unwrap();
+                writeln!(content, "{} {}({});", ret_type, function.name, params)?;
             }
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         // Close include guard
-        writeln!(content, "#endif /* {} */", guard).unwrap();
+        writeln!(content, "#endif /* {} */", guard)?;
 
         Ok(content)
     }
@@ -150,12 +154,12 @@ impl EmbeddedEmitter {
         ));
 
         // Include header
-        writeln!(content, "#include \"{}.h\"\n", self.config.base.module_name).unwrap();
+        writeln!(content, "#include \"{}.h\"\n", self.config.base.module_name)?;
 
         // Function implementations
         for function in &ir_module.functions {
             self.generate_function(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         Ok(content)
@@ -168,19 +172,19 @@ impl EmbeddedEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "/* {} */", doc).unwrap();
+            writeln!(content, "/* {} */", doc)?;
         }
 
         let ret_type = map_ir_type_to_c(function.return_type);
         let params = self.format_parameters(&function.parameters);
-        writeln!(content, "{} {}({}) {{", ret_type, function.name, params).unwrap();
+        writeln!(content, "{} {}({}) {{", ret_type, function.name, params)?;
 
         // Generate statements
         for stmt in &function.statements {
             self.generate_statement(content, stmt, 1)?;
         }
 
-        writeln!(content, "}}").unwrap();
+        writeln!(content, "}}")?;
         Ok(())
     }
 
@@ -195,22 +199,22 @@ impl EmbeddedEmitter {
 
         match stmt.stmt_type {
             IRStatementType::Nop => {
-                writeln!(content, "{}/* nop */", indent).unwrap();
+                writeln!(content, "{}/* nop */", indent)?;
             }
             IRStatementType::VarDecl => {
                 let c_type = stmt.data_type.map(map_ir_type_to_c).unwrap_or("int32_t");
                 let var_name = stmt.target.as_deref().unwrap_or("v0");
                 let init = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{} {} = {};", indent, c_type, var_name, init).unwrap();
+                writeln!(content, "{}{} {} = {};", indent, c_type, var_name, init)?;
             }
             IRStatementType::Assign => {
                 let target = stmt.target.as_deref().unwrap_or("v0");
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{} = {};", indent, target, value).unwrap();
+                writeln!(content, "{}{} = {};", indent, target, value)?;
             }
             IRStatementType::Return => {
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}return {};", indent, value).unwrap();
+                writeln!(content, "{}return {};", indent, value)?;
             }
             IRStatementType::Add
             | IRStatementType::Sub
@@ -226,34 +230,34 @@ impl EmbeddedEmitter {
                     IRStatementType::Div => "/",
                     _ => "+",
                 };
-                writeln!(content, "{}{} = {} {} {};", indent, target, left, op, right).unwrap();
+                writeln!(content, "{}{} = {} {} {};", indent, target, left, op, right)?;
             }
             IRStatementType::Call => {
                 let func = stmt.target.as_deref().unwrap_or("noop");
                 let args = stmt.value.as_deref().unwrap_or("");
-                writeln!(content, "{}{}({});", indent, func, args).unwrap();
+                writeln!(content, "{}{}({});", indent, func, args)?;
             }
             IRStatementType::If => {
                 let condition = stmt.value.as_deref().unwrap_or("1");
-                writeln!(content, "{}if ({}) {{", indent, condition).unwrap();
-                writeln!(content, "{}    /* if body */", indent).unwrap();
-                writeln!(content, "{}}}", indent).unwrap();
+                writeln!(content, "{}if ({}) {{", indent, condition)?;
+                writeln!(content, "{}    /* if body */", indent)?;
+                writeln!(content, "{}}}", indent)?;
             }
             IRStatementType::Loop => {
-                writeln!(content, "{}while (1) {{", indent).unwrap();
-                writeln!(content, "{}    /* loop body */", indent).unwrap();
-                writeln!(content, "{}}}", indent).unwrap();
+                writeln!(content, "{}while (1) {{", indent)?;
+                writeln!(content, "{}    /* loop body */", indent)?;
+                writeln!(content, "{}}}", indent)?;
             }
             IRStatementType::Break => {
-                writeln!(content, "{}break;", indent).unwrap();
+                writeln!(content, "{}break;", indent)?;
             }
             IRStatementType::Continue => {
-                writeln!(content, "{}continue;", indent).unwrap();
+                writeln!(content, "{}continue;", indent)?;
             }
             IRStatementType::Block => {
-                writeln!(content, "{}{{", indent).unwrap();
-                writeln!(content, "{}    /* block */", indent).unwrap();
-                writeln!(content, "{}}}", indent).unwrap();
+                writeln!(content, "{}{{", indent)?;
+                writeln!(content, "{}    /* block */", indent)?;
+                writeln!(content, "{}}}", indent)?;
             }
         }
 
@@ -276,45 +280,42 @@ impl EmbeddedEmitter {
     fn generate_linker_script(&self) -> Result<String, EmitterError> {
         let mut content = String::new();
 
-        writeln!(content, "/* STUNIR Generated Linker Script */").unwrap();
+        writeln!(content, "/* STUNIR Generated Linker Script */")?;
         writeln!(
             content,
             "/* Architecture: {} */\n",
             arch_name(&self.config.architecture)
-        )
-        .unwrap();
+        )?;
 
-        writeln!(content, "MEMORY {{").unwrap();
+        writeln!(content, "MEMORY {{")?;
         writeln!(
             content,
             "    FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K"
-        )
-        .unwrap();
+        )?;
         writeln!(
             content,
             "    RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 64K"
-        )
-        .unwrap();
-        writeln!(content, "}}\n").unwrap();
+        )?;
+        writeln!(content, "}}\n")?;
 
-        writeln!(content, "SECTIONS {{").unwrap();
-        writeln!(content, "    .text : {{").unwrap();
-        writeln!(content, "        *(.text*)").unwrap();
-        writeln!(content, "    }} > FLASH\n").unwrap();
+        writeln!(content, "SECTIONS {{")?;
+        writeln!(content, "    .text : {{")?;
+        writeln!(content, "        *(.text*)")?;
+        writeln!(content, "    }} > FLASH\n")?;
 
-        writeln!(content, "    .data : {{").unwrap();
-        writeln!(content, "        *(.data*)").unwrap();
-        writeln!(content, "    }} > RAM\n").unwrap();
+        writeln!(content, "    .data : {{")?;
+        writeln!(content, "        *(.data*)")?;
+        writeln!(content, "    }} > RAM\n")?;
 
-        writeln!(content, "    .bss : {{").unwrap();
-        writeln!(content, "        *(.bss*)").unwrap();
-        writeln!(content, "    }} > RAM\n").unwrap();
+        writeln!(content, "    .bss : {{")?;
+        writeln!(content, "        *(.bss*)")?;
+        writeln!(content, "    }} > RAM\n")?;
 
-        writeln!(content, "    .stack : {{").unwrap();
-        writeln!(content, "        . = . + {};", self.config.stack_size).unwrap();
-        writeln!(content, "        _stack_top = .;").unwrap();
-        writeln!(content, "    }} > RAM").unwrap();
-        writeln!(content, "}}").unwrap();
+        writeln!(content, "    .stack : {{")?;
+        writeln!(content, "        . = . + {};", self.config.stack_size)?;
+        writeln!(content, "        _stack_top = .;")?;
+        writeln!(content, "    }} > RAM")?;
+        writeln!(content, "}}")?;
 
         Ok(content)
     }
@@ -388,7 +389,7 @@ mod tests {
 
     #[test]
     fn test_embedded_emitter_arm() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = EmbeddedConfig::new(base_config, Architecture::ARM);
         let emitter = EmbeddedEmitter::new(config);
@@ -410,7 +411,7 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
         assert_eq!(result.files.len(), 3); // header, source, linker
     }

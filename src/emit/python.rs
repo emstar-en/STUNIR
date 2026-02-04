@@ -1,9 +1,69 @@
+//! Python Code Emitter Module
+//!
+//! Generates Python 3 source code from STUNIR Intermediate Representation.
+//! Produces idiomatic Python with proper function definitions and docstrings.
+//!
+//! # Generated Code Structure
+//!
+//! - Module-level comment with generation metadata
+//! - Function definitions for each IR function
+//! - Instruction mapping to Python statements
+//! - Main entry point guard
+//!
+//! # Instruction Mapping
+//!
+//! - `print` → Python `print()` function
+//! - Unknown ops → Comments for manual review
+//!
+//! # Safety
+//!
+//! Generated code is deterministic and safe to execute. Unknown
+//! instructions are commented rather than causing errors.
+
 use crate::errors::StunirError;
 use crate::ir_v1::IrV1;
 use anyhow::Result;
 use std::fs;
 use std::path::Path;
 
+/// Emit Python code from IR.
+///
+/// Generates Python source code from the provided IR and writes
+/// it to the specified output file.
+///
+/// # Arguments
+///
+/// * `ir` - The IR structure to emit
+/// * `out_file` - Path for the output Python file
+///
+/// # Returns
+///
+/// * `Ok(())` - If emission succeeds
+/// * `Err(anyhow::Error)` - If emission or file writing fails
+///
+/// # Generated Code
+///
+/// The generated Python code includes:
+/// - Header comment with generation metadata
+/// - Function definitions for each IR function
+/// - Main entry point guard
+///
+/// # Example
+///
+/// For an IR function `main` with a `print` instruction,
+/// generates:
+/// ```python
+/// def main():
+///     print("Hello from STUNIR!")
+///
+/// if __name__ == "__main__":
+///     main()
+/// ```
+///
+/// # Safety
+///
+/// Creates parent directories as needed. Unknown instructions
+/// are converted to comments rather than causing failures.
 pub fn emit(ir: &IrV1, out_file: &str) -> Result<()> {
     let mut code = String::new();
 

@@ -1,24 +1,34 @@
 #!/usr/bin/env python3
+"""Generate build receipts for produced artifacts."""
+
 import argparse
 import hashlib
 import json
 import sys
 from pathlib import Path
 
+
 def canonical_json_bytes(obj):
+    """Serialize an object to canonical JSON bytes."""
     return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
+
 def sha256_bytes(b):
+    """Compute a SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
 
+
 def sha256_file(path):
+    """Compute a SHA-256 digest for a file path."""
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             h.update(chunk)
     return h.hexdigest()
 
-def main():
+
+def main() -> None:
+    """Write a canonical build receipt for a target artifact."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--target", required=True)
     parser.add_argument("--toolchain-lock")

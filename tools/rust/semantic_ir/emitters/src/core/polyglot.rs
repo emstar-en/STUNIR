@@ -88,17 +88,17 @@ impl PolyglotEmitter {
         header.push_str(&self.get_do178c_header(&self.config.base, "C89 Header"));
 
         let guard = format!("{}_H", self.config.base.module_name.to_uppercase());
-        writeln!(header, "#ifndef {}", guard).unwrap();
-        writeln!(header, "#define {}\\n", guard).unwrap();
+        writeln!(header, "#ifndef {}", guard)?;
+        writeln!(header, "#define {}\\n", guard)?;
 
         // C89 doesn't have stdint.h, so define types
-        writeln!(header, "/* Fixed-width integer types for C89 */").unwrap();
-        writeln!(header, "typedef signed char int8_t;").unwrap();
-        writeln!(header, "typedef short int16_t;").unwrap();
-        writeln!(header, "typedef long int32_t;").unwrap();
-        writeln!(header, "typedef unsigned char uint8_t;").unwrap();
-        writeln!(header, "typedef unsigned short uint16_t;").unwrap();
-        writeln!(header, "typedef unsigned long uint32_t;\\n").unwrap();
+        writeln!(header, "/* Fixed-width integer types for C89 */")?;
+        writeln!(header, "typedef signed char int8_t;")?;
+        writeln!(header, "typedef short int16_t;")?;
+        writeln!(header, "typedef long int32_t;")?;
+        writeln!(header, "typedef unsigned char uint8_t;")?;
+        writeln!(header, "typedef unsigned short uint16_t;")?;
+        writeln!(header, "typedef unsigned long uint32_t;\\n")?;
 
         // Type definitions
         for ir_type in &ir_module.types {
@@ -109,16 +109,16 @@ impl PolyglotEmitter {
         for function in &ir_module.functions {
             let ret_type = map_ir_type_to_c(function.return_type);
             let params = self.format_c_parameters(&function.parameters);
-            writeln!(header, "{} {}({});", ret_type, function.name, params).unwrap();
+            writeln!(header, "{} {}({});", ret_type, function.name, params)?;
         }
 
-        writeln!(header, "\\n#endif /* {} */", guard).unwrap();
+        writeln!(header, "\\n#endif /* {} */", guard)?;
         files.push((format!("{}.h", self.config.base.module_name), header));
 
         // Source file
         let mut source = String::new();
         source.push_str(&self.get_do178c_header(&self.config.base, "C89 Source"));
-        writeln!(source, "#include \"{}.h\"\\n", self.config.base.module_name).unwrap();
+        writeln!(source, "#include \"{}.h\"\\n", self.config.base.module_name)?;
 
         for function in &ir_module.functions {
             self.generate_c_function(&mut source, function)?;
@@ -138,12 +138,12 @@ impl PolyglotEmitter {
         header.push_str(&self.get_do178c_header(&self.config.base, "C99 Header"));
 
         let guard = format!("{}_H", self.config.base.module_name.to_uppercase());
-        writeln!(header, "#ifndef {}", guard).unwrap();
-        writeln!(header, "#define {}\\n", guard).unwrap();
+        writeln!(header, "#ifndef {}", guard)?;
+        writeln!(header, "#define {}\\n", guard)?;
 
         // C99 has stdint.h
-        writeln!(header, "#include <stdint.h>").unwrap();
-        writeln!(header, "#include <stdbool.h>\\n").unwrap();
+        writeln!(header, "#include <stdint.h>")?;
+        writeln!(header, "#include <stdbool.h>\\n")?;
 
         // Type definitions
         for ir_type in &ir_module.types {
@@ -154,16 +154,16 @@ impl PolyglotEmitter {
         for function in &ir_module.functions {
             let ret_type = map_ir_type_to_c(function.return_type);
             let params = self.format_c_parameters(&function.parameters);
-            writeln!(header, "{} {}({});", ret_type, function.name, params).unwrap();
+            writeln!(header, "{} {}({});", ret_type, function.name, params)?;
         }
 
-        writeln!(header, "\\n#endif /* {} */", guard).unwrap();
+        writeln!(header, "\\n#endif /* {} */", guard)?;
         files.push((format!("{}.h", self.config.base.module_name), header));
 
         // Source file
         let mut source = String::new();
         source.push_str(&self.get_do178c_header(&self.config.base, "C99 Source"));
-        writeln!(source, "#include \"{}.h\"\\n", self.config.base.module_name).unwrap();
+        writeln!(source, "#include \"{}.h\"\\n", self.config.base.module_name)?;
 
         for function in &ir_module.functions {
             self.generate_c_function(&mut source, function)?;
@@ -183,8 +183,8 @@ impl PolyglotEmitter {
         content.push_str("//! DO-178C Level A Compliant\\n\\n");
 
         // Module attributes
-        writeln!(content, "#![deny(unsafe_code)]").unwrap();
-        writeln!(content, "#![allow(dead_code)]\\n").unwrap();
+        writeln!(content, "#![deny(unsafe_code)]")?;
+        writeln!(content, "#![allow(dead_code)]\\n")?;
 
         // Type definitions
         for ir_type in &ir_module.types {
@@ -204,13 +204,13 @@ impl PolyglotEmitter {
     /// Generate C type definition
     fn generate_c_type(&self, content: &mut String, ir_type: &IRType) -> Result<(), EmitterError> {
         if let Some(ref doc) = ir_type.docstring {
-            writeln!(content, "/* {} */", doc).unwrap();
+            writeln!(content, "/* {} */", doc)?;
         }
-        writeln!(content, "typedef struct {} {{", ir_type.name).unwrap();
+        writeln!(content, "typedef struct {} {{", ir_type.name)?;
         for field in &ir_type.fields {
-            writeln!(content, "    {} {};", field.field_type, field.name).unwrap();
+            writeln!(content, "    {} {};", field.field_type, field.name)?;
         }
-        writeln!(content, "}} {};\\n", ir_type.name).unwrap();
+        writeln!(content, "}} {};\\n", ir_type.name)?;
         Ok(())
     }
 
@@ -221,15 +221,15 @@ impl PolyglotEmitter {
         ir_type: &IRType,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = ir_type.docstring {
-            writeln!(content, "/// {}", doc).unwrap();
+            writeln!(content, "/// {}", doc)?;
         }
-        writeln!(content, "#[derive(Debug, Clone)]").unwrap();
-        writeln!(content, "pub struct {} {{", ir_type.name).unwrap();
+        writeln!(content, "#[derive(Debug, Clone)]")?;
+        writeln!(content, "pub struct {} {{", ir_type.name)?;
         for field in &ir_type.fields {
             let rust_type = map_ir_type_to_rust(&field.field_type);
-            writeln!(content, "    pub {}: {},", field.name, rust_type).unwrap();
+            writeln!(content, "    pub {}: {},", field.name, rust_type)?;
         }
-        writeln!(content, "}}\\n").unwrap();
+        writeln!(content, "}}\\n")?;
         Ok(())
     }
 
@@ -240,18 +240,18 @@ impl PolyglotEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "/* {} */", doc).unwrap();
+            writeln!(content, "/* {} */", doc)?;
         }
 
         let ret_type = map_ir_type_to_c(function.return_type);
         let params = self.format_c_parameters(&function.parameters);
-        writeln!(content, "{} {}({}) {{", ret_type, function.name, params).unwrap();
+        writeln!(content, "{} {}({}) {{", ret_type, function.name, params)?;
 
         for stmt in &function.statements {
             self.generate_c_statement(content, stmt, 1)?;
         }
 
-        writeln!(content, "}}\\n").unwrap();
+        writeln!(content, "}}\\n")?;
         Ok(())
     }
 
@@ -262,7 +262,7 @@ impl PolyglotEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "/// {}", doc).unwrap();
+            writeln!(content, "/// {}", doc)?;
         }
 
         let ret_type = map_ir_type_to_rust_type(function.return_type);
@@ -283,7 +283,7 @@ impl PolyglotEmitter {
             self.generate_rust_statement(content, stmt, 1)?;
         }
 
-        writeln!(content, "}}\\n").unwrap();
+        writeln!(content, "}}\\n")?;
         Ok(())
     }
 
@@ -301,14 +301,14 @@ impl PolyglotEmitter {
                 let c_type = stmt.data_type.map(map_ir_type_to_c).unwrap_or("int32_t");
                 let var_name = stmt.target.as_deref().unwrap_or("v0");
                 let init = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{} {} = {};", indent, c_type, var_name, init).unwrap();
+                writeln!(content, "{}{} {} = {};", indent, c_type, var_name, init)?;
             }
             IRStatementType::Return => {
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}return {};", indent, value).unwrap();
+                writeln!(content, "{}return {};", indent, value)?;
             }
             _ => {
-                writeln!(content, "{}/* {:?} */", indent, stmt.stmt_type).unwrap();
+                writeln!(content, "{}/* {:?} */", indent, stmt.stmt_type)?;
             }
         }
 
@@ -336,15 +336,14 @@ impl PolyglotEmitter {
                     content,
                     "{}let {}: {} = {};",
                     indent, var_name, rust_type, init
-                )
-                .unwrap();
+                )?;
             }
             IRStatementType::Return => {
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{}", indent, value).unwrap();
+                writeln!(content, "{}{}", indent, value)?;
             }
             _ => {
-                writeln!(content, "{}// {:?}", indent, stmt.stmt_type).unwrap();
+                writeln!(content, "{}// {:?}", indent, stmt.stmt_type)?;
             }
         }
 
@@ -444,7 +443,7 @@ mod tests {
 
     #[test]
     fn test_polyglot_c89() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = PolyglotConfig::new(base_config, PolyglotLanguage::C89);
         let emitter = PolyglotEmitter::new(config);
@@ -463,14 +462,14 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
         assert_eq!(result.files.len(), 2); // header and source
     }
 
     #[test]
     fn test_polyglot_rust() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = PolyglotConfig::new(base_config, PolyglotLanguage::Rust);
         let emitter = PolyglotEmitter::new(config);
@@ -489,7 +488,7 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
         assert_eq!(result.files.len(), 1); // single .rs file
     }

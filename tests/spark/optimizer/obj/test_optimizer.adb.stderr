@@ -1,0 +1,4 @@
+test_optimizer.adb:5:09: warning: unit "Ada.Assertions" is not referenced [-gnatwu]
+test_optimizer.adb:85:27: error: no selector "Type_Param_Cnt" for type "IR_Function" defined at stunir-semantic_ir.ads:130
+test_optimizer.adb:131:27: error: no selector "Type_Param_Cnt" for type "IR_Function" defined at stunir-semantic_ir.ads:130
+test_optimizer.adb:173:27: error: no selector "Type_Param_Cnt" for type "IR_Function" defined at stunir-semantic_ir.ads:130

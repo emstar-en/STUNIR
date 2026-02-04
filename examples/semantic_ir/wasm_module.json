@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema": "stunir_ir_v1",
   "ir_version": "1.0.0",
   "root": {
     "node_id": "n_mod_wasm",
@@ -14,11 +14,15 @@
     "imports": [
       {
         "module": "env",
-        "symbols": ["log"],
+        "symbols": [
+          "log"
+        ],
         "alias": null
       }
     ],
-    "exports": ["multiply"],
+    "exports": [
+      "multiply"
+    ],
     "declarations": [
       {
         "node_id": "n_func_multiply",
@@ -86,7 +90,9 @@
       }
     ],
     "metadata": {
-      "target_categories": ["wasm"],
+      "target_categories": [
+        "wasm"
+      ],
       "safety_level": "None"
     }
   },
@@ -94,6 +100,15 @@
     "source_file": "wasm_example.spec",
     "generator": "STUNIR Spec-to-IR v1.0",
     "timestamp": "2026-01-30T12:00:00Z",
-    "target_categories": ["wasm"]
-  }
+    "target_categories": [
+      "wasm"
+    ]
+  },
+  "module_name": "wasm_example",
+  "functions": [
+    {
+      "name": "multiply",
+      "return_type": "i32"
+    }
+  ]
 }

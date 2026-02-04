@@ -141,8 +141,7 @@ def main():
         out_path = Path(args.out_json)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(
-            json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '
-',
+            json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '\n',
             encoding='utf-8',
         )
 

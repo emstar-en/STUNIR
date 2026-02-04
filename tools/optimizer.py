@@ -234,7 +234,9 @@ class ConstantFolding(OptimizationPass):
                 if result == int(result):
                     return int(result), True
                 return result, True
-            except:
+            except Exception:
+                # Catches any arithmetic error (division by zero, overflow, etc.)
+                # Returns original expression unchanged to indicate no optimization possible
                 return expr, False
         
         # Try boolean expressions: "true && false", "1 > 0", etc.

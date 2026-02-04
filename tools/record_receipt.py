@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+"""Record a minimal receipt JSON for a target build."""
 import argparse, json
 from pathlib import Path
 
-def main():
+
+def main() -> None:
+    """Parse arguments and write a receipt file if requested."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--target")
     ap.add_argument("--receipt")

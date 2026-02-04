@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema": "stunir_ir_v1",
   "ir_version": "1.0.0",
   "root": {
     "node_id": "n_mod_simple",
@@ -12,7 +12,9 @@
     },
     "hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     "imports": [],
-    "exports": ["add"],
+    "exports": [
+      "add"
+    ],
     "declarations": [
       {
         "node_id": "n_func_add",
@@ -88,7 +90,9 @@
       }
     ],
     "metadata": {
-      "target_categories": ["native"],
+      "target_categories": [
+        "native"
+      ],
       "safety_level": "None"
     }
   },
@@ -96,5 +100,12 @@
     "source_file": "simple_function.spec",
     "generator": "STUNIR Spec-to-IR v1.0",
     "timestamp": "2026-01-30T12:00:00Z"
-  }
+  },
+  "module_name": "simple_function",
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "i32"
+    }
+  ]
 }

@@ -147,7 +147,7 @@ def shutdown_handler() -> GracefulShutdown:
         return _global_shutdown
 
 
-def on_shutdown(priority: int = 50, name: str = '', timeout: float = 10.0):
+def on_shutdown(priority: int = 50, name: str = '', timeout: float = 10.0) -> Callable[[Callable[[], None]], Callable[[], None]]:
     """Decorator to register a function as a shutdown hook."""
     def decorator(func: Callable[[], None]) -> Callable[[], None]:
         shutdown_handler().register(func, priority=priority, name=name or func.__name__, timeout=timeout)

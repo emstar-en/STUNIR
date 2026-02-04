@@ -15,6 +15,7 @@ from pathlib import Path
 
 
 def sha256_file(path: Path) -> str:
+    """Compute the SHA-256 digest for a file path."""
     h = hashlib.sha256()
     with path.open('rb') as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
@@ -23,6 +24,7 @@ def sha256_file(path: Path) -> str:
 
 
 def write_canon_json(path: Path, obj) -> None:
+    """Write a canonical JSON document with a trailing newline."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n',
@@ -31,6 +33,7 @@ def write_canon_json(path: Path, obj) -> None:
 
 
 def main() -> None:
+    """Emit a deterministic output manifest for a directory tree."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--root', required=True)
     ap.add_argument('--manifest-out', required=True)

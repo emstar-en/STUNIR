@@ -64,19 +64,19 @@ impl WasmEmitter {
         let mut content = String::new();
 
         // Module header
-        writeln!(content, ";; STUNIR Generated WebAssembly").unwrap();
-        writeln!(content, ";; DO-178C Level A Compliant\n").unwrap();
+        writeln!(content, ";; STUNIR Generated WebAssembly")?;
+        writeln!(content, ";; DO-178C Level A Compliant\n")?;
 
-        writeln!(content, "(module").unwrap();
+        writeln!(content, "(module")?;
 
         // Memory declaration
-        writeln!(content, "  ;; Memory").unwrap();
-        writeln!(content, "  (memory (export \"memory\") 1)\n").unwrap();
+        writeln!(content, "  ;; Memory")?;
+        writeln!(content, "  (memory (export \"memory\") 1)\n")?;
 
         // Type imports for WASI
         if self.config.target == WasmTarget::WASI {
-            writeln!(content, "  ;; WASI imports").unwrap();
-            writeln!(content, "  (import \"wasi_snapshot_preview1\" \"fd_write\"").unwrap();
+            writeln!(content, "  ;; WASI imports")?;
+            writeln!(content, "  (import \"wasi_snapshot_preview1\" \"fd_write\"")?;
             writeln!(
                 content,
                 "    (func $fd_write (param i32 i32 i32 i32) (result i32)))\n"
@@ -87,10 +87,10 @@ impl WasmEmitter {
         // Function implementations
         for function in &ir_module.functions {
             self.generate_wat_function(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
-        writeln!(content, ")").unwrap();
+        writeln!(content, ")")?;
 
         Ok(content)
     }
@@ -102,37 +102,37 @@ impl WasmEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "  ;; {}", doc).unwrap();
+            writeln!(content, "  ;; {}", doc)?;
         }
 
         // Function signature
-        writeln!(content, "  (func ${}", function.name).unwrap();
+        writeln!(content, "  (func ${}", function.name)?;
 
         // Export if not internal
-        writeln!(content, "    (export \"{}\")", function.name).unwrap();
+        writeln!(content, "    (export \"{}\")", function.name)?;
 
         // Parameters
         for param in &function.parameters {
             let wasm_type = map_ir_type_to_wasm(param.param_type);
-            writeln!(content, "    (param ${} {})", param.name, wasm_type).unwrap();
+            writeln!(content, "    (param ${} {})", param.name, wasm_type)?;
         }
 
         // Return type
         if function.return_type != IRDataType::Void {
             let wasm_type = map_ir_type_to_wasm(function.return_type);
-            writeln!(content, "    (result {})", wasm_type).unwrap();
+            writeln!(content, "    (result {})", wasm_type)?;
         }
 
         // Local variables
-        writeln!(content, "    ;; Locals").unwrap();
-        writeln!(content, "    (local $temp i32)\n").unwrap();
+        writeln!(content, "    ;; Locals")?;
+        writeln!(content, "    (local $temp i32)\n")?;
 
         // Function body
         for stmt in &function.statements {
             self.generate_wat_statement(content, stmt)?;
         }
 
-        writeln!(content, "  )").unwrap();
+        writeln!(content, "  )")?;
         Ok(())
     }
 
@@ -144,7 +144,7 @@ impl WasmEmitter {
     ) -> Result<(), EmitterError> {
         match stmt.stmt_type {
             IRStatementType::Nop => {
-                writeln!(content, "    ;; nop").unwrap();
+                writeln!(content, "    ;; nop")?;
             }
             IRStatementType::VarDecl => {
                 writeln!(
@@ -156,7 +156,7 @@ impl WasmEmitter {
             }
             IRStatementType::Return => {
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "    i32.const {}", value).unwrap();
+                writeln!(content, "    i32.const {}", value)?;
             }
             IRStatementType::Add => {
                 writeln!(
@@ -171,7 +171,7 @@ impl WasmEmitter {
                     stmt.right_op.as_deref().unwrap_or("v1")
                 )
                 .unwrap();
-                writeln!(content, "    i32.add").unwrap();
+                writeln!(content, "    i32.add")?;
                 writeln!(
                     content,
                     "    local.set ${}",
@@ -192,7 +192,7 @@ impl WasmEmitter {
                     stmt.right_op.as_deref().unwrap_or("v1")
                 )
                 .unwrap();
-                writeln!(content, "    i32.sub").unwrap();
+                writeln!(content, "    i32.sub")?;
                 writeln!(
                     content,
                     "    local.set ${}",
@@ -213,7 +213,7 @@ impl WasmEmitter {
                     stmt.right_op.as_deref().unwrap_or("v1")
                 )
                 .unwrap();
-                writeln!(content, "    i32.mul").unwrap();
+                writeln!(content, "    i32.mul")?;
                 writeln!(
                     content,
                     "    local.set ${}",
@@ -234,7 +234,7 @@ impl WasmEmitter {
                     stmt.right_op.as_deref().unwrap_or("v1")
                 )
                 .unwrap();
-                writeln!(content, "    i32.div_s").unwrap();
+                writeln!(content, "    i32.div_s")?;
                 writeln!(
                     content,
                     "    local.set ${}",
@@ -243,7 +243,7 @@ impl WasmEmitter {
                 .unwrap();
             }
             _ => {
-                writeln!(content, "    ;; {:?}", stmt.stmt_type).unwrap();
+                writeln!(content, "    ;; {:?}", stmt.stmt_type)?;
             }
         }
 
@@ -303,7 +303,7 @@ mod tests {
 
     #[test]
     fn test_wasm_emitter() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_module");
         let config = WasmConfig::new(base_config, WasmTarget::Core);
         let emitter = WasmEmitter::new(config);
@@ -322,7 +322,7 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
         assert_eq!(result.files.len(), 1);
     }

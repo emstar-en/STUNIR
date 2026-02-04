@@ -5,7 +5,7 @@ Provides context managers and utilities for scoped logging contexts.
 
 import threading
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, Optional
+from typing import Any, Callable, Dict, Generator, Optional, TypeVar
 from functools import wraps
 
 
@@ -13,7 +13,7 @@ from functools import wraps
 _context_store = threading.local()
 
 
-def _get_context_stack() -> list:
+def _get_context_stack() -> list[Dict[str, Any]]:
     """Get the context stack for the current thread."""
     if not hasattr(_context_store, 'stack'):
         _context_store.stack = [{}]
@@ -53,28 +53,28 @@ def clear_context() -> None:
 
 class LogContext:
     """Context manager for scoped logging context.
-    
+
     Usage:
         with LogContext(request_id='123', user='admin'):
             logger.info('Processing request')  # includes context
     """
-    
-    def __init__(self, **kwargs):
+
+    def __init__(self, **kwargs: Any) -> None:
         self.context = kwargs
         self._token: Optional[int] = None
-    
+
     def __enter__(self) -> 'LogContext':
         stack = _get_context_stack()
         stack.append(self.context.copy())
         self._token = len(stack)
         return self
-    
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+
+    def __exit__(self, exc_type: Optional[type], exc_val: Optional[BaseException], exc_tb: Optional[object]) -> None:
         stack = _get_context_stack()
         if self._token and len(stack) >= self._token:
             stack.pop()
-    
-    def update(self, **kwargs) -> None:
+
+    def update(self, **kwargs: Any) -> None:
         """Update context within the scope."""
         self.context.update(kwargs)
         stack = _get_context_stack()
@@ -101,19 +101,22 @@ def log_context(**kwargs) -> Generator[LogContext, None, None]:
         yield ctx
 
 
-def capture_context(func):
+TFunc = TypeVar("TFunc", bound=Callable[..., Any])
+
+
+def capture_context(func: TFunc) -> TFunc:
     """Decorator to capture function execution context.
-    
+
     Automatically adds function name and module to log context.
-    
+
     Args:
         func: Function to wrap
-    
+
     Returns:
         Wrapped function with logging context
     """
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         ctx = {
             'function': func.__name__,
             'module': func.__module__,
@@ -125,14 +128,14 @@ def capture_context(func):
 
 class ContextAdapter:
     """Adapter to inject context into external loggers.
-    
+
     Useful for integrating with libraries that use standard logging.
     """
-    
-    def __init__(self, logger):
+
+    def __init__(self, logger: Any) -> None:
         self._logger = logger
-    
-    def _inject_context(self, kwargs: dict) -> dict:
+
+    def _inject_context(self, kwargs: Dict[str, Any]) -> Dict[str, Any]:
         """Inject current context into log kwargs."""
         extra = kwargs.get('extra', {})
         extra['structured'] = {
@@ -141,18 +144,18 @@ class ContextAdapter:
         }
         kwargs['extra'] = extra
         return kwargs
-    
-    def debug(self, msg, *args, **kwargs):
+
+    def debug(self, msg: str, *args: Any, **kwargs: Any) -> None:
         self._logger.debug(msg, *args, **self._inject_context(kwargs))
-    
-    def info(self, msg, *args, **kwargs):
+
+    def info(self, msg: str, *args: Any, **kwargs: Any) -> None:
         self._logger.info(msg, *args, **self._inject_context(kwargs))
-    
-    def warning(self, msg, *args, **kwargs):
+
+    def warning(self, msg: str, *args: Any, **kwargs: Any) -> None:
         self._logger.warning(msg, *args, **self._inject_context(kwargs))
-    
-    def error(self, msg, *args, **kwargs):
+
+    def error(self, msg: str, *args: Any, **kwargs: Any) -> None:
         self._logger.error(msg, *args, **self._inject_context(kwargs))
-    
-    def critical(self, msg, *args, **kwargs):
+
+    def critical(self, msg: str, *args: Any, **kwargs: Any) -> None:
         self._logger.critical(msg, *args, **self._inject_context(kwargs))

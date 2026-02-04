@@ -30,7 +30,7 @@ import sys
 import os
 
 
-def main():
+def main() -> None:
     """Generate and output canonical JSON timestamp."""
     # Capture standard epoch data
     now = time.time()

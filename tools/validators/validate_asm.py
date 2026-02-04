@@ -28,67 +28,67 @@ class ASMValidator(BaseValidator):
     # Register patterns for different architectures
     X86_REGISTERS = r'\b(eax|ebx|ecx|edx|esi|edi|ebp|esp|rax|rbx|rcx|rdx|rsi|rdi|rbp|rsp|r8|r9|r10|r11|r12|r13|r14|r15|al|ah|bl|bh|cl|ch|dl|dh|ax|bx|cx|dx)\b'
     ARM_REGISTERS = r'\b(r[0-9]|r1[0-5]|sp|lr|pc|w[0-9]|w[12][0-9]|w30|x[0-9]|x[12][0-9]|x30)\b'
-    
+
     # Instruction patterns
     X86_INSTRUCTIONS = r'\b(mov|push|pop|add|sub|mul|div|inc|dec|and|or|xor|not|shl|shr|cmp|test|jmp|je|jne|jg|jl|call|ret|nop|lea)\b'
     ARM_INSTRUCTIONS = r'\b(mov|add|sub|mul|ldr|str|push|pop|bl|bx|cmp|beq|bne|nop|ret|svc)\b'
     WASM_INSTRUCTIONS = r'\b(i32|i64|f32|f64|local|global|func|param|result|call|return|block|loop|br|if|else|end)\b'
-    
-    def __init__(self, arch: str = "x86", syntax: str = "intel", strict: bool = False):
+
+    def __init__(self, arch: str = "x86", syntax: str = "intel", strict: bool = False) -> None:
         super().__init__(strict)
         self.arch = arch.lower()
         self.syntax = syntax.lower()
-    
+
     def _detect_architecture(self, content: str) -> str:
         """Auto-detect assembly architecture from content."""
         # Check for WASM
         if re.search(r'\(module|\(func|\(param|i32\.|i64\.', content):
             return "wasm"
-        
+
         # Check for ARM
         if re.search(self.ARM_REGISTERS, content, re.IGNORECASE):
             arm_count = len(re.findall(self.ARM_REGISTERS, content, re.IGNORECASE))
             x86_count = len(re.findall(self.X86_REGISTERS, content, re.IGNORECASE))
             if arm_count > x86_count:
                 return "arm"
-        
+
         return "x86"
-    
+
     def _validate_x86(self, content: str) -> List[Tuple[str, str, int]]:
         """Validate x86 assembly."""
         issues = []
         lines = content.split('\n')
-        
+
         for i, line in enumerate(lines, 1):
             stripped = line.strip()
             if not stripped or stripped.startswith(';') or stripped.startswith('#'):
                 continue
-            
+
             # Check for valid section directives
             if stripped.startswith('.'):
                 if not re.match(r'\.(text|data|bss|section|global|extern|align)', stripped):
                     issues.append(("UNKNOWN_DIRECTIVE", f"Unknown directive: {stripped[:30]}", i))
-            
+
             # Check for balanced brackets
             if stripped.count('[') != stripped.count(']'):
                 issues.append(("UNBALANCED_BRACKETS", "Unbalanced square brackets", i))
-            
+
             # Check for potentially unsafe instructions
             if self.strict and re.search(r'\b(int\s+0x80|syscall|sysenter)\b', stripped):
                 issues.append(("UNSAFE_SYSCALL", "Direct syscall detected", i))
-        
+
         return issues
-    
+
     def _validate_arm(self, content: str) -> List[Tuple[str, str, int]]:
         """Validate ARM assembly."""
         issues = []
         lines = content.split('\n')
-        
+
         for i, line in enumerate(lines, 1):
             stripped = line.strip()
             if not stripped or stripped.startswith(';') or stripped.startswith('@') or stripped.startswith('//'):
                 continue
-            
+
             # Check for stack alignment (ARM64 requires 16-byte)
             if re.search(r'\bsp\b.*#[0-9]+', stripped):
                 match = re.search(r'#([0-9]+)', stripped)
@@ -96,44 +96,44 @@ class ASMValidator(BaseValidator):
                     val = int(match.group(1))
                     if val % 16 != 0 and 'sub' in stripped.lower():
                         issues.append(("STACK_ALIGNMENT", f"Stack may not be 16-byte aligned: {val}", i))
-        
+
         return issues
-    
+
     def _validate_wasm(self, content: str) -> List[Tuple[str, str, int]]:
         """Validate WASM text format."""
         issues = []
         lines = content.split('\n')
         paren_depth = 0
-        
+
         for i, line in enumerate(lines, 1):
             stripped = line.strip()
             if not stripped or stripped.startswith(';;'):
                 continue
-            
+
             paren_depth += stripped.count('(') - stripped.count(')')
-            
+
             # Check for negative depth (extra closing parens)
             if paren_depth < 0:
                 issues.append(("UNBALANCED_PARENS", "Unbalanced parentheses (extra closing)", i))
                 paren_depth = 0
-        
+
         if paren_depth != 0:
             issues.append(("UNBALANCED_PARENS", f"Unbalanced parentheses at end (depth: {paren_depth})", len(lines)))
-        
+
         return issues
-    
-    def validate(self, content: str, filepath: str = None) -> ValidationResult:
+
+    def validate(self, content: str, filepath: Optional[str] = None) -> ValidationResult:
         """Validate assembly content."""
         self.errors = []
         self.warnings = []
-        
+
         if not content.strip():
             self.add_warning("EMPTY_FILE", "Empty assembly file")
             return ValidationResult(True, [], self.warnings)
-        
+
         # Auto-detect architecture if not specified
         arch = self._detect_architecture(content)
-        
+
         # Validate based on architecture
         if arch == "wasm":
             issues = self._validate_wasm(content)
@@ -141,19 +141,19 @@ class ASMValidator(BaseValidator):
             issues = self._validate_arm(content)
         else:
             issues = self._validate_x86(content)
-        
+
         # Convert issues to errors/warnings
         for code, msg, line in issues:
             if self.strict:
                 self.add_error(code, msg, line)
             else:
                 self.add_warning(code, msg, line)
-        
+
         valid = len(self.errors) == 0
         return ValidationResult(valid, self.errors, self.warnings)
 
 
-def main():
+def main() -> int:
     """CLI entry point."""
     import argparse
     parser = argparse.ArgumentParser(description="STUNIR ASM Validator")

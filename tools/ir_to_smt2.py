@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
-# STUNIR: minimal deterministic SMT2 codegen (portable)
+"""Generate minimal deterministic SMT2 outputs from an IR manifest."""
 from __future__ import annotations
 import argparse, json, hashlib
 from pathlib import Path
+from typing import Any
+
 def sha256_bytes(b: bytes) -> str:
+    """Compute a SHA-256 digest for bytes."""
     return hashlib.sha256(b).hexdigest()
-def canonical_json_bytes(obj) -> bytes:
+
+def canonical_json_bytes(obj: Any) -> bytes:
+    """Serialize an object to canonical JSON bytes with a trailing newline."""
     return (json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + '\n').encode('utf-8')
-def write_text(p: Path, s: str):
+
+def write_text(p: Path, s: str) -> None:
+    """Write text to a file path, creating parent directories as needed."""
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(s, encoding='utf-8', newline='\n')
-def main():
+
+def main() -> None:
+    """Emit a minimal SMT2 problem from an IR manifest."""
     ap = argparse.ArgumentParser()
     ap.add_argument('--variant', required=True)
     ap.add_argument('--ir-manifest', required=True)

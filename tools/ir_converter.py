@@ -229,10 +229,10 @@ def save_ir(ir_data: Dict[str, Any], output_path: Path) -> None:
         json.dump(ir_data, f, indent=2, sort_keys=False)
 
 
-def main():
+def main() -> None:
     """
     Command-line interface for IR conversion.
-    
+
     Usage:
         python ir_converter.py <input_ir.json> <output_flat_ir.json>
     """

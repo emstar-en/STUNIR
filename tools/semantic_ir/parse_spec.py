@@ -15,7 +15,7 @@ from .parser import SpecParser
 from .types import ParserOptions
 
 
-def main():
+def main() -> int:
     """Main CLI entrypoint."""
     parser = argparse.ArgumentParser(
         description="Parse specification files to Semantic IR",

@@ -16,7 +16,8 @@ Example usage:
     from tools.security import validate_path, run_command, SecurityError
     
     # Validate a path before use
-    safe_path = validate_path(user_input, base_dir="/home/ubuntu/stunir_repo")
+    from pathlib import Path
+    safe_path = validate_path(user_input, base_dir=str(Path.home() / "stunir_repo"))
     
     # Run a command safely
     result = run_command(["ls", "-la", str(safe_path)])

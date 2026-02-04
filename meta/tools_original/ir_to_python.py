@@ -28,8 +28,7 @@ def load_ir_manifest(path: Path) -> dict:
 
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding='utf-8', newline='
-')
+    path.write_text(text, encoding='utf-8', newline='\n')
 
 
 def gen_runtime_py() -> str:

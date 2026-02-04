@@ -19,6 +19,13 @@ from .types import (
     Architecture,
     Endianness,
     ArchConfig,
+    IRStatement,
+    IRParameter,
+    IRFunction,
+    IRTypeField,
+    IRType,
+    IRModule,
+    GeneratedFile,
 )
 
 __all__ = [
@@ -33,4 +40,11 @@ __all__ = [
     "Architecture",
     "Endianness",
     "ArchConfig",
+    "IRStatement",
+    "IRParameter",
+    "IRFunction",
+    "IRTypeField",
+    "IRType",
+    "IRModule",
+    "GeneratedFile",
 ]

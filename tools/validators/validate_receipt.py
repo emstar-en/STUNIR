@@ -11,6 +11,7 @@ Usage:
 import json
 import sys
 import hashlib
+from typing import Any, Dict, List, Tuple
 
 # Receipt Schema definitions
 RECEIPT_SCHEMAS = {
@@ -24,19 +25,19 @@ RECEIPT_SCHEMAS = {
     }
 }
 
-def canonical_json(data):
+def canonical_json(data: Any) -> str:
     """Generate canonical JSON output."""
     return json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
 
-def compute_sha256(data):
+def compute_sha256(data: Any) -> str:
     """Compute SHA-256 hash."""
     if isinstance(data, str):
         data = data.encode('utf-8')
     return hashlib.sha256(data).hexdigest()
 
-def validate_receipt(receipt_data, strict=False):
+def validate_receipt(receipt_data: Dict[str, Any], strict: bool = False) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
     """Validate receipt data against schema.
-    
+
     Returns:
         tuple: (is_valid, errors, warnings, metadata)
     """
@@ -97,11 +98,12 @@ def validate_receipt(receipt_data, strict=False):
     # Compute content hash
     content_hash = compute_sha256(canonical_json(receipt_data))
     metadata['content_hash'] = content_hash
-    
+
     is_valid = len(errors) == 0
     return is_valid, errors, warnings, metadata
 
-def main():
+def main() -> None:
+    """Validate a receipt JSON file via CLI and print results."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <receipt.json> [--strict]", file=sys.stderr)
         print("\nSTUNIR Receipt Validator - Validates receipt files.", file=sys.stderr)

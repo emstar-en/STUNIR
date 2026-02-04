@@ -6,6 +6,9 @@ This ensures consistency and speeds up implementation.
 import os
 from pathlib import Path
 
+# Get project root relative to this script
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+
 # Emitter categories and their implementations
 EMITTERS = {
     "core": [
@@ -232,7 +235,7 @@ def emit_{snake_name}(
     return emitter.emit(ir_module)
 '''
 
-def generate_emitter(category: str, snake_name: str, class_name: str, description: str):
+def generate_emitter(category: str, snake_name: str, class_name: str, description: str) -> None:
     """Generate a single emitter file."""
     
     # Determine file extension and target language
@@ -275,9 +278,9 @@ def generate_emitter(category: str, snake_name: str, class_name: str, descriptio
         target_lang=target_lang,
         output_format=output_format
     )
-    
+
     # Write file
-    output_dir = Path("/home/ubuntu/stunir_repo/tools/semantic_ir/emitters") / category
+    output_dir = PROJECT_ROOT / "tools" / "semantic_ir" / "emitters" / category
     output_dir.mkdir(parents=True, exist_ok=True)
     
     output_file = output_dir / f"{snake_name}.py"
@@ -285,7 +288,7 @@ def generate_emitter(category: str, snake_name: str, class_name: str, descriptio
     
     print(f"✓ Generated {category}/{snake_name}.py")
 
-def main():
+def main() -> None:
     """Generate all emitters."""
     print("Generating STUNIR Semantic IR Emitters...")
     
@@ -298,7 +301,7 @@ def main():
     
     # Generate __init__.py files for each category
     for category in EMITTERS.keys():
-        init_file = Path("/home/ubuntu/stunir_repo/tools/semantic_ir/emitters") / category / "__init__.py"
+        init_file = PROJECT_ROOT / "tools" / "semantic_ir" / "emitters" / category / "__init__.py"
         emitter_list = [e[0] for e in EMITTERS[category]]
         imports = "\n".join([f"from .{e} import {EMITTERS[category][i][1]}Emitter" 
                             for i, e in enumerate(emitter_list)])

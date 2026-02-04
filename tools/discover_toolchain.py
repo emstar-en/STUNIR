@@ -25,12 +25,14 @@ from pathlib import Path
 
 
 def _norm_abs_path(p: str) -> str:
+    """Normalize a path to a forward-slash absolute form."""
     rp = Path(p).resolve()
     s = str(rp)
-    return s.replace('\\\\', '/').replace('\\', '/')
+    return s.replace('\\', '/')
 
 
 def _sha256_file(path: str) -> str:
+    """Compute the SHA-256 digest for a file path."""
     h = hashlib.sha256()
     with open(path, 'rb') as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b''):
@@ -39,6 +41,7 @@ def _sha256_file(path: str) -> str:
 
 
 def _run_probe(exe: str, args: list[str]) -> str:
+    """Run a version probe command and return combined output."""
     try:
         p = subprocess.run(
             [exe, *args],
@@ -59,6 +62,7 @@ def _run_probe(exe: str, args: list[str]) -> str:
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
+    """Read a boolean environment variable with a default."""
     v = os.environ.get(name)
     if v is None:
         return default
@@ -67,6 +71,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 
 def _which(name: str) -> str | None:
+    """Return the resolved path to an executable on PATH."""
     p = shutil.which(name)
     if not p:
         return None
@@ -74,6 +79,7 @@ def _which(name: str) -> str | None:
 
 
 def _pick_exe(env_override: str | None, fallbacks: list[str]) -> str | None:
+    """Select an executable path from env override or fallbacks."""
     if env_override:
         v = os.environ.get(env_override)
         if v and Path(v).exists():
@@ -86,6 +92,7 @@ def _pick_exe(env_override: str | None, fallbacks: list[str]) -> str | None:
 
 
 def _tool_record(exe_path: str, version_args: list[str]) -> dict:
+    """Build a tool record with path, hash, and version string."""
     return {
         "path": _norm_abs_path(exe_path),
         "sha256": _sha256_file(exe_path),
@@ -95,6 +102,7 @@ def _tool_record(exe_path: str, version_args: list[str]) -> dict:
 
 
 def _find_substrate_dir_from_bash(bash_path: str) -> list[Path]:
+    """Locate directories likely containing POSIX utilities near bash."""
     bash_dir = Path(bash_path).resolve().parent
     candidates = [
         bash_dir,
@@ -114,6 +122,7 @@ def _find_substrate_dir_from_bash(bash_path: str) -> list[Path]:
 
 
 def main() -> int:
+    """Discover toolchain binaries and write a lockfile."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="build/local_toolchain.lock.json")
     ap.add_argument("--allowlist-json", default="spec/env/host_env_allowlist.windows.discovery.json")

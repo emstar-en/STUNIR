@@ -12,7 +12,9 @@ pub fn scan_directory(root: &str) -> Result<Vec<SpecModule>, std::io::Error> {
             if let Some(ext) = path.extension() {
                 if ext == "stunir" {
                     let content = fs::read_to_string(&path)?;
-                    let name = path.file_stem().unwrap().to_string_lossy().to_string();
+                    let name = path.file_stem()
+                        .map(|s| s.to_string_lossy().to_string())
+                        .unwrap_or_else(|| "unknown".to_string());
                     
                     modules.push(SpecModule {
                         name,

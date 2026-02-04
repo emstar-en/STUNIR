@@ -15,7 +15,7 @@ Attributes:
 
 from typing import Final
 
-__version__: Final[str] = "1.0.0"
+__version__: Final[str] = "0.8.9"
 __author__: Final[str] = "STUNIR Team"
 __license__: Final[str] = "MIT"
 

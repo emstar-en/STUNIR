@@ -82,6 +82,7 @@ def verify_manifest(manifest_data, tools_dir=None):
     return is_valid, errors, warnings, stats
 
 def main():
+    """Validate a toolchain manifest from the command line."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <manifest.json> [--tools-dir=<dir>]", file=sys.stderr)
         print("\nSTUNIR Toolchain Manifest Verifier.", file=sys.stderr)

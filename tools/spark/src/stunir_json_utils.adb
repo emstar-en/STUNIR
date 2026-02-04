@@ -167,6 +167,31 @@ package body STUNIR_JSON_Utils is
       end loop;
    end Get_Next_Object;
 
+   --  Helper: Get next string value from JSON array (for type_args)
+   procedure Get_Next_String
+     (JSON_Text : String;
+      Start_Pos : Positive;
+      Str_Start : out Natural;
+      Str_End   : out Natural)
+   is
+      In_String : Boolean := False;
+   begin
+      Str_Start := 0;
+      Str_End := 0;
+
+      for I in Start_Pos .. JSON_Text'Last loop
+         if JSON_Text (I) = '"' then
+            if not In_String then
+               Str_Start := I + 1;
+               In_String := True;
+            else
+               Str_End := I - 1;
+               return;
+            end if;
+         end if;
+      end loop;
+   end Get_Next_String;
+
    --  Parse simple JSON spec into IR Module
    procedure Parse_Spec_JSON
      (JSON_Text : String;
@@ -259,7 +284,7 @@ package body STUNIR_JSON_Utils is
                            while Module.Functions (Func_Idx).Arg_Cnt < Max_Args loop
                               Get_Next_Object (Func_JSON, Param_Pos, Param_Start, Param_End);
                               exit when Param_Start = 0 or Param_End = 0;
-                              
+
                               declare
                                  Param_JSON : constant String := Func_JSON (Param_Start .. Param_End);
                                  Param_Name : constant String := Extract_String_Value (Param_JSON, "name");
@@ -278,11 +303,52 @@ package body STUNIR_JSON_Utils is
                                     end if;
                                  end if;
                               end;
-                              
+
                               Param_Pos := Param_End + 1;
                            end loop;
                         end;
                      end if;
+
+                     -- v0.8.9: Parse type_params for generic functions
+                     declare
+                        Type_Params_Pos : constant Natural := Find_Array (Func_JSON, "type_params");
+                        Func_Idx : constant Positive := Module.Func_Cnt;
+                     begin
+                        if Type_Params_Pos > 0 then
+                           declare
+                              Type_Param_Pos : Natural := Type_Params_Pos + 1;
+                              Type_Param_Start, Type_Param_End : Natural;
+                              Type_Param_Count : Natural := 0;
+                           begin
+                              while Type_Param_Count < Max_Type_Params loop
+                                 Get_Next_Object (Func_JSON, Type_Param_Pos, Type_Param_Start, Type_Param_End);
+                                 exit when Type_Param_Start = 0 or Type_Param_End = 0;
+
+                                 declare
+                                    Type_Param_JSON : constant String := Func_JSON (Type_Param_Start .. Type_Param_End);
+                                    Type_Param_Name : constant String := Extract_String_Value (Type_Param_JSON, "name");
+                                    Type_Param_Constraint : constant String := Extract_String_Value (Type_Param_JSON, "constraint");
+                                 begin
+                                    if Type_Param_Name'Length > 0 then
+                                       Type_Param_Count := Type_Param_Count + 1;
+                                       Module.Functions (Func_Idx).Type_Params (Type_Param_Count).Name :=
+                                         Name_Strings.To_Bounded_String (Type_Param_Name);
+                                       if Type_Param_Constraint'Length > 0 and Type_Param_Constraint'Length <= Max_Type_Length then
+                                          Module.Functions (Func_Idx).Type_Params (Type_Param_Count).Constraint :=
+                                            Type_Strings.To_Bounded_String (Type_Param_Constraint);
+                                       end if;
+                                    end if;
+                                 end;
+
+                                 Type_Param_Pos := Type_Param_End + 1;
+                              end loop;
+
+                              Module.Functions (Func_Idx).Type_Param_Cnt := Type_Param_Count;
+                              Put_Line ("[INFO] Function " & Func_Name & " has " &
+                                        Natural'Image(Type_Param_Count) & " type parameter(s)");
+                           end;
+                        end if;
+                     end;
                      
                 -- v0.8.2: Parse body statements with recursive multi-level nesting support
                 if Body_Pos > 0 then
@@ -584,6 +650,75 @@ package body STUNIR_JSON_Utils is
                                               end;
                                            end if;
                                         end;
+                                     elsif Stmt_Type = "generic_call" then
+                                        -- v0.8.9: Generic function call with type arguments
+                                        Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_Generic_Call;
+                                        declare
+                                           Target_Str : constant String := Extract_String_Value (Stmt_JSON, "target");
+                                           Value_Str : constant String := Extract_String_Value (Stmt_JSON, "value");
+                                           Type_Args_Pos : constant Natural := Find_Array (Stmt_JSON, "type_args");
+                                        begin
+                                           if Target_Str'Length > 0 and Target_Str'Length <= Max_Name_Length then
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Target :=
+                                                Name_Strings.To_Bounded_String (Target_Str);
+                                           end if;
+                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Value :=
+                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                           end if;
+                                           -- Parse type arguments array
+                                           if Type_Args_Pos > 0 then
+                                              declare
+                                                 Type_Arg_Pos : Natural := Type_Args_Pos + 1;
+                                                 Type_Arg_Start, Type_Arg_End : Natural;
+                                                 Type_Arg_Count : Natural := 0;
+                                              begin
+                                                 while Type_Arg_Count < Max_Type_Args loop
+                                                    Get_Next_String (Stmt_JSON, Type_Arg_Pos, Type_Arg_Start, Type_Arg_End);
+                                                    exit when Type_Arg_Start = 0 or Type_Arg_End = 0;
+
+                                                    Type_Arg_Count := Type_Arg_Count + 1;
+                                                    declare
+                                                       Type_Arg_Str : constant String := Stmt_JSON (Type_Arg_Start .. Type_Arg_End);
+                                                    begin
+                                                       if Type_Arg_Str'Length > 0 and Type_Arg_Str'Length <= Max_Type_Length then
+                                                          Module.Functions (Func_Idx).Statements (Current_Idx).Type_Args (Type_Arg_Count) :=
+                                                            Type_Strings.To_Bounded_String (Type_Arg_Str);
+                                                       end if;
+                                                    end;
+                                                    Type_Arg_Pos := Type_Arg_End + 1;
+                                                 end loop;
+                                                 Module.Functions (Func_Idx).Statements (Current_Idx).Type_Arg_Cnt := Type_Arg_Count;
+                                              end;
+                                           end if;
+                                           Put_Line ("[INFO] Added generic call: target=" & Target_Str &
+                                                     " func=" & Value_Str &
+                                                     " type_args=" & Natural'Image(Module.Functions (Func_Idx).Statements (Current_Idx).Type_Arg_Cnt));
+                                        end;
+                                     elsif Stmt_Type = "type_cast" then
+                                        -- v0.8.9: Type casting operation
+                                        Module.Functions (Func_Idx).Statements (Current_Idx).Kind := Stmt_Type_Cast;
+                                        declare
+                                           Target_Str : constant String := Extract_String_Value (Stmt_JSON, "target");
+                                           Value_Str : constant String := Extract_String_Value (Stmt_JSON, "value");
+                                           Cast_Type_Str : constant String := Extract_String_Value (Stmt_JSON, "cast_type");
+                                        begin
+                                           if Target_Str'Length > 0 and Target_Str'Length <= Max_Name_Length then
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Target :=
+                                                Name_Strings.To_Bounded_String (Target_Str);
+                                           end if;
+                                           if Value_Str'Length > 0 and Value_Str'Length <= Max_Code_Length then
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Value :=
+                                                Code_Buffers.To_Bounded_String (Value_Str);
+                                           end if;
+                                           if Cast_Type_Str'Length > 0 and Cast_Type_Str'Length <= Max_Type_Length then
+                                              Module.Functions (Func_Idx).Statements (Current_Idx).Cast_Type :=
+                                                Type_Strings.To_Bounded_String (Cast_Type_Str);
+                                           end if;
+                                           Put_Line ("[INFO] Added type cast: target=" & Target_Str &
+                                                     " value=" & Value_Str &
+                                                     " cast_type=" & Cast_Type_Str);
+                                        end;
                                      else
                                         -- Unknown statement type - keep as Stmt_Nop
                                         null;
@@ -606,7 +741,70 @@ package body STUNIR_JSON_Utils is
          end;
       end if;
 
-      Put_Line ("[INFO] Parsed module: " & Name_Strings.To_String (Module.Module_Name) & 
+      -- v0.8.9: Parse generic_instantiations at module level
+      declare
+         Generic_Insts_Pos : constant Natural := Find_Array (JSON_Text, "generic_instantiations");
+      begin
+         if Generic_Insts_Pos > 0 then
+            declare
+               Inst_Pos : Natural := Generic_Insts_Pos + 1;
+               Inst_Start, Inst_End : Natural;
+            begin
+               while Module.Generic_Inst_Cnt < Max_Generic_Insts loop
+                  Get_Next_Object (JSON_Text, Inst_Pos, Inst_Start, Inst_End);
+                  exit when Inst_Start = 0 or Inst_End = 0;
+
+                  declare
+                     Inst_JSON : constant String := JSON_Text (Inst_Start .. Inst_End);
+                     Inst_Name : constant String := Extract_String_Value (Inst_JSON, "name");
+                     Base_Type_Str : constant String := Extract_String_Value (Inst_JSON, "base_type");
+                     Type_Args_Pos : constant Natural := Find_Array (Inst_JSON, "type_args");
+                     Type_Arg_Count : Natural := 0;
+                  begin
+                     if Inst_Name'Length > 0 and Base_Type_Str'Length > 0 then
+                        Module.Generic_Inst_Cnt := Module.Generic_Inst_Cnt + 1;
+                        Module.Generic_Insts (Module.Generic_Inst_Cnt).Name :=
+                          Name_Strings.To_Bounded_String (Inst_Name);
+                        Module.Generic_Insts (Module.Generic_Inst_Cnt).Base_Type :=
+                          Name_Strings.To_Bounded_String (Base_Type_Str);
+
+                        -- Parse type arguments
+                        if Type_Args_Pos > 0 then
+                           declare
+                              Type_Arg_Pos : Natural := Type_Args_Pos + 1;
+                              Type_Arg_Start, Type_Arg_End : Natural;
+                           begin
+                              while Type_Arg_Count < Max_Type_Args loop
+                                 Get_Next_String (JSON_Text, Type_Arg_Pos, Type_Arg_Start, Type_Arg_End);
+                                 exit when Type_Arg_Start = 0 or Type_Arg_End = 0;
+
+                                 Type_Arg_Count := Type_Arg_Count + 1;
+                                 declare
+                                    Type_Arg_Str : constant String := JSON_Text (Type_Arg_Start .. Type_Arg_End);
+                                 begin
+                                    if Type_Arg_Str'Length > 0 and Type_Arg_Str'Length <= Max_Type_Length then
+                                       Module.Generic_Insts (Module.Generic_Inst_Cnt).Type_Args (Type_Arg_Count) :=
+                                         Type_Strings.To_Bounded_String (Type_Arg_Str);
+                                    end if;
+                                 end;
+                                 Type_Arg_Pos := Type_Arg_End + 1;
+                              end loop;
+                              Module.Generic_Insts (Module.Generic_Inst_Cnt).Type_Arg_Cnt := Type_Arg_Count;
+                           end;
+                        end if;
+
+                        Put_Line ("[INFO] Parsed generic instantiation: " & Inst_Name &
+                                  " -> " & Base_Type_Str & "<" & Natural'Image(Type_Arg_Count) & " type args>");
+                     end if;
+                  end;
+
+                  Inst_Pos := Inst_End + 1;
+               end loop;
+            end;
+         end if;
+      end;
+
+      Put_Line ("[INFO] Parsed module: " & Name_Strings.To_String (Module.Module_Name) &
                 " with " & Natural'Image (Module.Func_Cnt) & " function(s)");
       Status := Success;
 

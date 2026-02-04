@@ -34,7 +34,7 @@ class DO331Wrapper:
             search_paths = [
                 Path(__file__).parent / "bin" / "do331_main",
                 Path(__file__).parent.parent.parent / "bin" / "do331_main",
-                Path("/home/ubuntu/stunir_repo/tools/do331/bin/do331_main"),
+                Path(__file__).parent.parent.parent.parent / "tools" / "do331" / "bin" / "do331_main",
             ]
             for p in search_paths:
                 if p.exists():

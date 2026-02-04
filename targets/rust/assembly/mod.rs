@@ -3,9 +3,24 @@
 //! Supports: ARM, ARM64, x86, x86_64, RISC-V, MIPS, AVR
 
 use crate::types::*;
+use std::fmt;
 
 pub mod arm;
 pub mod x86;
+
+/// Error type for unsupported architectures
+#[derive(Debug)]
+pub struct UnsupportedArchitectureError {
+    pub arch: Architecture,
+}
+
+impl fmt::Display for UnsupportedArchitectureError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Unsupported architecture: {:?}", self.arch)
+    }
+}
+
+impl std::error::Error for UnsupportedArchitectureError {}
 
 /// Assembly emitter trait
 pub trait AssemblyEmitter {
@@ -16,10 +31,13 @@ pub trait AssemblyEmitter {
 }
 
 /// Get emitter for architecture
-pub fn get_emitter(arch: Architecture) -> Box<dyn AssemblyEmitter> {
+///
+/// # Errors
+/// Returns `UnsupportedArchitectureError` if the architecture is not supported
+pub fn get_emitter(arch: Architecture) -> Result<Box<dyn AssemblyEmitter>, UnsupportedArchitectureError> {
     match arch {
-        Architecture::ARM | Architecture::ARM64 => Box::new(arm::ARMEmitter::new(arch)),
-        Architecture::X86 | Architecture::X86_64 => Box::new(x86::X86Emitter::new(arch)),
-        _ => panic!("Unsupported architecture: {}", arch),
+        Architecture::ARM | Architecture::ARM64 => Ok(Box::new(arm::ARMEmitter::new(arch))),
+        Architecture::X86 | Architecture::X86_64 => Ok(Box::new(x86::X86Emitter::new(arch))),
+        _ => Err(UnsupportedArchitectureError { arch }),
     }
 }

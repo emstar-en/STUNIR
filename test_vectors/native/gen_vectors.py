@@ -15,15 +15,15 @@ from base import (
     compute_sha256,
     DEFAULT_EPOCH
 )
-from typing import Dict, List
+from typing import Dict, List, Any
 
 
 class NativeTestVectorGenerator(BaseTestVectorGenerator):
     """Generator for native tool test vectors."""
-    
-    def _generate_vectors(self) -> List[Dict]:
+
+    def _generate_vectors(self) -> List[Dict[str, Any]]:
         """Generate native tool test vectors."""
-        vectors = []
+        vectors: List[Dict[str, Any]] = []
         
         # Test 1: Haskell native tool manifest generation
         vectors.append(self.create_vector(
@@ -126,7 +126,7 @@ class NativeTestVectorGenerator(BaseTestVectorGenerator):
         return vectors
 
 
-def main():
+def main() -> int:
     """Generate native test vectors."""
     import argparse
     parser = argparse.ArgumentParser(description='Generate native test vectors')

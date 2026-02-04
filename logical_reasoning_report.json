@@ -1,0 +1,248 @@
+{
+  "metadata": {
+    "analysis_type": "Logical Reasoning Analysis",
+    "version": "2.0.0",
+    "methods": [
+      "deductive",
+      "anfis",
+      "fuzzy_inference"
+    ]
+  },
+  "summary": {
+    "total_files_analyzed": 1316,
+    "total_deductive_conclusions": 0,
+    "anfis_r_squared": 0,
+    "anfis_rmse": 0.0
+  },
+  "deductive_analysis": {
+    "conclusions": [],
+    "statistics": {
+      "total_rules": 12,
+      "total_conclusions": 0,
+      "by_severity": {
+        "error": 0,
+        "warning": 0,
+        "info": 0,
+        "debug": 0
+      },
+      "by_category": {
+        "ir_format": 0,
+        "code_generation": 0,
+        "security": 0,
+        "version_consistency": 0,
+        "naming": 0,
+        "documentation": 0
+      }
+    }
+  },
+  "anfis_model": {
+    "training_history": {
+      "epochs_trained": 16,
+      "final_train_mse": 0.0,
+      "final_val_mse": 0.0,
+      "best_val_mse": 0.0
+    },
+    "performance_metrics": {
+      "mse": 0.0,
+      "rmse": 0.0,
+      "mae": 0.0,
+      "r2": 0
+    },
+    "fuzzy_rules": [
+      "Rule 1: IF x1 is Gaussian(c=0.27, \u03c3=0.28) AND x2 is Gaussian(c=-0.86, \u03c3=0.75) AND x3 is Gaussian(c=0.70, \u03c3=0.75) AND x4 is Gaussian(c=0.07, \u03c3=0.47) AND x5 is Gaussian(c=0.29, \u03c3=0.72) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 2: IF x1 is Gaussian(c=-0.89, \u03c3=0.43) AND x2 is Gaussian(c=-0.52, \u03c3=0.50) AND x3 is Gaussian(c=-0.70, \u03c3=0.40) AND x4 is Gaussian(c=0.26, \u03c3=0.51) AND x5 is Gaussian(c=-0.66, \u03c3=0.46) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 3: IF x1 is Gaussian(c=-0.29, \u03c3=0.50) AND x2 is Gaussian(c=0.15, \u03c3=0.72) AND x3 is Gaussian(c=0.30, \u03c3=0.53) AND x4 is Gaussian(c=0.32, \u03c3=0.30) AND x5 is Gaussian(c=-0.95, \u03c3=0.76) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 4: IF x1 is Gaussian(c=-0.27, \u03c3=0.58) AND x2 is Gaussian(c=0.96, \u03c3=0.35) AND x3 is Gaussian(c=0.53, \u03c3=0.40) AND x4 is Gaussian(c=0.66, \u03c3=0.42) AND x5 is Gaussian(c=0.22, \u03c3=0.50) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 5: IF x1 is Gaussian(c=0.77, \u03c3=0.25) AND x2 is Gaussian(c=-0.08, \u03c3=0.70) AND x3 is Gaussian(c=-0.63, \u03c3=0.45) AND x4 is Gaussian(c=0.93, \u03c3=0.54) AND x5 is Gaussian(c=0.30, \u03c3=0.66) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 6: IF x1 is Gaussian(c=-0.31, \u03c3=0.51) AND x2 is Gaussian(c=-0.47, \u03c3=0.30) AND x3 is Gaussian(c=0.51, \u03c3=0.71) AND x4 is Gaussian(c=-0.89, \u03c3=0.64) AND x5 is Gaussian(c=0.65, \u03c3=0.44) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 7: IF x1 is Gaussian(c=-0.87, \u03c3=0.47) AND x2 is Gaussian(c=-0.93, \u03c3=0.20) AND x3 is Gaussian(c=-0.06, \u03c3=0.31) AND x4 is Gaussian(c=0.61, \u03c3=0.67) AND x5 is Gaussian(c=0.25, \u03c3=0.47) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 8: IF x1 is Gaussian(c=0.58, \u03c3=0.64) AND x2 is Gaussian(c=-0.37, \u03c3=0.44) AND x3 is Gaussian(c=0.50, \u03c3=0.66) AND x4 is Gaussian(c=-0.30, \u03c3=0.73) AND x5 is Gaussian(c=-0.61, \u03c3=0.22) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 9: IF x1 is Gaussian(c=0.67, \u03c3=0.25) AND x2 is Gaussian(c=0.75, \u03c3=0.26) AND x3 is Gaussian(c=0.40, \u03c3=0.39) AND x4 is Gaussian(c=0.36, \u03c3=0.59) AND x5 is Gaussian(c=0.02, \u03c3=0.30) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 10: IF x1 is Gaussian(c=0.78, \u03c3=0.23) AND x2 is Gaussian(c=-0.71, \u03c3=0.76) AND x3 is Gaussian(c=-1.00, \u03c3=0.66) AND x4 is Gaussian(c=0.87, \u03c3=0.31) AND x5 is Gaussian(c=0.78, \u03c3=0.33) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 11: IF x1 is Gaussian(c=-0.05, \u03c3=0.29) AND x2 is Gaussian(c=0.36, \u03c3=0.52) AND x3 is Gaussian(c=-0.86, \u03c3=0.51) AND x4 is Gaussian(c=-0.95, \u03c3=0.52) AND x5 is Gaussian(c=-0.02, \u03c3=0.31) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00",
+      "Rule 12: IF x1 is Gaussian(c=0.61, \u03c3=0.68) AND x2 is Gaussian(c=-0.85, \u03c3=0.79) AND x3 is Gaussian(c=0.19, \u03c3=0.79) AND x4 is Gaussian(c=0.97, \u03c3=0.33) AND x5 is Gaussian(c=0.99, \u03c3=0.32) THEN y = 0.00*x1 + 0.00*x2 + 0.00*x3 + 0.00*x4 + 0.00*x5 + 0.00"
+    ]
+  },
+  "file_metrics": [
+    {
+      "file": "unknown",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": ".git-cliff.toml",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": ".stunir_progress.json",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "CHANGELOG.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "comprehensive_analysis.py",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "COMPREHENSIVE_GAP_ANALYSIS_v0.9.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "pyproject.toml",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "RECOVERY_STATUS.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "RELEASE_NOTES.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "V0.9_RECOVERY_PLAN.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "validate_release.py",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docker\\README.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\API_REFERENCE.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\API_REFERENCE_v1.0.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\CLI_STANDARDIZATION.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\DEPLOYMENT.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\FAQ.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\GLOSSARY.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\HASKELL_PIPELINE_STATUS.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    },
+    {
+      "file": "docs\\MIGRATION_GUIDE.md",
+      "complexity": 0.0,
+      "test_coverage": 0.0,
+      "todo_density": 0.0,
+      "unwrap_ratio": 0.0,
+      "doc_coverage": 0.0,
+      "issue_density": 0.0
+    }
+  ]
+}

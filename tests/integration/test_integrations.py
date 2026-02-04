@@ -183,7 +183,8 @@ class TestPackageIntegration(unittest.TestCase):
     
     def test_pip_project_detection(self):
         """Test pip project detection."""
-        pip = PipIntegration('/home/ubuntu/stunir_repo')
+        repo_root = Path(__file__).parent.parent.parent
+        pip = PipIntegration(str(repo_root))
         # We just created pyproject.toml
         self.assertTrue(pip.has_pyproject())
 

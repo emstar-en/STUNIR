@@ -12,6 +12,7 @@ import json
 import sys
 import hashlib
 import os
+from typing import Any, Dict, Optional
 
 # Add parent directory for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -22,21 +23,21 @@ try:
 except ImportError:
     DCBOR_AVAILABLE = False
 
-def canonical_json(data):
+def canonical_json(data: Any) -> str:
     """Generate canonical JSON output."""
     return json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
 
-def compute_sha256(data):
+def compute_sha256(data: Any) -> str:
     """Compute SHA-256 hash."""
     if isinstance(data, str):
         data = data.encode('utf-8')
     return hashlib.sha256(data).hexdigest()
 
-def serialize_to_json(ir_data):
+def serialize_to_json(ir_data: Any) -> bytes:
     """Serialize IR to canonical JSON bytes."""
     return canonical_json(ir_data).encode('utf-8')
 
-def serialize_to_dcbor(ir_data):
+def serialize_to_dcbor(ir_data: Any) -> bytes:
     """Serialize IR to dCBOR bytes."""
     if DCBOR_AVAILABLE:
         return encode(ir_data, float_policy=FloatPolicy.FLOAT64_FIXED)
@@ -44,10 +45,10 @@ def serialize_to_dcbor(ir_data):
         # Fallback to canonical JSON
         return serialize_to_json(ir_data)
 
-def parse_args(argv):
+def parse_args(argv: list[str]) -> Dict[str, Optional[str]]:
     """Parse command line arguments."""
     args = {'format': 'json', 'output': None, 'input': None}
-    
+
     for arg in argv[1:]:
         if arg.startswith('--format='):
             args['format'] = arg.split('=', 1)[1]
@@ -55,10 +56,10 @@ def parse_args(argv):
             args['output'] = arg.split('=', 1)[1]
         elif not arg.startswith('--'):
             args['input'] = arg
-    
+
     return args
 
-def main():
+def main() -> None:
     args = parse_args(sys.argv)
     
     if not args['input']:

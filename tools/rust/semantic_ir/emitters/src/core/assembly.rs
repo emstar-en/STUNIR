@@ -68,26 +68,26 @@ impl AssemblyEmitter {
         let mut content = String::new();
 
         // Header comment
-        writeln!(content, "; STUNIR Generated Assembly").unwrap();
-        writeln!(content, "; DO-178C Level A Compliant").unwrap();
-        writeln!(content, "; Architecture: {:?}", self.config.architecture).unwrap();
-        writeln!(content, "; Syntax: {:?}\n", self.config.syntax).unwrap();
+        writeln!(content, "; STUNIR Generated Assembly")?;
+        writeln!(content, "; DO-178C Level A Compliant")?;
+        writeln!(content, "; Architecture: {:?}", self.config.architecture)?;
+        writeln!(content, "; Syntax: {:?}\n", self.config.syntax)?;
 
         // Directives
         self.generate_directives(&mut content)?;
 
         // Data section
-        writeln!(content, ".section .data").unwrap();
-        writeln!(content, "    ; Data section\n").unwrap();
+        writeln!(content, ".section .data")?;
+        writeln!(content, "    ; Data section\n")?;
 
         // Text section
-        writeln!(content, ".section .text").unwrap();
-        writeln!(content, ".global _start\n").unwrap();
+        writeln!(content, ".section .text")?;
+        writeln!(content, ".global _start\n")?;
 
         // Functions
         for function in &ir_module.functions {
             self.generate_function(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         Ok(content)
@@ -97,20 +97,20 @@ impl AssemblyEmitter {
     fn generate_directives(&self, content: &mut String) -> Result<(), EmitterError> {
         match self.config.architecture {
             Architecture::X86 => {
-                writeln!(content, ".arch i386").unwrap();
+                writeln!(content, ".arch i386")?;
             }
             Architecture::X86_64 => {
-                writeln!(content, ".arch x86-64").unwrap();
+                writeln!(content, ".arch x86-64")?;
             }
             Architecture::ARM => {
-                writeln!(content, ".arch armv7-a").unwrap();
+                writeln!(content, ".arch armv7-a")?;
             }
             Architecture::ARM64 => {
-                writeln!(content, ".arch armv8-a").unwrap();
+                writeln!(content, ".arch armv8-a")?;
             }
             _ => {}
         }
-        writeln!(content).unwrap();
+        writeln!(content)?;
         Ok(())
     }
 
@@ -121,11 +121,11 @@ impl AssemblyEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "; {}", doc).unwrap();
+            writeln!(content, "; {}", doc)?;
         }
 
-        writeln!(content, ".global {}", function.name).unwrap();
-        writeln!(content, "{}:", function.name).unwrap();
+        writeln!(content, ".global {}", function.name)?;
+        writeln!(content, "{}:", function.name)?;
 
         // Function prologue
         self.generate_prologue(content)?;
@@ -143,33 +143,33 @@ impl AssemblyEmitter {
 
     /// Generate function prologue
     fn generate_prologue(&self, content: &mut String) -> Result<(), EmitterError> {
-        writeln!(content, "    ; Prologue").unwrap();
+        writeln!(content, "    ; Prologue")?;
         match self.config.architecture {
             Architecture::X86 => {
                 if self.config.syntax == AssemblySyntax::Intel {
-                    writeln!(content, "    push ebp").unwrap();
-                    writeln!(content, "    mov ebp, esp").unwrap();
+                    writeln!(content, "    push ebp")?;
+                    writeln!(content, "    mov ebp, esp")?;
                 } else {
-                    writeln!(content, "    pushl %ebp").unwrap();
-                    writeln!(content, "    movl %esp, %ebp").unwrap();
+                    writeln!(content, "    pushl %ebp")?;
+                    writeln!(content, "    movl %esp, %ebp")?;
                 }
             }
             Architecture::X86_64 => {
                 if self.config.syntax == AssemblySyntax::Intel {
-                    writeln!(content, "    push rbp").unwrap();
-                    writeln!(content, "    mov rbp, rsp").unwrap();
+                    writeln!(content, "    push rbp")?;
+                    writeln!(content, "    mov rbp, rsp")?;
                 } else {
-                    writeln!(content, "    pushq %rbp").unwrap();
-                    writeln!(content, "    movq %rsp, %rbp").unwrap();
+                    writeln!(content, "    pushq %rbp")?;
+                    writeln!(content, "    movq %rsp, %rbp")?;
                 }
             }
             Architecture::ARM => {
-                writeln!(content, "    push {{fp, lr}}").unwrap();
-                writeln!(content, "    mov fp, sp").unwrap();
+                writeln!(content, "    push {{fp, lr}}")?;
+                writeln!(content, "    mov fp, sp")?;
             }
             Architecture::ARM64 => {
-                writeln!(content, "    stp x29, x30, [sp, #-16]!").unwrap();
-                writeln!(content, "    mov x29, sp").unwrap();
+                writeln!(content, "    stp x29, x30, [sp, #-16]!")?;
+                writeln!(content, "    mov x29, sp")?;
             }
             _ => {}
         }
@@ -178,32 +178,32 @@ impl AssemblyEmitter {
 
     /// Generate function epilogue
     fn generate_epilogue(&self, content: &mut String) -> Result<(), EmitterError> {
-        writeln!(content, "    ; Epilogue").unwrap();
+        writeln!(content, "    ; Epilogue")?;
         match self.config.architecture {
             Architecture::X86 => {
                 if self.config.syntax == AssemblySyntax::Intel {
-                    writeln!(content, "    pop ebp").unwrap();
-                    writeln!(content, "    ret").unwrap();
+                    writeln!(content, "    pop ebp")?;
+                    writeln!(content, "    ret")?;
                 } else {
-                    writeln!(content, "    popl %ebp").unwrap();
-                    writeln!(content, "    ret").unwrap();
+                    writeln!(content, "    popl %ebp")?;
+                    writeln!(content, "    ret")?;
                 }
             }
             Architecture::X86_64 => {
                 if self.config.syntax == AssemblySyntax::Intel {
-                    writeln!(content, "    pop rbp").unwrap();
-                    writeln!(content, "    ret").unwrap();
+                    writeln!(content, "    pop rbp")?;
+                    writeln!(content, "    ret")?;
                 } else {
-                    writeln!(content, "    popq %rbp").unwrap();
-                    writeln!(content, "    ret").unwrap();
+                    writeln!(content, "    popq %rbp")?;
+                    writeln!(content, "    ret")?;
                 }
             }
             Architecture::ARM => {
-                writeln!(content, "    pop {{fp, pc}}").unwrap();
+                writeln!(content, "    pop {{fp, pc}}")?;
             }
             Architecture::ARM64 => {
-                writeln!(content, "    ldp x29, x30, [sp], #16").unwrap();
-                writeln!(content, "    ret").unwrap();
+                writeln!(content, "    ldp x29, x30, [sp], #16")?;
+                writeln!(content, "    ret")?;
             }
             _ => {}
         }
@@ -218,31 +218,31 @@ impl AssemblyEmitter {
     ) -> Result<(), EmitterError> {
         match stmt.stmt_type {
             IRStatementType::Nop => {
-                writeln!(content, "    ; nop").unwrap();
-                writeln!(content, "    nop").unwrap();
+                writeln!(content, "    ; nop")?;
+                writeln!(content, "    nop")?;
             }
             IRStatementType::Return => {
-                writeln!(content, "    ; return").unwrap();
+                writeln!(content, "    ; return")?;
                 // Return value should already be in appropriate register
             }
             IRStatementType::Add => {
-                writeln!(content, "    ; add").unwrap();
+                writeln!(content, "    ; add")?;
                 match self.config.architecture {
                     Architecture::X86 | Architecture::X86_64 => {
                         if self.config.syntax == AssemblySyntax::Intel {
-                            writeln!(content, "    add eax, ebx").unwrap();
+                            writeln!(content, "    add eax, ebx")?;
                         } else {
-                            writeln!(content, "    addl %ebx, %eax").unwrap();
+                            writeln!(content, "    addl %ebx, %eax")?;
                         }
                     }
                     Architecture::ARM | Architecture::ARM64 => {
-                        writeln!(content, "    add r0, r0, r1").unwrap();
+                        writeln!(content, "    add r0, r0, r1")?;
                     }
                     _ => {}
                 }
             }
             _ => {
-                writeln!(content, "    ; {:?}", stmt.stmt_type).unwrap();
+                writeln!(content, "    ; {:?}", stmt.stmt_type)?;
             }
         }
         Ok(())

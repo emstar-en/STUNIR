@@ -12,6 +12,7 @@ import json
 import sys
 import hashlib
 import os
+from typing import Any, Dict, List, Tuple
 
 # Add parent directory for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,19 +25,19 @@ IR_SCHEMAS = {
     }
 }
 
-def canonical_json(data):
+def canonical_json(data: Any) -> str:
     """Generate canonical JSON output."""
     return json.dumps(data, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
 
-def compute_sha256(data):
+def compute_sha256(data: Any) -> str:
     """Compute SHA-256 hash."""
     if isinstance(data, str):
         data = data.encode('utf-8')
     return hashlib.sha256(data).hexdigest()
 
-def validate_ir(ir_data, strict=False):
+def validate_ir(ir_data: Dict[str, Any], strict: bool = False) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
     """Validate IR data against schema.
-    
+
     Returns:
         tuple: (is_valid, errors, warnings, metadata)
     """
@@ -99,7 +100,8 @@ def validate_ir(ir_data, strict=False):
     is_valid = len(errors) == 0
     return is_valid, errors, warnings, metadata
 
-def main():
+def main() -> None:
+    """Validate an IR JSON file via CLI and print results."""
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <ir.json> [--strict] [--hash]", file=sys.stderr)
         print("\nSTUNIR IR Validator - Validates IR files against schema.", file=sys.stderr)

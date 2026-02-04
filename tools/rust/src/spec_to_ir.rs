@@ -13,10 +13,10 @@
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
-use stunir_tools::{sha256_json, types::*};
+use stunir_tools::types::*;
 
 #[derive(Parser, Debug)]
 #[command(name = "stunir_spec_to_ir")]
@@ -162,7 +162,7 @@ fn generate_ir(spec: &Value) -> Result<IRModule> {
     let functions = if let Some(funcs) = spec["functions"].as_array() {
         funcs
             .iter()
-            .map(|f| parse_function(f))
+            .map(parse_function)
             .collect::<Result<Vec<_>>>()?        
     } else {
         vec![]
@@ -175,7 +175,9 @@ fn generate_ir(spec: &Value) -> Result<IRModule> {
         docstring,
         type_params: None,
         optimization_level: None,
-        types,
+        types: Some(types),
+        generic_types: None,
+        imports: None,
         generic_instantiations: None,
         functions,
     })
@@ -202,12 +204,12 @@ fn parse_function(func: &Value) -> Result<IRFunction> {
     let args = if let Some(params) = func["params"].as_array() {
         params
             .iter()
-            .map(|p| parse_arg(p))
+            .map(parse_arg)
             .collect::<Result<Vec<_>>>()?        
     } else if let Some(params) = func["parameters"].as_array() {
         params
             .iter()
-            .map(|p| parse_arg(p))
+            .map(parse_arg)
             .collect::<Result<Vec<_>>>()?        
     } else {
         vec![]
@@ -217,7 +219,7 @@ fn parse_function(func: &Value) -> Result<IRFunction> {
     let steps = if let Some(body) = func["body"].as_array() {
         Some(
             body.iter()
-                .map(|s| parse_statement(s))
+                .map(parse_statement)
                 .collect::<Result<Vec<_>>>()?
         )
     } else {
@@ -229,8 +231,10 @@ fn parse_function(func: &Value) -> Result<IRFunction> {
         docstring,
         type_params: None,
         optimization: None,
+        generic_instantiations: None,
+        params: None,
         args,
-        return_type,
+        return_type: Some(return_type),
         steps,
     })
 }
@@ -267,7 +271,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             let then_block = if let Some(then_stmts) = stmt["then"].as_array() {
                 Some(
                     then_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -277,7 +281,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             let else_block = if let Some(else_stmts) = stmt["else"].as_array() {
                 Some(
                     else_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -314,7 +318,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             let body = if let Some(body_stmts) = stmt["body"].as_array() {
                 Some(
                     body_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -359,7 +363,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             let body = if let Some(body_stmts) = stmt["body"].as_array() {
                 Some(
                     body_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -401,7 +405,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                         let value = c["value"].clone();
                         let body = if let Some(body_stmts) = c["body"].as_array() {
                             body_stmts.iter()
-                                .map(|s| parse_statement(s))
+                                .map(parse_statement)
                                 .collect::<Result<Vec<_>>>()?
                         } else {
                             vec![]
@@ -417,7 +421,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             let default = if let Some(default_stmts) = stmt["default"].as_array() {
                 Some(
                     default_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -651,7 +655,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 .or_else(|| stmt["body"].as_array()) {
                 Some(
                     try_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -675,7 +679,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                             .map(|s| s.to_string());
                         let body = if let Some(body_stmts) = c["body"].as_array() {
                             body_stmts.iter()
-                                .map(|s| parse_statement(s))
+                                .map(parse_statement)
                                 .collect::<Result<Vec<_>>>()?
                         } else {
                             vec![]
@@ -692,7 +696,7 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
             let finally_block = if let Some(finally_stmts) = stmt["finally"].as_array() {
                 Some(
                     finally_stmts.iter()
-                        .map(|s| parse_statement(s))
+                        .map(parse_statement)
                         .collect::<Result<Vec<_>>>()?
                 )
             } else {
@@ -748,5 +752,376 @@ fn parse_statement(stmt: &Value) -> Result<IRStep> {
                 ..Default::default()
             })
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_generate_ir_basic_function() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "add",
+                    "parameters": [
+                        {"name": "a", "type": "i32"},
+                        {"name": "b", "type": "i32"}
+                    ],
+                    "return_type": "i32",
+                    "body": [
+                        {"type": "return", "value": "a + b"}
+                    ]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        assert_eq!(ir.kind, "ir");
+        assert_eq!(ir.schema, "stunir_ir_v1");
+        assert_eq!(ir.functions.len(), 1);
+        assert_eq!(ir.functions[0].name, "add");
+    }
+
+    #[test]
+    fn test_generate_ir_with_types() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "types": [
+                    {
+                        "name": "Point",
+                        "kind": "struct",
+                        "fields": [
+                            {"name": "x", "type": "f64"},
+                            {"name": "y", "type": "f64"}
+                        ]
+                    }
+                ],
+                "functions": []
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        assert!(ir.types.is_some());
+        assert_eq!(ir.types.as_ref().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_generate_ir_with_imports() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "imports": [
+                    {"path": "std::collections::HashMap"},
+                    {"path": "serde::Deserialize"}
+                ],
+                "functions": []
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        assert!(ir.imports.is_some());
+        assert_eq!(ir.imports.as_ref().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn test_generate_ir_empty_modules() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": []
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        assert!(ir.functions.is_empty());
+    }
+
+    #[test]
+    fn test_generate_ir_control_flow() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "max",
+                    "parameters": [
+                        {"name": "a", "type": "i32"},
+                        {"name": "b", "type": "i32"}
+                    ],
+                    "return_type": "i32",
+                    "body": [
+                        {
+                            "type": "if",
+                            "condition": "a > b",
+                            "then": [{"type": "return", "value": "a"}],
+                            "else": [{"type": "return", "value": "b"}]
+                        }
+                    ]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        assert!(func.steps.is_some());
+        let steps = func.steps.as_ref().unwrap();
+        assert_eq!(steps[0].op, "if");
+        assert!(steps[0].then_block.is_some());
+        assert!(steps[0].else_block.is_some());
+    }
+
+    #[test]
+    fn test_generate_ir_loops() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "sum",
+                    "parameters": [{"name": "n", "type": "i32"}],
+                    "return_type": "i32",
+                    "body": [
+                        {"type": "var_decl", "name": "total", "var_type": "i32", "init": "0"},
+                        {
+                            "type": "for",
+                            "var": "i",
+                            "start": "0",
+                            "end": "n",
+                            "body": [
+                                {"type": "assign", "target": "total", "value": "total + i"}
+                            ]
+                        },
+                        {"type": "return", "value": "total"}
+                    ]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        let steps = func.steps.as_ref().unwrap();
+        assert_eq!(steps[1].op, "for");
+        assert!(steps[1].body.is_some());
+    }
+
+    #[test]
+    fn test_generate_ir_data_structures() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "test_arrays",
+                    "parameters": [],
+                    "return_type": "void",
+                    "body": [
+                        {"type": "array_new", "target": "arr", "element_type": "i32", "size": "10"},
+                        {"type": "array_set", "array": "arr", "index": "0", "value": "42"},
+                        {"type": "array_get", "target": "x", "array": "arr", "index": "0"}
+                    ]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        let steps = func.steps.as_ref().unwrap();
+        assert_eq!(steps[0].op, "array_new");
+        assert_eq!(steps[1].op, "array_set");
+        assert_eq!(steps[2].op, "array_get");
+    }
+
+    #[test]
+    fn test_generate_ir_exception_handling() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "safe_divide",
+                    "parameters": [
+                        {"name": "a", "type": "i32"},
+                        {"name": "b", "type": "i32"}
+                    ],
+                    "return_type": "i32",
+                    "body": [
+                        {
+                            "type": "try",
+                            "try_block": [
+                                {"type": "return", "value": "a / b"}
+                            ],
+                            "catch_blocks": [
+                                {
+                                    "exception_type": "DivisionByZero",
+                                    "var": "e",
+                                    "body": [
+                                        {"type": "return", "value": "0"}
+                                    ]
+                                }
+                            ],
+                            "finally_block": [
+                                {"type": "call", "function": "cleanup"}
+                            ]
+                        }
+                    ]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        let steps = func.steps.as_ref().unwrap();
+        assert_eq!(steps[0].op, "try");
+        assert!(steps[0].try_block.is_some());
+        assert!(steps[0].catch_blocks.is_some());
+        assert!(steps[0].finally_block.is_some());
+    }
+
+    #[test]
+    fn test_generate_ir_generics() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "identity",
+                    "type_params": [{"name": "T"}],
+                    "parameters": [{"name": "x", "type": "T"}],
+                    "return_type": "T",
+                    "body": [{"type": "return", "value": "x"}]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        assert!(func.type_params.is_some());
+        assert_eq!(func.type_params.as_ref().unwrap().len(), 1);
+        assert_eq!(func.type_params.as_ref().unwrap()[0].name, "T");
+    }
+
+    #[test]
+    fn test_generate_ir_optimization_hints() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "pure_add",
+                    "parameters": [
+                        {"name": "a", "type": "i32"},
+                        {"name": "b", "type": "i32"}
+                    ],
+                    "return_type": "i32",
+                    "optimization": {
+                        "pure": true,
+                        "inline": true,
+                        "const_eval": true
+                    },
+                    "body": [{"type": "return", "value": "a + b"}]
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        assert!(func.optimization.is_some());
+        let opt = func.optimization.as_ref().unwrap();
+        assert_eq!(opt.pure, Some(true));
+        assert_eq!(opt.inline, Some(true));
+        assert_eq!(opt.const_eval, Some(true));
+    }
+
+    #[test]
+    fn test_type_mapping() {
+        assert_eq!(map_type("i32"), "i32");
+        assert_eq!(map_type("i64"), "i64");
+        assert_eq!(map_type("f32"), "f32");
+        assert_eq!(map_type("f64"), "f64");
+        assert_eq!(map_type("bool"), "bool");
+        assert_eq!(map_type("string"), "string");
+        assert_eq!(map_type("void"), "void");
+        assert_eq!(map_type("unknown"), "unknown");
+    }
+
+    #[test]
+    fn test_generate_ir_invalid_spec() {
+        let spec = json!({
+            "kind": "invalid",
+            "schema": "wrong_schema"
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_generate_ir_empty_function() {
+        let spec = json!({
+            "kind": "spec",
+            "schema": "stunir_spec_v1",
+            "modules": [{
+                "name": "test_module",
+                "functions": [{
+                    "name": "empty_func",
+                    "parameters": [],
+                    "return_type": "void",
+                    "body": []
+                }]
+            }]
+        });
+
+        let result = generate_ir(&spec);
+        assert!(result.is_ok());
+
+        let ir = result.unwrap();
+        let func = &ir.functions[0];
+        assert!(func.steps.is_none() || func.steps.as_ref().unwrap().is_empty());
     }
 }

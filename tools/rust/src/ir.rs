@@ -3,7 +3,6 @@
 use crate::types::*;
 use anyhow::{Context, Result};
 use serde_json::Value;
-use std::collections::BTreeMap;
 
 /// Parse IR from JSON
 pub fn parse_ir(json: &Value) -> Result<IRModule> {

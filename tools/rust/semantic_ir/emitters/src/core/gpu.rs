@@ -87,7 +87,7 @@ impl GPUEmitter {
         // Kernel implementations
         for function in &ir_module.functions {
             self.generate_kernel_function(&mut content, function)?;
-            writeln!(content).unwrap();
+            writeln!(content)?;
         }
 
         Ok(content)
@@ -97,21 +97,21 @@ impl GPUEmitter {
     fn generate_platform_headers(&self, content: &mut String) -> Result<(), EmitterError> {
         match self.config.platform {
             GPUPlatform::CUDA => {
-                writeln!(content, "#include <cuda_runtime.h>").unwrap();
-                writeln!(content, "#include <device_launch_parameters.h>\n").unwrap();
+                writeln!(content, "#include <cuda_runtime.h>")?;
+                writeln!(content, "#include <device_launch_parameters.h>\n")?;
             }
             GPUPlatform::OpenCL => {
-                writeln!(content, "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n").unwrap();
+                writeln!(content, "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n")?;
             }
             GPUPlatform::Metal => {
-                writeln!(content, "#include <metal_stdlib>").unwrap();
-                writeln!(content, "using namespace metal;\n").unwrap();
+                writeln!(content, "#include <metal_stdlib>")?;
+                writeln!(content, "using namespace metal;\n")?;
             }
             GPUPlatform::ROCm => {
-                writeln!(content, "#include <hip/hip_runtime.h>\n").unwrap();
+                writeln!(content, "#include <hip/hip_runtime.h>\n")?;
             }
             GPUPlatform::Vulkan => {
-                writeln!(content, "#version 450\n").unwrap();
+                writeln!(content, "#version 450\n")?;
             }
         }
         Ok(())
@@ -124,7 +124,7 @@ impl GPUEmitter {
         function: &IRFunction,
     ) -> Result<(), EmitterError> {
         if let Some(ref doc) = function.docstring {
-            writeln!(content, "/* {} */", doc).unwrap();
+            writeln!(content, "/* {} */", doc)?;
         }
 
         // Platform-specific function qualifiers
@@ -153,14 +153,14 @@ impl GPUEmitter {
             self.generate_statement(content, stmt, 1)?;
         }
 
-        writeln!(content, "}}").unwrap();
+        writeln!(content, "}}")?;
         Ok(())
     }
 
     /// Generate thread indexing code
     fn generate_thread_indexing(&self, content: &mut String) -> Result<(), EmitterError> {
         let indent = self.indent(&self.config.base, 1);
-        writeln!(content, "{}/* Thread indexing */", indent).unwrap();
+        writeln!(content, "{}/* Thread indexing */", indent)?;
 
         match self.config.platform {
             GPUPlatform::CUDA | GPUPlatform::ROCm => {
@@ -168,38 +168,35 @@ impl GPUEmitter {
                     content,
                     "{}int idx = blockIdx.x * blockDim.x + threadIdx.x;",
                     indent
-                )
-                .unwrap();
+                )?;
                 writeln!(
                     content,
                     "{}int idy = blockIdx.y * blockDim.y + threadIdx.y;",
                     indent
-                )
-                .unwrap();
+                )?;
                 writeln!(
                     content,
                     "{}int idz = blockIdx.z * blockDim.z + threadIdx.z;",
                     indent
-                )
-                .unwrap();
+                )?;
             }
             GPUPlatform::OpenCL => {
-                writeln!(content, "{}int idx = get_global_id(0);", indent).unwrap();
-                writeln!(content, "{}int idy = get_global_id(1);", indent).unwrap();
-                writeln!(content, "{}int idz = get_global_id(2);", indent).unwrap();
+                writeln!(content, "{}int idx = get_global_id(0);", indent)?;
+                writeln!(content, "{}int idy = get_global_id(1);", indent)?;
+                writeln!(content, "{}int idz = get_global_id(2);", indent)?;
             }
             GPUPlatform::Metal => {
-                writeln!(content, "{}uint idx = gid.x;", indent).unwrap();
-                writeln!(content, "{}uint idy = gid.y;", indent).unwrap();
-                writeln!(content, "{}uint idz = gid.z;", indent).unwrap();
+                writeln!(content, "{}uint idx = gid.x;", indent)?;
+                writeln!(content, "{}uint idy = gid.y;", indent)?;
+                writeln!(content, "{}uint idz = gid.z;", indent)?;
             }
             GPUPlatform::Vulkan => {
-                writeln!(content, "{}uint idx = gl_GlobalInvocationID.x;", indent).unwrap();
-                writeln!(content, "{}uint idy = gl_GlobalInvocationID.y;", indent).unwrap();
-                writeln!(content, "{}uint idz = gl_GlobalInvocationID.z;", indent).unwrap();
+                writeln!(content, "{}uint idx = gl_GlobalInvocationID.x;", indent)?;
+                writeln!(content, "{}uint idy = gl_GlobalInvocationID.y;", indent)?;
+                writeln!(content, "{}uint idz = gl_GlobalInvocationID.z;", indent)?;
             }
         }
-        writeln!(content).unwrap();
+        writeln!(content)?;
         Ok(())
     }
 
@@ -214,22 +211,22 @@ impl GPUEmitter {
 
         match stmt.stmt_type {
             IRStatementType::Nop => {
-                writeln!(content, "{}/* nop */", indent).unwrap();
+                writeln!(content, "{}/* nop */", indent)?;
             }
             IRStatementType::VarDecl => {
                 let c_type = stmt.data_type.map(map_ir_type_to_c).unwrap_or("int");
                 let var_name = stmt.target.as_deref().unwrap_or("v0");
                 let init = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{} {} = {};", indent, c_type, var_name, init).unwrap();
+                writeln!(content, "{}{} {} = {};", indent, c_type, var_name, init)?;
             }
             IRStatementType::Assign => {
                 let target = stmt.target.as_deref().unwrap_or("v0");
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}{} = {};", indent, target, value).unwrap();
+                writeln!(content, "{}{} = {};", indent, target, value)?;
             }
             IRStatementType::Return => {
                 let value = stmt.value.as_deref().unwrap_or("0");
-                writeln!(content, "{}return {};", indent, value).unwrap();
+                writeln!(content, "{}return {};", indent, value)?;
             }
             IRStatementType::Add
             | IRStatementType::Sub
@@ -245,7 +242,7 @@ impl GPUEmitter {
                     IRStatementType::Div => "/",
                     _ => "+",
                 };
-                writeln!(content, "{}{} = {} {} {};", indent, target, left, op, right).unwrap();
+                writeln!(content, "{}{} = {} {} {};", indent, target, left, op, right)?;
             }
             _ => {
                 writeln!(
@@ -335,7 +332,7 @@ mod tests {
 
     #[test]
     fn test_gpu_emitter_cuda() {
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new()?;
         let base_config = EmitterConfig::new(temp_dir.path(), "test_kernel");
         let config = GPUConfig::new(base_config, GPUPlatform::CUDA);
         let emitter = GPUEmitter::new(config);
@@ -354,7 +351,7 @@ mod tests {
             docstring: None,
         };
 
-        let result = emitter.emit(&ir_module).unwrap();
+        let result = emitter.emit(&ir_module)?;
         assert_eq!(result.status, EmitterStatus::Success);
         assert_eq!(result.files.len(), 1);
     }
