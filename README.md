@@ -203,22 +203,24 @@ gprbuild -P stunir_tools.gpr
 gnatprove -P stunir_tools.gpr --level=2
 ```
 
-### Python Tools (Reference Only)
+### Python Tools (Alternative Pipeline)
 
-⚠️ **Do NOT use Python tools for production!**
+Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a **fully functional alternative** to Ada SPARK:
 
-Python files are for documentation/readability only:
-```bash
-# These are REFERENCE IMPLEMENTATIONS ONLY
-# NOT for production use:
-# tools/spec_to_ir.py
-# tools/ir_to_code.py
-# tools/verify_build.py
-```
+**When to use Python:**
+- ✅ Rapid prototyping and development workflows
+- ✅ Easier to read, understand, and modify
+- ✅ When GNAT/SPARK toolchain is unavailable
+- ✅ CI/CD pipelines where speed matters more than formal verification
+- ✅ Learning and experimentation
+- ✅ Production use cases where formal verification is not required
 
-If you see documentation or examples using Python tools, translate them to SPARK:
-- `tools/spec_to_ir.py` → `precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main`
-- `tools/ir_to_code.py` → `precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main`
+**When to prefer Ada SPARK:**
+- Safety-critical applications requiring DO-178C compliance
+- Production systems requiring formal verification
+- Reproducible builds with maximum determinism
+
+**Both pipelines produce identical IR output** - choose based on your verification and workflow needs.
 
 ## What is STUNIR?
 **STUNIR = Deterministic Multi-Language Code Generation**
@@ -245,12 +247,6 @@ If you want to understand "how STUNIR works", start with:
 * **`scripts/verify.sh`** — Receipt verification (uses SPARK verifier when available)
 * **`docs/verification.md`** — Local vs DSSE verification model
 * **`tools/native/README.md`** — Native verification stages (Rust/Haskell; SPARK-compatible)
-
-### Python Reference Files (Documentation Only)
-
-These files are for reading/understanding only, **NOT** for production use:
-* `tools/spec_to_ir.py` — Reference implementation (readable, NOT for production)
-* `tools/ir_to_code.py` — Reference implementation (readable, NOT for production)
 
 ### Pack/Container Interchange Format
 
@@ -455,9 +451,10 @@ STUNIR's deterministic pipeline is built around **Ada SPARK** as the primary imp
 2. **Source SPARK Tools** (if building from source): `tools/spark/bin/`
    - Same binaries, built from Ada SPARK source via GNAT
 
-3. **Reference Implementations** (documentation only): `tools/*.py`
-   - Python files for readability only
-   - **NOT** used in production pipelines
+3. **Python Implementation** (fully functional alternative): `tools/*.py`
+   - Complete, production-ready Python implementations
+   - Use when SPARK toolchain is unavailable or for rapid development
+   - Produces identical IR output to SPARK tools
 
 ### Polyglot Build System
 The entry point `scripts/build.sh` now implements a **Polyglot Dispatcher** with SPARK priority:
@@ -480,8 +477,6 @@ Epoch selection uses `scripts/build.sh` logic (with Ada SPARK integration where 
 The choice is written to `build/epoch.json`.
 In strict mode, `scripts/build.sh` can forbid non-deterministic epochs; by default the pipeline should not require the user to manually provide an epoch.
 
-**Note:** `tools/epoch.py` exists as a reference implementation only. Production pipelines should use the SPARK-integrated epoch handling in `scripts/build.sh`.
-
 ### IR emission (current)
 This repo currently emits IR using **Ada SPARK** as the primary implementation:
 
@@ -496,10 +491,11 @@ This repo currently emits IR using **Ada SPARK** as the primary implementation:
    - A manifest `receipts/ir_manifest.json` is written containing sha256 for each IR file (and epoch metadata when available)
    - Optional bundle output: `asm/ir_bundle.bin` with `receipts/ir_bundle_manifest.json`
 
-3. **Reference Python Implementation** (documentation only):
+3. **Python Implementation** (alternative):
    - Files: `tools/spec_to_ir.py`, `tools/spec_to_ir_files.py`
-   - Purpose: Readable reference for understanding the algorithm
-   - **NOT** for production use
+   - Complete, production-ready implementation
+   - Use when SPARK toolchain is unavailable or for rapid development
+   - Produces identical IR output to SPARK tools
 #### dCBOR float policy (Ada SPARK implementation)
 
 The **Ada SPARK implementation** handles float encoding with formal verification guarantees:
@@ -507,13 +503,13 @@ The **Ada SPARK implementation** handles float encoding with formal verification
 - Float policy is built into the SPARK type system with SPARK contracts
 - Ensures deterministic encoding with compile-time verification
 
-**Reference Python implementation** (`tools/dcbor.py`) documents the float encoding policy for readability:
+**Python implementation** (`tools/dcbor.py`) provides the float encoding policy:
 Policies:
 * `forbid_floats` — reject any float values.
 * `float64_fixed` — encode floats always as IEEE-754 float64 (deterministic, not "shortest form").
 * `dcbor_shortest` — dCBOR-style numeric reduction and shortest-width float encoding.
 
-Configuration (Python reference only):
+Configuration:
 * Environment: `STUNIR_CBOR_FLOAT_POLICY` (default: `float64_fixed`)
 * CLI: `tools/spec_to_ir_files.py --float-policy` (overrides env)
 
@@ -532,8 +528,6 @@ It writes:
 * `build/provenance.json`
 * `build/provenance.h` (tiny header used by runtime tooling)
 
-**Note:** `tools/gen_provenance.py` exists as a reference implementation only.
-
 ### Receipt emission
 Receipt generation uses the Ada SPARK toolchain when available, with machine-checkable receipts that bind:
 * target path + sha256
@@ -541,8 +535,6 @@ Receipt generation uses the Ada SPARK toolchain when available, with machine-che
 * input files and directory digests
 * tool identity (path + sha256) and argv
 * `receipt_core_id_sha256` (excludes platform noise for stable receipts)
-
-**Note:** `tools/record_receipt.py` exists as a reference implementation only.
 
 ### Optional native tool build
 If a C compiler exists, `scripts/build.sh` builds `tools/prov_emit.c` into `bin/prov_emit` and records a receipt.
@@ -552,7 +544,7 @@ If the toolchain is missing, a receipt still records the skip/requirement status
 `scripts/verify.sh` runs verification using **Ada SPARK verifier** when available:
 * Primary: Ada SPARK verification tools (precompiled or built from source)
 * Fallback: Native verification tools (`stunir-native`)
-* Reference: `python3 -B tools/verify_build.py --repo . --strict` (for documentation)
+* Alternative: `python3 -B tools/verify_build.py --repo . --strict`
 
 **SPARK Verifier** (primary) checks:
 * `build/provenance.json` matches recomputed digests of `spec/` and `asm/`
