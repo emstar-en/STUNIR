@@ -1,0 +1,62 @@
+# STUNIR Emitter Specification: GPU
+# GPU kernel emitter (CUDA/HIP/OpenCL)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: gpu
+description: "GPU kernel emitter"
+output_types:
+  - cuda
+  - hip
+  - opencl
+features:
+  - kernels
+  - grid_block
+extension: cu
+config:
+  Target_Backend: "String"
+  Use_Shared_Memory: "Boolean"
+config_defaults:
+  Target_Backend: "cuda"
+  Use_Shared_Memory: true
+type_map:
+  i32: "int"
+  i64: "long long"
+  f32: "float"
+  f64: "double"
+  bool: "bool"
+  string: "char*"
+ir_fields:
+  required:
+    - functions
+    - kernels
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  GPU kernel code with backend-specific syntax.
+example_input:
+  module: "example"
+  functions:
+    - name: "vector_add"
+      return_type: "void"
+      params:
+        - name: "a"
+          type: "f32*"
+        - name: "b"
+          type: "f32*"
+example_output: |
+  __global__ void vector_add(float* a, float* b) { }
+architectures:
+  - gpu
+notes: |
+  - Emit kernel launch configuration
+  - Support CUDA/HIP/OpenCL backends

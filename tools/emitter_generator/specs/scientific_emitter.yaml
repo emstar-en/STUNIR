@@ -1,0 +1,62 @@
+# STUNIR Emitter Specification: Scientific
+# Scientific computing emitter (MATLAB/Julia/Fortran)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: scientific
+description: "Scientific computing emitter"
+output_types:
+  - matlab
+  - julia
+  - fortran
+features:
+  - arrays
+  - math_lib
+extension: m
+config:
+  Target_Language: "String"
+config_defaults:
+  Target_Language: "matlab"
+type_map:
+  i32: "int"
+  i64: "int64"
+  f32: "single"
+  f64: "double"
+  bool: "logical"
+  string: "string"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Scientific language output with numerical libraries.
+example_input:
+  module: "example"
+  functions:
+    - name: "dot"
+      return_type: "f64"
+      params:
+        - name: "a"
+          type: "f64[]"
+        - name: "b"
+          type: "f64[]"
+example_output: |
+  function y = dot(a, b)
+    y = a' * b;
+  end
+architectures:
+  - any
+notes: |
+  - Emit vectorized operations when possible
+  - Preserve numerical stability

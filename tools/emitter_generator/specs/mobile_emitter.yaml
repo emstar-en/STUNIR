@@ -1,0 +1,55 @@
+# STUNIR Emitter Specification: Mobile
+# Mobile platform emitter (Android/iOS)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: mobile
+description: "Mobile platform emitter"
+output_types:
+  - android
+  - ios
+features:
+  - mobile_ui
+  - platform_bridging
+extension: txt
+config:
+  Target_Platform: "String"
+config_defaults:
+  Target_Platform: "android"
+type_map:
+  i32: "int"
+  i64: "long"
+  f32: "float"
+  f64: "double"
+  bool: "bool"
+  string: "String"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Mobile platform-specific code stubs.
+example_input:
+  module: "example"
+  functions:
+    - name: "main"
+      return_type: "void"
+      params: []
+example_output: |
+  // Android/iOS bridge code
+architectures:
+  - arm
+notes: |
+  - Emit platform-specific wrappers
+  - Keep ABI stable

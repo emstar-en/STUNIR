@@ -1,0 +1,59 @@
+# STUNIR Emitter Specification: Lisp
+# Lisp dialect emitter (Common Lisp, Scheme, Clojure)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: lisp
+description: "Lisp dialects emitter"
+output_types:
+  - common_lisp
+  - scheme
+  - clojure
+features:
+  - s_expressions
+  - macros
+extension: lisp
+config:
+  Dialect: "String"
+config_defaults:
+  Dialect: "common_lisp"
+type_map:
+  i32: "integer"
+  i64: "integer"
+  f32: "float"
+  f64: "float"
+  bool: "boolean"
+  string: "string"
+ir_fields:
+  required:
+    - functions
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Lisp S-expression syntax with selected dialect.
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  (defun add (a b) (+ a b))
+architectures:
+  - any
+notes: |
+  - Emit correct dialect forms
+  - Preserve symbol names

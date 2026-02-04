@@ -335,6 +335,12 @@ pub struct IRCase {
     pub value: serde_json::Value,
     /// Body steps to execute when case matches
     pub body: Vec<IRStep>,
+    /// Flattened IR: case block start index (1-based)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_start: Option<usize>,
+    /// Flattened IR: case block length
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_count: Option<usize>,
 }
 
 /// IR Catch block entry for exception handling (v0.8.7)
@@ -358,7 +364,7 @@ pub struct IRStep {
     pub target: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub value: Option<serde_json::Value>,
-    
+
     // Control flow fields (v0.6.1+)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub condition: Option<String>,
@@ -372,7 +378,16 @@ pub struct IRStep {
     pub init: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub increment: Option<String>,
-    
+    // Flattened IR: block indices for if/then/else
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_start: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block_count: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub else_start: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub else_count: Option<usize>,
+
     // Switch/case fields (v0.9.0)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expr: Option<String>,
@@ -380,7 +395,12 @@ pub struct IRStep {
     pub cases: Option<Vec<IRCase>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub default: Option<Vec<IRStep>>,
-    
+    // Flattened IR: block indices for default case
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_start: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default_count: Option<usize>,
+
     // Exception handling fields (v0.8.7)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub try_block: Option<Vec<IRStep>>,

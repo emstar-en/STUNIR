@@ -1,0 +1,63 @@
+# STUNIR Emitter Specification: FPGA
+# FPGA emitter (Verilog/VHDL)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: fpga
+description: "FPGA emitter"
+output_types:
+  - verilog
+  - vhdl
+features:
+  - pipelining
+  - fixed_point
+extension: v
+config:
+  Pipeline_Depth: "Positive"
+  Use_Fixed_Point: "Boolean"
+config_defaults:
+  Pipeline_Depth: 1
+  Use_Fixed_Point: false
+type_map:
+  i32: "signed"
+  i64: "signed"
+  f32: "real"
+  f64: "real"
+  bool: "logic"
+  string: "string"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  HDL output suitable for FPGA synthesis.
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  module add(input signed [31:0] a, input signed [31:0] b, output signed [31:0] y);
+    assign y = a + b;
+  endmodule
+architectures:
+  - fpga
+notes: |
+  - Emit synthesizable HDL only
+  - Keep timing deterministic

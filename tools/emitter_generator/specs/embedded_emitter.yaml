@@ -1,0 +1,60 @@
+# STUNIR Emitter Specification: Embedded
+# Embedded systems emitter (bare-metal targets)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: embedded
+description: "Embedded systems emitter"
+output_types:
+  - c
+  - baremetal
+features:
+  - fixed_memory
+  - no_alloc
+  - deterministic
+extension: c
+config:
+  Use_Static_Memory: "Boolean"
+  Max_Buffer_Size: "Positive"
+config_defaults:
+  Use_Static_Memory: true
+  Max_Buffer_Size: 1024
+type_map:
+  i32: "int32_t"
+  i64: "int64_t"
+  f32: "float"
+  f64: "double"
+  bool: "bool"
+  string: "char*"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  C code suitable for embedded/bare-metal targets.
+example_input:
+  module: "example"
+  functions:
+    - name: "init"
+      return_type: "void"
+      params: []
+example_output: |
+  void init(void) {
+  }
+architectures:
+  - arm
+  - riscv
+notes: |
+  - Avoid dynamic allocation
+  - Emit fixed-size buffers

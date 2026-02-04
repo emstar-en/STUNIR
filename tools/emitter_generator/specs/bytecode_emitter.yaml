@@ -1,0 +1,58 @@
+# STUNIR Emitter Specification: Bytecode
+# Bytecode emitter for VM targets
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: bytecode
+description: "Bytecode emitter"
+output_types:
+  - bytecode
+features:
+  - stack_machine
+  - instruction_stream
+extension: bc
+config:
+  Version: "String"
+config_defaults:
+  Version: "1.0"
+type_map:
+  i32: "i32"
+  i64: "i64"
+  f32: "f32"
+  f64: "f64"
+  bool: "bool"
+  string: "string"
+ir_fields:
+  required:
+    - functions
+    - basic_blocks
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::vec
+  haskell:
+    - bytestring
+output_format: |
+  Linear bytecode stream with opcodes and operands.
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  0x01 0x00 0x00 0x02 0x00 0x00
+architectures:
+  - any
+notes: |
+  - Ensure deterministic opcode ordering
+  - Emit versioned header if required

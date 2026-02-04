@@ -1,0 +1,67 @@
+# STUNIR Emitter Specification: Assembly
+# Assembly code emitters (x86, x86_os, ARM)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: assembly
+description: "Assembly code emitter"
+output_types:
+  - x86
+  - x86_os
+  - arm
+features:
+  - registers
+  - sections
+  - calling_conventions
+extension: s
+config:
+  Syntax: "String"
+  Use_Att_Syntax: "Boolean"
+config_defaults:
+  Syntax: "intel"
+  Use_Att_Syntax: false
+type_map:
+  i32: "dword"
+  i64: "qword"
+  f32: "single"
+  f64: "double"
+  bool: "byte"
+  string: "byteptr"
+ir_fields:
+  required:
+    - functions
+    - basic_blocks
+  optional:
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  Assembly text format with target-specific syntax.
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  add:
+      mov eax, edi
+      add eax, esi
+      ret
+architectures:
+  - x86_64
+  - arm64
+notes: |
+  - Emit correct calling conventions per target
+  - Respect platform-specific section layout

@@ -1,0 +1,64 @@
+# STUNIR Emitter Specification: WASM
+# WebAssembly emitter (WAT/WASM)
+#
+# Generated to align non-Haskell pipelines with SPARK baseline
+
+category: wasm
+description: "WebAssembly emitter"
+output_types:
+  - wat
+  - wasm
+features:
+  - linear_memory
+  - imports
+extension: wat
+config:
+  Output_Format: "String"
+config_defaults:
+  Output_Format: "wat"
+type_map:
+  i32: "i32"
+  i64: "i64"
+  f32: "f32"
+  f64: "f64"
+  bool: "i32"
+  string: "i32"
+ir_fields:
+  required:
+    - functions
+    - types
+  optional:
+    - imports
+    - exports
+    - metadata
+dependencies:
+  spark:
+    - Ada.Strings.Unbounded
+  python:
+    - typing
+  rust:
+    - std::fmt
+  haskell:
+    - text
+output_format: |
+  WebAssembly Text Format (WAT).
+example_input:
+  module: "example"
+  functions:
+    - name: "add"
+      return_type: "i32"
+      params:
+        - name: "a"
+          type: "i32"
+        - name: "b"
+          type: "i32"
+example_output: |
+  (func $add (param $a i32) (param $b i32) (result i32)
+    local.get $a
+    local.get $b
+    i32.add)
+architectures:
+  - wasm
+notes: |
+  - Emit imports/exports sections
+  - Keep stack discipline valid
