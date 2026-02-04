@@ -44,5 +44,10 @@
   "test_harness",
   "test_vectors",
   "tests",
-  "tools"
+  "tools",
+  "tools/spark",
+  "tools/spark/bin",
+  "tools/spark/src",
+  "tools/spark/stunir_tools.gpr",
+  "tools/spark/index.machine.json"
 ]
