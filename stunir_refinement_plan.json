@@ -1,0 +1,189 @@
+{
+  "plan_version": "1.2",
+  "objective": "Refine STUNIR for accurate signature extraction, IR fidelity, and codegen correctness using three deterministic CLI programs. Merges advanced metrics, safety guardrails, and case handling.",
+  "programs": [
+    {
+      "name": "GNU bc",
+      "type": "CLI calculator",
+      "why": "Medium-sized mature C codebase; diverse parsing and math; deterministic.",
+      "specific_challenges": [
+        "Deep recursion in expression evaluation",
+        "Signal handling (SIGINT)",
+        "Global state management"
+      ],
+      "tests": "bc test suite inputs; strict deterministic subset.",
+      "expected_output_source": "Check-in expected output files or golden run capture."
+    },
+    {
+      "name": "Lua 5.4",
+      "type": "CLI interpreter",
+      "why": "Complex C patterns: tagging, unions, setjmp/longjmp, GC.",
+      "specific_challenges": [
+        "setjmp/longjmp for error handling (needs careful IR mapping)",
+        "Tagged unions (Lua values)",
+        "Standard library interaction"
+      ],
+      "tests": "Official Lua test suite (subset without date/time/os randomness).",
+      "expected_output_source": "Golden outputs from reference build."
+    },
+    {
+      "name": "SQLite",
+      "type": "CLI database",
+      "why": "Heavy I/O, paging, B-trees, massive switch cases (VDBE).",
+      "specific_challenges": [
+        "Preprocessor macro complexity",
+        "Variable argument functions",
+        "File locking/VFS abstraction layer"
+      ],
+      "tests": "sqllogictest (slt) or distinct TCL tests.",
+      "expected_output_source": "sqllogictest verification logic."
+    }
+  ],
+  "phases": [
+    {
+      "id": "P0",
+      "title": "Analysis & Stabilization",
+      "steps": [
+        "Pin exact versions, tags, and toolchain versions.",
+        "Disable locale/time randomness (fix locale and timezone).",
+        "Record build flags and compilation settings.",
+        "AST Depth Analysis: Scan source to predict stack depth requirements.",
+        "Module Partitioning: Group source into batches (< 100 functions) to prevent stack overflow."
+      ]
+    },
+    {
+      "id": "P1",
+      "title": "Corpus Preparation",
+      "steps": [
+        "Isolate deterministic tests; flatten test harnesses.",
+        "Normalize outputs: define line ending and whitespace policy.",
+        "Create 'Golden Master' outputs from original C builds.",
+        "Segment corpus by feature coverage and complexity."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Extraction & IR Generation (Batched)",
+      "steps": [
+        "Run extraction on each batch.",
+        "Reject/flag unsupported constructs early (inline asm).",
+        "Validate JSON schema and content (Signature correctness check).",
+        "Convert Spec -> IR per batch (respecting Max_Functions limit).",
+        "Merge IR or maintain separate IR modules for linking."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Codegen & Static Verification",
+      "steps": [
+        "Generate code for each IR batch.",
+        "Static Analysis: Lint generated code for obvious errors.",
+        "Signature Matching: Verify generated headers match original C headers exactly.",
+        "Verify `struct` alignment and padding in generated types."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "Compilation & Linkage",
+      "steps": [
+        "Compile generated sources.",
+        "Implement shims for libc/system calls unavailable in target language.",
+        "Link against original object files if doing partial translation (hybrid build)."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Behavioral Verification",
+      "steps": [
+        "Repo-Run: Execute generated binary against Golden Master corpus.",
+        "Stream Comparison: Compare stdout and stderr separately.",
+        "Track deltas per test case and aggregate metrics.",
+        "Memory Verification: Run under Valgrind/ASAN to ensure no new leaks/corruption."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Triage & Refinement",
+      "steps": [
+        "Map failing tests to functions and IR nodes.",
+        "Categorize issues: signature, control flow, arithmetic, I/O.",
+        "Patch STUNIR and re-run affected phases.",
+        "Maintain regression suite for fixes."
+      ]
+    }
+  ],
+  "case_handling": {
+    "unsupported_constructs": [
+      "Inline Assembly: Flag and fallback to external C implementation.",
+      "setjmp/longjmp: Warning generation; manual review or specific exception handling mapping.",
+      "Computed Gotos: Convert to switch-loop if detected."
+    ],
+    "preprocessor_macros": [
+      "Expand macros during extraction; record macro-expanded signatures.",
+      "Track macro-origin for troubleshooting."
+    ],
+    "multi_file_resolution": [
+      "Ensure unique symbol handling and consistent linkage.",
+      "Avoid duplicate definitions by resolving translation units."
+    ],
+    "memory_model": [
+      "Pointer Arithmetic: Validate semantic preservation.",
+      "Uninitialized Memory: Ensure generated code doesn't zero-init if C didn't (unless safety requested)."
+    ],
+    "io_and_state": [
+      "Normalize file paths and temporary directories.",
+      "Control environment variables to enforce determinism."
+    ],
+    "library_calls": [
+      "libc shim layer: Map standard C lib calls to target language equivalents or FFI.",
+      "Variadic functions: Generate overloads or array-based passing depending on target.",
+      "Whitelist known library functions behavior."
+    ]
+  },
+  "limits_and_safety": {
+    "batch_processing_strategy": {
+      "trigger": "Function count > Safe_Threshold (e.g., 50-80 functions per batch)",
+      "action": "Split input JSONs into numbered chunks. Process independently.",
+      "resolution": "Linker handles symbol resolution between chunks."
+    },
+    "stack_overflow_protection": {
+      "tool_config": "Use 'ulimit -s' expansion for Ada tools if possible.",
+      "code_structure": "Flatten deep recursion in IR processing if detected."
+    },
+    "guardrails": [
+      "Fail fast with clear diagnostics when limits are reached.",
+      "Emit counts and memory estimates before heavy processing.",
+      "Provide a dry-run mode that validates sizes only."
+    ]
+  },
+  "metrics": {
+    "correctness": [
+      "Pass Rate (%)",
+      "Output Bit-Exactness (stdout/stderr)",
+      "Exit Code Match",
+      "Signature Match Rate (100% required)"
+    ],
+    "quality": [
+      "Code Size Ratio (Generated vs Original)",
+      "Cyclomatic Complexity Delta"
+    ],
+    "stability": [
+      "Non-flaky test rate",
+      "Determinism checks across multiple runs"
+    ],
+    "performance": [
+      "Extraction Time per LoC",
+      "Execution Speed (Generated vs Original)"
+    ]
+  },
+  "artifacts": {
+    "manifests": ["corpus_manifest.json", "build_config.json", "batch_config.json"],
+    "logs": ["extraction.log", "batch_processing_debug.log", "test.log"],
+    "reports": ["comparison_report.md", "failure_map.json", "signature_diff.json"]
+  },
+  "execution_order": ["GNU bc (Baseline)", "Lua (Control Flow Stress)", "SQLite (Data/Macro Stress)"],
+  "exit_criteria": {
+    "pass_threshold": "100% output and exit code match for selected corpus; zero signature mismatches.",
+    "regression_rule": "No new failures introduced compared to previous baseline."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "program": "Lua 5.4",
+  "type": "CLI interpreter",
+  "execution_start": "2026-02-05T03:27:37.863182",
+  "workspace": "stunir_execution_workspace\\lua_5.4",
+  "challenges": [
+    "setjmp/longjmp for error handling (needs careful IR mapping)",
+    "Tagged unions (Lua values)",
+    "Standard library interaction"
+  ]
+}

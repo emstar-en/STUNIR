@@ -1,162 +1,304 @@
-# STUNIR Ada SPARK Tools
+# STUNIR SPARK Components
 
-## PRIMARY IMPLEMENTATION
-
-**Ada SPARK is the DEFAULT and PRIMARY implementation language for STUNIR tools.**
-
-The Python versions of these tools (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) exist only as reference implementations for readability. For all production use, verification, and deterministic builds, use the Ada SPARK tools in this directory.
+This directory contains Ada SPARK implementations of STUNIR pipeline components, replacing the Python reference implementations with formally verified alternatives while preserving existing JSON interfaces.
 
 ## Overview
 
-This directory contains the Ada SPARK implementations of STUNIR's core tools:
+The SPARK migration provides:
+- **Formal Verification**: GNATprove-backed proofs for critical components
+- **DO-333 Alignment**: Evidence for high-assurance certification workflows
+- **Determinism**: Predictable outputs with bounded data structures
+- **Safety**: Defensive handling of malformed inputs and bounded resource use
 
-- **`spec_to_ir`** - Converts specification files to STUNIR Intermediate Reference (IR)
-- **`ir_to_code`** - Generates deterministic source code from IR
+## Scope
 
-## Why Ada SPARK?
+Included:
+- Core pipeline stages (spec assembly, IR conversion, code emission, orchestration)
+- Parsing, validation, analysis, testing, and utility tooling
 
-1. **Formal Verification**: SPARK proofs guarantee absence of runtime errors
-2. **Determinism**: Ada's predictable execution model ensures reproducible builds
-3. **Safety**: Strong typing and contracts prevent entire classes of bugs
-4. **DO-178C Compliance**: Ada SPARK is the standard for safety-critical systems
-5. **Performance**: Native compilation with no interpreter overhead
+Not yet included:
+- Remaining Python components pending migration (see `SPARK_MIGRATION_PLAN.md`)
 
-## Building
+## Inputs and Outputs
 
-### Prerequisites
+| Stage | Input | Output |
+|-------|-------|--------|
+| Spec Assembler | `extraction.json` | `spec.json` |
+| IR Converter | `spec.json` | `ir.json` |
+| Code Emitter | `ir.json` | target source files |
+| Pipeline Driver | `extraction.json` | `spec.json`, `ir.json`, target source files |
 
-- GNAT (Ada compiler) >= 12.0
-- GNATprove (for SPARK proofs)
+## Target Languages
 
-### Build Commands
-
-```bash
-# Build all tools
-cd tools/spark
-gprbuild -P stunir_tools.gpr
-
-# Build specific tool
-gprbuild -P stunir_tools.gpr stunir_spec_to_ir_main.adb
-gprbuild -P stunir_tools.gpr stunir_ir_to_code_main.adb
-
-# Run SPARK proofs
-gnatprove -P stunir_tools.gpr --level=2
-```
-
-### Output
-
-Compiled binaries are placed in `bin/`:
-- `bin/stunir_spec_to_ir_main` - Spec to IR converter
-- `bin/stunir_ir_to_code_main` - IR to code emitter
-
-## Usage
-
-### spec_to_ir
-
-```bash
-./bin/stunir_spec_to_ir_main --spec-root spec/ --out asm/spec_ir.json
-```
-
-Options:
-- `--spec-root <dir>` - Directory containing spec JSON files
-- `--out <file>` - Output IR manifest file
-- `--lockfile <file>` - Toolchain lockfile (default: local_toolchain.lock.json)
-
-### ir_to_code
-
-```bash
-./bin/stunir_ir_to_code_main --input asm/spec_ir.json --output asm/output.py --target python
-```
-
-Options:
-- `--input <file>` - Input IR JSON file
-- `--output <file>` - Output source code file
-- `--target <lang>` - Target language (python, rust, c, cpp, go, javascript, typescript, java, csharp, wasm, x86, arm)
-- `--templates <dir>` - Custom templates directory
-
-## Supported Targets
-
-| Target | Extension | Notes |
-|--------|-----------|-------|
-| python | .py | Reference implementation |
-| rust | .rs | Memory-safe systems |
-| c | .c | Embedded/legacy |
-| cpp | .cpp | C++ with OOP |
-| go | .go | Concurrent systems |
-| javascript | .js | Browser/Node.js |
-| typescript | .ts | Type-safe JavaScript |
-| java | .java | JVM platform |
-| csharp | .cs | .NET platform |
-| wasm | .wasm | WebAssembly |
-| x86 | .asm | x86-64 assembly |
-| arm | .s | ARM assembly |
-
-## Integration with STUNIR Build System
-
-The main build script (`scripts/build.sh`) automatically detects and uses Ada SPARK tools when available:
-
-```bash
-# Ada SPARK is the default (STUNIR_PROFILE=spark)
-./scripts/build.sh
-
-# Force Ada SPARK even if detection fails
-STUNIR_PROFILE=spark ./scripts/build.sh
-
-# Fall back to Python reference implementation (not recommended)
-STUNIR_PROFILE=python ./scripts/build.sh
-```
-
-## SPARK Verification
-
-All core packages are written with SPARK_Mode(On) and include:
-
-- **Preconditions**: Input validation contracts
-- **Postconditions**: Output guarantees
-- **Data Flow Contracts**: Information flow verification
-- **Absence of Runtime Errors**: Proven via GNATprove
-
-To verify:
-
-```bash
-# Full SPARK proof
-gnatprove -P stunir_tools.gpr --level=2 --report=all
-
-# Quick check (level 1)
-gnatprove -P stunir_tools.gpr --level=1
-```
+- C, C++, Rust, Go, Python
+- JavaScript, Java, C#, Swift, Kotlin
 
 ## Directory Structure
 
 ```
 tools/spark/
-├── README.md           # This file
-├── stunir_tools.gpr    # GNAT project file
 ├── src/
-│   ├── stunir_spec_to_ir.ads       # Spec to IR specification
-│   ├── stunir_spec_to_ir.adb       # Spec to IR implementation
-│   ├── stunir_spec_to_ir_main.adb  # Spec to IR entry point
-│   ├── stunir_ir_to_code.ads       # IR to Code specification
-│   ├── stunir_ir_to_code.adb       # IR to Code implementation
-│   └── stunir_ir_to_code_main.adb  # IR to Code entry point
-├── obj/                # Build objects
-└── bin/                # Compiled binaries
+│   ├── stunir_types.ads          # Common types (bounded strings, etc.)
+│   ├── stunir_json_parser.ads    # Streaming JSON parser
+│   ├── core/                      # Phase 1: Core Pipeline
+│   │   ├── spec_assembler.ads     # extraction.json → spec.json
+│   │   ├── ir_converter.ads       # spec.json → ir.json
+│   │   ├── code_emitter.ads       # ir.json → target code
+│   │   └── pipeline_driver.ads    # Pipeline orchestrator
+│   ├── parsing/                   # Phase 2: Extraction & Parsing
+│   ├── validation/                # Phase 3: Validation
+│   ├── analysis/                  # Phase 4: Analysis
+│   ├── testing/                   # Phase 5: Testing
+│   └── utils/                     # Phase 6: Utilities
+├── tests/                         # SPARK test suite
+├── obj/                           # Build artifacts
+├── Makefile                       # Build configuration
+└── core.gpr                       # GNAT project file
 ```
 
-## Relationship to Python Tools
+## Components
 
-The Python implementations in `tools/` are **reference implementations only**:
+### Phase 1: Core Pipeline (P0 - Critical)
 
-| Python (Reference) | Ada SPARK (Primary) |
-|--------------------|--------------------|
-| `tools/spec_to_ir.py` | `tools/spark/bin/stunir_spec_to_ir_main` |
-| `tools/ir_to_code.py` | `tools/spark/bin/stunir_ir_to_code_main` |
+| SPARK Package | Replaces Python | Status |
+|--------------|-----------------|--------|
+| `Spec_Assembler` | `bridge_spec_assemble.py` | Specification Complete |
+| `IR_Converter` | `bridge_spec_to_ir.py` | Specification Complete |
+| `Code_Emitter` | `bridge_ir_to_code.py` | Specification Complete |
+| `Pipeline_Driver` | `stunir_pipeline.py` | Specification Complete |
 
-Python files include headers marking them as reference implementations. They should NOT be used for:
-- Production builds
-- Verification workflows
-- DO-178C compliance
-- Any safety-critical applications
+### Phase 2: Extraction & Parsing (P1 - High)
+
+| SPARK Package | Replaces Python | Status |
+|--------------|-----------------|--------|
+| `C_Parser` | `extract_bc_functions.py` | Pending |
+| `Signature_Extractor` | `extract_signatures.py` | Pending |
+| `Extraction_Creator` | `create_extraction.py` | Pending |
+
+### Phase 3: Validation (P1 - High)
+
+| SPARK Package | Replaces Python | Status |
+|--------------|-----------------|--------|
+| `IR_Validator` | `validate_ir.py` | Pending |
+| `Spec_Validator` | `validate_spec.py` | Pending |
+| `IR_Checker` | `check_ir.py` | Pending |
+
+### Phase 4-6: Analysis, Testing, Utilities (P2/P3)
+
+See `SPARK_MIGRATION_PLAN.md` for complete list.
+
+## Building
+
+### Prerequisites
+- GNAT Pro or GNAT Community with SPARK support
+- GNATprove for formal verification
+
+### Build All Components
+```bash
+cd tools/spark
+make all
+```
+
+### Build Modes
+```bash
+make core MODE=prove
+make core MODE=debug
+make core MODE=release
+```
+
+### Run Formal Verification
+```bash
+make prove
+```
+
+### Prove a Single Phase
+```bash
+make core-prove
+make parsing-prove
+make validation-prove
+```
+
+### Build Specific Phase
+```bash
+make core          # Phase 1
+make parsing       # Phase 2
+make validation    # Phase 3
+```
+
+### Clean
+```bash
+make clean
+make distclean
+```
+
+### Run Tests
+```bash
+make test
+```
+
+## Usage
+
+Once built, the SPARK binaries replace Python scripts:
+
+```bash
+# Instead of:
+python bridge_spec_assemble.py -i extraction.json -o spec.json
+
+# Use:
+./bin/spec_assembler -i extraction.json -o spec.json
+
+# Instead of:
+python stunir_pipeline.py --input extraction.json --output ./out
+
+# Use:
+./bin/pipeline_driver -i extraction.json -o ./out
+```
+
+### Pipeline Flags
+
+```bash
+./bin/pipeline_driver \
+  -i extraction.json \
+  -o ./out \
+  --targets c,cpp,rust,go,python,js,java,csharp,swift,kotlin \
+  --emit-ir \
+  --emit-spec
+```
+
+### Single-Stage Commands
+
+```bash
+./bin/spec_assembler -i extraction.json -o spec.json
+./bin/ir_converter -i spec.json -o ir.json
+./bin/code_emitter -i ir.json -o ./out --targets c,cpp
+```
+
+## Interoperability
+
+- Inputs/outputs are JSON-compatible with existing Python tooling
+- When SPARK binaries are missing, Python scripts remain the fallback
+- All file names and extensions are preserved per target language
+
+## Verification Levels
+
+| Component Level | GNATprove Level | Description |
+|----------------|-----------------|-------------|
+| Gold (P0) | 4 | Full functional correctness proofs |
+| Silver (P1) | 3 | Flow analysis + partial proofs |
+| Bronze (P2/P3) | 1-2 | Basic flow analysis |
+
+### Verification Artifacts
+
+- `obj/` contains `.ali` and proof artifacts per unit
+- GNATprove logs are generated per run and should be archived with build outputs
+- Proof results are required for P0/P1 components before release
+
+## Migration Status
+
+- [x] Analysis of Python components
+- [x] Directory structure created
+- [x] Common types package (`STUNIR_Types`)
+- [x] JSON parser specification
+- [x] Phase 1 specifications complete
+- [ ] Phase 1 implementations
+- [ ] Phase 2-6 specifications
+- [ ] Phase 2-6 implementations
+- [ ] Build system complete
+- [ ] Test suite
+- [ ] Integration with remaining Python tools
+
+## Python Components Status
+
+### Replaced by SPARK
+- `bridge_spec_assemble.py` → `Spec_Assembler`
+- `bridge_spec_to_ir.py` → `IR_Converter`
+- `bridge_ir_to_code.py` → `Code_Emitter`
+- `stunir_pipeline.py` → `Pipeline_Driver`
+
+### Pending Migration
+All other Python files listed in `SPARK_MIGRATION_PLAN.md`
+
+## Developer Workflow
+
+### 1. Adding a New Feature
+1. **Design**: Update `stunir_types.ads` if data structures change.
+2. **Specify**: Write package spec `.ads` with formal contracts (`Pre`, `Post`).
+3. **Verify Spec**: Run `gnatprove` on spec to check contract consistency.
+4. **Implement**: Write package body `.adb`.
+5. **Prove**: Run `gnatprove` iteratively until AoRTE is proven.
+6. **Test**: Add unit tests in `tests/`.
+
+### 2. Common Proof Issues
+- **Loop Invariants**: Required for all loops. Must capture everything that changes.
+- **flow errors**: Often mean uninitialized variables or missing `Global` contracts.
+- **overflow check**: Use saturating arithmetic or preconditions to constrain inputs.
+
+## CI/CD Integration
+
+The build system is designed for easy CI integration:
+
+```yaml
+# Example GitLab CI / GitHub Actions step
+spark-build:
+  image: adacore/gnatpro:25.0
+  script:
+    - cd tools/spark
+    - make all MODE=release
+    - make test
+
+spark-proof:
+  image: adacore/gnatpro:25.0
+  script:
+    - cd tools/spark
+    - make prove PROOF_LEVEL=2
+  artifacts:
+    paths:
+      - tools/spark/gnatprove/
+```
+
+## Troubleshooting
+
+| Error | Cause | Resolution |
+|-------|-------|------------|
+| `medium: overflow check might fail` | Arithmetic without constraints | Add `Pre` condition or use bounded types |
+| `medium: range check might fail` | Array indexing | Assert index is within `'Range` |
+| `high: initialisation of "X" failed` | Variable read before write | Initialize variable at declaration or ensure all paths write to it |
+| `file "X.ads" not found` | Missing dependencies | Check `core.gpr` source dirs |
+
+## Python Components Status
+
+### Replaced by SPARK
+- `bridge_spec_assemble.py` → `Spec_Assembler`
+- `bridge_spec_to_ir.py` → `IR_Converter`
+- `bridge_ir_to_code.py` → `Code_Emitter`
+- `stunir_pipeline.py` → `Pipeline_Driver`
+
+### Pending Migration
+All other Python files listed in `SPARK_MIGRATION_PLAN.md`
+
+## Contributing
+
+When implementing SPARK packages:
+1. Always use `pragma SPARK_Mode (On)`
+2. Use bounded strings from `STUNIR_Types`
+3. Return `Status_Code` instead of raising exceptions
+4. Add pre/post conditions for verification
+5. Avoid dynamic allocation in P0/P1 components
+6. Run `gnatprove` before committing
+7. Capture proof logs with build artifacts
+
+## Artifacts
+
+- `bin/` contains compiled SPARK binaries
+- `obj/` contains `.o`, `.ali`, and proof artifacts
+- Proof logs should be archived per build
+
+## Configuration
+
+- `MODE=prove|debug|release` controls build switches
+- `PROOF_LEVEL=0..4` controls GNATprove effort
+- `--targets` accepts a comma-separated list of target languages
 
 ## License
 
-MIT License - Copyright (c) 2026 STUNIR Project
+Apache-2.0 - See SPDX-License-Identifier in source files

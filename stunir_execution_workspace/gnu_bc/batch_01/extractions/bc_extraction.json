@@ -1,0 +1,59 @@
+{
+  "source_files": [
+    "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+  ],
+  "total_functions": 6,
+  "functions": [
+    {
+      "name": "stop_execution",
+      "return_type": "void",
+      "parameters": [
+        {
+          "type": "int",
+          "name": "sig"
+        }
+      ],
+      "source_file": "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+    },
+    {
+      "name": "execute",
+      "return_type": "void",
+      "parameters": [],
+      "source_file": "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+    },
+    {
+      "name": "prog_char",
+      "return_type": "int",
+      "parameters": [],
+      "source_file": "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+    },
+    {
+      "name": "input_char",
+      "return_type": "int",
+      "parameters": [],
+      "source_file": "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+    },
+    {
+      "name": "push_b10_const",
+      "return_type": "void",
+      "parameters": [
+        {
+          "type": "program_counter *",
+          "name": "progctr"
+        }
+      ],
+      "source_file": "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+    },
+    {
+      "name": "assign",
+      "return_type": "void",
+      "parameters": [
+        {
+          "type": "char",
+          "name": "code"
+        }
+      ],
+      "source_file": "stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c"
+    }
+  ]
+}

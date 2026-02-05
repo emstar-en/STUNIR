@@ -1,0 +1,18 @@
+{
+  "kind": "stunir.spec.v1",
+  "meta": {
+    "origin": "stunir_spec_assemble",
+    "spec_hash": "",
+    "source_index": ""
+  },
+  "modules": [
+    {
+      "name": "bc_batch_01",
+      "functions": [
+      ],
+      "types": [
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,10 @@
+{
+  "python_version": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "win32",
+  "cwd": "C:\\Users\\MSTAR\\AppData\\Roaming\\AbacusAI\\Agent Workspaces",
+  "stunir_tools_available": {
+    "stunir_spec_assemble_main.exe": false,
+    "stunir_spec_to_ir_main.exe": false,
+    "stunir_ir_to_code_main.exe": false
+  }
+}
