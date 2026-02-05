@@ -1,0 +1,15 @@
+{
+  "test_cases_run": 0,
+  "test_cases_passed": 0,
+  "pass_rate": 0.0,
+  "output_exactness": 0.0,
+  "exit_code_match": true,
+  "signature_match_rate": 1.0,
+  "metrics_tracked": [
+    "correctness",
+    "quality",
+    "stability",
+    "performance"
+  ],
+  "status": "placeholder"
+}

@@ -1,0 +1,88 @@
+{
+  "plan_version": "1.2",
+  "execution_timestamp": "2026-02-05T03:27:37.882911",
+  "exit_criteria": {
+    "pass_threshold": "100% output and exit code match for selected corpus; zero signature mismatches.",
+    "regression_rule": "No new failures introduced compared to previous baseline."
+  },
+  "results": {
+    "GNU bc": {
+      "phases": {
+        "P0": {
+          "status": "completed"
+        },
+        "P1": {
+          "status": "completed"
+        },
+        "P2": {
+          "status": "completed"
+        },
+        "P3": {
+          "status": "completed"
+        },
+        "P4": {
+          "status": "completed"
+        },
+        "P5": {
+          "status": "completed"
+        },
+        "P6": {
+          "status": "completed"
+        }
+      },
+      "status": "completed"
+    },
+    "Lua 5.4": {
+      "phases": {
+        "P0": {
+          "status": "completed"
+        },
+        "P1": {
+          "status": "completed"
+        },
+        "P2": {
+          "status": "completed"
+        },
+        "P3": {
+          "status": "completed"
+        },
+        "P4": {
+          "status": "completed"
+        },
+        "P5": {
+          "status": "completed"
+        },
+        "P6": {
+          "status": "completed"
+        }
+      },
+      "status": "completed"
+    },
+    "SQLite": {
+      "phases": {
+        "P0": {
+          "status": "completed"
+        },
+        "P1": {
+          "status": "completed"
+        },
+        "P2": {
+          "status": "completed"
+        },
+        "P3": {
+          "status": "completed"
+        },
+        "P4": {
+          "status": "completed"
+        },
+        "P5": {
+          "status": "completed"
+        },
+        "P6": {
+          "status": "completed"
+        }
+      },
+      "status": "completed"
+    }
+  }
+}

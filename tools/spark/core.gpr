@@ -1,0 +1,76 @@
+--  STUNIR Core Components GPR Project File
+--  DO-333 / SPARK 2014 compliant
+--  Copyright (C) 2026 STUNIR Project
+--  SPDX-License-Identifier: Apache-2.0
+
+with "../../STUNIR-main/tools/do333/spark_config.gpr";
+
+project Core is
+
+   for Source_Dirs use ("src", "src/core");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   for Main use (
+      "spec_assembler_main.adb",
+      "ir_converter_main.adb",
+      "code_emitter_main.adb",
+      "pipeline_driver_main.adb"
+   );
+
+   --  Target and runtime
+   for Target use "native";
+
+   --  Build modes
+   type Mode_Type is ("prove", "debug", "release");
+   Mode : Mode_Type := external ("mode", "prove");
+
+   --  Common switches
+   Common_Switches := ("-gnatwa", "-gnatyy", "-gnatf");
+
+   --  Mode-specific switches
+   package Builder is
+      case Mode is
+         when "prove" =>
+            for Global_Configuration_Pragmas use "spark.adc";
+         when "debug" =>
+            for Default_Switches ("Ada") use ("-g", "-O0");
+         when "release" =>
+            for Default_Switches ("Ada") use ("-O3", "-gnatn");
+      end case;
+   end Builder;
+
+   package Compiler is
+      case Mode is
+         when "prove" =>
+            for Default_Switches ("Ada") use
+               Common_Switches &
+               ("-gnatwa", "-gnaty", "-gnatf", "-gnat2022");
+         when "debug" =>
+            for Default_Switches ("Ada") use
+               Common_Switches &
+               ("-g", "-O0", "-gnata");
+         when "release" =>
+            for Default_Switches ("Ada") use
+               Common_Switches &
+               ("-O3", "-gnatn", "-fomit-frame-pointer");
+      end case;
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-E");
+   end Binder;
+
+   package Linker is
+      case Mode is
+         when "debug" =>
+            for Default_Switches ("Ada") use ("-g");
+         when others =>
+            null;
+      end case;
+   end Linker;
+
+   package Prove is
+      for Proof_Switches ("Ada") use ("--level=4", "--checks-as-errors");
+   end Prove;
+
+end Core;

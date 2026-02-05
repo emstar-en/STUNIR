@@ -1,0 +1,12 @@
+{
+  "program": "SQLite",
+  "tests_source": "sqllogictest (slt) or distinct TCL tests.",
+  "expected_output_source": "sqllogictest verification logic.",
+  "test_cases": [],
+  "deterministic_policy": {
+    "line_endings": "LF",
+    "whitespace": "trim_trailing",
+    "locale": "C",
+    "timezone": "UTC"
+  }
+}

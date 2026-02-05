@@ -1,0 +1,440 @@
+{
+  "kind": "stunir.spec.v1",
+  "meta": {
+    "origin": "stunir_spec_assemble",
+    "spec_hash": "",
+    "source_index": ""
+  },
+  "modules": [
+    {
+      "name": "crc",
+      "functions": [
+        {
+          "name": "crc_crc4",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "uint16_t *"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_crc8",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "p",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_generic",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "buf",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "buf_len",
+              "type": " const uint16_t"
+            }
+            ,{
+              "name": "polynomial",
+              "type": " const uint8_t"
+            }
+            ,{
+              "name": "initial_value",
+              "type": " uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_dvb_s2",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint8_t"
+            }
+            ,{
+              "name": "a",
+              "type": " uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_dvb",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint8_t"
+            }
+            ,{
+              "name": "a",
+              "type": " uint8_t"
+            }
+            ,{
+              "name": "seed",
+              "type": " uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_dvb_s2_update",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint8_t"
+            }
+            ,{
+              "name": "data",
+              "type": " const void *"
+            }
+            ,{
+              "name": "length",
+              "type": " uint32_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_dvb_update",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint8_t"
+            }
+            ,{
+              "name": "buf",
+              "type": " const uint8_t*"
+            }
+            ,{
+              "name": "buf_len",
+              "type": " const uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_maxim",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "length",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_sae",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "length",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc8_rds02uf",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "length",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_xmodem_update",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint16_t"
+            }
+            ,{
+              "name": "data",
+              "type": " uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_xmodem",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_crc32",
+          "return_type": "uint32_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint32_t"
+            }
+            ,{
+              "name": "buf",
+              "type": " const uint8_t *"
+            }
+            ,{
+              "name": "size",
+              "type": " uint32_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc32_small",
+          "return_type": "uint32_t",
+          "parameters": [
+            {
+              "name": "crc",
+              "type": "uint32_t"
+            }
+            ,{
+              "name": "buf",
+              "type": " const uint8_t *"
+            }
+            ,{
+              "name": "size",
+              "type": " uint32_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc16_ccitt",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "buf",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint32_t"
+            }
+            ,{
+              "name": "crc",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc16_ccitt_r",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "buf",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint32_t"
+            }
+            ,{
+              "name": "crc",
+              "type": " uint16_t"
+            }
+            ,{
+              "name": "out",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc16_ccitt_GDL90",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "buf",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint32_t"
+            }
+            ,{
+              "name": "crc",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "calc_crc_modbus",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "buf",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_fletcher16",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "buffer",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint32_t"
+            }
+          ]
+        }
+        ,{
+          "name": "hash_fnv_1a",
+          "return_type": "void",
+          "parameters": [
+            {
+              "name": "len",
+              "type": "uint32_t"
+            }
+            ,{
+              "name": "buf",
+              "type": " const uint8_t*"
+            }
+            ,{
+              "name": "hash",
+              "type": " uint64_t*"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_crc24",
+          "return_type": "uint32_t",
+          "parameters": [
+            {
+              "name": "bytes",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_sum8_with_carry",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "p",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "len",
+              "type": " uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_crc16_ibm",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "crc_accum",
+              "type": "uint16_t"
+            }
+            ,{
+              "name": "data_blk_ptr",
+              "type": " uint8_t *"
+            }
+            ,{
+              "name": "data_blk_size",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_crc64",
+          "return_type": "uint64_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint32_t *"
+            }
+            ,{
+              "name": "num_words",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "parity",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "byte",
+              "type": "uint8_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_sum_of_bytes_16",
+          "return_type": "uint16_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "count",
+              "type": " uint16_t"
+            }
+          ]
+        }
+        ,{
+          "name": "crc_sum_of_bytes",
+          "return_type": "uint8_t",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "const uint8_t *"
+            }
+            ,{
+              "name": "count",
+              "type": " uint16_t"
+            }
+          ]
+        }
+      ],
+      "types": [
+      ]
+    }
+  ]
+}
+
