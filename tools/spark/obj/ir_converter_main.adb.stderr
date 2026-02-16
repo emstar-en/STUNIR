@@ -1,0 +1,20 @@
+stunir_types.ads:11:06: error: cannot depend on "Bounded" (wrong categorization)
+stunir_types.ads:11:06: error: pure unit cannot depend on non-pure unit
+stunir_types.ads:12:06: error: cannot depend on "Hash" (wrong categorization)
+stunir_types.ads:12:06: error: pure unit cannot depend on non-pure unit
+stunir_types.ads:234:53: error: missing "with Ada.Containers;"
+stunir_types.ads:235:32: error: "Hash" not declared in "Identifier_Strings"
+stunir_types.ads:242:06: error: non-static constant in preelaborated unit
+stunir_types.ads:242:24: error: static expression must have scalar or string type (RM 4.9(2))
+stunir_types.ads:245:06: error: non-static constant in preelaborated unit
+stunir_types.ads:245:23: error: static expression must have scalar or string type (RM 4.9(2))
+stunir_types.ads:248:06: error: non-static constant in preelaborated unit
+stunir_types.ads:248:19: error: static expression must have scalar or string type (RM 4.9(2))
+ir_converter.ads:120:30: error: operator for private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:34 is not directly visible
+ir_converter.ads:120:30: error: use clause would make operation legal
+ir_converter.ads:121:36: error: operator for private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:38 is not directly visible
+ir_converter.ads:121:36: error: use clause would make operation legal
+ir_converter.ads:129:31: error: operator for private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:34 is not directly visible
+ir_converter.ads:129:31: error: use clause would make operation legal
+ir_converter.ads:130:38: error: operator for private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:38 is not directly visible
+ir_converter.ads:130:38: error: use clause would make operation legal

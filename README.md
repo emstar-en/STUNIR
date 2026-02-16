@@ -77,7 +77,7 @@ Python implementations are fully functional alternatives suitable for many use c
 | Priority | Implementation | Best For | Tools |
 |----------|---------------|----------|-------|
 | **1. DEFAULT** | **Ada SPARK** | Safety-critical, formal verification, DO-178C Level A | Precompiled binaries (recommended) or build from source |
-| 2. Alternative | Python | Rapid prototyping, development, ease of modification | `tools/spec_to_ir.py`, `tools/ir_to_code.py` |
+| 2. Alternative | Python | Rapid prototyping, development, ease of modification | `tools/scripts/spec_to_ir.py`, `tools/scripts/ir_to_code.py` |
 | 3. Native | Rust/Haskell | High-performance verification | `stunir-native` (when available) |
 
 ### Precompiled SPARK Binaries (Recommended for Production)
@@ -382,7 +382,7 @@ STUNIR also aims to make integrity verification possible in constrained environm
 
 ## Ada SPARK Core (Formal Methods Implementation)
 
-The `core/` directory contains an Ada SPARK 2014 implementation of STUNIR's core components. This implementation provides determinism guarantees through formal methods and static verification.
+The `src/ada/core/` directory contains an Ada SPARK 2014 implementation of STUNIR's core components. This implementation provides determinism guarantees through formal methods and static verification.
 
 ### Purpose
 
@@ -424,7 +424,7 @@ External tool coordination:
 ### Building and Testing
 
 ```bash
-cd core/
+cd src/ada/core/
 make          # Build all SPARK components
 make test     # Run unit tests
 make prove    # Run GNATprove (requires SPARK toolchain)
@@ -433,7 +433,7 @@ make prove    # Run GNATprove (requires SPARK toolchain)
 ### Directory Structure
 
 ```
-core/
+src/ada/core/
 ├── src/           # SPARK source files (.ads, .adb)
 ├── tests/         # Test sources
 ├── obj/           # Build artifacts

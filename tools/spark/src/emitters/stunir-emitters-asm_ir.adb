@@ -11,8 +11,8 @@ package body STUNIR.Emitters.ASM_IR is
          when LLVM_IR =>
             Code_Buffers.Append (Source => Output, New_Item => "; STUNIR Generated LLVM IR" & ASCII.LF);
             Code_Buffers.Append (Source => Output, New_Item => "; DO-178C Level A" & ASCII.LF & ASCII.LF);
-            Code_Buffers.Append (Source => Output, New_Item => "target datalayout = \"e-m:e-p:64:64-i64:64\"" & ASCII.LF);
-            Code_Buffers.Append (Source => Output, New_Item => "target triple = \"x86_64-unknown-linux-gnu\"" & ASCII.LF & ASCII.LF);
+            Code_Buffers.Append (Source => Output, New_Item => "target datalayout = ""e-m:e-p:64:64-i64:64""" & ASCII.LF);
+            Code_Buffers.Append (Source => Output, New_Item => "target triple = ""x86_64-unknown-linux-gnu""" & ASCII.LF & ASCII.LF);
          when GCC_RTL =>
             Code_Buffers.Append (Source => Output, New_Item => ";; STUNIR Generated GCC RTL" & ASCII.LF);
          when MLIR =>

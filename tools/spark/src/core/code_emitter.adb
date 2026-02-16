@@ -83,9 +83,64 @@ package body Code_Emitter is
                Mapped := Type_Name_Strings.To_Bounded_String ("bool");
             elsif Type_Str = "void" then
                Mapped := Type_Name_Strings.To_Bounded_String ("void");
+            elsif Type_Str = "program_counter" then
+               --  Custom C type - map to appropriate C++ type
+               Mapped := Type_Name_Strings.To_Bounded_String ("size_t");
+            elsif Type_Str = "bc_num" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("void*");
+            elsif Type_Str = "sigjmp_buf" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("jmp_buf");
+            elsif Type_Str = "FILE*" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("FILE*");
+            elsif Type_Str = "char*" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("char*");
+            elsif Type_Str = "const char*" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("const char*");
             else
-               Mapped := IR_Type;
+               --  For unknown custom types, try to map pointer syntax
+               declare
+                  Type_Len : constant Natural := Type_Str'Length;
+               begin
+                  if Type_Len > 2 and then
+                     Type_Str (Type_Len - 1 .. Type_Len) = " *" then
+                     --  Custom pointer type - keep as void* for safety
+                     Mapped := Type_Name_Strings.To_Bounded_String ("void*");
+                  else
+                     Mapped := IR_Type;
+                  end if;
+               end;
             end if;
+
+         when Lang_Python =>
+            --  Python is dynamically typed, but we keep type hints
+            --  Strip C pointer syntax and map to Python types
+            declare
+               Type_Len : constant Natural := Type_Str'Length;
+            begin
+               if Type_Str = "int" or Type_Str = "i32" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("int");
+               elsif Type_Str = "float" or Type_Str = "double" or Type_Str = "f64" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("float");
+               elsif Type_Str = "string" or Type_Str = "String" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("str");
+               elsif Type_Str = "bool" or Type_Str = "boolean" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("bool");
+               elsif Type_Str = "void" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("None");
+               elsif Type_Str = "program_counter" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("int");
+               elsif Type_Len > 2 and then
+                     Type_Str (Type_Len - 1 .. Type_Len) = " *" then
+                  --  Pointer type - use Any from typing module
+                  Mapped := Type_Name_Strings.To_Bounded_String ("Any");
+               elsif Type_Str = "char*" or Type_Str = "const char*" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("str");
+               elsif Type_Str = "FILE*" or Type_Str = "bc_num" or Type_Str = "sigjmp_buf" then
+                  Mapped := Type_Name_Strings.To_Bounded_String ("Any");
+               else
+                  Mapped := Type_Name_Strings.To_Bounded_String ("Any");
+               end if;
+            end;
 
          when Lang_C =>
             if Type_Str = "int" then
@@ -98,13 +153,14 @@ package body Code_Emitter is
                Mapped := Type_Name_Strings.To_Bounded_String ("int");
             elsif Type_Str = "void" then
                Mapped := Type_Name_Strings.To_Bounded_String ("void");
+            elsif Type_Str = "program_counter" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("size_t");
+            elsif Type_Str = "bc_num" or Type_Str = "sigjmp_buf" or Type_Str = "FILE*" then
+               Mapped := IR_Type;
             else
                Mapped := IR_Type;
             end if;
 
-         when Lang_Python =>
-            --  Python is dynamically typed, but we keep type hints
-            Mapped := IR_Type;
 
          when Lang_Rust =>
             if Type_Str = "int" then
@@ -117,8 +173,31 @@ package body Code_Emitter is
                Mapped := Type_Name_Strings.To_Bounded_String ("bool");
             elsif Type_Str = "void" then
                Mapped := Type_Name_Strings.To_Bounded_String ("()");
+            elsif Type_Str = "program_counter" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("usize");
+            elsif Type_Str = "bc_num" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("*mut c_void");
+            elsif Type_Str = "sigjmp_buf" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("jmp_buf");
+            elsif Type_Str = "FILE*" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("*mut FILE");
+            elsif Type_Str = "char*" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("*mut c_char");
+            elsif Type_Str = "const char*" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("*const c_char");
             else
-               Mapped := IR_Type;
+               --  For unknown custom types, check for pointer syntax
+               declare
+                  Type_Len : constant Natural := Type_Str'Length;
+               begin
+                  if Type_Len > 2 and then
+                     Type_Str (Type_Len - 1 .. Type_Len) = " *" then
+                     --  Custom pointer type
+                     Mapped := Type_Name_Strings.To_Bounded_String ("*mut c_void");
+                  else
+                     Mapped := IR_Type;
+                  end if;
+               end;
             end if;
 
          when Lang_Go =>
@@ -296,6 +375,204 @@ package body Code_Emitter is
             Append_To_Code (Code, "):" & ASCII.LF, Temp_Status);
             Append_To_Code (Code, "    # TODO: Implement function body" & ASCII.LF, Temp_Status);
             Append_To_Code (Code, "    pass" & ASCII.LF & ASCII.LF, Temp_Status);
+
+         when Lang_Rust =>
+            --  Function signature: pub fn name(param: type, ...) -> ret_type
+            Append_To_Code (Code, "pub fn ", Temp_Status);
+            Append_To_Code (Code, Identifier_Strings.To_String (Func.Name), Temp_Status);
+            Append_To_Code (Code, "(", Temp_Status);
+
+            --  Parameters with Rust syntax: name: type
+            for I in 1 .. Func.Parameters.Count loop
+               declare
+                  Param : constant Parameter := Func.Parameters.Params (I);
+                  Mapped_Type : Type_Name_String;
+               begin
+                  --  Parameter name first
+                  Append_To_Code (Code, Identifier_Strings.To_String (Param.Name), Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Temp_Status;
+                     return;
+                  end if;
+
+                  --  Then type with colon separator
+                  Map_Type_To_Target (Param.Param_Type, Lang_Rust, Mapped_Type, Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Temp_Status;
+                     return;
+                  end if;
+                  Append_To_Code (Code, ": " & Type_Name_Strings.To_String (Mapped_Type), Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Temp_Status;
+                     return;
+                  end if;
+
+                  if I < Func.Parameters.Count then
+                     Append_To_Code (Code, ", ", Temp_Status);
+                     if Temp_Status /= Success then
+                        Status := Temp_Status;
+                        return;
+                     end if;
+                  end if;
+               end;
+            end loop;
+            Append_To_Code (Code, ")", Temp_Status);
+            if Temp_Status /= Success then
+               Status := Temp_Status;
+               return;
+            end if;
+
+            --  Return type
+            declare
+               Mapped_Type : Type_Name_String;
+            begin
+               Map_Type_To_Target (Func.Return_Type, Lang_Rust, Mapped_Type, Temp_Status);
+               if Temp_Status /= Success then
+                  Status := Temp_Status;
+                  return;
+               end if;
+               declare
+                  Ret_Str : constant String := Type_Name_Strings.To_String (Mapped_Type);
+               begin
+                  if Ret_Str /= "()" then
+                     Append_To_Code (Code, " -> " & Ret_Str, Temp_Status);
+                     if Temp_Status /= Success then
+                        Status := Temp_Status;
+                        return;
+                     end if;
+                  end if;
+               end;
+            end;
+
+            Append_To_Code (Code, " {" & ASCII.LF, Temp_Status);
+            if Temp_Status /= Success then
+               Status := Temp_Status;
+               return;
+            end if;
+
+            --  Function body with return statement
+            Append_To_Code (Code, "    // TODO: Implement function body" & ASCII.LF, Temp_Status);
+            declare
+               Mapped_Type : Type_Name_String;
+            begin
+               Map_Type_To_Target (Func.Return_Type, Lang_Rust, Mapped_Type, Temp_Status);
+               declare
+                  Ret_Str : constant String := Type_Name_Strings.To_String (Mapped_Type);
+               begin
+                  if Ret_Str /= "()" then
+                     Append_To_Code (Code, "    ", Temp_Status);
+                     if Ret_Str = "i32" or Ret_Str = "i64" or Ret_Str = "isize" then
+                        Append_To_Code (Code, "return 0;" & ASCII.LF, Temp_Status);
+                     elsif Ret_Str = "f32" or Ret_Str = "f64" then
+                        Append_To_Code (Code, "return 0.0;" & ASCII.LF, Temp_Status);
+                     elsif Ret_Str = "bool" then
+                        Append_To_Code (Code, "return false;" & ASCII.LF, Temp_Status);
+                     elsif Ret_Str = "String" then
+                        Append_To_Code (Code, "return String::new();" & ASCII.LF, Temp_Status);
+                     else
+                        Append_To_Code (Code, "return Default::default();" & ASCII.LF, Temp_Status);
+                     end if;
+                  end if;
+               end;
+            end;
+            Append_To_Code (Code, "}" & ASCII.LF & ASCII.LF, Temp_Status);
+
+         when Lang_Go =>
+            --  Function signature: func name(param type) ret_type
+            Append_To_Code (Code, "func ", Temp_Status);
+            Append_To_Code (Code, Identifier_Strings.To_String (Func.Name), Temp_Status);
+            Append_To_Code (Code, "(", Temp_Status);
+
+            --  Parameters
+            for I in 1 .. Func.Parameters.Count loop
+               declare
+                  Param : constant Parameter := Func.Parameters.Params (I);
+                  Mapped_Type : Type_Name_String;
+               begin
+                  Append_To_Code (Code, Identifier_Strings.To_String (Param.Name) & " ", Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Temp_Status;
+                     return;
+                  end if;
+                  Map_Type_To_Target (Param.Param_Type, Lang_Go, Mapped_Type, Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Temp_Status;
+                     return;
+                  end if;
+                  Append_To_Code (Code, Type_Name_Strings.To_String (Mapped_Type), Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Temp_Status;
+                     return;
+                  end if;
+                  if I < Func.Parameters.Count then
+                     Append_To_Code (Code, ", ", Temp_Status);
+                     if Temp_Status /= Success then
+                        Status := Temp_Status;
+                        return;
+                     end if;
+                  end if;
+               end;
+            end loop;
+            Append_To_Code (Code, ")", Temp_Status);
+            if Temp_Status /= Success then
+               Status := Temp_Status;
+               return;
+            end if;
+
+            --  Return type
+            declare
+               Mapped_Type : Type_Name_String;
+            begin
+               Map_Type_To_Target (Func.Return_Type, Lang_Go, Mapped_Type, Temp_Status);
+               if Temp_Status /= Success then
+                  Status := Temp_Status;
+                  return;
+               end if;
+               declare
+                  Ret_Str : constant String := Type_Name_Strings.To_String (Mapped_Type);
+               begin
+                  if Ret_Str /= "" then
+                     Append_To_Code (Code, " " & Ret_Str, Temp_Status);
+                     if Temp_Status /= Success then
+                        Status := Temp_Status;
+                        return;
+                     end if;
+                  end if;
+               end;
+            end;
+
+            Append_To_Code (Code, " {" & ASCII.LF, Temp_Status);
+            if Temp_Status /= Success then
+               Status := Temp_Status;
+               return;
+            end if;
+
+            --  Function body
+            Append_To_Code (Code, "    // TODO: Implement function body" & ASCII.LF, Temp_Status);
+            declare
+               Mapped_Type : Type_Name_String;
+            begin
+               Map_Type_To_Target (Func.Return_Type, Lang_Go, Mapped_Type, Temp_Status);
+               declare
+                  Ret_Str : constant String := Type_Name_Strings.To_String (Mapped_Type);
+               begin
+                  if Ret_Str /= "" then
+                     Append_To_Code (Code, "    return ", Temp_Status);
+                     if Ret_Str = "int" or Ret_Str = "int32" or Ret_Str = "int64" then
+                        Append_To_Code (Code, "0" & ASCII.LF, Temp_Status);
+                     elsif Ret_Str = "float64" or Ret_Str = "float32" then
+                        Append_To_Code (Code, "0.0" & ASCII.LF, Temp_Status);
+                     elsif Ret_Str = "bool" then
+                        Append_To_Code (Code, "false" & ASCII.LF, Temp_Status);
+                     elsif Ret_Str = "string" then
+                        Append_To_Code (Code, """" & ASCII.LF, Temp_Status);
+                     else
+                        Append_To_Code (Code, "nil" & ASCII.LF, Temp_Status);
+                     end if;
+                  end if;
+               end;
+            end;
+            Append_To_Code (Code, "}" & ASCII.LF & ASCII.LF, Temp_Status);
 
          when others =>
             --  Simplified for other languages

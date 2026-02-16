@@ -53,7 +53,7 @@ package body STUNIR.Emitters.Constraints is
 
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "output [\"x = \(x), y = \(y)\n\"];" & ASCII.LF);
+               New_Item => "output [""x = \(x), y = \(y)\n""];" & ASCII.LF);
 
          when Z3 =>
             -- Emit Z3 SMT-LIB format

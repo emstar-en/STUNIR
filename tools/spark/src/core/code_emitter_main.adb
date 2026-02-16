@@ -29,34 +29,34 @@ procedure Code_Emitter_Main is
    function Parse_Target (Target_Str : String) return Target_Language is
    begin
       if Target_Str = "cpp" or Target_Str = "c++" then
-         return Lang_CPP;
+         return Target_CPP;
       elsif Target_Str = "c" then
-         return Lang_C;
+         return Target_C;
       elsif Target_Str = "python" or Target_Str = "py" then
-         return Lang_Python;
+         return Target_Python;
       elsif Target_Str = "rust" or Target_Str = "rs" then
-         return Lang_Rust;
+         return Target_Rust;
       elsif Target_Str = "go" or Target_Str = "golang" then
-         return Lang_Go;
+         return Target_Go;
       elsif Target_Str = "java" then
-         return Lang_Java;
+         return Target_Java;
       elsif Target_Str = "javascript" or Target_Str = "js" then
-         return Lang_JavaScript;
+         return Target_JavaScript;
       elsif Target_Str = "typescript" or Target_Str = "ts" then
-         return Lang_TypeScript;
+         return Target_JavaScript;
       elsif Target_Str = "ada" then
-         return Lang_Ada;
+         return Target_SPARK;
       elsif Target_Str = "spark" then
-         return Lang_SPARK;
+         return Target_SPARK;
       else
-         return Lang_CPP;  --  Default
+         return Target_CPP;  --  Default
       end if;
    end Parse_Target;
 
    Input_Path  : Path_String := Path_Strings.Null_Bounded_String;
    Output_Dir  : Path_String := Path_Strings.Null_Bounded_String;
    Target_Str  : Identifier_String := Identifier_Strings.Null_Bounded_String;
-   Target      : Target_Language := Lang_CPP;
+   Target      : Target_Language := Target_CPP;
    All_Targets : Boolean := False;
    Status      : Status_Code;
    Arg_Index   : Positive := 1;

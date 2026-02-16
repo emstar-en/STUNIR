@@ -1,55 +1,57 @@
-# STUNIR Build Artifacts
-local_toolchain.lock.json
-receipts/*
-!receipts/README.md
-asm/
+# Build artifacts
 build/
-dist-newstyle/
-target/
+dist/
+*.o
+*.ali
+*.exe
+*.a
+b~*.ad[sb]
 
-# Compliance Artifacts
-stunir_omnibus_sbom.*.json
+# Ada/GNAT artifacts
+src/ada/core/obj/
+src/ada/core/lib/
+src/ada/targets/spark/*/embedded_emitter_main
+src/ada/targets/spark/*/*.ali
+src/ada/targets/spark/*/*.o
+
+# Local model workspace
+local_tasks/work/*
+!local_tasks/work/.gitkeep
+local_tasks/tests/temp/
 
 # Python
 __pycache__/
 *.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+.tox/
+.coverage
+htmlcov/
+tools/scripts/__pycache__/
 
-# System
+# Temporary files
+*.tmp
+*.log
+*~
+*.swp
+*.swo
 .DS_Store
-tools/spark/bin/
-tools/spark/obj/
-targets/spark/bin/
-targets/spark/obj/
 
-# Week 6 test artifacts
-test_rust_pipeline/
-test_output_spark.py
-.coverage.chatllm-*
+# IDE
+.vscode/
+.idea/
+*.sublime-*
 
-# Prevent reports and plans at root - they should go in docs/reports/
-/*_REPORT.md
-/*_REPORT.pdf
-/*_SUMMARY.md
-/*_SUMMARY.pdf
-/*_STATUS.md
-/*_STATUS.pdf
-/*_PLAN.md
-/*_PLAN.pdf
-/*_plan.md
-/*_plan.pdf
-/PUSH_STATUS*.md
-/PUSH_STATUS*.pdf
-/V0*.md
-/V0*.pdf
-/v0*.md
-/v0*.pdf
-/WEEK*.md
-/WEEK*.pdf
+# Backup files
+docs_backup/
+*_backup/
 
-# Temporary files that should not be at root
-/*.ada
-/*.adb
-/*.ads
-/apply_*.py
-/test_*.py
-/*.snippet
+# Test outputs
+test_output/
+*.test
+
+# Old directories (after migration)
+/core/
+/targets/
+/analysis/

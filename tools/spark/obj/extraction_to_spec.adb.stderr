@@ -1,0 +1,67 @@
+extraction_to_spec.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
+extraction_to_spec.adb:212:17: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:212:17: error: use clause would make operation legal
+extraction_to_spec.adb:229:27: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:229:27: error: use clause would make operation legal
+extraction_to_spec.adb:237:29: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:237:29: error: use clause would make operation legal
+extraction_to_spec.adb:239:32: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:239:32: error: use clause would make operation legal
+extraction_to_spec.adb:262:36: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:262:36: error: use clause would make operation legal
+extraction_to_spec.adb:269:42: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:269:42: error: use clause would make operation legal
+extraction_to_spec.adb:272:42: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:272:42: error: use clause would make operation legal
+extraction_to_spec.adb:294:54: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+extraction_to_spec.adb:294:54: error: use clause would make operation legal
+extraction_to_spec.adb:321:22: error: "continue" is undefined
+extraction_to_spec.adb:348:45: error: prefix of "Access" attribute must be aliased
+extraction_to_spec.adb:349:45: error: prefix of "Access" attribute must be aliased
+extraction_to_spec.adb:350:45: error: prefix of "Access" attribute must be aliased
+extraction_to_spec.adb:351:45: error: prefix of "Access" attribute must be aliased
+extraction_to_spec.adb:352:45: error: prefix of "Access" attribute must be aliased
+extraction_to_spec.adb:353:21: error: no candidate interpretations match the actuals:
+extraction_to_spec.adb:353:56: error: expected type "Value_Callback" defined at g-comlin.ads:692
+extraction_to_spec.adb:353:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 353
+extraction_to_spec.adb:353:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:694
+extraction_to_spec.adb:353:56: error: expected an access type with designated type "System.Strings.String_Access"
+extraction_to_spec.adb:353:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:353:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:678
+extraction_to_spec.adb:353:56: error: expected an access type with designated type "Standard.Integer"
+extraction_to_spec.adb:353:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:353:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:659
+extraction_to_spec.adb:353:56: error: expected an access type with designated type "Standard.Boolean"
+extraction_to_spec.adb:353:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:353:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:640
+extraction_to_spec.adb:353:56: error: expected type "Standard.String"
+extraction_to_spec.adb:353:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 353
+extraction_to_spec.adb:353:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:608
+extraction_to_spec.adb:354:21: error: no candidate interpretations match the actuals:
+extraction_to_spec.adb:354:56: error: expected type "Value_Callback" defined at g-comlin.ads:692
+extraction_to_spec.adb:354:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 354
+extraction_to_spec.adb:354:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:694
+extraction_to_spec.adb:354:56: error: expected an access type with designated type "System.Strings.String_Access"
+extraction_to_spec.adb:354:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:354:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:678
+extraction_to_spec.adb:354:56: error: expected an access type with designated type "Standard.Integer"
+extraction_to_spec.adb:354:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:354:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:659
+extraction_to_spec.adb:354:56: error: expected an access type with designated type "Standard.Boolean"
+extraction_to_spec.adb:354:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:354:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:640
+extraction_to_spec.adb:354:56: error: expected type "Standard.String"
+extraction_to_spec.adb:354:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 354
+extraction_to_spec.adb:354:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:608
+stunir_types.ads:11:06: error: cannot depend on "Bounded" (wrong categorization)
+stunir_types.ads:11:06: error: pure unit cannot depend on non-pure unit
+stunir_types.ads:12:06: error: cannot depend on "Hash" (wrong categorization)
+stunir_types.ads:12:06: error: pure unit cannot depend on non-pure unit
+stunir_types.ads:234:53: error: missing "with Ada.Containers;"
+stunir_types.ads:235:32: error: "Hash" not declared in "Identifier_Strings"
+stunir_types.ads:242:06: error: non-static constant in preelaborated unit
+stunir_types.ads:242:24: error: static expression must have scalar or string type (RM 4.9(2))
+stunir_types.ads:245:06: error: non-static constant in preelaborated unit
+stunir_types.ads:245:23: error: static expression must have scalar or string type (RM 4.9(2))
+stunir_types.ads:248:06: error: non-static constant in preelaborated unit
+stunir_types.ads:248:19: error: static expression must have scalar or string type (RM 4.9(2))

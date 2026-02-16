@@ -1,0 +1,10 @@
+hash_compute.adb:63:31: error: "Stream_Access" is not visible
+hash_compute.adb:63:31: error: multiple use clauses cause hiding
+hash_compute.adb:63:31: error: hidden declaration at a-titest.ads:19
+hash_compute.adb:63:31: error: hidden declaration at a-ststio.ads:42
+hash_compute.adb:72:18: error: "End_Error" is not visible
+hash_compute.adb:72:18: error: multiple use clauses cause hiding
+hash_compute.adb:72:18: error: hidden declaration at a-ststio.ads:143
+hash_compute.adb:72:18: error: hidden declaration at a-textio.ads:604
+hash_compute.adb:72:18: error: exception name expected
+hash_compute.adb:79:14: error: "Exists" is undefined

@@ -1,0 +1,16 @@
+spec_assembler_main.adb:90:24: error: "Success" is not visible
+spec_assembler_main.adb:90:24: error: multiple use clauses cause hiding
+spec_assembler_main.adb:90:24: error: hidden declaration at stunir_types.ads:55
+spec_assembler_main.adb:90:24: error: hidden declaration at a-comlin.ads:76
+stunir_types.ads:11:06: error: cannot depend on "Bounded" (wrong categorization)
+stunir_types.ads:11:06: error: pure unit cannot depend on non-pure unit
+stunir_types.ads:12:06: error: cannot depend on "Hash" (wrong categorization)
+stunir_types.ads:12:06: error: pure unit cannot depend on non-pure unit
+stunir_types.ads:234:53: error: missing "with Ada.Containers;"
+stunir_types.ads:235:32: error: "Hash" not declared in "Identifier_Strings"
+stunir_types.ads:242:06: error: non-static constant in preelaborated unit
+stunir_types.ads:242:24: error: static expression must have scalar or string type (RM 4.9(2))
+stunir_types.ads:245:06: error: non-static constant in preelaborated unit
+stunir_types.ads:245:23: error: static expression must have scalar or string type (RM 4.9(2))
+stunir_types.ads:248:06: error: non-static constant in preelaborated unit
+stunir_types.ads:248:19: error: static expression must have scalar or string type (RM 4.9(2))

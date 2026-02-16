@@ -1,0 +1,4 @@
+sig_gen_python.adb:92:33: error: illegal character
+sig_gen_python.adb:92:33: error: binary operator expected
+sig_gen_python.adb:92:34: error: illegal character
+sig_gen_python.adb:92:36: error: illegal character

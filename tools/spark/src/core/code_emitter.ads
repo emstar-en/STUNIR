@@ -9,12 +9,11 @@
 
 pragma SPARK_Mode (On);
 
+with Ada.Strings.Bounded;
 with STUNIR_Types;
 use STUNIR_Types;
 
 package Code_Emitter is
-
-   pragma Pure;
 
    --  ========================================================================
    --  Code Buffer Type
