@@ -549,24 +549,24 @@ package body IR_Converter is
       procedure Append_Identifier (Id : Identifier_String) is
          Str : constant String := Identifier_Strings.To_String (Id);
       begin
-         Append ("\"");
+         Append (""");
          Append (Str);
-         Append ("\"");
+         Append (""");
       end Append_Identifier;
 
       procedure Append_Type_Name (T : Type_Name_String) is
          Str : constant String := Type_Name_Strings.To_String (T);
       begin
-         Append ("\"");
+         Append (""");
          Append (Str);
-         Append ("\"");
+         Append (""");
       end Append_Type_Name;
 
       procedure Append_Parameter (Param : Parameter; Is_Last : Boolean) is
       begin
-         Append ("{\"name\":");
+         Append ("{""name"":");
          Append_Identifier (Param.Name);
-         Append (",\"type\":");
+         Append (",""type"":");
          Append_Type_Name (Param.Param_Type);
          Append ("}");
          if not Is_Last then
@@ -576,22 +576,22 @@ package body IR_Converter is
 
       procedure Append_Step (Step : IR_Step; Is_Last : Boolean) is
       begin
-         Append ("{\"step_type\":");
+         Append ("{""step_type"":");
          case Step.Step_Type is
             when Step_Noop =>
-               Append ("\"noop\"");
+               Append ("""noop""");
             when Step_Assign =>
-               Append ("\"assign\"");
+               Append ("""assign""");
             when Step_Call =>
-               Append ("\"call\"");
+               Append ("""call""");
             when Step_Return =>
-               Append ("\"return\"");
+               Append ("""return""");
          end case;
-         Append (",\"target\":");
+         Append (",""target"":");
          Append_Identifier (Step.Target);
-         Append (",\"source\":");
+         Append (",""source"":");
          Append_Identifier (Step.Source);
-         Append (",\"value\":");
+         Append (",""value"":");
          Append_Identifier (Step.Value);
          Append ("}");
          if not Is_Last then
@@ -601,17 +601,17 @@ package body IR_Converter is
 
       procedure Append_IR_Function (IR_Func : IR_Function; Is_Last : Boolean) is
       begin
-         Append ("{\"name\":");
+         Append ("{""name"":");
          Append_Identifier (IR_Func.Name);
-         Append (",\"return_type\":");
+         Append (",""return_type"":");
          Append_Type_Name (IR_Func.Return_Type);
 
          --  Parameters
-         Append (",\"parameters\":[");
+         Append (",""parameters"":[");
          for I in 1 .. IR_Func.Parameters.Count loop
             Append_Parameter (IR_Func.Parameters.Params (I), I = IR_Func.Parameters.Count);
          end loop;
-         Append ("],\"steps\":[");
+         Append ("],""steps"":[");
 
          --  Steps
          for I in 1 .. IR_Func.Steps.Count loop
@@ -626,13 +626,13 @@ package body IR_Converter is
 
    begin
       --  Build JSON output
-      Append ("{\"schema_version\":");
+      Append ("{""schema_version"":");
       Append_Identifier (IR.Schema_Version);
-      Append (",\"ir_version\":");
+      Append (",""ir_version"":");
       Append_Identifier (IR.IR_Version);
-      Append (",\"module_name\":");
+      Append (",""module_name"":");
       Append_Identifier (IR.Module_Name);
-      Append (",\"functions\":[");
+      Append (",""functions"":[");
 
       for I in 1 .. IR.Functions.Count loop
          Append_IR_Function (IR.Functions.IR_Functions (I), I = IR.Functions.Count);

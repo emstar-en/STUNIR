@@ -1,0 +1,113 @@
+{
+  "schema_version": "2.2.0",
+  "section": "workflows",
+  "last_updated": "2026-02-06",
+  "status": "active_development",
+  "workflows": {
+    "description": "Common tool compositions for typical tasks",
+    "patterns": [
+      {
+        "name": "full_pipeline",
+        "description": "Complete workflow from source to generated code",
+        "steps": [
+          "file_indexer --recursive src/ > manifest.json",
+          "extraction_to_spec < extraction.json | spec_validate | func_dedup | type_normalize > spec.json",
+          "stunir_spec_to_ir_main --input=spec.json --output=ir.json",
+          "sig_gen_cpp < ir.json > output/generated.cpp"
+        ]
+      },
+      {
+        "name": "validate_and_extract",
+        "description": "Safe JSON processing pattern",
+        "steps": [
+          "json_validate < input.json && json_extract -p key < input.json"
+        ]
+      },
+      {
+        "name": "multi_target_generation",
+        "description": "Generate bindings for multiple languages",
+        "steps": [
+          "cat spec.json | sig_gen_cpp > bindings.cpp",
+          "cat spec.json | sig_gen_rust > bindings.rs",
+          "cat spec.json | type_map --lang=python > type_map.json"
+        ]
+      },
+      {
+        "name": "integrity_check",
+        "description": "Verify file hashes against manifest",
+        "steps": [
+          "json_extract -p files < manifest.json | while read file; do hash_compute $file --verify=$(json_extract -p hash < file_entry); done"
+        ]
+      },
+      {
+        "name": "spec_processing",
+        "description": "Full spec normalization and validation",
+        "steps": [
+          "format_detect < extraction.json",
+          "extraction_to_spec --lang=c < extraction.json | type_normalize | func_dedup | spec_validate --strict > validated_spec.json"
+        ]
+      },
+      {
+        "name": "error_recovery",
+        "description": "Workflow with fallback on error",
+        "steps": [
+          "tool1 || (echo 'tool1 failed' >&2; fallback_tool)"
+        ]
+      }
+    ],
+    "validation_gates": [
+      {
+        "name": "json_gate",
+        "description": "Ensure input JSON is valid before processing",
+        "pattern": "json_validate < input.json && next_tool",
+        "failure_action": "Abort pipeline and emit validation error"
+      },
+      {
+        "name": "spec_gate",
+        "description": "Validate spec before IR conversion",
+        "pattern": "spec_validate --strict < spec.json",
+        "failure_action": "Stop and return validation report"
+      },
+      {
+        "name": "hash_gate",
+        "description": "Verify hashes before generation",
+        "pattern": "hash_compute --verify=EXPECTED file.ext",
+        "failure_action": "Abort on mismatch"
+      }
+    ],
+    "failure_modes": [
+      {
+        "name": "invalid_json",
+        "symptom": "json_validate exits with code 1",
+        "action": "Stop; report line/column from stderr"
+      },
+      {
+        "name": "conversion_failed",
+        "symptom": "extraction_to_spec exits with code 2",
+        "action": "Re-run format_detect and inspect extraction format"
+      },
+      {
+        "name": "spec_invalid",
+        "symptom": "spec_validate exits with code 1",
+        "action": "Fix schema errors; re-run normalization and dedup"
+      },
+      {
+        "name": "generation_failed",
+        "symptom": "sig_gen_cpp or sig_gen_rust exits with code 2",
+        "action": "Check for unsupported types; run type_map"
+      }
+    ],
+    "recovery_strategies": [
+      {
+        "name": "retry_with_pretty",
+        "description": "Re-run converter with pretty output to aid debugging",
+        "pattern": "extraction_to_spec --pretty < extraction.json"
+      },
+      {
+        "name": "fallback_to_legacy",
+        "description": "Use legacy monolith if powertool pipeline fails",
+        "pattern": "stunir_spec_to_ir_main --input=spec.json --output=ir.json"
+      }
+    ]
+  }
+}

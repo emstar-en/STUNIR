@@ -1,0 +1,435 @@
+{
+  "version": "1.7.0",
+  "title": "STUNIR SPARK Powertools - Master Architecture",
+  "description": "Comprehensive plan for the STUNIR toolchain, adhering to Unix philosophy, SPARK reliability, and AI-native introspection.",
+  "philosophy": {
+    "core_principles": [
+      "Simplicity: Each tool does exactly one thing well.",
+      "Composability: Tools communicate via standard streams (JSON/text) and can be piped.",
+      "Reliability: Validated with SPARK 2014; no undefined behavior.",
+      "Introspection: Every tool describes its own capabilities and schema for AI orchestration.",
+      "Robustness: 'Idiot-proof' handling of missing files, bad inputs, and edge cases."
+    ],
+    "ai_native_features": [
+      "Self-Description: '--describe' flag outputting deep JSON schema of inputs/outputs.",
+      "Deterministic Output: AI can predict tool behavior reliably.",
+      "Structured Errors: Machine-readable error logs on stderr.",
+      "Simulation Ready: Logic is simple enough (<500 LoC) for LLMs to mentally simulate.",
+      "Typed Outputs: Optional output annotations {value, type} to reduce ambiguity."
+    ]
+  },
+  "conformance_standards": {
+    "interfaces": {
+      "input": "JSON object or NDJSON (newline delimited) stream; auto-detected.",
+      "output": "JSON object (default) or raw text (requested via flags).",
+      "logging": "Structured JSON logs to stderr (level, message, code).",
+      "exit_codes": {
+        "0": "Success",
+        "1": "Validation Error (inputs invalid)",
+        "2": "Processing Error (logic failed)",
+        "3": "Resource Error (file/network)",
+        "4": "Partial Success"
+      }
+    },
+    "error_object": {
+      "format": "{level, code, message, details, tool, timestamp}",
+      "levels": ["debug", "info", "warn", "error"],
+      "strict_mode": "any warn escalates to error (exit code 1)"
+    },
+    "standard_flags": [
+      "--help: Show usage text.",
+      "--version: Show semantic version.",
+      "--describe: Output introspection schema.",
+      "--schema: Output input/output JSON schemas.",
+      "--strict: Fail hard on any warning.",
+      "--dry-run: Validate without writing outputs."
+    ],
+    "resource_limits": {
+      "max_json_bytes": 1048576,
+      "max_items": 10000,
+      "max_depth": 64,
+      "max_line_bytes": 1048576
+    },
+    "file_safety": {
+      "no_clobber": true,
+      "atomic_write": true,
+      "tmp_suffix": ".tmp",
+      "backup_suffix": ".bak"
+    }
+  },
+  "data_contracts": {
+    "manifest_v1": {
+      "required": ["generated_at", "root", "files"],
+      "file_entry": ["path", "size", "modified", "hash"],
+      "hash_optional": true
+    },
+    "spec_v1": {
+      "required": ["schema_version", "module"],
+      "module_required": ["name", "functions"],
+      "function_required": ["name", "return_type", "params"]
+    },
+    "ir_v1": {
+      "required": ["schema_version", "ir_version", "module_name", "functions"],
+      "function_required": ["name", "return_type", "args", "steps"]
+    },
+    "receipt_v1": {
+      "required": ["spec_hash", "source_index", "links"]
+    }
+  },
+  "tool_catalog": {
+    "implemented_core": [
+      { "name": "json_validate", "purpose": "Validate JSON structure/syntax" },
+      { "name": "json_extract", "purpose": "Extract values via dot-path" },
+      { "name": "func_dedup", "purpose": "Deduplicate JSON function lists" },
+      { "name": "type_normalize", "purpose": "Canonicalize C type strings" },
+      { "name": "type_map", "purpose": "Map C types to target languages" },
+      { "name": "format_detect", "purpose": "Identify extraction JSON variant" },
+      { "name": "extraction_to_spec", "purpose": "Convert legacy/various formats to Spec" },
+      { "name": "sig_gen_cpp", "purpose": "Generate C++ signatures/stubs" },
+      { "name": "sig_gen_rust", "purpose": "Generate Rust FFI bindings" },
+      { "name": "file_indexer", "purpose": "Index directories into manifest JSON" },
+      { "name": "hash_compute", "purpose": "Compute SHA-256 hashes" },
+      { "name": "lang_detect", "purpose": "Detect source language" },
+      { "name": "spec_validate", "purpose": "Validate spec.json structure" },
+      { "name": "toolchain_verify", "purpose": "Verify toolchain.lock file" }
+    ],
+    "planned_decomposition": [
+      "manifest_merge", "manifest_verify",
+      "code_slice", "region_extract", "region_type_detect",
+      "spec_merge", "spec_hash", "spec_diff",
+      "ir_validate", "ir_diff", "ir_stats",
+      "template_apply", "code_format", "code_verify", "header_gen",
+      "link_validate", "receipt_generate", "confidence_score"
+    ]
+  },
+  "tool_specs": {
+    "file_indexer": {
+      "inputs": ["directory"],
+      "outputs": ["manifest_v1"],
+      "options": ["--recursive", "--include", "--exclude", "--no-hash", "--output"]
+    },
+    "hash_compute": {
+      "inputs": ["file_or_stdin"],
+      "outputs": ["hash"],
+      "options": ["--algorithm", "--verify", "--json"]
+    },
+    "lang_detect": {
+      "inputs": ["file"],
+      "outputs": ["language_id", "confidence"],
+      "options": ["--content", "--json", "--confidence"]
+    },
+    "spec_validate": {
+      "inputs": ["spec_v1"],
+      "outputs": ["validation_report"],
+      "options": ["--strict", "--json"]
+    },
+    "toolchain_verify": {
+      "inputs": ["toolchain.lock"],
+      "outputs": ["validation_report"],
+      "options": ["--json", "--check-versions"]
+    }
+  },
+  "decomposition_strategy": {
+    "principles": [
+      "Single Responsibility: Each tool does ONE thing well",
+      "Composability: Tools chain together via pipes",
+      "Small Size: Target <250 LoC per tool, ideally <150",
+      "Clear Interfaces: JSON in, JSON out, stderr for logs",
+      "Deterministic: Same input always produces same output"
+    ],
+    "source_files": [
+      {
+        "file": "tools/spark/src/stunir_code_index.ads",
+        "lines": 88,
+        "current_tools": ["code_index"],
+        "decomposition": [
+          {
+            "tool": "file_indexer",
+            "purpose": "Index directory and output manifest JSON",
+            "extracts_from": ["Scan_Directory", "Generate_Manifest", "Write_Manifest"],
+            "estimated_loc": 120,
+            "inputs": ["directory path", "file patterns (glob)"],
+            "outputs": ["manifest JSON with file list, sizes, hashes"],
+            "options": ["--recursive", "--include=*.c,*.h", "--exclude=*.o,*.obj", "--output"]
+          },
+          {
+            "tool": "hash_compute",
+            "purpose": "Compute SHA-256 hash of file content",
+            "extracts_from": ["Compute_Hash"],
+            "estimated_loc": 80,
+            "inputs": ["file path or stdin"],
+            "outputs": ["hash string or JSON with hash metadata"],
+            "options": ["--algorithm=sha256|md5", "--json", "--verify=expected_hash"]
+          },
+          {
+            "tool": "lang_detect",
+            "purpose": "Detect programming language from file extension and content",
+            "extracts_from": ["Detect_Language"],
+            "estimated_loc": 100,
+            "inputs": ["file path or content"],
+            "outputs": ["language identifier (c, cpp, python, rust, ada, etc.)"],
+            "options": ["--confidence", "--content-only", "--json"]
+          },
+          {
+            "tool": "manifest_merge",
+            "purpose": "Merge multiple manifests into single manifest",
+            "extracts_from": ["Merge_Manifests"],
+            "estimated_loc": 90,
+            "inputs": ["multiple manifest JSON files"],
+            "outputs": ["merged manifest JSON"],
+            "options": ["--dedup", "--sort", "--output"]
+          },
+          {
+            "tool": "manifest_verify",
+            "purpose": "Verify manifest integrity against actual files",
+            "extracts_from": ["Verify_Manifest"],
+            "estimated_loc": 110,
+            "inputs": ["manifest JSON", "base directory"],
+            "outputs": ["verification report (missing/changed/valid files)"],
+            "options": ["--strict", "--report=json|text", "--fix"]
+          }
+        ]
+      },
+      {
+        "file": "tools/spark/src/stunir_code_slice.ads",
+        "lines": 74,
+        "current_tools": ["code_slice"],
+        "decomposition": [
+          {
+            "tool": "code_slice",
+            "purpose": "Slice source code into semantic regions",
+            "extracts_from": ["Slice_File", "Detect_Regions"],
+            "estimated_loc": 140,
+            "inputs": ["source file path", "language hint"],
+            "outputs": ["regions JSON with line ranges and types"],
+            "options": ["--lang=c|cpp|ada|rust", "--output", "--min-lines"]
+          },
+          {
+            "tool": "region_extract",
+            "purpose": "Extract specific region by line range or hash",
+            "extracts_from": ["Extract_Region"],
+            "estimated_loc": 85,
+            "inputs": ["source file", "start line", "end line OR hash"],
+            "outputs": ["extracted code region"],
+            "options": ["--by-hash", "--by-lines", "--output", "--with-context"]
+          },
+          {
+            "tool": "region_type_detect",
+            "purpose": "Detect semantic type of code region",
+            "extracts_from": ["Classify_Region"],
+            "estimated_loc": 120,
+            "inputs": ["code snippet or region JSON"],
+            "outputs": ["region type: function, typedef, constant, macro, etc."],
+            "options": ["--confidence", "--json", "--lang"]
+          }
+        ]
+      },
+      {
+        "file": "tools/spark/src/stunir_spec_assemble.ads",
+        "lines": 109,
+        "current_tools": ["spec_assemble"],
+        "decomposition": [
+          {
+            "tool": "spec_validate",
+            "purpose": "Validate spec.json structure against schema",
+            "extracts_from": ["Validate_Spec"],
+            "estimated_loc": 130,
+            "inputs": ["spec JSON file"],
+            "outputs": ["validation report with errors/warnings"],
+            "options": ["--schema=path", "--strict", "--report=json|text"]
+          },
+          {
+            "tool": "spec_merge",
+            "purpose": "Merge multiple specs, resolving conflicts",
+            "extracts_from": ["Merge_Specs"],
+            "estimated_loc": 150,
+            "inputs": ["multiple spec JSON files"],
+            "outputs": ["merged spec JSON"],
+            "options": ["--strategy=union|intersection", "--on-conflict=error|keep-first|keep-last", "--output"]
+          },
+          {
+            "tool": "spec_hash",
+            "purpose": "Compute deterministic hash of spec content",
+            "extracts_from": ["Compute_Spec_Hash"],
+            "estimated_loc": 90,
+            "inputs": ["spec JSON file"],
+            "outputs": ["hash string"],
+            "options": ["--algorithm", "--canonical", "--json"]
+          },
+          {
+            "tool": "spec_diff",
+            "purpose": "Compare two specs and show differences",
+            "extracts_from": ["Diff_Specs"],
+            "estimated_loc": 120,
+            "inputs": ["spec A", "spec B"],
+            "outputs": ["diff report (added/removed/changed functions)"],
+            "options": ["--format=json|unified", "--ignore-order", "--output"]
+          }
+        ]
+      },
+      {
+        "file": "tools/spark/src/stunir_spec_to_ir.ads",
+        "lines": 123,
+        "current_tools": ["spec_to_ir"],
+        "decomposition": [
+          {
+            "tool": "toolchain_verify",
+            "purpose": "Verify toolchain lock file integrity",
+            "extracts_from": ["Verify_Toolchain_Lock"],
+            "estimated_loc": 110,
+            "inputs": ["toolchain.lock file"],
+            "outputs": ["verification status and version info"],
+            "options": ["--check-versions", "--strict", "--json"]
+          },
+          {
+            "tool": "ir_validate",
+            "purpose": "Validate IR structure and semantics",
+            "extracts_from": ["Validate_IR"],
+            "estimated_loc": 140,
+            "inputs": ["ir JSON file"],
+            "outputs": ["validation report"],
+            "options": ["--schema", "--check-types", "--strict", "--report"]
+          },
+          {
+            "tool": "ir_diff",
+            "purpose": "Compare two IR files",
+            "extracts_from": ["Diff_IR"],
+            "estimated_loc": 100,
+            "inputs": ["ir A", "ir B"],
+            "outputs": ["structural diff report"],
+            "options": ["--format", "--ignore-metadata", "--output"]
+          },
+          {
+            "tool": "ir_stats",
+            "purpose": "Compute statistics about IR (function count, complexity)",
+            "extracts_from": ["Compute_IR_Stats"],
+            "estimated_loc": 90,
+            "inputs": ["ir JSON file"],
+            "outputs": ["statistics JSON"],
+            "options": ["--format", "--output"]
+          }
+        ]
+      },
+      {
+        "file": "tools/spark/src/stunir_ir_to_code.ads",
+        "lines": 219,
+        "current_tools": ["ir_to_code"],
+        "decomposition": [
+          {
+            "tool": "template_apply",
+            "purpose": "Apply code template to IR data",
+            "extracts_from": ["Apply_Template"],
+            "estimated_loc": 130,
+            "inputs": ["ir JSON", "template file"],
+            "outputs": ["templated code output"],
+            "options": ["--template", "--vars=key:value", "--output"]
+          },
+          {
+            "tool": "code_format",
+            "purpose": "Format generated code with language-specific formatter",
+            "extracts_from": ["Format_Code"],
+            "estimated_loc": 100,
+            "inputs": ["code string or file"],
+            "outputs": ["formatted code"],
+            "options": ["--lang", "--style", "--check-only", "--output"]
+          },
+          {
+            "tool": "code_verify",
+            "purpose": "Verify generated code compiles/syntax-valid",
+            "extracts_from": ["Verify_Code"],
+            "estimated_loc": 140,
+            "inputs": ["code file", "language"],
+            "outputs": ["compilation/syntax check result"],
+            "options": ["--lang", "--compiler", "--flags", "--json"]
+          },
+          {
+            "tool": "header_gen",
+            "purpose": "Generate header file from IR",
+            "extracts_from": ["Generate_Header"],
+            "estimated_loc": 110,
+            "inputs": ["ir JSON", "target language"],
+            "outputs": ["header/declaration file"],
+            "options": ["--lang", "--guard", "--namespace", "--output"]
+          }
+        ]
+      },
+      {
+        "file": "tools/spark/src/stunir_receipt_link.ads",
+        "lines": 76,
+        "current_tools": ["receipt_link"],
+        "decomposition": [
+          {
+            "tool": "link_validate",
+            "purpose": "Validate spec-to-source links",
+            "extracts_from": ["Validate_Links"],
+            "estimated_loc": 120,
+            "inputs": ["spec JSON", "source files or index"],
+            "outputs": ["link validation report"],
+            "options": ["--strict", "--report", "--fix-broken"]
+          },
+          {
+            "tool": "receipt_generate",
+            "purpose": "Generate receipt from validated links",
+            "extracts_from": ["Generate_Receipt"],
+            "estimated_loc": 100,
+            "inputs": ["spec JSON", "link validation result"],
+            "outputs": ["receipt JSON"],
+            "options": ["--format", "--sign", "--output"]
+          },
+          {
+            "tool": "confidence_score",
+            "purpose": "Score link confidence based on heuristics",
+            "extracts_from": ["Score_Confidence"],
+            "estimated_loc": 110,
+            "inputs": ["link data"],
+            "outputs": ["confidence scores (0.0-1.0)"],
+            "options": ["--threshold", "--json", "--output"]
+          }
+        ]
+      }
+    ]
+  },
+  "testing_strategy": {
+    "unit_tests": {
+      "focus": ["parser edge cases", "schema validation", "error handling"],
+      "framework": "GNATtest or custom minimal harness"
+    },
+    "integration_tests": {
+      "focus": ["multi-tool pipeline chains", "stdin/stdout compatibility", "NDJSON streaming"],
+      "method": "Golden file comparison"
+    },
+    "golden_tests": {
+      "description": "Maintain golden outputs for extraction/spec/IR/code for regression assurance",
+      "inputs": ["gnu_bc", "lua_5.4", "sqlite"]
+    }
+  },
+  "migration_plan": {
+    "phase_4_introspective_utils": {
+      "status": "complete",
+      "focus": "Building foundation tools for introspection and basic file ops",
+      "tools": ["file_indexer", "hash_compute", "lang_detect"]
+    },
+    "phase_5_validation_suite": {
+      "status": "in_progress",
+      "focus": "Tools that ensure pipeline integrity",
+      "tools": ["spec_validate", "ir_validate", "manifest_verify", "toolchain_verify"]
+    },
+    "phase_6_gen_and_compare": {
+      "status": "pending",
+      "focus": "Generating code and comparing assets",
+      "tools": ["template_apply", "code_format", "code_verify", "header_gen", "spec_diff", "ir_diff", "spec_merge"]
+    },
+    "phase_7_traceability": {
+      "status": "pending",
+      "focus": "Receipt and confidence tooling",
+      "tools": ["link_validate", "receipt_generate", "confidence_score"]
+    }
+  },
+  "example_chains": {
+    "index_and_verify": "file_indexer --recursive . | manifest_verify --strict",
+    "full_pipeline": "file_indexer . | code_slice | spec_assemble | spec_validate | spec_to_ir | ir_validate | ir_to_code",
+    "compare_specs": "spec_hash spec_a.json > hash_a.txt && spec_hash spec_b.json > hash_b.txt && diff hash_a.txt hash_b.txt",
+    "validate_generation": "ir_to_code input.ir | code_verify --lang=cpp",
+    "confidence_pipeline": "link_validate spec.json sources/ | confidence_score --threshold=0.8 | receipt_generate"
+  }
+}

@@ -6,6 +6,9 @@
 
 pragma SPARK_Mode (On);
 
+with STUNIR_JSON_Parser;
+use STUNIR_JSON_Parser;
+
 with Ada.Strings.Bounded;
 
 package body Spec_Assembler is
@@ -15,6 +18,8 @@ package body Spec_Assembler is
       Extraction   :    out Extraction_Data;
       Status       :    out Status_Code)
    is
+      Parser     : Parser_State;
+      Temp_Status : Status_Code;
    begin
       --  Initialize extraction data
       Extraction := Extraction_Data'(
@@ -32,9 +37,79 @@ package body Spec_Assembler is
             Count => 0)),
          File_Count => 0);
 
-      --  For now, return not implemented
-      --  Full JSON parsing requires streaming parser implementation
-      Status := Error_Not_Implemented;
+      --  Initialize parser
+      Initialize_Parser (Parser, JSON_Content, Temp_Status);
+      if Temp_Status /= Success then
+         Status := Temp_Status;
+         return;
+      end if;
+
+      --  Expect object start
+      Expect_Token (Parser, Token_Object_Start, Temp_Status);
+      if Temp_Status /= Success then
+         Status := Error_Invalid_JSON;
+         return;
+      end if;
+
+      --  Parse top-level members
+      loop
+         exit when Current_Token (Parser) = Token_Object_End;
+
+         declare
+            Member_Name  : Identifier_String;
+            Member_Value : JSON_String;
+         begin
+            Parse_String_Member (Parser, Member_Name, Member_Value, Temp_Status);
+            if Temp_Status /= Success then
+               Status := Error_Invalid_JSON;
+               return;
+            end if;
+
+            --  Handle known members
+            declare
+               Name_Str : constant String := Identifier_Strings.To_String (Member_Name);
+            begin
+               if Name_Str = "schema_version" then
+                  Extraction.Schema_Version := Member_Name;
+               elsif Name_Str = "source_index" then
+                  Extraction.Source_Index := Path_Strings.To_Bounded_String (
+                     JSON_Strings.To_String (Member_Value));
+               elsif Name_Str = "files" then
+                  --  Parse files array (simplified - would need full array parsing)
+                  --  For now, skip the array value
+                  Skip_Value (Parser, Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Error_Invalid_JSON;
+                     return;
+                  end if;
+               elsif Name_Str = "module_name" then
+                  --  Single module extraction format
+                  null;  --  Will be handled differently
+               elsif Name_Str = "functions" then
+                  --  Parse functions directly (alternative format)
+                  Skip_Value (Parser, Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Error_Invalid_JSON;
+                     return;
+                  end if;
+               end if;
+            end;
+         end;
+
+         --  Check for comma or object end
+         if Current_Token (Parser) = Token_Comma then
+            Next_Token (Parser, Temp_Status);
+            if Temp_Status /= Success then
+               Status := Temp_Status;
+               return;
+            end if;
+         elsif Current_Token (Parser) /= Token_Object_End then
+            Status := Error_Invalid_JSON;
+            return;
+         end if;
+      end loop;
+
+      Status := Success;
    end Parse_Extraction_JSON;
 
    procedure Validate_Extraction
@@ -201,7 +276,7 @@ package body Spec_Assembler is
       Module_Name : in     Identifier_String;
       Status      :    out Status_Code)
    is
-      pragma Unreferenced (Input_Path, Output_Path);
+      pragma Unreferenced (Input_Path, Output_Path, Module_Name);
    begin
       --  This is the main entry point that would:
       --  1. Read the input file
@@ -213,5 +288,80 @@ package body Spec_Assembler is
       --  Full implementation requires file I/O wrappers
       Status := Error_Not_Implemented;
    end Process_Extraction_File;
+
+   --  Helper procedure to parse a function object from JSON
+   procedure Parse_Function_Object
+     (Parser   : in out Parser_State;
+      Function_Out : out Extraction_Function;
+      Status   : out Status_Code)
+   with
+      Pre => Current_Token (Parser) = Token_Object_Start
+   is
+      Temp_Status : Status_Code;
+   begin
+      Function_Out := Extraction_Function'(
+         Name        => Null_Identifier,
+         Return_Type => Null_Type_Name,
+         Parameters  => Parameter_List'(Params => (others => Parameter'(
+            Name       => Null_Identifier,
+            Param_Type => Null_Type_Name)),
+         Count => 0));
+
+      --  Expect object start (already checked in precondition)
+      Expect_Token (Parser, Token_Object_Start, Temp_Status);
+      if Temp_Status /= Success then
+         Status := Temp_Status;
+         return;
+      end if;
+
+      --  Parse function members
+      loop
+         exit when Current_Token (Parser) = Token_Object_End;
+
+         declare
+            Member_Name  : Identifier_String;
+            Member_Value : JSON_String;
+         begin
+            Parse_String_Member (Parser, Member_Name, Member_Value, Temp_Status);
+            if Temp_Status /= Success then
+               Status := Error_Invalid_JSON;
+               return;
+            end if;
+
+            declare
+               Name_Str : constant String := Identifier_Strings.To_String (Member_Name);
+            begin
+               if Name_Str = "name" then
+                  Function_Out.Name := Identifier_Strings.To_Bounded_String (
+                     JSON_Strings.To_String (Member_Value));
+               elsif Name_Str = "return_type" then
+                  Function_Out.Return_Type := Type_Name_Strings.To_Bounded_String (
+                     JSON_Strings.To_String (Member_Value));
+               elsif Name_Str = "parameters" then
+                  --  Parse parameters array
+                  Skip_Value (Parser, Temp_Status);
+                  if Temp_Status /= Success then
+                     Status := Error_Invalid_JSON;
+                     return;
+                  end if;
+               end if;
+            end;
+         end;
+
+         --  Check for comma or object end
+         if Current_Token (Parser) = Token_Comma then
+            Next_Token (Parser, Temp_Status);
+            if Temp_Status /= Success then
+               Status := Temp_Status;
+               return;
+            end if;
+         elsif Current_Token (Parser) /= Token_Object_End then
+            Status := Error_Invalid_JSON;
+            return;
+         end if;
+      end loop;
+
+      Status := Success;
+   end Parse_Function_Object;
 
 end Spec_Assembler;

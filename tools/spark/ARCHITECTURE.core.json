@@ -1,0 +1,409 @@
+{
+  "schema_version": "2.2.0",
+  "section": "core",
+  "last_updated": "2026-02-06",
+  "status": "active_development",
+  "philosophy": {
+    "core_principles": [
+      {
+        "principle": "Unix_Philosophy",
+        "description": "Each tool does one thing well. Tools are composable via pipes.",
+        "rationale": "Enables AI models to reason about tool behavior independently and compose complex workflows from simple building blocks.",
+        "implications": [
+          "Tools read from stdin, write to stdout",
+          "Errors go to stderr with structured format",
+          "Exit codes indicate success/failure categories",
+          "No tool exceeds 500 lines of code"
+        ]
+      },
+      {
+        "principle": "AI_Native_Design",
+        "description": "Tools are designed for AI orchestration first, human convenience second.",
+        "rationale": "STUNIR is primarily an AI-driven toolchain; human CLI usage is secondary.",
+        "features": [
+          "--describe flag outputs complete JSON schema",
+          "Deterministic output formats",
+          "Structured error messages with error codes",
+          "Self-documenting capabilities"
+        ]
+      },
+      {
+        "principle": "SPARK_Reliability",
+        "description": "Core tools implemented in Ada SPARK 2014 for formal verification.",
+        "rationale": "Eliminates undefined behavior, ensures memory safety, enables proof of key properties.",
+        "scope": [
+          "All powertools implemented in SPARK",
+          "Original monolithic tools being migrated",
+          "Python bridges for rapid prototyping"
+        ]
+      }
+    ]
+  },
+  "glossary": {
+    "Manifest": "A JSON inventory of files in a directory with metadata and hashes (manifest_v1).",
+    "Spec": "A canonical JSON representation of function signatures and types (spec_v1), independent of source language.",
+    "IR": "Intermediate Representation (ir_v1) describing function logic in a language-agnostic way for generation.",
+    "Receipt": "A JSON proof of transformation linking source hashes to generated artifact hashes for auditing.",
+    "Powertool": "A small, focused SPARK-based utility adhering to the STUNIR Unix-like interface.",
+    "Monolith": "Legacy Ada tools that combine multiple phases into a single executable.",
+    "Schema": "A JSON Schema or schema snippet describing required fields and types for a data contract.",
+    "Pipeline": "A sequence of tools connected by stdin/stdout pipes producing a final artifact.",
+    "Strict_Mode": "Validation mode that fails on warnings or missing optional fields.",
+    "Describe_Mode": "Tool mode that emits JSON describing inputs, outputs, options, and constraints.",
+    "Determinism": "Property that identical inputs yield identical outputs byte-for-byte.",
+    "Exit_Code": "Numeric status returned by a tool indicating success or failure category.",
+    "Toolchain": "The complete set of STUNIR tools and their contracts for end-to-end processing."
+  },
+  "common_error_registry": {
+    "description": "Standardized exit codes across all tools",
+    "categories": {
+      "Validation": "Input or argument validation failures",
+      "Processing": "Internal processing failures",
+      "Resource": "Filesystem, permissions, or system resource failures",
+      "Partial": "Completed with warnings when strict mode is off",
+      "Verification": "Integrity or verification failures"
+    },
+    "required_stderr_fields": [
+      "timestamp",
+      "tool",
+      "code",
+      "message"
+    ],
+    "exit_code_guidance": {
+      "always_use_nonzero_on_error": true,
+      "avoid_reusing_codes": true,
+      "stdout_must_be_empty_on_failure": true
+    },
+    "codes": {
+      "0": "Success - Operation completed successfully",
+      "1": "Validation Error - Input data (JSON, args) is invalid or malformed",
+      "2": "Processing Error - Logic failed (e.g., conversion impossible, path not found)",
+      "3": "Resource Error - System issue (file not found, permission denied, OOM)",
+      "4": "Partial Success - Operation completed with warnings (when strict mode is off)",
+      "5": "Verification Failure - Integrity check failed (hash mismatch, signature invalid)",
+      "127": "Command Not Found - Tool executable missing or not in PATH"
+    }
+  },
+  "implementation_constraints": {
+    "spark_mode": "On",
+    "memory_management": "Stack-based preference; controlled pool usage for large structures.",
+    "dependencies": "Minimal external deps; rely on GNAT standard library and local SPARK crates.",
+    "portability": "POSIX-compliant paths preferred; Windows backslash handling in file_indexer only.",
+    "concurrency": "No internal threading in tools; concurrency is managed by the orchestrator (shell/agent).",
+    "io_policy": "Stdin/stdout for primary data flow; stderr reserved for logs only.",
+    "determinism": "Same inputs yield identical outputs; timestamps only in logs unless specified in schemas.",
+    "encoding": "UTF-8 for all text inputs and outputs.",
+    "limits": {
+      "max_json_depth": 128,
+      "max_string_length": 1048576,
+      "max_array_length": 100000,
+      "max_file_size_bytes": 268435456
+    },
+    "sandboxing": "No network access; filesystem access limited to provided paths.",
+    "exit_behavior": "Nonzero exit code on any error; stdout must be empty on failure."
+  },
+  "logging_conventions": {
+    "stderr_format": "NDJSON",
+    "required_fields": [
+      "timestamp",
+      "tool",
+      "level",
+      "code",
+      "message"
+    ],
+    "levels": [
+      "info",
+      "warn",
+      "error"
+    ],
+    "timestamp_format": "RFC3339",
+    "stdout_policy": "No logs on stdout"
+  },
+  "versioning_policy": {
+    "schema_versioning": "Semantic versioning for architecture docs and data contracts",
+    "compatibility": "Minor versions are backward compatible; major versions may break",
+    "tool_versioning": "Each tool reports version with --version",
+    "deprecation_window": "At least one minor version before removal"
+  },
+  "legacy_compatibility": {
+    "description": "Original monolithic tools and their powertools equivalents",
+    "migration_status": "in_progress",
+    "original_tools": [
+      {
+        "name": "stunir_spec_to_ir_main",
+        "status": "legacy",
+        "replacement": "spec_to_ir (internal, being decomposed)",
+        "powertools_equivalent": [
+          "extraction_to_spec",
+          "spec_validate",
+          "func_dedup",
+          "type_normalize"
+        ],
+        "deprecation_date": "2026-03-01",
+        "removal_date": "2026-06-01"
+      },
+      {
+        "name": "stunir_ir_to_code_main",
+        "status": "legacy",
+        "replacement": "sig_gen_cpp, sig_gen_rust, type_map",
+        "powertools_equivalent": [
+          "sig_gen_cpp",
+          "sig_gen_rust",
+          "type_map"
+        ],
+        "deprecation_date": "2026-03-01",
+        "removal_date": "2026-06-01"
+      },
+      {
+        "name": "stunir_code_index_main",
+        "status": "legacy",
+        "replacement": "file_indexer, hash_compute",
+        "powertools_equivalent": [
+          "file_indexer",
+          "hash_compute"
+        ],
+        "deprecation_date": "2026-03-01",
+        "removal_date": "2026-06-01"
+      },
+      {
+        "name": "stunir_code_slice_main",
+        "status": "legacy",
+        "replacement": "Planned: code_slice, region_extract",
+        "powertools_equivalent": [
+          "code_slice (planned)",
+          "region_extract (planned)"
+        ],
+        "deprecation_date": "2026-04-01",
+        "removal_date": "2026-07-01"
+      },
+      {
+        "name": "stunir_spec_assemble_main",
+        "status": "legacy",
+        "replacement": "extraction_to_spec, spec_validate",
+        "powertools_equivalent": [
+          "extraction_to_spec",
+          "spec_validate"
+        ],
+        "deprecation_date": "2026-03-01",
+        "removal_date": "2026-06-01"
+      },
+      {
+        "name": "stunir_receipt_link_main",
+        "status": "legacy",
+        "replacement": "Planned: receipt_generate, link_validate",
+        "powertools_equivalent": [
+          "receipt_generate (planned)",
+          "link_validate (planned)"
+        ],
+        "deprecation_date": "2026-04-01",
+        "removal_date": "2026-07-01"
+      }
+    ]
+  },
+  "ai_model_guidance": {
+    "description": "Instructions for AI models using this toolchain",
+    "tool_selection": {
+      "strategy": "Start with --describe to understand tool capabilities",
+      "command": "tool_name --describe",
+      "output": "Complete JSON schema of inputs, outputs, and options"
+    },
+    "error_handling": {
+      "approach": "Check exit codes before parsing output",
+      "exit_code_meanings": {
+        "0": "Success - output is valid",
+        "1": "Validation error - check stderr for details",
+        "2": "Processing error - input may be malformed",
+        "3": "Resource error - file not found or permission denied",
+        "4": "Partial success - check output but note warnings",
+        "5": "Verification failed - specific to verification tools"
+      },
+      "stderr_contract": "Expect JSON lines with fields: timestamp, tool, code, message"
+    },
+    "composition_patterns": {
+      "sequential": "tool1 | tool2 | tool3",
+      "conditional": "tool1 && tool2 || error_handler",
+      "branching": "tool1 | tee output.json | tool2",
+      "validation_first": "json_validate < input.json && process_tool",
+      "parallel": "Use shell scripting for parallel execution where possible"
+    },
+    "determinism_guidance": {
+      "rule": "Avoid tools that inject timestamps into stdout unless schema requires it",
+      "verification": "Hash stdout to confirm stable output across runs",
+      "replay": "Use recorded inputs to re-run pipelines for identical outputs"
+    },
+    "logging_guidance": {
+      "consume_stderr": "Always capture stderr separately for diagnostics",
+      "do_not_parse_stdout_on_error": true,
+      "strict_mode_for_ci": true
+    },
+    "common_mistakes": [
+      {
+        "mistake": "Assuming tool output format without checking --describe",
+        "solution": "Always call --describe first to get schema"
+      },
+      {
+        "mistake": "Not checking exit codes",
+        "solution": "Check exit code before processing stdout"
+      },
+      {
+        "mistake": "Chaining tools that don't accept stdin",
+        "solution": "Check 'stdin' field in tool definition"
+      },
+      {
+        "mistake": "Using legacy tools for new workflows",
+        "solution": "Prefer powertools; legacy tools are deprecated"
+      },
+      {
+        "mistake": "Ignoring warnings in non-strict mode",
+        "solution": "Use --strict for critical validations"
+      },
+      {
+        "mistake": "Not handling large inputs efficiently",
+        "solution": "Use streaming where possible, check performance_guidelines"
+      }
+    ],
+    "best_practices": [
+      "Always validate inputs before processing",
+  "security_considerations": {
+    "description": "Security guidelines for toolchain usage",
+    "principles": [
+      "No network access in tools - all operations local",
+      "Input validation to prevent injection attacks",
+      "No execution of generated code within tools",
+      "Use of SPARK for memory safety",
+      "Hash verification for integrity checks"
+    ],
+    "best_practices": [
+      "Run in sandboxed environments",
+      "Validate all inputs with json_validate and spec_validate",
+      "Use --strict modes for production",
+      "Monitor for unexpected file accesses",
+      "Regularly update toolchain versions"
+    ],
+    "threat_model": {
+      "assumptions": [
+        "Inputs may be untrusted",
+        "Execution environment is local",
+        "No network access for tools"
+      ],
+      "out_of_scope": [
+        "Network-originated attacks",
+        "Remote code execution within tools"
+      ]
+    },
+    "known_risks": [
+      {
+        "risk": "Path traversal in file_indexer",
+        "mitigation": "Use absolute paths and validate inputs"
+      },
+      {
+        "risk": "Large file processing OOM",
+        "mitigation": "Set resource limits, process in streams"
+      },
+      {
+        "risk": "Schema drift between tools",
+        "mitigation": "Pin schema versions and validate at boundaries"
+      }
+    ]
+  },
+  "performance_guidelines": {
+    "description": "Tips for efficient toolchain usage",
+    "general": [
+      "Use stdin/stdout for small to medium data",
+      "Write to files for large outputs",
+      "Parallelize independent tool calls",
+      "Use --no-hash in file_indexer for speed"
+    ],
+    "large_scale": [
+      "Split large directories into batches",
+      "Use filtering options to reduce scope",
+      "Monitor memory usage for JSON parsing",
+      "Prefer streaming where possible"
+    ],
+    "pipeline_optimizations": [
+      "Validate early to fail fast",
+      "Reuse manifests when inputs are unchanged",
+      "Avoid repeated hashing unless needed"
+    ],
+    "benchmarks": {
+      "file_indexer": "1000 files/sec on SSD",
+      "json_validate": "10MB/sec",
+      "sig_gen_cpp": "100 functions/sec"
+    }
+  }
+      "Use tee for debugging pipelines",
+      "Check --version for tool compatibility",
+      "Combine with shell scripting for complex logic",
+      "Monitor stderr for all operations",
+      "Record inputs/outputs for reproducibility"
+    ]
+      },
+      {
+        "mistake": "Using legacy tools for new workflows",
+        "solution": "Prefer powertools; legacy tools are deprecated"
+      },
+      {
+        "mistake": "Ignoring warnings in non-strict mode",
+        "solution": "Use --strict for critical validations"
+      },
+      {
+        "mistake": "Not handling large inputs efficiently",
+        "solution": "Use streaming where possible, check performance_guidelines"
+      }
+    ],
+    "best_practices": [
+      "Always validate inputs before processing",
+      "Use tee for debugging pipelines",
+      "Check --version for tool compatibility",
+      "Combine with shell scripting for complex logic",
+      "Monitor stderr for all operations"
+    ]
+  },
+  "security_considerations": {
+    "description": "Security guidelines for toolchain usage",
+    "principles": [
+      "No network access in tools - all operations local",
+      "Input validation to prevent injection attacks",
+      "No execution of generated code within tools",
+      "Use of SPARK for memory safety",
+      "Hash verification for integrity checks"
+    ],
+    "best_practices": [
+      "Run in sandboxed environments",
+      "Validate all inputs with json_validate and spec_validate",
+      "Use --strict modes for production",
+      "Monitor for unexpected file accesses",
+      "Regularly update toolchain versions"
+    ],
+    "known_risks": [
+      {
+        "risk": "Path traversal in file_indexer",
+        "mitigation": "Use absolute paths and validate inputs"
+      },
+      {
+        "risk": "Large file processing OOM",
+        "mitigation": "Set resource limits, process in streams"
+      }
+    ]
+  },
+  "performance_guidelines": {
+    "description": "Tips for efficient toolchain usage",
+    "general": [
+      "Use stdin/stdout for small to medium data",
+      "Write to files for large outputs",
+      "Parallelize independent tool calls",
+      "Use --no-hash in file_indexer for speed"
+    ],
+    "large_scale": [
+      "Split large directories into batches",
+      "Use filtering options to reduce scope",
+      "Monitor memory usage for JSON parsing",
+      "Prefer streaming where possible"
+    ],
+    "benchmarks": {
+      "file_indexer": "1000 files/sec on SSD",
+      "json_validate": "10MB/sec",
+      "sig_gen_cpp": "100 functions/sec"
+    }
+  }
+}

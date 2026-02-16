@@ -9,11 +9,8 @@
 pragma SPARK_Mode (On);
 
 with Ada.Strings.Bounded;
-with Ada.Strings.Bounded.Hash;
 
 package STUNIR_Types is
-
-   pragma Pure;
 
    --  ========================================================================
    --  String Type Definitions
@@ -65,7 +62,11 @@ package STUNIR_Types is
       Error_Validation_Failed,
       Error_Conversion_Failed,
       Error_Emission_Failed,
-      Error_Not_Implemented
+      Error_Not_Implemented,
+      Error_Invalid_Format,
+      Error_Empty_Extraction,
+      Error_Too_Large,
+      Error_Parse
    );
 
    --  Status code helper functions
@@ -224,13 +225,6 @@ package STUNIR_Types is
    subtype All_Targets is Target_Language range Target_CPP .. Target_SPARK;
 
    --  ========================================================================
-   --  Hash Support for Strings
-   --  ========================================================================
-
-   function Hash (S : Identifier_String) return Ada.Containers.Hash_Type
-     renames Identifier_Strings.Hash;
-
-   --  ========================================================================
    --  Constants
    --  ========================================================================
 
@@ -239,5 +233,8 @@ package STUNIR_Types is
 
    Null_Type_Name : constant Type_Name_String :=
      Type_Name_Strings.Null_Bounded_String;
+
+   Null_Error_String : constant Error_String :=
+     Error_Strings.Null_Bounded_String;
 
 end STUNIR_Types;

@@ -43,7 +43,7 @@ package body STUNIR.Emitters.OOP is
             Code_Buffers.Append (Source => Output, New_Item => "# STUNIR Generated Python OOP" & ASCII.LF);
             Code_Buffers.Append (Source => Output, New_Item => "# DO-178C Level A" & ASCII.LF & ASCII.LF);
             Code_Buffers.Append (Source => Output, New_Item => "class " & Name_Strings.To_String (Module.Module_Name) & ":" & ASCII.LF);
-            Code_Buffers.Append (Source => Output, New_Item => "    \"\"\"STUNIR generated class\"\"\"" & ASCII.LF);
+            Code_Buffers.Append (Source => Output, New_Item => "    """"""STUNIR generated class""""""" & ASCII.LF);
             Code_Buffers.Append (Source => Output, New_Item => "    pass" & ASCII.LF);
 
          when Ruby =>

@@ -1,0 +1,31 @@
+-- Example C code that should be generated for Stmt_Add
+
+-- Input Statement:
+--   Stmt_Type => Stmt_Add
+--   Data_Type => Type_I32
+--   Target    => "result"
+--   Left_Op   => "a"
+--   Right_Op  => "b"
+
+-- Expected Output:
+result = a + b;
+
+-- With indentation (Indent = 1):
+   result = a + b;
+
+-- Full example with variable declaration:
+int32_t result;
+result = a + b;
+
+-- For Stmt_Sub:
+result = a - b;
+
+-- For Stmt_Mul:
+result = a * b;
+
+-- For Stmt_Div:
+result = a / b;
+
+-- Error cases:
+-- If Left_Op or Right_Op is empty, should still generate valid C
+-- If Target is empty, this is an error (but not your concern in this task)

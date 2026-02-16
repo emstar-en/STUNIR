@@ -1,0 +1,49 @@
+{
+  "schema_version": "2.2.0",
+  "title": "STUNIR SPARK Toolchain Architecture",
+  "description": "Enhanced architecture documentation for the STUNIR SPARK toolchain, split into focused section files.",
+  "last_updated": "2026-02-06",
+  "status": "active_development",
+  "version_history": [
+    {
+      "version": "2.0.0",
+      "date": "2026-02-06",
+      "changes": ["Initial comprehensive documentation"]
+    },
+    {
+      "version": "2.1.0",
+      "date": "2026-02-06",
+      "changes": [
+        "Added planned_tools section",
+        "Expanded data_formats with schema examples",
+        "Added security_considerations and performance_guidelines",
+        "Added more workflows and common_mistakes",
+        "Added dependencies to tool definitions",
+        "Split architecture into focused JSON files"
+      ]
+    },
+    {
+      "version": "2.2.0",
+      "date": "2026-02-06",
+      "changes": [
+        "Expanded core guidance and constraints",
+        "Added tool contracts and compatibility matrix",
+        "Added schema registry and validation rules",
+        "Expanded workflows with validation gates and recovery",
+        "Expanded CI with build profiles, proofs, and caching"
+      ]
+    }
+  ],
+  "split_index": {
+    "core": "ARCHITECTURE.core.json",
+    "tools": "ARCHITECTURE.tools.json",
+    "formats": "ARCHITECTURE.formats.json",
+    "workflows": "ARCHITECTURE.workflows.json",
+    "ci": "ARCHITECTURE.ci.json"
+  },
+  "notes": {
+    "intent": "Split monolithic architecture file into focused sections",
+    "format": "Each referenced file is standalone JSON",
+    "source": "ARCHITECTURE.json (pre-split)"
+  }
+}

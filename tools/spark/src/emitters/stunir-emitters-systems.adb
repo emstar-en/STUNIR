@@ -24,7 +24,7 @@ package body STUNIR.Emitters.Systems is
             Code_Buffers.Append (Source => Output, New_Item => "# DO-178C Level A" & ASCII.LF & ASCII.LF);
          when Zig =>
             Code_Buffers.Append (Source => Output, New_Item => "// STUNIR Generated Zig" & ASCII.LF);
-            Code_Buffers.Append (Source => Output, New_Item => "const std = @import(\"std\");" & ASCII.LF & ASCII.LF);
+            Code_Buffers.Append (Source => Output, New_Item => "const std = @import(""std"");" & ASCII.LF & ASCII.LF);
          when Carbon =>
             Code_Buffers.Append (Source => Output, New_Item => "// STUNIR Generated Carbon" & ASCII.LF);
       end case;

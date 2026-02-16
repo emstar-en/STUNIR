@@ -27,108 +27,42 @@ YELLOW = \033[1;33m
 NC = \033[0m # No Color
 
 # Targets
-.PHONY: all clean core parsing validation analysis testing utils prove test install
+.PHONY: all clean tools core parsing validation analysis testing utils prove test install
 
 # Default target
-all: directories core parsing validation
+all: directories tools
 	@echo "$(GREEN)SPARK components built successfully$(NC)"
 
 # Create necessary directories
 directories:
-	@mkdir -p $(OBJ_DIR)
-	@mkdir -p $(BIN_DIR)
+	@powershell -NoProfile -Command "if (-not (Test-Path '$(OBJ_DIR)')) { New-Item -ItemType Directory -Path '$(OBJ_DIR)' | Out-Null }"
+	@powershell -NoProfile -Command "if (-not (Test-Path '$(BIN_DIR)')) { New-Item -ItemType Directory -Path '$(BIN_DIR)' | Out-Null }"
 
 # ============================================================================
-# Core Components (Phase 1)
+# Toolchain Build
 # ============================================================================
 
-core: directories
-	@echo "$(YELLOW)Building Core Components...$(NC)"
-	$(GNATMAKE) -P core.gpr -Xmode=$(MODE) -aO$(OBJ_DIR)
-	@echo "$(GREEN)Core components built$(NC)"
+tools: directories
+	@echo "$(YELLOW)Building STUNIR tools...$(NC)"
+	$(GPRBUILD) -P stunir_tools.gpr -Xmode=$(MODE)
+	@echo "$(GREEN)STUNIR tools built$(NC)"
 
-# Core formal verification
-core-prove: core
-	@echo "$(YELLOW)Running formal verification on Core...$(NC)"
-	$(GNATPROVE) -P core.gpr --level=$(PROOF_LEVEL) --checks-as-errors
-	@echo "$(GREEN)Core verification complete$(NC)"
-
-# ============================================================================
-# Parsing Components (Phase 2)
-# ============================================================================
-
-parsing: core
-	@echo "$(YELLOW)Building Parsing Components...$(NC)"
-	$(GNATMAKE) -P parsing.gpr -Xmode=$(MODE) -aO$(OBJ_DIR)
-	@echo "$(GREEN)Parsing components built$(NC)"
-
-parsing-prove: parsing
-	@echo "$(YELLOW)Running formal verification on Parsing...$(NC)"
-	$(GNATPROVE) -P parsing.gpr --level=3 --checks-as-errors
-	@echo "$(GREEN)Parsing verification complete$(NC)"
+# Compatibility targets
+core: tools
+parsing: tools
+validation: tools
+analysis: tools
+testing: tools
+utils: tools
 
 # ============================================================================
-# Validation Components (Phase 3)
+# Formal Verification
 # ============================================================================
 
-validation: core
-	@echo "$(YELLOW)Building Validation Components...$(NC)"
-	$(GNATMAKE) -P validation.gpr -Xmode=$(MODE) -aO$(OBJ_DIR)
-	@echo "$(GREEN)Validation components built$(NC)"
-
-validation-prove: validation
-	@echo "$(YELLOW)Running formal verification on Validation...$(NC)"
-	$(GNATPROVE) -P validation.gpr --level=$(PROOF_LEVEL) --checks-as-errors
-	@echo "$(GREEN)Validation verification complete$(NC)"
-
-# ============================================================================
-# Analysis Components (Phase 4)
-# ============================================================================
-
-analysis: core validation
-	@echo "$(YELLOW)Building Analysis Components...$(NC)"
-	$(GNATMAKE) -P analysis.gpr -Xmode=$(MODE) -aO$(OBJ_DIR)
-	@echo "$(GREEN)Analysis components built$(NC)"
-
-analysis-prove: analysis
-	@echo "$(YELLOW)Running formal verification on Analysis...$(NC)"
-	$(GNATPROVE) -P analysis.gpr --level=2 --checks-as-errors
-	@echo "$(GREEN)Analysis verification complete$(NC)"
-
-# ============================================================================
-# Testing Components (Phase 5)
-# ============================================================================
-
-testing: core parsing validation
-	@echo "$(YELLOW)Building Testing Components...$(NC)"
-	$(GNATMAKE) -P testing.gpr -Xmode=$(MODE) -aO$(OBJ_DIR)
-	@echo "$(GREEN)Testing components built$(NC)"
-
-testing-prove: testing
-	@echo "$(YELLOW)Running formal verification on Testing...$(NC)"
-	$(GNATPROVE) -P testing.gpr --level=2 --checks-as-errors
-	@echo "$(GREEN)Testing verification complete$(NC)"
-
-# ============================================================================
-# Utility Components (Phase 6)
-# ============================================================================
-
-utils: core
-	@echo "$(YELLOW)Building Utility Components...$(NC)"
-	$(GNATMAKE) -P utils.gpr -Xmode=$(MODE) -aO$(OBJ_DIR)
-	@echo "$(GREEN)Utility components built$(NC)"
-
-utils-prove: utils
-	@echo "$(YELLOW)Running formal verification on Utils...$(NC)"
-	$(GNATPROVE) -P utils.gpr --level=1 --checks-as-errors
-	@echo "$(GREEN)Utils verification complete$(NC)"
-
-# ============================================================================
-# Full Verification
-# ============================================================================
-
-prove: core-prove parsing-prove validation-prove analysis-prove testing-prove utils-prove
-	@echo "$(GREEN)All formal verification complete$(NC)"
+prove:
+	@echo "$(YELLOW)Running formal verification...$(NC)"
+	$(GNATPROVE) -P stunir_tools.gpr --level=$(PROOF_LEVEL) --checks-as-errors
+	@echo "$(GREEN)Formal verification complete$(NC)"
 
 # ============================================================================
 # Testing

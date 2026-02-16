@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "STUNIR Unified Extraction Schema",
+  "description": "Unified schema for function signature extraction from C/C++ source code",
+  "version": "2.0.0",
+  
+  "definitions": {
+    "parameter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Parameter name"
+        },
+        "type": {
+          "type": "string",
+          "description": "C/C++ type string"
+        }
+      },
+      "required": ["type"]
+    },
+    
+    "function": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Function name"
+        },
+        "return_type": {
+          "type": "string",
+          "description": "Return type of the function",
+          "default": "void"
+        },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/parameter" },
+          "default": []
+        },
+        "source_file": {
+          "type": "string",
+          "description": "Source file path"
+        }
+      },
+      "required": ["name"]
+    },
+    
+    "source_file": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Source file path"
+        },
+        "functions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/function" }
+        }
+      },
+      "required": ["path", "functions"]
+    }
+  },
+  
+  "oneOf": [
+    {
+      "title": "Format A: Direct Functions Array",
+      "description": "Functions listed directly with source_file per function",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "extraction.v2"
+        },
+        "source_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of source file paths"
+        },
+        "total_functions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "functions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/function" }
+        }
+      },
+      "required": ["schema_version", "functions"]
+    },
+    {
+      "title": "Format B: Files Array",
+      "description": "Functions grouped by source file",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "extraction.v2"
+        },
+        "files": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/source_file" }
+        },
+        "total_functions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["schema_version", "files"]
+    },
+    {
+      "title": "Format C: Placeholder/Minimal",
+      "description": "Minimal extraction result for unsupported or placeholder cases",
+      "properties": {
+        "batches_processed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "functions_extracted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsupported_constructs_found": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["success", "partial", "placeholder", "failed"]
+        }
+      },
+      "required": ["status"]
+    },
+    {
+      "title": "Format D: Legacy v1",
+      "description": "Legacy extraction format",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "extraction.v1"
+        },
+        "source_index": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_file": { "type": "string" },
+              "functions": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/function" }
+              }
+            }
+          }
+        }
+      },
+      "required": ["schema_version", "files"]
+    }
+  ]
+}

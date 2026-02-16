@@ -1,0 +1,3 @@
+json_extract.adb:106:29: error: binary operator expected
+json_extract.adb:106:30: error: illegal character
+json_extract.adb:106:37: error: illegal character

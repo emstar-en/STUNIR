@@ -52,7 +52,7 @@ package body STUNIR.Emitters.Parser is
                New_Item => "%%" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "prog: expr { printf(\"Parsed expression\\n\"); };" & ASCII.LF);
+               New_Item => "prog: expr { printf(""Parsed expression\n""); };" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
                New_Item => "expr: ID | NUM ;" & ASCII.LF);

@@ -37,7 +37,7 @@ package body STUNIR.Emitters.Expert is
                New_Item => "(defrule example-rule" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "  \"STUNIR generated rule\"" & ASCII.LF);
+               New_Item => "  ""STUNIR generated rule""" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
                New_Item => "  (fact ?x)" & ASCII.LF);
@@ -70,7 +70,7 @@ package body STUNIR.Emitters.Expert is
                New_Item => "  =>" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "  (printout t \"Rule fired\" crlf))" & ASCII.LF);
+               New_Item => "  (printout t ""Rule fired"" crlf))" & ASCII.LF);
 
          when Drools =>
             -- Emit Drools business rules
@@ -85,7 +85,7 @@ package body STUNIR.Emitters.Expert is
                New_Item => "package com.stunir.rules;" & ASCII.LF & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "rule \"Example Rule\"" & ASCII.LF);
+               New_Item => "rule ""Example Rule""" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
                New_Item => "  when" & ASCII.LF);
@@ -97,7 +97,7 @@ package body STUNIR.Emitters.Expert is
                New_Item => "  then" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "    System.out.println(\"Rule matched\");" & ASCII.LF);
+               New_Item => "    System.out.println(""Rule matched"");" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
                New_Item => "end" & ASCII.LF);
@@ -205,7 +205,7 @@ package body STUNIR.Emitters.Expert is
          when Drools =>
             Code_Buffers.Append
               (Source   => Output,
-               New_Item => "rule \"" & Name_Strings.To_String (Func.Name) & "\"" & ASCII.LF);
+               New_Item => "rule """ & Name_Strings.To_String (Func.Name) & """" & ASCII.LF);
             Code_Buffers.Append
               (Source   => Output,
                New_Item => "  when" & ASCII.LF);

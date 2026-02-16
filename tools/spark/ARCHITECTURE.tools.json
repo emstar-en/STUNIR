@@ -1,0 +1,675 @@
+{
+  "schema_version": "2.2.0",
+  "section": "tools",
+  "last_updated": "2026-02-06",
+  "status": "active_development",
+  "tool_organization": {
+    "categories": [
+      {
+        "id": "phase_0_data_prep",
+        "name": "Data Preparation",
+        "description": "Tools for discovering and validating input files",
+        "phase": 0,
+        "tools": [
+          {
+            "name": "file_indexer",
+            "executable": "file_indexer",
+            "purpose": "Index directory into manifest JSON with metadata and hashes",
+            "inputs": [
+              "directory_path"
+            ],
+            "outputs": [
+              "manifest_v1"
+            ],
+            "stdin": false,
+            "stdout": true,
+            "file_output": "optional",
+            "options": [
+              "--recursive",
+              "--include=GLOB",
+              "--exclude=GLOB",
+              "--no-hash",
+              "--output=FILE"
+            ],
+            "exit_codes": {
+              "0": "Success - manifest generated",
+              "1": "Validation error - invalid arguments",
+              "2": "Processing error - directory traversal failed",
+              "3": "Resource error - permission denied or path not found"
+            },
+            "dependencies": [
+              "Ada.Directories",
+              "GNAT.SHA256"
+            ],
+            "ai_hints": {
+              "when_to_use": "Start of any workflow to establish file inventory",
+              "common_patterns": [
+                "file_indexer --recursive src/ > manifest.json",
+                "file_indexer --include='*.c,*.h' src/ | next_tool"
+              ],
+              "error_handling": "Check exit code 3 for permission issues, 2 for invalid paths; retry with adjusted paths or permissions"
+            }
+          },
+          {
+            "name": "hash_compute",
+            "executable": "hash_compute",
+            "purpose": "Compute SHA-256 hash of file or stdin content",
+            "inputs": [
+              "file_path_or_stdin"
+            ],
+            "outputs": [
+              "hex_hash"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--algorithm=sha256|md5",
+              "--verify=EXPECTED_HASH",
+              "--json"
+            ],
+            "exit_codes": {
+              "0": "Success - hash computed or verified",
+              "1": "Validation error - unknown algorithm",
+              "2": "Processing error - file read failed",
+              "3": "Resource error - file not found",
+              "5": "Verification failed - hash mismatch"
+            },
+            "dependencies": [
+              "GNAT.SHA256",
+              "GNAT.MD5"
+            ],
+            "ai_hints": {
+              "when_to_use": "Verify file integrity, generate checksums for receipts",
+              "common_patterns": [
+                "hash_compute file.c",
+                "cat file.c | hash_compute",
+                "hash_compute --verify=abc123 file.c"
+              ],
+              "error_handling": "On exit 5, compare actual vs expected hash; on 3, confirm file existence"
+            }
+          },
+          {
+            "name": "lang_detect",
+            "executable": "lang_detect",
+            "purpose": "Detect programming language of source file",
+            "inputs": [
+              "file_path"
+            ],
+            "outputs": [
+              "language_id",
+              "confidence_score"
+            ],
+            "stdin": false,
+            "stdout": true,
+            "options": [
+              "--content",
+              "--json",
+              "--confidence"
+            ],
+            "exit_codes": {
+              "0": "Success - language detected",
+              "1": "Validation error - invalid options",
+              "3": "Resource error - file not found"
+            },
+            "dependencies": [
+              "Language_Detection_Library"
+            ],
+            "ai_hints": {
+              "when_to_use": "Before processing unknown files, batch classification",
+              "output_formats": {
+                "default": "c\n",
+                "json": "{\"language\":\"c\",\"confidence\":0.95}\n"
+              },
+              "error_handling": "On low confidence, use multiple files or manual override"
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase_1_spec",
+        "name": "Specification Pipeline",
+        "description": "Tools for creating and validating function specifications",
+        "phase": 1,
+        "tools": [
+          {
+            "name": "format_detect",
+            "executable": "format_detect",
+            "purpose": "Identify extraction JSON format variant",
+            "inputs": [
+              "extraction_json"
+            ],
+            "outputs": [
+              "format_id",
+              "version"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--json"
+            ],
+            "exit_codes": {
+              "0": "Success - format identified",
+              "1": "Validation error - invalid JSON",
+              "2": "Processing error - unknown format"
+            },
+            "dependencies": [
+              "JSON_Parser"
+            ],
+            "ai_hints": {
+              "when_to_use": "Before extraction_to_spec to determine conversion strategy",
+              "detected_formats": [
+                "stunir_v1",
+                "cproto",
+                "clang_ast",
+                "doxygen_xml",
+                "tree_sitter"
+              ],
+              "error_handling": "On exit 2, inspect input for custom formats"
+            }
+          },
+          {
+            "name": "extraction_to_spec",
+            "executable": "extraction_to_spec",
+            "purpose": "Convert various extraction formats to canonical spec_v1",
+            "inputs": [
+              "extraction_json"
+            ],
+            "outputs": [
+              "spec_v1"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--lang=c|cpp|rust",
+              "--output=FILE",
+              "--pretty",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - spec generated",
+              "1": "Validation error - invalid input",
+              "2": "Processing error - conversion failed"
+            },
+            "dependencies": [
+              "JSON_Parser",
+              "Type_Normalizer"
+            ],
+            "ai_hints": {
+              "when_to_use": "After extraction to normalize format",
+              "pipeline_position": "Typically: format_detect | extraction_to_spec | spec_validate",
+              "error_handling": "On conversion failure, check format_detect output first"
+            }
+          },
+          {
+            "name": "spec_validate",
+            "executable": "spec_validate",
+            "purpose": "Validate spec.json structure against schema",
+            "inputs": [
+              "spec_v1"
+            ],
+            "outputs": [
+              "validation_report"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--strict",
+              "--json"
+            ],
+            "exit_codes": {
+              "0": "Success - spec is valid",
+              "1": "Validation error - spec has errors",
+              "4": "Partial success - warnings present (with --strict)"
+            },
+            "dependencies": [
+              "JSON_Schema_Validator"
+            ],
+            "ai_hints": {
+              "when_to_use": "After any spec modification, before IR conversion",
+              "strict_mode": "Any warning becomes error with --strict",
+              "error_handling": "Parse validation_report for specific error locations"
+            }
+          },
+          {
+            "name": "func_dedup",
+            "executable": "func_dedup",
+            "purpose": "Remove duplicate functions from spec based on signature",
+            "inputs": [
+              "spec_v1"
+            ],
+            "outputs": [
+              "deduplicated_spec_v1"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--key=name|signature",
+              "--output=FILE",
+              "--last",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - deduplication complete",
+              "1": "Validation error - invalid spec",
+              "2": "Processing error - deduplication failed"
+            },
+            "dependencies": [
+              "Hash_Maps"
+            ],
+            "ai_hints": {
+              "when_to_use": "When multiple source files define same function",
+              "key_options": {
+                "name": "Deduplicate by function name only",
+                "signature": "Deduplicate by full signature (name + params + return)"
+              },
+              "error_handling": "Use --verbose to see which duplicates were removed"
+            }
+          },
+          {
+            "name": "type_normalize",
+            "executable": "type_normalize",
+            "purpose": "Canonicalize C type strings to standard form",
+            "inputs": [
+              "type_string_or_spec"
+            ],
+            "outputs": [
+              "normalized_types"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--output=FILE",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - types normalized",
+              "1": "Validation error - invalid input",
+              "2": "Processing error - normalization failed"
+            },
+            "dependencies": [
+              "Type_Parser"
+            ],
+            "ai_hints": {
+              "when_to_use": "Before type mapping to ensure consistency",
+              "examples": [
+                "unsigned int -> uint32_t",
+                "char* -> char_ptr",
+                "struct Foo* -> Foo_ptr",
+                "const void* -> const_void_ptr"
+              ],
+              "error_handling": "On failure, check for unsupported type qualifiers"
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase_2_ir",
+        "name": "Intermediate Representation",
+        "description": "Tools for IR manipulation and validation",
+        "phase": 2,
+        "tools": [
+          {
+            "name": "spec_to_ir",
+            "executable": "stunir_spec_to_ir_main",
+            "purpose": "Convert spec_v1 to IR format (internal tool)",
+            "inputs": [
+              "spec_v1"
+            ],
+            "outputs": [
+              "ir_v1"
+            ],
+            "stdin": false,
+            "stdout": false,
+            "file_io": true,
+            "options": [
+              "--input=FILE",
+              "--output=FILE"
+            ],
+            "exit_codes": {
+              "0": "Success - IR generated",
+              "1": "Validation error - invalid spec",
+              "2": "Processing error - conversion failed"
+            },
+            "dependencies": [
+              "IR_Converter"
+            ],
+            "ai_hints": {
+              "when_to_use": "After spec is validated, before code generation",
+              "note": "This is a legacy monolithic tool being decomposed",
+              "error_handling": "Validate spec first to avoid conversion errors"
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase_3_codegen",
+        "name": "Code Generation",
+        "description": "Tools for generating target language code",
+        "phase": 3,
+        "tools": [
+          {
+            "name": "sig_gen_cpp",
+            "executable": "sig_gen_cpp",
+            "purpose": "Generate C++ signatures and stub implementations",
+            "inputs": [
+              "spec_v1_or_ir_v1"
+            ],
+            "outputs": [
+              "cpp_header",
+              "cpp_impl"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--namespace=NAME",
+              "--guard=MACRO",
+              "--output=FILE",
+              "--impl",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - C++ generated",
+              "1": "Validation error - invalid input",
+              "2": "Processing error - generation failed"
+            },
+            "dependencies": [
+              "Code_Emitter"
+            ],
+            "ai_hints": {
+              "when_to_use": "Target is C++ binding or wrapper",
+              "output_control": "--impl generates .cpp, without generates .h",
+              "error_handling": "On failure, check input for unsupported types"
+            }
+          },
+          {
+            "name": "sig_gen_rust",
+            "executable": "sig_gen_rust",
+            "purpose": "Generate Rust FFI bindings",
+            "inputs": [
+              "spec_v1_or_ir_v1"
+            ],
+            "outputs": [
+              "rust_bindings"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--module=NAME",
+              "--output=FILE",
+              "--safe",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - Rust bindings generated",
+              "1": "Validation error - invalid input",
+              "2": "Processing error - generation failed"
+            },
+            "dependencies": [
+              "Code_Emitter"
+            ],
+            "ai_hints": {
+              "when_to_use": "Target is Rust FFI",
+              "safe_option": "--safe generates safe wrappers around unsafe FFI",
+              "error_handling": "Use --verbose for detailed generation logs"
+            }
+          },
+          {
+            "name": "type_map",
+            "executable": "type_map",
+            "purpose": "Map C types to target language types",
+            "inputs": [
+              "type_string_or_spec"
+            ],
+            "outputs": [
+              "mapped_types"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--lang=cpp|rust|python|go|java",
+              "--output=FILE",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - types mapped",
+              "1": "Validation error - unsupported language",
+              "2": "Processing error - mapping failed"
+            },
+            "dependencies": [
+              "Type_Mapper"
+            ],
+            "ai_hints": {
+              "when_to_use": "Before code generation to establish type mappings",
+              "supported_languages": [
+                "cpp",
+                "rust",
+                "python",
+                "go",
+                "java",
+                "csharp",
+                "swift",
+                "kotlin",
+                "javascript",
+                "typescript"
+              ],
+              "error_handling": "On unsupported language, suggest alternatives or extensions"
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase_4_validation",
+        "name": "Validation and Utilities",
+        "description": "Cross-cutting validation and utility tools",
+        "phase": 4,
+        "tools": [
+          {
+            "name": "toolchain_verify",
+            "executable": "toolchain_verify",
+            "purpose": "Verify toolchain.lock file integrity",
+            "inputs": [
+              "toolchain.lock"
+            ],
+            "outputs": [
+              "verification_report"
+            ],
+            "stdin": false,
+            "stdout": true,
+            "options": [
+              "--check-versions",
+              "--json"
+            ],
+            "exit_codes": {
+              "0": "Success - toolchain valid",
+              "1": "Validation error - lock file invalid",
+              "3": "Resource error - lock file not found"
+            },
+            "dependencies": [
+              "JSON_Parser"
+            ],
+            "ai_hints": {
+              "when_to_use": "At start of reproducible build workflow",
+              "error_handling": "On failure, regenerate lock file"
+            }
+          },
+          {
+            "name": "json_validate",
+            "executable": "json_validate",
+            "purpose": "Validate JSON syntax and structure",
+            "inputs": [
+              "json_file_or_stdin"
+            ],
+            "outputs": [
+              "validation_status"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--strict",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - JSON is valid",
+              "1": "Validation error - JSON has syntax errors"
+            },
+            "dependencies": [
+              "JSON_Parser"
+            ],
+            "ai_hints": {
+              "when_to_use": "Before parsing any JSON input",
+              "pipeline_use": "cat file.json | json_validate | json_extract -p key",
+              "error_handling": "Use --verbose for line/column of syntax errors"
+            }
+          },
+          {
+            "name": "json_extract",
+            "executable": "json_extract",
+            "purpose": "Extract values from JSON by dot-notation path",
+            "inputs": [
+              "json_file_or_stdin"
+            ],
+            "outputs": [
+              "extracted_value"
+            ],
+            "stdin": true,
+            "stdout": true,
+            "options": [
+              "--path=PATH",
+              "--default=VALUE",
+              "--raw",
+              "--verbose"
+            ],
+            "exit_codes": {
+              "0": "Success - value extracted",
+              "1": "Validation error - invalid JSON",
+              "2": "Processing error - path not found (without --default)"
+            },
+            "dependencies": [
+              "JSON_Parser"
+            ],
+            "ai_hints": {
+              "when_to_use": "Extract specific fields from JSON output",
+              "path_syntax": "dot.notation.for.objects and.0.for.arrays",
+              "examples": [
+                "json_extract -p functions.0.name < spec.json",
+                "json_extract -p module.name --default=unknown < spec.json",
+                "json_extract -p array.1.subkey < data.json"
+              ],
+              "error_handling": "Use --default to handle missing paths gracefully"
+            }
+          }
+        ]
+      }
+    ],
+    "compatibility_matrix": {
+      "stdin_stdout": {
+        "file_indexer": "stdout_only",
+        "hash_compute": "stdin_or_file",
+        "lang_detect": "file_only",
+        "format_detect": "stdin_only",
+        "extraction_to_spec": "stdin_only",
+        "spec_validate": "stdin_only",
+        "func_dedup": "stdin_only",
+        "type_normalize": "stdin_or_file",
+        "spec_to_ir": "file_io_only",
+        "sig_gen_cpp": "stdin_only",
+        "sig_gen_rust": "stdin_only",
+        "type_map": "stdin_or_file",
+        "toolchain_verify": "file_only",
+        "json_validate": "stdin_or_file",
+        "json_extract": "stdin_or_file"
+      },
+      "strict_mode": {
+        "spec_validate": true,
+        "json_validate": true,
+        "json_extract": false,
+        "func_dedup": false,
+        "type_normalize": false
+      },
+      "schema_inputs": {
+        "spec_validate": "spec_v1",
+        "extraction_to_spec": "extraction_*",
+        "format_detect": "extraction_*",
+        "sig_gen_cpp": "spec_v1_or_ir_v1",
+        "sig_gen_rust": "spec_v1_or_ir_v1",
+        "type_map": "type_string_or_spec"
+      }
+    },
+    "tool_contracts": {
+      "stdout": "Data output only; no logs",
+      "stderr": "NDJSON log lines with code and message",
+      "exit_codes": "Use common_error_registry definitions",
+      "describe": "--describe returns JSON with inputs/outputs/options",
+      "schema": "--schema returns JSON schema when supported",
+      "determinism": "Deterministic outputs for identical inputs"
+    },
+    "planned_tools": [
+      {
+        "name": "json_merge",
+        "phase": 4,
+        "purpose": "Merge multiple JSON objects or arrays",
+        "status": "planned",
+        "expected_inputs": [
+          "json_files_or_stdin"
+        ],
+        "expected_outputs": [
+          "merged_json"
+        ],
+        "ai_hints": "For combining specs from multiple sources"
+      },
+      {
+        "name": "type_resolve",
+        "phase": 1,
+        "purpose": "Resolve type aliases and dependencies in spec",
+        "status": "planned",
+        "expected_inputs": [
+          "spec_v1"
+        ],
+        "expected_outputs": [
+          "resolved_spec_v1"
+        ],
+        "ai_hints": "Handle complex type hierarchies"
+      },
+      {
+        "name": "ir_validate",
+        "phase": 2,
+        "purpose": "Validate IR structure and semantics",
+        "status": "planned",
+        "expected_inputs": [
+          "ir_v1"
+        ],
+        "expected_outputs": [
+          "validation_report"
+        ],
+        "ai_hints": "Ensure IR integrity before codegen"
+      },
+      {
+        "name": "sig_gen_python",
+        "phase": 3,
+        "purpose": "Generate Python CFFI bindings",
+        "status": "planned",
+        "expected_inputs": [
+          "spec_v1_or_ir_v1"
+        ],
+        "expected_outputs": [
+          "python_bindings"
+        ],
+        "ai_hints": "For Python integration"
+      },
+      {
+        "name": "receipt_generate",
+        "phase": 4,
+        "purpose": "Create verification receipt with hashes",
+        "status": "planned",
+        "expected_inputs": [
+          "spec",
+          "manifest"
+        ],
+        "expected_outputs": [
+          "receipt_v1"
+        ],
+        "ai_hints": "For auditable builds"
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": "2.2.0",
+  "section": "ci",
+  "last_updated": "2026-02-06",
+  "status": "active_development",
+  "building_and_testing": {
+    "build_system": "gprbuild with GNAT project files",
+    "project_files": [
+      "stunir_tools.gpr",
+      "core.gpr"
+    ],
+    "build_commands": {
+      "all": "gprbuild -P stunir_tools.gpr",
+      "powertools_only": "gprbuild -P stunir_tools.gpr json_validate json_extract func_dedup",
+      "with_proofs": "gnatprove -P stunir_tools.gpr --level=2"
+    },
+    "build_profiles": {
+      "debug": "gprbuild -P stunir_tools.gpr -XBUILD=debug",
+      "release": "gprbuild -P stunir_tools.gpr -XBUILD=release",
+      "spark_only": "gprbuild -P stunir_tools.gpr -XSPARK=on"
+    },
+    "proof_levels": {
+      "level_0": "gnatprove -P stunir_tools.gpr --level=0",
+      "level_1": "gnatprove -P stunir_tools.gpr --level=1",
+      "level_2": "gnatprove -P stunir_tools.gpr --level=2"
+    },
+    "test_harness": {
+      "location": "tools/spark/tests",
+      "pattern": "test_*.adb",
+      "execution": "Run individual test executables or use test runner",
+      "types": [
+        "unit_tests",
+        "integration_tests",
+        "golden_file_tests"
+      ]
+    }
+  },
+  "ci_integration": {
+    "github_actions": {
+      "name": "STUNIR CI Trigger",
+      "workflow": "on: push\njobs:\n  build:\n    runs-on: ubuntu-latest\n    container: ghcr.io/ada-core/gnat:latest\n    steps:\n      - uses: actions/checkout@v3\n      - run: gprbuild -P tools/spark/stunir_tools.gpr\n      - run: tools/spark/bin/toolchain_verify\n      - run: tools/spark/tests/run_all.sh"
+    },
+    "gitlab_ci": {
+      "image": "ghcr.io/ada-core/gnat:latest",
+      "script": [
+        "gprbuild -P tools/spark/stunir_tools.gpr",
+        "tools/spark/bin/toolchain_verify",
+        "tools/spark/tests/run_all.sh"
+      ]
+    },
+    "pre_commit_hooks": {
+      "description": "Recommended local hooks",
+      "hooks": [
+        {
+          "id": "format_check",
+          "entry": "gnatpp -P tools/spark/stunir_tools.gpr"
+        },
+        {
+          "id": "spec_validate",
+          "entry": "find . -name 'spec_*.json' -exec tools/spark/bin/spec_validate < {} \\;"
+        }
+      ]
+    }
+  },
+  "artifacts": {
+    "build_outputs": [
+      "tools/spark/bin",
+      "tools/spark/obj"
+    ],
+    "retention_policy": "Keep latest successful build artifacts",
+    "proof_outputs": "Store gnatprove reports and proof summaries"
+  },
+  "caching": {
+    "enabled": true,
+    "paths": [
+      "tools/spark/obj",
+      "~/.alire"
+    ],
+    "key_hint": "Include OS, compiler version, and project file hash"
+  },
+  "environment": {
+    "required_tools": [
+      "gprbuild",
+      "gnatprove",
+      "alr"
+    ],
+    "container_image": "ghcr.io/ada-core/gnat:latest",
+    "notes": "Ensure GNAT and SPARK toolchain are available in CI runners"
+  }
+}
