@@ -12,6 +12,7 @@
   "STUNIR_CHUNK_INDEX.jsonl",
   "STUNIR_EPOCH_AUTODERIVE_README.md",
   "STUNIR_INDEX_README.md",
+  "STUNIR_QUICKSTART_PRODUCTION.md",
   "STUNIR_REFERENCE_AUDIT.json",
   "STUNIR_REFERENCE_AUDIT.md",
   "STUNIR_REFERENCE_RULES.md",
@@ -49,5 +50,5 @@
   "tools/spark/bin",
   "tools/spark/src",
   "tools/spark/stunir_tools.gpr",
-  "tools/spark/index.machine.json"
+  "vex.attestation.json"
 ]

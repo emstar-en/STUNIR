@@ -1,10 +1,11 @@
-# STUNIR Production Quickstart Guide
+# STUNIR ALPHA Prototype Quickstart Guide
 
-## ✅ VERIFIED WORKING - Ready for Your Project
+## ⚠️ ALPHA PROTOTYPE - Experimental Pipeline
 
-**Status**: Production-ready spec-to-code pipeline fully functional on Windows  
-**Last Verified**: February 16, 2026  
+**Status**: ALPHA Prototype - spec-to-code pipeline functional on Windows
+**Last Verified**: February 16, 2026
 **Build Tools**: Ada SPARK via Alire toolchain
+**Stability**: Experimental - For testing and development only
 
 ---
 
@@ -259,7 +260,7 @@ gprbuild -P stunir_tools.gpr stunir_spec_to_ir_main.adb stunir_ir_to_code_main.a
 
 ## Next Steps for Your Project
 
-1. ✅ **Specs ready**: STUNIR pipeline is production-ready
+1. ✅ **Specs ready**: STUNIR pipeline is ALPHA Prototype
 2. ✅ **Tools built**: Ada SPARK binaries compiled and working
 3. ✅ **Tested**: Verified with 6 functions across 3 languages
 4. **Start coding**: Write your project spec JSON
@@ -275,4 +276,4 @@ gprbuild -P stunir_tools.gpr stunir_spec_to_ir_main.adb stunir_ir_to_code_main.a
 - **Ada SPARK Source**: `tools/spark/src/`
 - **Python Bridge**: `tools/scripts/bridge_*.py`
 
-**The pipeline is ready. Your handmade spec can now generate multi-language prototypes automatically.** 🚀
+**This ALPHA prototype pipeline is ready for testing. Your handmade spec can now generate multi-language prototypes automatically.** 🚀

@@ -54,7 +54,7 @@ Think of it as a **safety harness for AI code generation**:
 * **People who got a link at a convention** and were told "just use this"
 * **Anyone who's tired of AI code that's 90% perfect and 10% chaos**
 * **Developers who need audit trails** for generated code
-* **Teams shipping AI-generated code to production** (and need to sleep at night)
+* **Teams shipping AI-generated code to ALPHA prototypes** (early testing phase)
 ### **TL;DR**
 1. Download the pack
 2. Upload it to your AI or give your AI the repo URL
@@ -80,7 +80,7 @@ Python implementations are fully functional alternatives suitable for many use c
 | 2. Alternative | Python | Rapid prototyping, development, ease of modification | `tools/scripts/spec_to_ir.py`, `tools/scripts/ir_to_code.py` |
 | 3. Native | Rust/Haskell | High-performance verification | `stunir-native` (when available) |
 
-### Precompiled SPARK Binaries (Recommended for Production)
+### Precompiled SPARK Binaries (Recommended for ALPHA Testing)
 
 STUNIR provides **precompiled Ada SPARK binaries** that eliminate the need for GNAT compiler installation:
 
@@ -131,7 +131,7 @@ Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a fully func
 
 **When to prefer Ada SPARK:**
 - Safety-critical applications requiring DO-178C compliance
-- Production systems requiring formal verification
+- ALPHA prototype systems requiring formal verification
 - Reproducible builds with maximum determinism
 
 **Both pipelines produce identical IR output** - choose based on your verification and workflow needs.
