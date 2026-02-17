@@ -1,6 +1,4 @@
-stunir_json_parser.adb:6:17: warning: unit "Ada.Strings.Bounded" is not referenced [-gnatwu]
-stunir_json_parser.adb:8:14: error: missing body for "Skip_Value" declared at stunir_json_parser.ads:36
-stunir_json_parser.adb:11:08: warning: "Stunir_Types" is already use-visible through previous use_clause at stunir_json_parser.ads:16 [-gnatwr]
-stunir_json_parser.adb:168:07: warning: "Pos" is not modified, could be declared constant [-gnatwk]
-stunir_json_parser.ads:10:17: warning: no entities of "Ada.Strings.Unbounded" are referenced in spec [-gnatwu]
-stunir_json_parser.ads:10:17: warning: with clause might be moved to body [-gnatwu]
+stunir_json_parser.adb:6:20: warning: no entities of "Ada.Characters.Handling" are referenced [-gnatwu]
+stunir_json_parser.adb:10:04: warning: use clause for package "Handling" has no effect [-gnatwu]
+stunir_json_parser.adb:11:08: warning: "STUNIR_Types" is already use-visible through previous use_clause at stunir_json_parser.ads:13 [-gnatwr]
+stunir_json_parser.adb:189:07: warning: "Pos" is not modified, could be declared constant [-gnatwk]

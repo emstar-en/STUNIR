@@ -78,8 +78,8 @@ package body STUNIR_JSON_Parser is
                            Status := Error;
                            return;
                      end case;
-                     if Result_Len < JSON_Strings.Max_Length (Result) then
-                        Result := JSON_Strings.Insert (Result, Result_Len + 1, Escape_Char);
+                     if Result_Len < Max_JSON_Length then
+                        JSON_Strings.Append (Result, String'(1 => Escape_Char));
                         Result_Len := Result_Len + 1;
                      else
                         Status := Error;
@@ -95,8 +95,8 @@ package body STUNIR_JSON_Parser is
                Status := Error;
                return;
             else
-               if Result_Len < JSON_Strings.Max_Length (Result) then
-                  Result := JSON_Strings.Insert (Result, Result_Len + 1, C);
+               if Result_Len < Max_JSON_Length then
+                  JSON_Strings.Append (Result, String'(1 => C));
                   Result_Len := Result_Len + 1;
                else
                   Status := Error;
@@ -170,8 +170,9 @@ package body STUNIR_JSON_Parser is
 
       --  Extract the number string
       Num_Len := Pos - State.Position;
-      if Num_Len > 0 and Num_Len <= JSON_Strings.Max_Length (Num_Str) then
-         Num_Str := JSON_Strings.Slice (State.Input, State.Position, Pos - 1);
+      if Num_Len > 0 and Num_Len <= Max_JSON_Length then
+         Num_Str := JSON_Strings.To_Bounded_String
+           (JSON_Strings.Slice (State.Input, State.Position, Pos - 1));
          State.Token_Value := Num_Str;
       else
          Status := Error;
@@ -394,6 +395,53 @@ package body STUNIR_JSON_Parser is
 
       return Depth = 0;  --  All brackets matched
    end Validate_JSON;
+
+   procedure Skip_Value
+     (State  : in out Parser_State;
+      Status : out Status_Code)
+   is
+      Depth : Natural := 0;
+   begin
+      --  Skip the current value based on token type
+      case State.Current_Token is
+         when Token_String | Token_Number | Token_True | Token_False | Token_Null =>
+            --  Primitive values are already consumed
+            Status := Success;
+
+         when Token_LBrace =>
+            --  Skip object
+            Depth := 1;
+            loop
+               Next_Token (State, Status);
+               exit when Status /= Success;
+
+               if State.Current_Token = Token_LBrace then
+                  Depth := Depth + 1;
+               elsif State.Current_Token = Token_RBrace then
+                  Depth := Depth - 1;
+                  exit when Depth = 0;
+               end if;
+            end loop;
+
+         when Token_LBracket =>
+            --  Skip array
+            Depth := 1;
+            loop
+               Next_Token (State, Status);
+               exit when Status /= Success;
+
+               if State.Current_Token = Token_LBracket then
+                  Depth := Depth + 1;
+               elsif State.Current_Token = Token_RBracket then
+                  Depth := Depth - 1;
+                  exit when Depth = 0;
+               end if;
+            end loop;
+
+         when others =>
+            Status := Error;
+      end case;
+   end Skip_Value;
 
    procedure Expect_Token
      (State    : in out Parser_State;

@@ -10,7 +10,7 @@ with Ada.Strings.Bounded;
 
 package STUNIR_Types is
 
-   pragma Pure;
+   --  Note: Cannot use Pure pragma due to dependency on Ada.Strings.Bounded
 
    --  Maximum JSON input size (1MB) - matches main SPARK
    Max_JSON_Length : constant := 1_048_576;

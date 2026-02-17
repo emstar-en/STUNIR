@@ -10,15 +10,29 @@ func_dedup.adb:156:48: error:   ==> in call to "To_String" at a-strunb.ads:135
 func_dedup.adb:161:59: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
 func_dedup.adb:161:59: error: found type "System.Strings.String_Access"
 func_dedup.adb:161:59: error:   ==> in call to "To_String" at a-strunb.ads:135
-func_dedup.adb:167:11: warning: "Stunir_JSON_Parser" is already use-visible through previous use_clause at line 24 [-gnatwr]
+func_dedup.adb:167:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 24 [-gnatwr]
 func_dedup.adb:172:14: error: "String_Maps" is undefined
 func_dedup.adb:195:81: error: "Token_EOF" is not visible
 func_dedup.adb:195:81: error: multiple use clauses cause hiding
-func_dedup.adb:195:81: error: hidden declaration at stunir_json_parser.ads:19
-func_dedup.adb:195:81: error: hidden declaration at stunir_types.ads:27
+func_dedup.adb:195:81: error: hidden declaration at stunir_json_parser.ads:18
+func_dedup.adb:195:81: error: hidden declaration at stunir_types.ads:24
+func_dedup.adb:199:57: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:199:57: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+func_dedup.adb:199:57: error:   ==> in call to "To_String" at a-strunb.ads:135
+func_dedup.adb:215:45: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:215:45: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
 func_dedup.adb:243:25: error: "String_Maps" is undefined
 func_dedup.adb:247:25: error: "String_Maps" is undefined
 func_dedup.adb:250:22: error: "String_Maps" is undefined
+func_dedup.adb:262:19: error: ambiguous expression (cannot resolve "Append")
+func_dedup.adb:262:19: error: possible interpretation at a-strunb.ads:159
+func_dedup.adb:262:19: error: possible interpretation at a-strunb.ads:149
+func_dedup.adb:262:66: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:262:66: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+func_dedup.adb:262:66: error:   ==> in call to "To_String" at a-strunb.ads:135
+func_dedup.adb:264:59: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:264:59: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+func_dedup.adb:264:59: error:   ==> in call to "To_String" at a-strunb.ads:135
 func_dedup.adb:284:21: error: "String_Maps" is undefined
 func_dedup.adb:284:32: error: invalid subtype mark in discrete range
 func_dedup.adb:288:32: error: "String_Maps" is undefined
