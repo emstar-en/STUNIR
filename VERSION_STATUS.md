@@ -55,6 +55,31 @@
 | **Optimizer** | `0.8.9` | `tools/spark/src/stunir_optimizer.ads` | ⚠️ Needs version review |
 | **Semantic IR Schema** | `1.0.0` | `tools/spark/src/semantic_ir/semantic_ir.ads` | ✅ Schema stable |
 
+### Ada SPARK Powertools (Composable AI-Driven Tools)
+
+**Status**: ❌ Not Built - Source code exists but no executables compiled
+
+**See**: [`POWERTOOLS_STATUS.md`](./POWERTOOLS_STATUS.md) for complete details
+
+| Category | Tools | Version | Status |
+|----------|-------|---------|--------|
+| **Foundation Tools** | json_validate, json_extract, json_merge, type_normalize, type_map, func_dedup | `1.0.0` → `0.1.0-alpha` | ❌ Source only, not built |
+| **Code Analysis** | format_detect, lang_detect, extraction_to_spec | `1.0.0` → `0.1.0-alpha` | ❌ Source only, not built |
+| **Code Generation** | sig_gen_cpp, sig_gen_rust, sig_gen_python, type_resolve | `1.0.0` → `0.1.0-alpha` | ❌ Source only, not built |
+| **Verification** | hash_compute, receipt_generate, toolchain_verify, spec_validate, ir_validate, file_indexer | Various → `0.1.0-alpha` | ❌ Source only, not built |
+
+**Total**: 19 powertools defined, 0 built
+
+**Key Design Features**:
+- ✅ AI-introspectable via `--describe` flag
+- ✅ Composable via Unix pipes
+- ✅ JSON I/O for machine consumption
+- ✅ Attestation/receipt generation for AI safety
+- ❌ No build system (`.gpr` files needed)
+- ❌ No test suite
+
+**Critical Gaps**: See `POWERTOOLS_STATUS.md` for ~10 missing tools needed for complete Spec→Code→Env pipeline.
+
 ### Language Emitters (Planned/Incomplete)
 
 Most emitters in `src/ada/targets/` report version `1.0.0` but are **not tested** in the current pipeline.
