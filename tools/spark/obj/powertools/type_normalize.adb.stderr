@@ -1,0 +1,4 @@
+type_normalize.adb:11:17: warning: no entities of "Ada.Strings.Maps" are referenced [-gnatwu]
+type_normalize.adb:103:07: warning: use clause for package "Maps" has no effect [-gnatwu]
+type_normalize.adb:122:07: warning: variable "Result" is not referenced [-gnatwu]
+type_normalize.adb:332:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

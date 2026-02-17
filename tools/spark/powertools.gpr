@@ -1,0 +1,108 @@
+-------------------------------------------------------------------------------
+--  STUNIR Powertools - GNAT Project File
+--  Build all powertools (composable CLI utilities for AI-driven workflows)
+--
+--  Build with: gprbuild -P powertools.gpr
+--  Install with: gprinstall -P powertools.gpr --prefix=bin/
+--
+--  Copyright (c) 2026 STUNIR Project
+--  License: MIT
+-------------------------------------------------------------------------------
+
+project STUNIR_Powertools is
+
+   for Source_Dirs use ("src/powertools");
+   for Object_Dir use "obj/powertools";
+   for Exec_Dir use "bin";
+
+   --  All powertools (working set)
+   for Main use (
+      --  Phase 1: Foundation Tools (JSON & Type utilities)
+      "json_validate.adb",      -- Validate JSON syntax and structure
+      "json_extract.adb",       -- Extract values from JSON by path
+      "json_merge.adb",         -- Merge multiple JSON documents
+      "json_formatter.adb",     -- Format JSON with indentation
+      "json_path_parser.adb",   -- Parse dot-notation JSON paths
+      "json_value_format.adb",  -- Format extracted JSON values
+      "json_merge_objects.adb", -- Merge JSON objects with conflict resolution
+      "json_merge_arrays.adb",  -- Merge JSON arrays
+      "json_path_eval.adb",     -- Evaluate JSONPath expressions
+      "type_normalize.adb",     -- Normalize type names across languages
+      "type_map.adb",           -- Map types between languages
+      "type_resolver.adb",      -- Resolve type references
+      "func_dedup.adb",         -- Deduplicate function signatures
+
+      --  Phase 2: Code Analysis Tools
+      "format_detect.adb",      -- Detect source code format/language
+      "lang_detect.adb",        -- Language detection for source files
+      "extraction_to_spec.adb", -- Extract spec from existing code
+      "spec_extract_module.adb", -- Extract module info from spec
+
+      --  Phase 3: Code Generation Tools
+      "sig_gen_cpp.adb",        -- Generate C++ function signatures
+      "sig_gen_rust.adb",       -- Generate Rust function signatures
+      "sig_gen_python.adb",     -- Generate Python function signatures
+      "type_resolve.adb",       -- Resolve type dependencies
+      "type_map_cpp.adb",       -- Map types to C++
+      "cpp_sig_normalize.adb",  -- Normalize C++ signatures
+      "cpp_header_gen.adb",     -- Generate C++ headers
+      "cpp_impl_gen.adb",       -- Generate C++ implementations
+      "ir_gen_functions.adb",   -- Generate IR function representations
+
+      --  Phase 4: Verification & Attestation Tools
+      "hash_compute.adb",       -- Compute SHA-256 hashes
+      "receipt_generate.adb",   -- Generate verification receipts
+      "toolchain_verify.adb",   -- Verify toolchain.lock integrity
+      "spec_validate.adb",      -- Validate spec JSON against schema
+      "spec_validate_schema.adb", -- Validate spec against schema (orchestrator)
+      "ir_validate.adb",        -- Validate IR JSON against schema
+      "file_indexer.adb",       -- Index files for verification
+
+      --  Phase 5: Validation Utilities
+      "schema_check_required.adb", -- Check required fields
+      "schema_check_types.adb",    -- Validate field types
+      "schema_check_format.adb",   -- Validate formats/patterns
+      "validation_reporter.adb",   -- Format validation reports
+      "ir_check_required.adb",     -- Check required IR fields
+      "ir_check_functions.adb",    -- Validate function structures
+      "ir_check_types.adb",        -- Validate type definitions
+
+      --  Phase 6: Type Utilities
+      "type_lookup.adb",        -- Look up type definitions
+      "type_expand.adb",        -- Expand type aliases
+      "type_dependency.adb",    -- Resolve dependency order
+
+      --  Phase 7: File Utilities
+      "file_writer.adb",        -- Write files with error handling
+
+      --  Additional working tools
+      "json_validator.adb",     -- JSON validation tool
+      "type_map_target.adb"     -- Map types to target language
+   );
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnat2022",      -- Ada 2022
+         "-gnatwa",        -- All warnings
+         "-gnatVa",        -- All validity checks
+         "-gnatf",         -- Full errors
+         "-gnato",         -- Overflow checking
+         "-fstack-check",  -- Stack checking
+         "-g");            -- Debug info
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use 
+        ("-E",       -- Exception traceback
+         "-d32m");   -- 32MB primary stack size
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("Ada") use ("-g");
+   end Linker;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-s", "-j0");
+   end Builder;
+
+end STUNIR_Powertools;

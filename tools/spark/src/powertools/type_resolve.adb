@@ -27,7 +27,7 @@ procedure Type_Resolve is
       Put_Line ("{");
       Put_Line ("  ""name"": ""type_resolve"",");
       Put_Line ("  ""description"": ""Resolve type aliases and dependencies in spec"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [{""name"": ""spec"", ""type"": ""json"", ""source"": [""stdin"", ""file""]}],");
       Put_Line ("  ""outputs"": [{""name"": ""resolved_spec"", ""type"": ""json"", ""source"": ""stdout""}]");
       Put_Line ("}");

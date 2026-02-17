@@ -40,7 +40,7 @@ procedure JSON_Validate is
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""json_validate""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Validates JSON structure and syntax""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""json_input""," & ASCII.LF &

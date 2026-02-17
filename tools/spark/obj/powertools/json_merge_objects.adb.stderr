@@ -1,0 +1,4 @@
+json_merge_objects.adb:43:67: error: missing string quote
+json_merge_objects.adb:197:58: error: missing ")"
+json_merge_objects.adb:197:58: error: ":" should be ";"
+json_merge_objects.adb:197:68: error: missing string quote

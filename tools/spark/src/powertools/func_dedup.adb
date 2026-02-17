@@ -42,7 +42,7 @@ procedure Func_Dedup is
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""func_dedup""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Deduplicate functions by signature key""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""functions_array""," & ASCII.LF &

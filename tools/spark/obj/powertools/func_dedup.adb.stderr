@@ -1,0 +1,2 @@
+func_dedup.adb:16:06: error: file "stunir_json_parser.ads" not found
+func_dedup.adb:17:06: error: file "stunir_types.ads" not found

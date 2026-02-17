@@ -28,7 +28,7 @@ procedure Spec_Validate is
       Put_Line ("{");
       Put_Line ("  ""name"": ""spec_validate"",");
       Put_Line ("  ""description"": ""Validate STUNIR Spec JSON structure"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [");
       Put_Line ("    {""name"": ""file"", ""type"": ""file"", ""description"": ""Spec JSON file to validate""}");
       Put_Line ("  ],");

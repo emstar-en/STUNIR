@@ -11,6 +11,7 @@ with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 
 with GNAT.Command_Line;
+with GNAT.Strings;
 
 procedure Type_Map is
    use Ada.Command_Line;
@@ -29,11 +30,11 @@ procedure Type_Map is
    --  Configuration
    Input_Type    : Unbounded_String := Null_Unbounded_String;
    Target_Lang   : Target_Language := Lang_CPP;
-   Output_File   : Unbounded_String := Null_Unbounded_String;
-   Verbose_Mode  : Boolean := False;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
+   Output_File   : aliased GNAT.Strings.String_Access := new String'("");
+   Verbose_Mode  : aliased Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
    From_Stdin    : Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
@@ -42,7 +43,7 @@ procedure Type_Map is
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""type_map""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Map C types to target language types""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""c_type""," & ASCII.LF &
@@ -336,24 +337,24 @@ procedure Type_Map is
 
    procedure Write_Output (Content : String) is
    begin
-      if Output_File = Null_Unbounded_String then
+      if Output_File.all = "" then
          Put_Line (Content);
       else
          declare
             File : File_Type;
          begin
-            Create (File, Out_File, To_String (Output_File));
+            Create (File, Out_File, Output_File.all);
             Put (File, Content);
             Close (File);
          exception
             when others =>
-               Print_Error ("Cannot write: " & To_String (Output_File));
+               Print_Error ("Cannot write: " & Output_File.all);
          end;
       end if;
    end Write_Output;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;
-   Lang_Str : aliased String := "cpp";
+   Lang_Str : aliased GNAT.Strings.String_Access := new String'("cpp");
 
 begin
    GNAT.Command_Line.Define_Switch (Config, Show_Help'Access, "-h", "--help");
@@ -392,7 +393,7 @@ begin
 
    --  Parse language
    declare
-      L : constant String := Trim (Lang_Str, Ada.Strings.Both);
+      L : constant String := Trim (Lang_Str.all, Ada.Strings.Both);
    begin
       if L = "c" or else L = "C" then
          Target_Lang := Lang_C;

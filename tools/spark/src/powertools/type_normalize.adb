@@ -11,6 +11,7 @@ with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 
 with GNAT.Command_Line;
+with GNAT.Strings;
 
 procedure Type_Normalize is
    use Ada.Command_Line;
@@ -25,11 +26,11 @@ procedure Type_Normalize is
 
    --  Configuration
    Input_Type    : Unbounded_String := Null_Unbounded_String;
-   Output_File   : Unbounded_String := Null_Unbounded_String;
-   Verbose_Mode  : Boolean := False;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
+   Output_File   : aliased GNAT.Strings.String_Access := new String'("");
+   Verbose_Mode  : aliased Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
    From_Stdin    : Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
@@ -38,7 +39,7 @@ procedure Type_Normalize is
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""type_normalize""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Normalize C type declarations to canonical form""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""c_type""," & ASCII.LF &
@@ -274,18 +275,18 @@ procedure Type_Normalize is
 
    procedure Write_Output (Content : String) is
    begin
-      if Output_File = Null_Unbounded_String then
+      if Output_File.all = "" then
          Put_Line (Content);
       else
          declare
             File : File_Type;
          begin
-            Create (File, Out_File, To_String (Output_File));
+            Create (File, Out_File, Output_File.all);
             Put (File, Content);
             Close (File);
          exception
             when others =>
-               Print_Error ("Cannot write: " & To_String (Output_File));
+               Print_Error ("Cannot write: " & Output_File.all);
          end;
       end if;
    end Write_Output;

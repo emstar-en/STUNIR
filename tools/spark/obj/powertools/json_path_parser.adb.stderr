@@ -1,0 +1,4 @@
+json_path_parser.adb:10:17: warning: no entities of "Ada.Strings.Fixed" are referenced [-gnatwu]
+json_path_parser.adb:16:04: warning: use clause for package "Fixed" has no effect [-gnatwu]
+json_path_parser.adb:57:13: warning: function "Is_Valid_Index" is not referenced [-gnatwu]
+json_path_parser.adb:88:07: warning: variable "Result" is not referenced [-gnatwu]

@@ -40,7 +40,7 @@ procedure Sig_Gen_Rust is
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""sig_gen_rust""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Generate Rust FFI signatures from STUNIR spec""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""spec_json""," & ASCII.LF &

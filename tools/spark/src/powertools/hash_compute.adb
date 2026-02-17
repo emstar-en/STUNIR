@@ -29,7 +29,7 @@ procedure Hash_Compute is
       Put_Line ("{");
       Put_Line ("  ""name"": ""hash_compute"",");
       Put_Line ("  ""description"": ""Compute SHA-256 hash of file content"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [");
       Put_Line ("    {""name"": ""file"", ""type"": ""argument"", ""description"": ""File to hash (default: stdin)""}");
       Put_Line ("  ],");
@@ -101,7 +101,7 @@ begin
          if Arg = "--help" then
             Print_Usage; return;
          elsif Arg = "--version" then
-            Put_Line ("hash_compute 1.0.0"); return;
+            Put_Line ("hash_compute 0.1.0-alpha"); return;
          elsif Arg = "--describe" then
             Print_Describe; return;
          elsif Arg = "--json" then

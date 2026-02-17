@@ -1,99 +1,81 @@
+--  ir_validate - Validate IR structure and syntax (Refactored)
+--  Orchestrates ir_check_required, ir_check_functions, ir_check_types, validation_reporter
+--  Phase 4 Powertool for STUNIR - Refactored for Unix philosophy
+
 with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
-with Ada.IO_Exceptions;
-
-with STUNIR_JSON_Parser;
-with STUNIR_Types;
+with GNAT.OS_Lib;
 
 procedure IR_Validate is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
-   use STUNIR_Types;
 
-   Input_File    : Unbounded_String := Null_Unbounded_String;
-   Output_Json   : Boolean := False;
+   --  Exit codes
+   Exit_Success    : constant := 0;
+   Exit_Invalid    : constant := 1;
+
    Show_Help     : Boolean := False;
    Show_Describe : Boolean := False;
+   Output_Json   : Boolean := False;
+
+   Version : constant String := "0.1.0-alpha";
 
    procedure Print_Usage is
    begin
-      Put_Line (Standard_Error, "Usage: ir_validate [options] [file]");
+      Put_Line (Standard_Error, "ir_validate - Validate IR structure");
+      Put_Line (Standard_Error, "Version: " & Version);
+      Put_Line (Standard_Error, "Usage: ir_validate [options] < ir.json");
       Put_Line (Standard_Error, "Options:");
-      Put_Line (Standard_Error, "  --json           Output result as JSON");
-      Put_Line (Standard_Error, "  --describe       Show tool description");
-      Put_Line (Standard_Error, "  --help           Show this help");
+      Put_Line (Standard_Error, "  --json       Output result as JSON");
+      Put_Line (Standard_Error, "  --describe   Show tool description");
+      Put_Line (Standard_Error, "  --help       Show this help");
    end Print_Usage;
 
    procedure Print_Describe is
    begin
       Put_Line ("{");
-      Put_Line ("  ""name"": ""ir_validate"",");
+      Put_Line ("  ""tool"": ""ir_validate"",");
       Put_Line ("  ""description"": ""Validate IR structure and syntax"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
-      Put_Line ("  ""inputs"": [{""name"": ""ir"", ""type"": ""json"", ""source"": [""stdin"", ""file""]}],");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
+      Put_Line ("  ""inputs"": [{""name"": ""ir"", ""type"": ""json"", ""source"": [""stdin""]}],");
       Put_Line ("  ""outputs"": [{""name"": ""validation_report"", ""type"": ""json"", ""source"": ""stdout""}]");
       Put_Line ("}");
    end Print_Describe;
 
-   function Read_All (Path : String) return String is
-      File   : File_Type;
+   function Read_Stdin return String is
       Result : Unbounded_String := Null_Unbounded_String;
       Line   : String (1 .. 4096);
       Last   : Natural;
    begin
-      if Path = "" then
-         while not End_Of_File loop
-            Get_Line (Line, Last);
-            Append (Result, Line (1 .. Last));
-            Append (Result, ASCII.LF);
-         end loop;
-         return To_String (Result);
-      end if;
-
-      Open (File, In_File, Path);
-      while not End_Of_File (File) loop
-         Get_Line (File, Line, Last);
+      while not End_Of_File loop
+         Get_Line (Line, Last);
          Append (Result, Line (1 .. Last));
          Append (Result, ASCII.LF);
       end loop;
-      Close (File);
       return To_String (Result);
-   exception
-      when Ada.IO_Exceptions.Name_Error =>
-         return "";
-      when others =>
-         return "";
-   end Read_All;
+   end Read_Stdin;
 
-   function Validate_JSON (Content : String) return Boolean is
-      use STUNIR_JSON_Parser;
-      State  : Parser_State;
-      Status : Status_Code;
-      Input_Str : JSON_String;
+   function Run_Command (Cmd : String; Input : String) return String is
+      use GNAT.OS_Lib;
+      Args : Argument_List_Access;
    begin
-      if Content'Length = 0 then
-         return False;
-      end if;
-
-      if Content'Length > Max_JSON_Length then
-         return False;
-      end if;
-
-      Input_Str := JSON_Strings.To_Bounded_String (Content);
-      Initialize_Parser (State, Input_Str, Status);
-      if Status /= Success then
-         return False;
-      end if;
-
-      loop
-         Next_Token (State, Status);
-         exit when Status /= Success or else State.Current_Token = Token_EOF;
-      end loop;
-
-      return Status = Success;
-   end Validate_JSON;
+      Args := Argument_String_To_List (Cmd);
+      declare
+         Result : constant String :=
+           Get_Command_Output ("sh", Args.all, Input, Success'Access);
+      begin
+         Free (Args);
+         return Result;
+      end;
+   exception
+      when others =>
+         if Args /= null then
+            Free (Args);
+         end if;
+         return "";
+   end Run_Command;
 
 begin
    for I in 1 .. Argument_Count loop
@@ -106,42 +88,50 @@ begin
             Show_Describe := True;
          elsif Arg = "--json" then
             Output_Json := True;
-         elsif Arg (1) /= '-' then
-            Input_File := To_Unbounded_String (Arg);
          end if;
       end;
    end loop;
 
    if Show_Help then
       Print_Usage;
-      Set_Exit_Status (Success);
+      Set_Exit_Status (Exit_Success);
       return;
    end if;
 
    if Show_Describe then
       Print_Describe;
-      Set_Exit_Status (Success);
+      Set_Exit_Status (Exit_Success);
       return;
    end if;
 
    declare
-      Content : constant String := Read_All (To_String (Input_File));
-      Valid   : constant Boolean := Validate_JSON (Content);
+      Content : constant String := Read_Stdin;
    begin
-      if Valid then
-         if Output_Json then
-            Put_Line ("{""status"": ""valid""}");
-         else
-            Put_Line ("IR valid.");
-         end if;
-         Set_Exit_Status (Success);
-      else
-         if Output_Json then
-            Put_Line ("{""status"": ""invalid""}");
-         else
-            Put_Line (Standard_Error, "Invalid IR.");
-         end if;
-         Set_Exit_Status (Failure);
+      if Content'Length = 0 then
+         Put_Line (Standard_Error, "ERROR: Empty input");
+         Set_Exit_Status (Exit_Invalid);
+         return;
       end if;
+
+      --  Run validation checks
+      declare
+         Required_Result : constant String := Run_Command ("ir_check_required", Content);
+         Functions_Result : constant String := Run_Command ("ir_check_functions", Content);
+         Types_Result : constant String := Run_Command ("ir_check_types", Content);
+         All_Results : constant String :=
+           "[" & Required_Result & "," & Functions_Result & "," & Types_Result & "]";
+         Format_Flag : constant String := (if Output_Json then " --format json" else "");
+         Report : constant String := Run_Command ("validation_reporter" & Format_Flag, All_Results);
+      begin
+         Put_Line (Report);
+         --  Check if any validation failed
+         if Required_Result'Length > 0 and then
+            Functions_Result'Length > 0 and then
+            Types_Result'Length > 0 then
+            Set_Exit_Status (Exit_Success);
+         else
+            Set_Exit_Status (Exit_Invalid);
+         end if;
+      end;
    end;
 end IR_Validate;

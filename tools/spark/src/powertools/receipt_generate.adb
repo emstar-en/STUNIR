@@ -31,7 +31,7 @@ procedure Receipt_Generate is
       Put_Line ("{");
       Put_Line ("  ""name"": ""receipt_generate"",");
       Put_Line ("  ""description"": ""Create verification receipt with hashes"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [{""name"": ""spec"", ""type"": ""json"", ""source"": ""file""}, {""name"": ""manifest"", ""type"": ""json"", ""source"": ""file""}],");
       Put_Line ("  ""outputs"": [{""name"": ""receipt"", ""type"": ""json"", ""source"": ""stdout""}]");
       Put_Line ("}");

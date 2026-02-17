@@ -40,7 +40,7 @@ procedure Extraction_To_Spec is
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""extraction_to_spec""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Convert extraction JSON to STUNIR spec format""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""extraction_json""," & ASCII.LF &
