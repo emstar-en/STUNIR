@@ -16,6 +16,7 @@ procedure Spec_Validate_Schema is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use GNAT.Strings;
 
    --  Exit codes
    Exit_Success    : constant := 0;

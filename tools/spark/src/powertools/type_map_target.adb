@@ -16,6 +16,7 @@ procedure Type_Map_Target is
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
    use Ada.Characters.Handling;
+   use GNAT.Strings;
 
    --  Exit codes
    Exit_Success : constant := 0;

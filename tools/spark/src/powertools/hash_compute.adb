@@ -10,6 +10,7 @@ procedure Hash_Compute is
    use Ada.Text_IO;
    use Ada.Command_Line;
    use Ada.Strings.Unbounded;
+   use Ada.Streams;
 
    procedure Print_Usage is
    begin

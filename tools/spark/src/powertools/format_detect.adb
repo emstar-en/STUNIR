@@ -18,6 +18,8 @@ procedure Format_Detect is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use STUNIR_JSON_Parser;
+   use STUNIR_Types;
 
    --  Exit codes
    Exit_Success          : constant := 0;
@@ -145,8 +147,6 @@ procedure Format_Detect is
    end Read_Input;
 
    function Detect_Format (Content : String) return Extraction_Format is
-      use STUNIR_JSON_Parser;
-      use STUNIR_Types;
       State  : Parser_State;
       Status : Status_Code;
       Input_Str : JSON_String;
@@ -197,7 +197,7 @@ procedure Format_Detect is
                end if;
             end;
          elsif State.Current_Token = Token_Comma then
-            continue;
+            null;
          else
             exit;
          end if;
