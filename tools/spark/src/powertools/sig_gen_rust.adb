@@ -211,9 +211,9 @@ procedure Sig_Gen_Rust is
       In_Functions : Boolean := False;
       Function_Count : Natural := 0;
 
-      Current_Func : Unbounded_String := Null_Unbounded_String;
-      Current_Return : Unbounded_String := To_Unbounded_String ("c_void");
-      Current_Params : Unbounded_String := Null_Unbounded_String;
+      Current_Func : JSON_String := JSON_Strings.Null_Bounded_String;
+      Current_Return : JSON_String := JSON_Strings.To_Bounded_String ("c_void");
+      Current_Params : JSON_String := JSON_Strings.Null_Bounded_String;
    begin
       if Spec_JSON'Length = 0 then
          return "// Empty spec";
@@ -260,8 +260,8 @@ procedure Sig_Gen_Rust is
             end;
          elsif State.Current_Token = Token_Object_Start and then In_Functions then
             --  New function
-            Current_Func := Null_Unbounded_String;
-            Current_Return := To_Unbounded_String ("c_void");
+            Current_Func := JSON_Strings.Null_Bounded_String;
+            Current_Return := JSON_Strings.To_Bounded_String ("c_void");
             Current_Params := Null_Unbounded_String;
 
          elsif State.Current_Token = Token_String and then In_Functions then
@@ -277,7 +277,7 @@ procedure Sig_Gen_Rust is
                if Member_Key = "name" and then State.Current_Token = Token_String then
                   Current_Func := State.Token_Value;
                elsif Member_Key = "return_type" and then State.Current_Token = Token_String then
-                  Current_Return := To_Unbounded_String (Map_C_To_Rust (STUNIR_Types.JSON_Strings.To_String (State.Token_Value)));
+                  Current_Return := JSON_Strings.To_Bounded_String (Map_C_To_Rust (STUNIR_Types.JSON_Strings.To_String (State.Token_Value)));
                elsif Member_Key = "parameters" and then State.Current_Token = Token_Array_Start then
                   --  Parse parameters array
                   declare
@@ -340,7 +340,7 @@ procedure Sig_Gen_Rust is
             end;
          elsif State.Current_Token = Token_Object_End and then In_Functions then
             --  End of function - generate signature
-            if Current_Func /= Null_Unbounded_String then
+            if Current_Func /= JSON_Strings.Null_Bounded_String then
                Function_Count := Function_Count + 1;
 
                if Module_Name /= Null_Unbounded_String then

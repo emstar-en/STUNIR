@@ -1,6 +1,7 @@
 with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
+with Ada.Directories;
 with STUNIR_JSON_Parser;
 with STUNIR_Types;
 
@@ -51,12 +52,12 @@ procedure Toolchain_Verify is
    begin
       begin
          Open (File, In_File, Path);
-         Len := Long_Integer (Size (File));
+         Len := Long_Integer (Ada.Directories.Size (Path));
          declare
             Content : String (1 .. Integer (Len));
             Last    : Natural;
          begin
-            Get (File, Content, Last);
+             String'Read (Stream (File), Content, Last);
             Close (File);
             --  Strip trailing NULLs or generic cleanup if needed
             return Content (1 .. Last);
@@ -74,25 +75,31 @@ procedure Toolchain_Verify is
    begin
       Valid := False;
       Msg := Null_Unbounded_String;
-      Initialize_Parser (Parser, JSON_Strings.To_Bounded_String (Content));
-      
-      if Next_Token (Parser, Status) /= Token_Object_Start then
+      Initialize_Parser (Parser, JSON_Strings.To_Bounded_String (Content), Status);
+
+      if Status /= STUNIR_Types.Success then
+         Msg := To_Unbounded_String ("Failed to initialize parser");
+         return;
+      end if;
+
+      Next_Token (Parser, Status);
+      if Parser.Current_Token /= Token_Object_Start then
          Msg := To_Unbounded_String ("Root must be object"); return;
       end if;
 
       Next_Token (Parser, Status);
-      while Current_Token (Parser) /= Token_Object_End and Status = Success loop
-         if Current_Token (Parser) /= Token_String then
-            Msg := To_Unbounded_String ("Expected string key"); Status := Error_Parse; return;
+      while Parser.Current_Token /= Token_Object_End and Status = STUNIR_Types.Success loop
+         if Parser.Current_Token /= Token_String then
+            Msg := To_Unbounded_String ("Expected string key"); return;
          end if;
          Skip_Value (Parser, Status); -- Key
-         if Current_Token (Parser) = Token_Colon then Next_Token (Parser, Status); end if;
+         if Parser.Current_Token = Token_Colon then Next_Token (Parser, Status); end if;
          Skip_Value (Parser, Status); -- Value
-         
-         if Current_Token (Parser) = Token_Comma then Next_Token (Parser, Status); end if;
+
+         if Parser.Current_Token = Token_Comma then Next_Token (Parser, Status); end if;
       end loop;
 
-      if Status = Success then
+      if Status = STUNIR_Types.Success then
          Valid := True;
       else
          Msg := To_Unbounded_String ("Parse error or incomplete");
@@ -129,7 +136,7 @@ begin
       
       if Valid then
          if Output_Json then Put_Line ("{""status"": ""valid""}"); else Put_Line ("Lock file valid."); end if;
-         Set_Exit_Status (Success);
+          Set_Exit_Status (Ada.Command_Line.Success);
       else
          if Output_Json then Put_Line ("{""status"": ""invalid"", ""error"": """ & To_String (Msg) & """}");
          else Put_Line (Standard_Error, "Invalid: " & To_String (Msg)); end if;

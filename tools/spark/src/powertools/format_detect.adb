@@ -178,7 +178,7 @@ procedure Format_Detect is
 
          if State.Current_Token = Token_String then
             declare
-               Key : constant String := To_String (State.Token_Value);
+               Key : constant String := JSON_Strings.To_String (State.Token_Value);
             begin
                if Key = "files" then
                   Has_Files := True;

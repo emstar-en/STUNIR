@@ -223,7 +223,7 @@ procedure Extraction_To_Spec is
 
       Input_Str := JSON_Strings.To_Bounded_String (Content);
       Initialize_Parser (State, Input_Str, Status);
-      if Status /= Success then
+      if Status /= STUNIR_Types.Success then
          return "{}";
       end if;
 
@@ -240,15 +240,15 @@ procedure Extraction_To_Spec is
       --  Parse and extract functions
       loop
          Next_Token (State, Status);
-         exit when Status /= Success or else State.Current_Token = Token_EOF;
+         exit when Status /= STUNIR_Types.Success or else State.Current_Token = STUNIR_Types.Token_EOF;
 
          if State.Current_Token = Token_String then
             declare
-               Key : constant String := To_String (State.Token_Value);
+               Key : constant String := JSON_Strings.To_String (State.Token_Value);
             begin
                if Key = "functions" then
                   Expect_Token (State, Token_Colon, Status);
-                  if Status = Success then
+                  if Status = STUNIR_Types.Success then
                      Expect_Token (State, Token_Array_Start, Status);
                      if Status = Success then
                         In_Functions := True;

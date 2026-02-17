@@ -1,32 +1,68 @@
 sig_gen_rust.adb:205:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 21 [-gnatwr]
-sig_gen_rust.adb:278:40: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
-sig_gen_rust.adb:278:40: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:265:31: error: expected private type "JSON_String" defined at stunir_types.ads:20
+sig_gen_rust.adb:265:31: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
 sig_gen_rust.adb:312:62: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
 sig_gen_rust.adb:312:62: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:34: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:325:42: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:325:42: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:42: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:325:42: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:325:42: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:42: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:325:42: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:325:42: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:42: error:   ==> in call to "Append" at a-strunb.ads:149
+sig_gen_rust.adb:328:31: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:328:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:39: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:328:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:39: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:328:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:39: error:   ==> in call to "Append" at a-strunb.ads:149
 sig_gen_rust.adb:328:92: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
 sig_gen_rust.adb:328:92: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
 sig_gen_rust.adb:328:92: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:19
+sig_gen_rust.adb:329:31: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:329:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:329:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:329:39: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:329:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:329:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:329:39: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:329:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:329:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:329:39: error:   ==> in call to "Append" at a-strunb.ads:149
+sig_gen_rust.adb:330:31: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:330:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:39: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:330:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:39: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:330:39: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:39: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:39: error:   ==> in call to "Append" at a-strunb.ads:149
 sig_gen_rust.adb:330:92: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
 sig_gen_rust.adb:330:92: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
 sig_gen_rust.adb:330:92: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:19
-sig_gen_rust.adb:352:72: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
-sig_gen_rust.adb:352:72: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-sig_gen_rust.adb:352:72: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:19
-sig_gen_rust.adb:354:19: error: ambiguous expression (cannot resolve "Append")
-sig_gen_rust.adb:354:19: error: possible interpretation at a-strunb.ads:159
-sig_gen_rust.adb:354:19: error: possible interpretation at a-strunb.ads:149
-sig_gen_rust.adb:354:81: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
-sig_gen_rust.adb:354:81: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-sig_gen_rust.adb:354:81: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:19
-sig_gen_rust.adb:359:72: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
-sig_gen_rust.adb:359:72: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-sig_gen_rust.adb:359:72: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:19
-sig_gen_rust.adb:361:19: error: ambiguous expression (cannot resolve "Append")
-sig_gen_rust.adb:361:19: error: possible interpretation at a-strunb.ads:159
-sig_gen_rust.adb:361:19: error: possible interpretation at a-strunb.ads:149
-sig_gen_rust.adb:361:81: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
-sig_gen_rust.adb:361:81: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-sig_gen_rust.adb:361:81: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:19
+sig_gen_rust.adb:343:29: error: operator for private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19 is not directly visible
+sig_gen_rust.adb:343:29: error: use clause would make operation legal
+sig_gen_rust.adb:353:19: error: ambiguous expression (cannot resolve "Append")
+sig_gen_rust.adb:353:19: error: possible interpretation at a-strunb.ads:159
+sig_gen_rust.adb:353:19: error: possible interpretation at a-strunb.ads:149
+sig_gen_rust.adb:353:52: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:353:52: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:353:52: error:   ==> in call to "To_String" at a-strunb.ads:135
+sig_gen_rust.adb:360:19: error: ambiguous expression (cannot resolve "Append")
+sig_gen_rust.adb:360:19: error: possible interpretation at a-strunb.ads:159
+sig_gen_rust.adb:360:19: error: possible interpretation at a-strunb.ads:149
+sig_gen_rust.adb:360:52: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:360:52: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:360:52: error:   ==> in call to "To_String" at a-strunb.ads:135
 sig_gen_rust.adb:395:45: error: prefix of "Access" attribute must be aliased
 sig_gen_rust.adb:396:45: error: prefix of "Access" attribute must be aliased
 sig_gen_rust.adb:397:45: error: prefix of "Access" attribute must be aliased

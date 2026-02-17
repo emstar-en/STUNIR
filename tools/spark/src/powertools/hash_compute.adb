@@ -3,6 +3,7 @@ with Ada.Command_Line;
 with Ada.Streams;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO.Text_Streams;
+with Ada.Directories;
 with GNAT.SHA256;
 with Ada.Strings.Unbounded; 
 
@@ -61,7 +62,8 @@ procedure Hash_Compute is
       if Path = "-" then
          declare
             use Ada.Text_IO.Text_Streams;
-            Stream : constant Stream_Access := Text_Streams.Stream (Standard_Input);
+            Stream : constant Ada.Text_IO.Text_Streams.Stream_Access :=
+               Text_Streams.Stream (Standard_Input);
          begin
             loop
                Read (Stream.all, Buffer, Last);
@@ -70,14 +72,14 @@ procedure Hash_Compute is
             end loop;
             return GNAT.SHA256.Digest (C);
          exception
-            when End_Error => 
+            when Ada.Streams.Stream_IO.End_Error =>
                return GNAT.SHA256.Digest (C); -- End of stream
             when others => return "ERROR";
          end;
       end if;
 
       --  Handle File
-      if not Exists (Path) then return ""; end if;
+      if not Ada.Directories.Exists (Path) then return ""; end if;
       
       Open (F, In_File, Path);
       while not End_Of_File (F) loop
