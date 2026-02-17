@@ -8,7 +8,7 @@ with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
-with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 
 with GNAT.Command_Line;
@@ -64,12 +64,12 @@ procedure Func_Dedup is
      "  ]" & ASCII.LF &
      "}";
 
-   package String_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => Unbounded_String,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=");
 
+   package String_Maps is new Ada.Containers.Indefinite_Hashed_Maps
+     (Key_Type        => String,
+      Element_Type    => Natural,
+      Hash            => Ada.Strings.Hash,
+      Equivalent_Keys => "=");
    procedure Print_Usage;
    procedure Print_Error (Msg : String);
    procedure Print_Info (Msg : String);
