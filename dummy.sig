@@ -1,1 +1,0 @@
-This is a placeholder signature to satisfy the Omnibus security gate.
