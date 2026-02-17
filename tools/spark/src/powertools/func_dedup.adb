@@ -147,18 +147,18 @@ procedure Func_Dedup is
 
    procedure Write_Output (Content : String) is
    begin
-      if Output_File = Null_Unbounded_String then
+      if Output_File = null then
          Put_Line (Content);
       else
          declare
             File : File_Type;
          begin
-            Create (File, Out_File, To_String (Output_File));
+            Create (File, Out_File, Output_File.all);
             Put (File, Content);
             Close (File);
          exception
             when others =>
-               Print_Error ("Cannot write: " & To_String (Output_File));
+               Print_Error ("Cannot write: " & Output_File.all);
          end;
       end if;
    end Write_Output;
@@ -192,11 +192,11 @@ procedure Func_Dedup is
 
       loop
          Next_Token (State, Status);
-         exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_EOF;
+         exit when Status /= STUNIR_Types.Success or else State.Current_Token = STUNIR_Types.Token_EOF;
 
          if State.Current_Token = Token_String then
             declare
-               Val : constant String := To_String (State.Token_Value);
+               Val : constant String := JSON_Strings.To_String (State.Token_Value);
             begin
                if Val = "functions" then
                   Expect_Token (State, Token_Colon, Status);
