@@ -1,9 +1,9 @@
 extraction_to_spec.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
-extraction_to_spec.adb:206:11: warning: "Stunir_JSON_Parser" is already use-visible through previous use_clause at line 22 [-gnatwr]
-extraction_to_spec.adb:207:11: warning: "Stunir_Types" is already use-visible through previous use_clause at line 23 [-gnatwr]
+extraction_to_spec.adb:206:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 22 [-gnatwr]
+extraction_to_spec.adb:207:11: warning: "STUNIR_Types" is already use-visible through previous use_clause at line 23 [-gnatwr]
 extraction_to_spec.adb:226:20: error: "Success" is not visible
 extraction_to_spec.adb:226:20: error: multiple use clauses cause hiding
-extraction_to_spec.adb:226:20: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:226:20: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:226:20: error: hidden declaration at a-comlin.ads:76
 extraction_to_spec.adb:235:07: error: ambiguous expression (cannot resolve "Append")
 extraction_to_spec.adb:235:07: error: possible interpretation at a-strunb.ads:159
@@ -13,51 +13,39 @@ extraction_to_spec.adb:235:71: error: found type "System.Strings.String_Access"
 extraction_to_spec.adb:235:71: error:   ==> in call to "To_String" at a-strunb.ads:135
 extraction_to_spec.adb:243:30: error: "Success" is not visible
 extraction_to_spec.adb:243:30: error: multiple use clauses cause hiding
-extraction_to_spec.adb:243:30: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:243:30: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:243:30: error: hidden declaration at a-comlin.ads:76
 extraction_to_spec.adb:243:68: error: "Token_EOF" is not visible
 extraction_to_spec.adb:243:68: error: multiple use clauses cause hiding
-extraction_to_spec.adb:243:68: error: hidden declaration at stunir_json_parser.ads:19
-extraction_to_spec.adb:243:68: error: hidden declaration at stunir_types.ads:27
+extraction_to_spec.adb:243:68: error: hidden declaration at stunir_json_parser.ads:18
+extraction_to_spec.adb:243:68: error: hidden declaration at stunir_types.ads:24
+extraction_to_spec.adb:247:57: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:247:57: error: found private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+extraction_to_spec.adb:247:57: error:   ==> in call to "To_String" at a-strunb.ads:135
 extraction_to_spec.adb:251:31: error: "Success" is not visible
 extraction_to_spec.adb:251:31: error: multiple use clauses cause hiding
-extraction_to_spec.adb:251:31: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:251:31: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:251:31: error: hidden declaration at a-comlin.ads:76
 extraction_to_spec.adb:253:34: error: "Success" is not visible
 extraction_to_spec.adb:253:34: error: multiple use clauses cause hiding
-extraction_to_spec.adb:253:34: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:253:34: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:253:34: error: hidden declaration at a-comlin.ads:76
 extraction_to_spec.adb:276:39: error: "Success" is not visible
 extraction_to_spec.adb:276:39: error: multiple use clauses cause hiding
-extraction_to_spec.adb:276:39: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:276:39: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:276:39: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:280:86: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:21
-extraction_to_spec.adb:280:86: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:280:86: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:21
 extraction_to_spec.adb:283:45: error: "Success" is not visible
 extraction_to_spec.adb:283:45: error: multiple use clauses cause hiding
-extraction_to_spec.adb:283:45: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:283:45: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:283:45: error: hidden declaration at a-comlin.ads:76
 extraction_to_spec.adb:286:45: error: "Success" is not visible
 extraction_to_spec.adb:286:45: error: multiple use clauses cause hiding
-extraction_to_spec.adb:286:45: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:286:45: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:286:45: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:298:103: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:21
-extraction_to_spec.adb:298:103: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:298:103: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:21
-extraction_to_spec.adb:300:76: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:21
-extraction_to_spec.adb:300:76: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:300:76: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:21
 extraction_to_spec.adb:308:57: error: "Success" is not visible
 extraction_to_spec.adb:308:57: error: multiple use clauses cause hiding
-extraction_to_spec.adb:308:57: error: hidden declaration at stunir_types.ads:62
+extraction_to_spec.adb:308:57: error: hidden declaration at stunir_types.ads:56
 extraction_to_spec.adb:308:57: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:320:109: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:21
-extraction_to_spec.adb:320:109: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:320:109: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:21
-extraction_to_spec.adb:326:108: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:21
-extraction_to_spec.adb:326:108: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:326:108: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:21
 extraction_to_spec.adb:376:21: error: no candidate interpretations match the actuals:
 extraction_to_spec.adb:376:56: error: expected type "Value_Callback" defined at g-comlin.ads:692
 extraction_to_spec.adb:376:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 376

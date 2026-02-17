@@ -12,14 +12,14 @@ package STUNIR_JSON_Parser is
 
    use STUNIR_Types;
 
-   pragma Pure;
+   --  Note: Cannot use Pure pragma due to dependency on Ada.Strings.Bounded
 
    --  Token constants for compatibility
    Token_EOF : constant Token_Type := STUNIR_Types.Token_EOF;
 
    --  Initialize parser with input string
    procedure Initialize_Parser
-     (State  : out Parser_State;
+     (State  : in out Parser_State;
       Input  : in JSON_String;
       Status : out Status_Code)
    with
