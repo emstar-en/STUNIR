@@ -1,0 +1,2 @@
+type_map.adb:11:17: warning: unit "Ada.Strings.Maps" is not referenced [-gnatwu]
+type_map.adb:417:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

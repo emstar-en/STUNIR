@@ -28,7 +28,7 @@ procedure Toolchain_Verify is
       Put_Line ("{");
       Put_Line ("  ""name"": ""toolchain_verify"",");
       Put_Line ("  ""description"": ""Verify toolchain.lock file integrity"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [");
       Put_Line ("    {""name"": ""lockfile"", ""type"": ""file"", ""description"": ""Lock file (default: toolchain.lock)""}");
       Put_Line ("  ],");
@@ -137,3 +137,4 @@ begin
       end if;
    end;
 end Toolchain_Verify;
+

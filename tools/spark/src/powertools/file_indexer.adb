@@ -36,7 +36,7 @@ procedure File_Indexer is
       Put_Line ("{");
       Put_Line ("  ""name"": ""file_indexer"",");
       Put_Line ("  ""description"": ""Index directory and output manifest JSON with file metadata and hashes"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [");
       Put_Line ("    {""name"": ""directory"", ""type"": ""argument"", ""description"": ""Root directory to scan (default: current)""}");
       Put_Line ("  ],");

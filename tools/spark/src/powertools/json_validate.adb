@@ -18,7 +18,6 @@ procedure JSON_Validate is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
-   use STUNIR_Types;
 
    --  Exit codes per powertools spec
    Exit_Success         : constant := 0;
@@ -34,13 +33,13 @@ procedure JSON_Validate is
    Show_Help      : Boolean := False;
    Show_Describe  : Boolean := False;
 
-   Version : constant String := "1.0.0";
+   Version : constant String := "0.1.0-alpha";
 
    --  Description output for --describe
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""json_validate""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Validates JSON structure and syntax""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""json_input""," & ASCII.LF &
@@ -126,26 +125,26 @@ procedure JSON_Validate is
 
    function Validate_JSON (Content : String) return Integer is
       use STUNIR_JSON_Parser;
-      State  : Parser_State;
-      Status : Status_Code;
-      Input_Str : JSON_String;
+      State  : STUNIR_Types.Parser_State;
+      Status : STUNIR_Types.Status_Code;
+      Input_Str : STUNIR_Types.JSON_String;
    begin
       if Content'Length = 0 then
          Print_Error ("Empty input");
          return Exit_Validation_Error;
       end if;
 
-      if Content'Length > Max_JSON_Length then
-         Print_Error ("Input too large (max" & Max_JSON_Length'Img & " bytes)");
+      if Content'Length > STUNIR_Types.Max_JSON_Length then
+         Print_Error ("Input too large (max" & STUNIR_Types.Max_JSON_Length'Img & " bytes)");
          return Exit_Resource_Error;
       end if;
 
       --  Convert to bounded string
-      Input_Str := JSON_Strings.To_Bounded_String (Content);
+      Input_Str := STUNIR_Types.JSON_Strings.To_Bounded_String (Content);
 
       --  Initialize parser
       Initialize_Parser (State, Input_Str, Status);
-      if Status /= Success then
+      if Status /= STUNIR_Types.Success then
          Print_Error ("Failed to initialize parser");
          return Exit_Processing_Error;
       end if;
@@ -153,10 +152,10 @@ procedure JSON_Validate is
       --  Parse all tokens
       loop
          Next_Token (State, Status);
-         exit when Status /= Success or else State.Current_Token = Token_EOF;
+         exit when Status /= STUNIR_Types.Success or else State.Current_Token = STUNIR_Types.Token_EOF;
       end loop;
 
-      if Status = Success then
+      if Status = STUNIR_Types.Success then
          Print_Info ("JSON is valid");
          return Exit_Success;
       else

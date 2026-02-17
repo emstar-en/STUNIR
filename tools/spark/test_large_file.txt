@@ -1,0 +1,10 @@
+"This is a test file for verifying the file_hash progress reporting.
+It contains enough content to be considered large (>8KB).
+The current implementation should show percentage completion during processing.
+
+1234567890123456789012345678901234567890
+1234567890123456789012345678901234567890
+1234567890123456789012345678901234567890
+
+This file should be large enough to trigger the progress reporting feature.
+Let's verify that it works correctly with our improved implementation."

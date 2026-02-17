@@ -1,0 +1,4 @@
+json_path_eval.adb:127:48: error: mixed logical operators in expression
+json_path_eval.adb:134:73: error: ":" should be ";"
+json_path_eval.adb:134:74: error: declaration expected
+json_path_eval.adb:134:75: error: missing string quote

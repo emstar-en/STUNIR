@@ -20,7 +20,7 @@ with Ada.Strings.Bounded;
 package STUNIR_IR_To_Code is
 
    --  Version information
-   Version : constant String := "0.7.1";
+   Version : constant String := "0.1.0-alpha";
    Tool_ID : constant String := "stunir_ir_to_code_spark";
 
    --  Recursion control (v0.7.0 - Bounded Recursion, v0.7.1 - increased for 5-level nesting)

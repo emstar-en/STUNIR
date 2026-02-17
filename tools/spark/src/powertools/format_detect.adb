@@ -18,6 +18,8 @@ procedure Format_Detect is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use STUNIR_JSON_Parser;
+   use STUNIR_Types;
 
    --  Exit codes
    Exit_Success          : constant := 0;
@@ -41,13 +43,13 @@ procedure Format_Detect is
    Show_Describe : Boolean := False;
    Output_Json   : Boolean := False;
 
-   Version : constant String := "1.0.0";
+   Version : constant String := "0.1.0-alpha";
 
    --  Description output
    Describe_Output : constant String :=
      "{" & ASCII.LF &
      "  ""tool"": ""format_detect""," & ASCII.LF &
-     "  ""version"": ""1.0.0""," & ASCII.LF &
+     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
      "  ""description"": ""Detect extraction JSON format variant""," & ASCII.LF &
      "  ""inputs"": [{" & ASCII.LF &
      "    ""name"": ""extraction_json""," & ASCII.LF &
@@ -145,10 +147,9 @@ procedure Format_Detect is
    end Read_Input;
 
    function Detect_Format (Content : String) return Extraction_Format is
-      use STUNIR_JSON_Parser;
       State  : Parser_State;
-      Status : STUNIR_Types.Status_Code;
-      Input_Str : STUNIR_Types.JSON_String;
+      Status : Status_Code;
+      Input_Str : JSON_String;
       Has_Files : Boolean := False;
       Has_Functions : Boolean := False;
       Has_Project : Boolean := False;
@@ -177,7 +178,7 @@ procedure Format_Detect is
 
          if State.Current_Token = Token_String then
             declare
-               Key : constant String := STUNIR_Types.JSON_Strings.To_String (State.Token_Value);
+               Key : constant String := To_String (State.Token_Value);
             begin
                if Key = "files" then
                   Has_Files := True;
@@ -196,7 +197,7 @@ procedure Format_Detect is
                end if;
             end;
          elsif State.Current_Token = Token_Comma then
-            continue;
+            null;
          else
             exit;
          end if;

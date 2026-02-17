@@ -1,0 +1,18 @@
+spec_extract_module.adb:12:10: warning: unit "GNAT.Strings" is not referenced [-gnatwu]
+spec_extract_module.adb:89:12: error: "Get_Command_Output" is undefined
+spec_extract_module.adb:112:21: error: no candidate interpretations match the actuals:
+spec_extract_module.adb:112:57: error: expected type "Value_Callback" defined at g-comlin.ads:692
+spec_extract_module.adb:112:57: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 112
+spec_extract_module.adb:112:57: error:   ==> in call to "Define_Switch" at g-comlin.ads:694
+spec_extract_module.adb:112:57: error: expected an access type with designated type "System.Strings.String_Access"
+spec_extract_module.adb:112:57: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+spec_extract_module.adb:112:57: error:   ==> in call to "Define_Switch" at g-comlin.ads:678
+spec_extract_module.adb:112:57: error: expected an access type with designated type "Standard.Integer"
+spec_extract_module.adb:112:57: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+spec_extract_module.adb:112:57: error:   ==> in call to "Define_Switch" at g-comlin.ads:659
+spec_extract_module.adb:112:57: error: expected an access type with designated type "Standard.Boolean"
+spec_extract_module.adb:112:57: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
+spec_extract_module.adb:112:57: error:   ==> in call to "Define_Switch" at g-comlin.ads:640
+spec_extract_module.adb:112:57: error: expected type "Standard.String"
+spec_extract_module.adb:112:57: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 112
+spec_extract_module.adb:112:57: error:   ==> in call to "Define_Switch" at g-comlin.ads:608

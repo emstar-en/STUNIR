@@ -29,7 +29,7 @@ procedure Lang_Detect is
       Put_Line ("{");
       Put_Line ("  ""name"": ""lang_detect"",");
       Put_Line ("  ""description"": ""Detect programming language from file extension or content"",");
-      Put_Line ("  ""version"": ""1.0.0"",");
+      Put_Line ("  ""version"": ""0.1.0-alpha"",");
       Put_Line ("  ""inputs"": [");
       Put_Line ("    {""name"": ""file"", ""type"": ""argument"", ""description"": ""File to analyze""}");
       Put_Line ("  ],");

@@ -1,0 +1,9 @@
+"This is a sample text file for testing the file_hash tool.
+It contains multiple lines of text to test the hash computation functionality.
+
+The quick brown fox jumps over the lazy dog.
+This sentence is commonly used for testing hash algorithms because it contains all letters of the alphabet.
+
+1234567890
+Testing numbers and special characters: !@#$%^&*()
+"

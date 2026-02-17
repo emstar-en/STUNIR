@@ -1,0 +1,5 @@
+stunir_spec_to_ir.adb:139:14: warning: procedure "Process_Directory" is not referenced [-gnatwu]
+stunir_spec_to_ir.adb:150:49: warning: array aggregate using () is an obsolescent syntax, use [] instead [-gnatwj]
+stunir_spec_to_ir.adb:177:13: warning: function "Find_Spec_File" is not referenced [-gnatwu]
+stunir_spec_to_ir.adb:183:49: warning: array aggregate using () is an obsolescent syntax, use [] instead [-gnatwj]
+stunir_spec_to_ir.adb:218:49: warning: array aggregate using () is an obsolescent syntax, use [] instead [-gnatwj]

@@ -1,0 +1,2 @@
+sig_gen_rust.adb:14:06: error: file "stunir_json_parser.ads" not found
+sig_gen_rust.adb:15:06: error: file "stunir_types.ads" not found

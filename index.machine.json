@@ -12,6 +12,7 @@
   "STUNIR_CHUNK_INDEX.jsonl": "RAG-friendly chunk index of the repo",
   "STUNIR_EPOCH_AUTODERIVE_README.md": "Guide to epoch derivation",
   "STUNIR_INDEX_README.md": "Navigation guide for the repository",
+  "STUNIR_QUICKSTART_PRODUCTION.md": "ALPHA Prototype quickstart guide for spec-to-code pipeline",
   "STUNIR_REFERENCE_AUDIT.json": "Audit status of the reference implementation",
   "STUNIR_REFERENCE_AUDIT.md": "Human-readable audit report",
   "STUNIR_REFERENCE_RULES.md": "Rules for the reference implementation",
@@ -49,5 +50,5 @@
   "tools/spark/bin": "Compiled SPARK tool executables",
   "tools/spark/src": "SPARK Ada source code",
   "tools/spark/stunir_tools.gpr": "GNAT project file for SPARK tools",
-  "tools/spark/index.machine.json": "Machine index of SPARK source files"
+  "vex.attestation.json": "VEX attestation document"
 }
