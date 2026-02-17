@@ -1,1 +1,4 @@
-json_merge_arrays.adb:42:66: error: missing string quote
+json_merge_arrays.adb:11:20: warning: no entities of "Ada.Characters.Handling" are referenced [-gnatwu]
+json_merge_arrays.adb:17:04: warning: use clause for package "Handling" has no effect [-gnatwu]
+json_merge_arrays.adb:24:04: warning: variable "Unique_Mode" is assigned but never read [-gnatwm]
+json_merge_arrays.adb:25:04: warning: variable "Sort_Mode" is assigned but never read [-gnatwm]

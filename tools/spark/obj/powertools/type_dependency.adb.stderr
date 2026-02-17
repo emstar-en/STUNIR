@@ -1,0 +1,1 @@
+type_dependency.adb:18:04: warning: named number "Exit_Processing_Error" is not referenced [-gnatwu]

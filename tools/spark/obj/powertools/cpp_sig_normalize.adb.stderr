@@ -1,0 +1,2 @@
+cpp_sig_normalize.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
+cpp_sig_normalize.adb:19:04: warning: named number "Exit_Processing_Error" is not referenced [-gnatwu]

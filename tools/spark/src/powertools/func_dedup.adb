@@ -12,6 +12,7 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Hash;
 
 with GNAT.Command_Line;
+with GNAT.Strings;
 
 with STUNIR_JSON_Parser;
 with STUNIR_Types;
@@ -20,6 +21,8 @@ procedure Func_Dedup is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use STUNIR_JSON_Parser;
+   use STUNIR_Types;
 
    --  Exit codes
    Exit_Success          : constant := 0;
@@ -28,13 +31,13 @@ procedure Func_Dedup is
 
    --  Configuration
    Input_File    : Unbounded_String := Null_Unbounded_String;
-   Output_File   : Unbounded_String := Null_Unbounded_String;
-   Key_Field     : Unbounded_String := To_Unbounded_String ("name");
-   Verbose_Mode  : Boolean := False;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
-   Keep_First    : Boolean := True;
+   Output_File   : aliased GNAT.Strings.String_Access := null;
+   Key_Field     : aliased GNAT.Strings.String_Access := new String'("name");
+   Verbose_Mode  : aliased Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
+   Keep_First    : aliased Boolean := True;
 
    Version : constant String := "0.1.0-alpha";
 
@@ -204,7 +207,7 @@ procedure Func_Dedup is
                      end if;
                   end if;
                elsif In_Functions_Array and then Object_Depth = 1 and then
-                     Val = To_String (Key_Field) then
+                     Val = Key_Field.all then
                   Expect_Token (State, Token_Colon, Status);
                   if Status = STUNIR_Types.Success then
                      Next_Token (State, Status);

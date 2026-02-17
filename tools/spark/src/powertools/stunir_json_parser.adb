@@ -364,4 +364,20 @@ package body Stunir_JSON_Parser is
       return Depth = 0;  --  All brackets matched
    end Validate_JSON;
 
+   procedure Expect_Token
+     (State    : in out Parser_State;
+      Expected : Token_Type;
+      Status   : out Status_Code)
+   is
+   begin
+      Next_Token (State, Status);
+      if Status /= Success then
+         return;
+      end if;
+
+      if State.Current_Token /= Expected then
+         Status := Error;
+      end if;
+   end Expect_Token;
+
 end Stunir_JSON_Parser;

@@ -1,2 +1,16 @@
-json_validate.adb:14:06: error: file "stunir_json_parser.ads" not found
-json_validate.adb:15:06: error: file "stunir_types.ads" not found
+json_validate.adb:147:17: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+json_validate.adb:147:17: error: use clause would make operation legal
+json_validate.adb:155:27: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+json_validate.adb:155:27: error: use clause would make operation legal
+json_validate.adb:155:79: error: operator for type "Token_Type" defined at stunir_types.ads:21 is not directly visible
+json_validate.adb:155:79: error: use clause would make operation legal
+json_validate.adb:158:17: error: operator for type "Status_Code" defined at stunir_types.ads:54 is not directly visible
+json_validate.adb:158:17: error: use clause would make operation legal
+json_validate.adb:172:45: error: prefix of "Access" attribute must be aliased
+json_validate.adb:173:45: error: prefix of "Access" attribute must be aliased
+json_validate.adb:174:45: error: prefix of "Access" attribute must be aliased
+json_validate.adb:175:45: error: prefix of "Access" attribute must be aliased
+json_validate.adb:176:45: error: prefix of "Access" attribute must be aliased
+json_validate.adb:247:27: error: expected type "Ada.Command_Line.Exit_Status"
+json_validate.adb:247:27: error: found type "Standard.Integer"
+json_validate.adb:247:27: error:   ==> in call to "Set_Exit_Status" at a-comlin.ads:79

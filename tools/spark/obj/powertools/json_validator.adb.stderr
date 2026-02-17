@@ -1,0 +1,2 @@
+json_validator.adb:60:14: warning: procedure "Print_Error" is not referenced [-gnatwu]
+json_validator.adb:78:14: warning: procedure "Report_Error" is not referenced [-gnatwu]

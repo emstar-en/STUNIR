@@ -1,2 +1,2 @@
-sig_gen_cpp.adb:94:12: error: "Get_Command_Output" is undefined
-sig_gen_cpp.adb:174:23: warning: "Text_IO" is already use-visible through previous use_clause at line 16 [-gnatwr]
+sig_gen_cpp.adb:11:10: warning: unit "GNAT.OS_Lib" is not referenced [-gnatwu]
+sig_gen_cpp.adb:162:23: warning: "Text_IO" is already use-visible through previous use_clause at line 17 [-gnatwr]

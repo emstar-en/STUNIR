@@ -33,4 +33,10 @@ package Stunir_JSON_Parser is
      (State  : in out Parser_State;
       Status : out Status_Code);
 
+   --  Expect a specific token
+   procedure Expect_Token
+     (State    : in out Parser_State;
+      Expected : Token_Type;
+      Status   : out Status_Code);
+
 end Stunir_JSON_Parser;

@@ -1,0 +1,2 @@
+command_utils.adb:13:07: warning: formal parameter "Input" is not referenced [-gnatwf]
+command_utils.ads:6:10: warning: unit "GNAT.Strings" is not referenced [-gnatwu]
