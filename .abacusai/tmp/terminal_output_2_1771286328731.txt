@@ -1,0 +1,935 @@
+A  .abacusai/tmp/terminal_output_2_1771285868485.txt
+D  .coverage
+D  STUNIR-devsite/issues/native/haskell/build_integration.machine.json
+D  STUNIR-devsite/issues/native/haskell/compiler_determinism.machine.json
+D  STUNIR-devsite/issues/native/haskell/error_handling.machine.json
+D  STUNIR-devsite/issues/native/haskell/index.machine.json
+D  STUNIR-devsite/issues/native/haskell/manifest.machine.json
+D  STUNIR-devsite/issues/scripts/build_pipeline/index.machine.json
+D  STUNIR-devsite/issues/scripts/build_pipeline/manifest.machine.json
+D  STUNIR-devsite/issues/scripts/build_pipeline/path_alignment.machine.json
+D  STUNIR-main
+D  __pycache__/extract_bc_functions.cpython-314.pyc
+D  coverage.xml
+D  dist/index.machine.json
+D  dist/manifest.machine.json
+D  dist/manifest_scripts.txt
+D  stunir/__init__.py
+D  stunir/deprecation.py
+D  stunir_execution_workspace/execution_report.json
+D  stunir_execution_workspace/gnu_bc/batch_01/convert_to_ir.py
+D  stunir_execution_workspace/gnu_bc/batch_01/extraction.json
+D  stunir_execution_workspace/gnu_bc/batch_01/extractions/bc_extraction.json
+D  stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c
+D  stunir_execution_workspace/gnu_bc/batch_01/generated.cpp
+D  stunir_execution_workspace/gnu_bc/batch_01/generated/execute.cpp
+D  stunir_execution_workspace/gnu_bc/batch_01/ir.json
+D  stunir_execution_workspace/gnu_bc/batch_01/ir_new.json
+D  stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.cpp
+D  stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.go
+D  stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.py
+D  stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.rs
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.c
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.cpp
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.cs
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.go
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.java
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.js
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.kt
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.py
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.rs
+D  stunir_execution_workspace/gnu_bc/batch_01/output/generated.swift
+D  stunir_execution_workspace/gnu_bc/batch_01/output/ir.json
+D  stunir_execution_workspace/gnu_bc/batch_01/output/spec.json
+D  stunir_execution_workspace/gnu_bc/batch_01/spec.json
+D  stunir_execution_workspace/gnu_bc/batch_01/spec_new.json
+D  stunir_execution_workspace/gnu_bc/build_result.json
+D  stunir_execution_workspace/gnu_bc/codegen_result.json
+D  stunir_execution_workspace/gnu_bc/corpus_manifest.json
+D  stunir_execution_workspace/gnu_bc/environment.json
+D  stunir_execution_workspace/gnu_bc/extraction_result.json
+D  stunir_execution_workspace/gnu_bc/metadata.json
+D  stunir_execution_workspace/gnu_bc/triage_result.json
+D  stunir_execution_workspace/gnu_bc/verification_result.json
+D  stunir_execution_workspace/golden/bc/array.b.out
+D  stunir_execution_workspace/golden/bc/arrayp.b.out
+D  stunir_execution_workspace/golden/bc/aryprm.b.out
+D  stunir_execution_workspace/golden/bc/atan.b.out
+D  stunir_execution_workspace/golden/bc/checklib.b.out
+D  stunir_execution_workspace/golden/bc/div.b.out
+D  stunir_execution_workspace/golden/bc/exp.b.out
+D  stunir_execution_workspace/golden/bc/fact.b.out
+D  stunir_execution_workspace/golden/bc/jn.b.out
+D  stunir_execution_workspace/golden/bc/ln.b.out
+D  stunir_execution_workspace/golden/bc/mul.b.out
+D  stunir_execution_workspace/golden/bc/raise.b.out
+D  stunir_execution_workspace/golden/bc/sine.b.out
+D  stunir_execution_workspace/golden/bc/sqrt.b.out
+D  stunir_execution_workspace/golden/bc/sqrt1.b.out
+D  stunir_execution_workspace/golden/bc/sqrt2.b.out
+D  stunir_execution_workspace/golden/bc/testfn.b.out
+D  stunir_execution_workspace/lua_5.4/build_result.json
+D  stunir_execution_workspace/lua_5.4/codegen_result.json
+D  stunir_execution_workspace/lua_5.4/corpus_manifest.json
+D  stunir_execution_workspace/lua_5.4/environment.json
+D  stunir_execution_workspace/lua_5.4/extraction_result.json
+D  stunir_execution_workspace/lua_5.4/metadata.json
+D  stunir_execution_workspace/lua_5.4/triage_result.json
+D  stunir_execution_workspace/lua_5.4/verification_result.json
+D  stunir_execution_workspace/sources/bc-1.07.1.tar.gz
+D  stunir_execution_workspace/sources/bc-1.07.1/AUTHORS
+D  stunir_execution_workspace/sources/bc-1.07.1/COPYING
+D  stunir_execution_workspace/sources/bc-1.07.1/COPYING.LIB
+D  stunir_execution_workspace/sources/bc-1.07.1/ChangeLog
+D  stunir_execution_workspace/sources/bc-1.07.1/Examples/ckbook.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Examples/pi.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Examples/primes.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Examples/twins.b
+D  stunir_execution_workspace/sources/bc-1.07.1/FAQ
+D  stunir_execution_workspace/sources/bc-1.07.1/INSTALL
+D  stunir_execution_workspace/sources/bc-1.07.1/Makefile.am
+D  stunir_execution_workspace/sources/bc-1.07.1/Makefile.in
+D  stunir_execution_workspace/sources/bc-1.07.1/NEWS
+D  stunir_execution_workspace/sources/bc-1.07.1/README
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/BUG.bc
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/array.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/arrayp.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/aryprm.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/atan.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/checklib.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/div.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/exp.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/fact.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/jn.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/ln.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/mul.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/raise.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/signum
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/sine.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/sqrt.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/sqrt1.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/sqrt2.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/testfn.b
+D  stunir_execution_workspace/sources/bc-1.07.1/Test/timetest
+D  stunir_execution_workspace/sources/bc-1.07.1/aclocal.m4
+D  stunir_execution_workspace/sources/bc-1.07.1/ar-lib
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/Makefile.am
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/Makefile.in
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/bc.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/bc.h
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/bc.y
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/bcdefs.h
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/const.h
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/execute.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/fix-libmath_h
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/global.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/global.h
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/libmath.b
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/load.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/main.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/proto.h
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/sbc.y
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/scan.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/scan.l
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/storage.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/util.c
+D  stunir_execution_workspace/sources/bc-1.07.1/bc/warranty.c
+D  stunir_execution_workspace/sources/bc-1.07.1/compile
+D  stunir_execution_workspace/sources/bc-1.07.1/config.h
+D  stunir_execution_workspace/sources/bc-1.07.1/config.h.in
+D  stunir_execution_workspace/sources/bc-1.07.1/configure
+D  stunir_execution_workspace/sources/bc-1.07.1/configure.ac
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/Makefile.am
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/Makefile.in
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/array.c
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/dc-proto.h
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/dc-regdef.h
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/dc.c
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/dc.h
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/eval.c
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/misc.c
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/numeric.c
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/stack.c
+D  stunir_execution_workspace/sources/bc-1.07.1/dc/string.c
+D  stunir_execution_workspace/sources/bc-1.07.1/depcomp
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/Makefile.am
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/Makefile.in
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/bc.1
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/bc.info
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/bc.texi
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/dc.1
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/dc.info
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/dc.texi
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/texi-ver.incl.in
+D  stunir_execution_workspace/sources/bc-1.07.1/doc/texinfo.tex
+D  stunir_execution_workspace/sources/bc-1.07.1/h/getopt.h
+D  stunir_execution_workspace/sources/bc-1.07.1/h/number.h
+D  stunir_execution_workspace/sources/bc-1.07.1/install-sh
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/Makefile.am
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/Makefile.in
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/getopt.c
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/getopt1.c
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/number.c
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/testmul.c
+D  stunir_execution_workspace/sources/bc-1.07.1/lib/vfprintf.c
+D  stunir_execution_workspace/sources/bc-1.07.1/missing
+D  stunir_execution_workspace/sources/bc-1.07.1/ylwrap
+D  stunir_execution_workspace/sources/lua-5.4.6.tar.gz
+D  stunir_execution_workspace/sources/lua-5.4.6/Makefile
+D  stunir_execution_workspace/sources/lua-5.4.6/README
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/contents.html
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/index.css
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/logo.gif
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/lua.1
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/lua.css
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/luac.1
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/manual.css
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/manual.html
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/osi-certified-72x60.png
+D  stunir_execution_workspace/sources/lua-5.4.6/doc/readme.html
+D  stunir_execution_workspace/sources/lua-5.4.6/src/Makefile
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lapi.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lapi.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lauxlib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lauxlib.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lbaselib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lcode.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lcode.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lcorolib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lctype.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lctype.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ldblib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ldebug.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ldebug.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ldo.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ldo.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ldump.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lfunc.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lfunc.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lgc.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lgc.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/linit.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/liolib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ljumptab.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/llex.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/llex.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/llimits.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lmathlib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lmem.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lmem.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/loadlib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lobject.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lobject.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lopcodes.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lopcodes.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lopnames.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/loslib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lparser.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lparser.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lprefix.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lstate.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lstate.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lstring.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lstring.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lstrlib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ltable.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ltable.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ltablib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ltm.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/ltm.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lua.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lua.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lua.hpp
+D  stunir_execution_workspace/sources/lua-5.4.6/src/luac.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/luaconf.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lualib.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lundump.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lundump.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lutf8lib.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lvm.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lvm.h
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lzio.c
+D  stunir_execution_workspace/sources/lua-5.4.6/src/lzio.h
+D  stunir_execution_workspace/sources/sqlite-amalgamation-3450000.zip
+D  stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/shell.c
+D  stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/sqlite3.c
+D  stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/sqlite3.h
+D  stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/sqlite3ext.h
+D  stunir_execution_workspace/sqlite/build_result.json
+D  stunir_execution_workspace/sqlite/codegen_result.json
+D  stunir_execution_workspace/sqlite/corpus_manifest.json
+D  stunir_execution_workspace/sqlite/environment.json
+D  stunir_execution_workspace/sqlite/extraction_result.json
+D  stunir_execution_workspace/sqlite/metadata.json
+D  stunir_execution_workspace/sqlite/triage_result.json
+D  stunir_execution_workspace/sqlite/verification_result.json
+D  stunir_runs/ardupilot_crc/code_slice.json
+D  stunir_runs/ardupilot_full/baseline_signatures.txt
+D  stunir_runs/ardupilot_full/code_slice.json
+D  stunir_runs/ardupilot_full/extraction.json
+D  stunir_runs/ardupilot_full/extractions/extraction.json
+D  stunir_runs/ardupilot_full/generated.cpp
+D  stunir_runs/ardupilot_full/generated_final.cpp
+D  stunir_runs/ardupilot_full/generated_full.cpp
+D  stunir_runs/ardupilot_full/ir.json
+D  stunir_runs/ardupilot_full/ir_clean.json
+D  stunir_runs/ardupilot_full/ir_final.json
+D  stunir_runs/ardupilot_full/ir_fixed.json
+D  stunir_runs/ardupilot_full/ir_formatted.json
+D  stunir_runs/ardupilot_full/ir_full.json
+D  stunir_runs/ardupilot_full/local_toolchain.lock.json
+D  stunir_runs/ardupilot_full/spec.json
+D  stunir_runs/ardupilot_full/spec_only/local_toolchain.lock.json
+D  stunir_runs/ardupilot_full/spec_only/spec.json
+D  stunir_runs/index.json
+D  test_confluence/confluence_run.log
+D  test_outputs/ardupilot_production/generated_c/imu_health_monitor.o
+D  test_outputs/ardupilot_production/generated_c/imu_health_monitor_strict.o
+D  test_outputs/confluence_run.log
+D  test_outputs/python_pipeline_v2/test_compile.o
+D  test_outputs/v0.8.4_spark_final/break_while.o
+D  test_outputs/week12_test/python_test.o
+D  test_recursive/nested_2_levels.o
+D  test_recursive/nested_3_levels.o
+D  test_recursive/nested_4_levels.o
+D  test_recursive/nested_5_levels.o
+D  test_v084_rust_output/combined_features.o
+D  test_v084_rust_output/switch_simple.o
+R  test_confluence/CONFLUENCE_REPORT.md -> tests/test_confluence/CONFLUENCE_REPORT.md
+R  test_confluence/WEEK2_STATUS.md -> tests/test_confluence/WEEK2_STATUS.md
+R  test_confluence/WEEK2_STATUS.pdf -> tests/test_confluence/WEEK2_STATUS.pdf
+R  test_confluence/confluence_results.json -> tests/test_confluence/confluence_results.json
+R  test_confluence/confluence_test_output.txt -> tests/test_confluence/confluence_test_output.txt
+R  test_confluence/outputs/rust/asmIR/ir.json -> tests/test_confluence/outputs/rust/asmIR/ir.json
+R  test_confluence/outputs/rust/asp/ir.json -> tests/test_confluence/outputs/rust/asp/ir.json
+R  test_confluence/outputs/rust/assembly/ir.json -> tests/test_confluence/outputs/rust/assembly/ir.json
+R  test_confluence/outputs/rust/beam/ir.json -> tests/test_confluence/outputs/rust/beam/ir.json
+R  test_confluence/outputs/rust/business/ir.json -> tests/test_confluence/outputs/rust/business/ir.json
+R  test_confluence/outputs/rust/bytecode/ir.json -> tests/test_confluence/outputs/rust/bytecode/ir.json
+R  test_confluence/outputs/rust/constraints/ir.json -> tests/test_confluence/outputs/rust/constraints/ir.json
+R  test_confluence/outputs/rust/embedded/ir.json -> tests/test_confluence/outputs/rust/embedded/ir.json
+R  test_confluence/outputs/rust/expert/ir.json -> tests/test_confluence/outputs/rust/expert/ir.json
+R  test_confluence/outputs/rust/fpga/ir.json -> tests/test_confluence/outputs/rust/fpga/ir.json
+R  test_confluence/outputs/rust/functional/ir.json -> tests/test_confluence/outputs/rust/functional/ir.json
+R  test_confluence/outputs/rust/gpu/ir.json -> tests/test_confluence/outputs/rust/gpu/ir.json
+R  test_confluence/outputs/rust/grammar/ir.json -> tests/test_confluence/outputs/rust/grammar/ir.json
+R  test_confluence/outputs/rust/lexer/ir.json -> tests/test_confluence/outputs/rust/lexer/ir.json
+R  test_confluence/outputs/rust/lisp/ir.json -> tests/test_confluence/outputs/rust/lisp/ir.json
+R  test_confluence/outputs/rust/mobile/ir.json -> tests/test_confluence/outputs/rust/mobile/ir.json
+R  test_confluence/outputs/rust/oop/ir.json -> tests/test_confluence/outputs/rust/oop/ir.json
+R  test_confluence/outputs/rust/parser/ir.json -> tests/test_confluence/outputs/rust/parser/ir.json
+R  test_confluence/outputs/rust/planning/ir.json -> tests/test_confluence/outputs/rust/planning/ir.json
+R  test_confluence/outputs/rust/polyglot/ir.json -> tests/test_confluence/outputs/rust/polyglot/ir.json
+R  test_confluence/outputs/rust/prolog/ir.json -> tests/test_confluence/outputs/rust/prolog/ir.json
+R  test_confluence/outputs/rust/scientific/ir.json -> tests/test_confluence/outputs/rust/scientific/ir.json
+R  test_confluence/outputs/rust/systems/ir.json -> tests/test_confluence/outputs/rust/systems/ir.json
+R  test_confluence/outputs/rust/wasm/ir.json -> tests/test_confluence/outputs/rust/wasm/ir.json
+R  test_confluence/specs/ardupilot_test/mavlink_handler.json -> tests/test_confluence/specs/ardupilot_test/mavlink_handler.json
+R  test_confluence/specs/ardupilot_test/mavproxy_tool.json -> tests/test_confluence/specs/ardupilot_test/mavproxy_tool.json
+R  test_confluence/specs/asmIR_test.stunir -> tests/test_confluence/specs/asmIR_test.stunir
+R  test_confluence/specs/asp_test.stunir -> tests/test_confluence/specs/asp_test.stunir
+R  test_confluence/specs/assembly_test.stunir -> tests/test_confluence/specs/assembly_test.stunir
+R  test_confluence/specs/beam_test.stunir -> tests/test_confluence/specs/beam_test.stunir
+R  test_confluence/specs/business_test.stunir -> tests/test_confluence/specs/business_test.stunir
+R  test_confluence/specs/bytecode_test.stunir -> tests/test_confluence/specs/bytecode_test.stunir
+R  test_confluence/specs/constraints_test.stunir -> tests/test_confluence/specs/constraints_test.stunir
+R  test_confluence/specs/embedded_test.stunir -> tests/test_confluence/specs/embedded_test.stunir
+R  test_confluence/specs/expert_test.stunir -> tests/test_confluence/specs/expert_test.stunir
+R  test_confluence/specs/fpga_test.stunir -> tests/test_confluence/specs/fpga_test.stunir
+R  test_confluence/specs/functional_test.stunir -> tests/test_confluence/specs/functional_test.stunir
+R  test_confluence/specs/gpu_test.stunir -> tests/test_confluence/specs/gpu_test.stunir
+R  test_confluence/specs/grammar_test.stunir -> tests/test_confluence/specs/grammar_test.stunir
+R  test_confluence/specs/lexer_test.stunir -> tests/test_confluence/specs/lexer_test.stunir
+R  test_confluence/specs/lisp_test.stunir -> tests/test_confluence/specs/lisp_test.stunir
+R  test_confluence/specs/mobile_test.stunir -> tests/test_confluence/specs/mobile_test.stunir
+R  test_confluence/specs/oop_test.stunir -> tests/test_confluence/specs/oop_test.stunir
+R  test_confluence/specs/parser_test.stunir -> tests/test_confluence/specs/parser_test.stunir
+R  test_confluence/specs/planning_test.stunir -> tests/test_confluence/specs/planning_test.stunir
+R  test_confluence/specs/polyglot_test.stunir -> tests/test_confluence/specs/polyglot_test.stunir
+R  test_confluence/specs/prolog_test.stunir -> tests/test_confluence/specs/prolog_test.stunir
+R  test_confluence/specs/scientific_test.stunir -> tests/test_confluence/specs/scientific_test.stunir
+R  test_confluence/specs/systems_test.stunir -> tests/test_confluence/specs/systems_test.stunir
+R  test_confluence/specs/wasm_test.stunir -> tests/test_confluence/specs/wasm_test.stunir
+R  test_confluence/test_confluence.py -> tests/test_confluence/test_confluence.py
+R  test_harness/haskell_pipeline_test.sh -> tests/test_harness/haskell_pipeline_test.sh
+R  test_harness/index.machine.json -> tests/test_harness/index.machine.json
+R  test_harness/manifest.machine.json -> tests/test_harness/manifest.machine.json
+R  test_nested_control/nested_if_flattened_ir.json -> tests/test_nested_control/nested_if_flattened_ir.json
+R  test_nested_control/nested_if_ir.json -> tests/test_nested_control/nested_if_ir.json
+R  test_nested_control/nested_if_ir_manual.json -> tests/test_nested_control/nested_if_ir_manual.json
+R  test_nested_control/nested_if_spec.json -> tests/test_nested_control/nested_if_spec.json
+R  test_nested_control/output_python.c/nested_control_test.c -> tests/test_nested_control/output_python.c/nested_control_test.c
+R  test_nested_control/output_spark.c -> tests/test_nested_control/output_spark.c
+R  test_nested_control/simple_if_ir.json -> tests/test_nested_control/simple_if_ir.json
+R  test_nested_control/simple_output.c -> tests/test_nested_control/simple_output.c
+R  test_nested_control/spark_output/nested_control_test.c -> tests/test_nested_control/spark_output/nested_control_test.c
+R  test_outputs/PIPELINE_COMPARISON.md -> tests/test_outputs/PIPELINE_COMPARISON.md
+R  test_outputs/PIPELINE_COMPARISON.pdf -> tests/test_outputs/PIPELINE_COMPARISON.pdf
+R  test_outputs/WEEK10_FEATURE_PARITY.md -> tests/test_outputs/WEEK10_FEATURE_PARITY.md
+R  test_outputs/WEEK10_FEATURE_PARITY.pdf -> tests/test_outputs/WEEK10_FEATURE_PARITY.pdf
+R  test_outputs/WEEK11_FEATURE_PARITY_COMPARISON.md -> tests/test_outputs/WEEK11_FEATURE_PARITY_COMPARISON.md
+R  test_outputs/WEEK11_FEATURE_PARITY_COMPARISON.pdf -> tests/test_outputs/WEEK11_FEATURE_PARITY_COMPARISON.pdf
+R  test_outputs/ardupilot/ARDUPILOT_TEST_REPORT.md -> tests/test_outputs/ardupilot/ARDUPILOT_TEST_REPORT.md
+R  test_outputs/ardupilot/generated_code/manifest.json -> tests/test_outputs/ardupilot/generated_code/manifest.json
+R  test_outputs/ardupilot/generated_code/mavlink_handler.c -> tests/test_outputs/ardupilot/generated_code/mavlink_handler.c
+R  test_outputs/ardupilot/generated_code/mavlink_handler.h -> tests/test_outputs/ardupilot/generated_code/mavlink_handler.h
+R  test_outputs/ardupilot/ir.json -> tests/test_outputs/ardupilot/ir.json
+R  test_outputs/ardupilot/ir_new.json -> tests/test_outputs/ardupilot/ir_new.json
+R  test_outputs/ardupilot/test_result.json -> tests/test_outputs/ardupilot/test_result.json
+R  test_outputs/ardupilot_do178c_test/README.md -> tests/test_outputs/ardupilot_do178c_test/README.md
+R  test_outputs/ardupilot_do178c_test/asm/ardupilot_ir.json -> tests/test_outputs/ardupilot_do178c_test/asm/ardupilot_ir.json
+R  test_outputs/ardupilot_do178c_test/asm/stunir.emit.v1.json -> tests/test_outputs/ardupilot_do178c_test/asm/stunir.emit.v1.json
+R  test_outputs/ardupilot_do178c_test/generated_code/ada/ap_math_crc.adb -> tests/test_outputs/ardupilot_do178c_test/generated_code/ada/ap_math_crc.adb
+R  test_outputs/ardupilot_do178c_test/generated_code/c/ap_math_crc.c -> tests/test_outputs/ardupilot_do178c_test/generated_code/c/ap_math_crc.c
+R  test_outputs/ardupilot_do178c_test/generated_code/c_new/ap_math_crc.c -> tests/test_outputs/ardupilot_do178c_test/generated_code/c_new/ap_math_crc.c
+R  test_outputs/ardupilot_do178c_test/generated_code/rust/ap_math_crc.rs -> tests/test_outputs/ardupilot_do178c_test/generated_code/rust/ap_math_crc.rs
+R  test_outputs/ardupilot_do178c_test/generated_code/rust_new/ap_math_crc.rs -> tests/test_outputs/ardupilot_do178c_test/generated_code/rust_new/ap_math_crc.rs
+R  test_outputs/ardupilot_do178c_test/generated_code/spark_c/ap_math_crc.c -> tests/test_outputs/ardupilot_do178c_test/generated_code/spark_c/ap_math_crc.c
+R  test_outputs/ardupilot_do178c_test/specs/ap_math_crc.json -> tests/test_outputs/ardupilot_do178c_test/specs/ap_math_crc.json
+R  test_outputs/ardupilot_do178c_test/specs/ap_math_vector2.json -> tests/test_outputs/ardupilot_do178c_test/specs/ap_math_vector2.json
+R  test_outputs/ardupilot_production/docs/README.md -> tests/test_outputs/ardupilot_production/docs/README.md
+R  test_outputs/ardupilot_production/docs/design.md -> tests/test_outputs/ardupilot_production/docs/design.md
+R  test_outputs/ardupilot_production/docs/design.pdf -> tests/test_outputs/ardupilot_production/docs/design.pdf
+R  test_outputs/ardupilot_production/docs/integration.md -> tests/test_outputs/ardupilot_production/docs/integration.md
+R  test_outputs/ardupilot_production/docs/integration.pdf -> tests/test_outputs/ardupilot_production/docs/integration.pdf
+R  test_outputs/ardupilot_production/docs/requirements.md -> tests/test_outputs/ardupilot_production/docs/requirements.md
+R  test_outputs/ardupilot_production/docs/requirements.pdf -> tests/test_outputs/ardupilot_production/docs/requirements.pdf
+R  test_outputs/ardupilot_production/generated_c/imu_health_monitor.c -> tests/test_outputs/ardupilot_production/generated_c/imu_health_monitor.c
+R  test_outputs/ardupilot_production/generated_c/imu_health_monitor.h -> tests/test_outputs/ardupilot_production/generated_c/imu_health_monitor.h
+R  test_outputs/ardupilot_production/generated_c/manifest.json -> tests/test_outputs/ardupilot_production/generated_c/manifest.json
+R  test_outputs/ardupilot_production/generated_c/traceability.md -> tests/test_outputs/ardupilot_production/generated_c/traceability.md
+R  test_outputs/ardupilot_production/ir.json -> tests/test_outputs/ardupilot_production/ir.json
+R  test_outputs/ardupilot_production/verification/do178c_verification_report.md -> tests/test_outputs/ardupilot_production/verification/do178c_verification_report.md
+R  test_outputs/ardupilot_production/verification/do178c_verification_report.pdf -> tests/test_outputs/ardupilot_production/verification/do178c_verification_report.pdf
+R  test_outputs/ardupilot_production/verification/sha256_manifest.txt -> tests/test_outputs/ardupilot_production/verification/sha256_manifest.txt
+R  test_outputs/code_to_spec_test/example_crc.c -> tests/test_outputs/code_to_spec_test/example_crc.c
+R  test_outputs/code_to_spec_test/test_toolchain.sh -> tests/test_outputs/code_to_spec_test/test_toolchain.sh
+R  test_outputs/comparison/mavlink_handler.c -> tests/test_outputs/comparison/mavlink_handler.c
+R  test_outputs/comparison/mavlink_rust.c -> tests/test_outputs/comparison/mavlink_rust.c
+R  test_outputs/comparison/mavlink_spark.c -> tests/test_outputs/comparison/mavlink_spark.c
+R  test_outputs/confluence/confluence_results.json -> tests/test_outputs/confluence/confluence_results.json
+R  test_outputs/confluence/ir_python.json -> tests/test_outputs/confluence/ir_python.json
+R  test_outputs/confluence/ir_rust.json -> tests/test_outputs/confluence/ir_rust.json
+R  test_outputs/confluence/ir_spark.json -> tests/test_outputs/confluence/ir_spark.json
+R  test_outputs/confluence/output.c -> tests/test_outputs/confluence/output.c
+R  test_outputs/confluence/output_python.c -> tests/test_outputs/confluence/output_python.c
+R  test_outputs/confluence/output_spark.c -> tests/test_outputs/confluence/output_spark.c
+R  test_outputs/confluence/python_out/output.c -> tests/test_outputs/confluence/python_out/output.c
+R  test_outputs/fixtures/ardupilot_spark_ir.json -> tests/test_outputs/fixtures/ardupilot_spark_ir.json
+R  test_outputs/generated/c/output.c -> tests/test_outputs/generated/c/output.c
+R  test_outputs/generated/c/stunir.emit.v1.json -> tests/test_outputs/generated/c/stunir.emit.v1.json
+R  test_outputs/generated/rust/output.rs -> tests/test_outputs/generated/rust/output.rs
+R  test_outputs/mini_os/ir.json -> tests/test_outputs/mini_os/ir.json
+R  test_outputs/minimal_os/Makefile -> tests/test_outputs/minimal_os/Makefile
+R  test_outputs/minimal_os/README.md -> tests/test_outputs/minimal_os/README.md
+R  test_outputs/minimal_os/c/init.c -> tests/test_outputs/minimal_os/c/init.c
+R  test_outputs/minimal_os/c/interrupts.c -> tests/test_outputs/minimal_os/c/interrupts.c
+R  test_outputs/minimal_os/c/interrupts.h -> tests/test_outputs/minimal_os/c/interrupts.h
+R  test_outputs/minimal_os/c/io.h -> tests/test_outputs/minimal_os/c/io.h
+R  test_outputs/minimal_os/c/pmm.c -> tests/test_outputs/minimal_os/c/pmm.c
+R  test_outputs/minimal_os/c/pmm.h -> tests/test_outputs/minimal_os/c/pmm.h
+R  test_outputs/minimal_os/c/scheduler.c -> tests/test_outputs/minimal_os/c/scheduler.c
+R  test_outputs/minimal_os/c/scheduler.h -> tests/test_outputs/minimal_os/c/scheduler.h
+R  test_outputs/minimal_os/c/serial.c -> tests/test_outputs/minimal_os/c/serial.c
+R  test_outputs/minimal_os/c/serial.h -> tests/test_outputs/minimal_os/c/serial.h
+R  test_outputs/minimal_os/c/syscalls.c -> tests/test_outputs/minimal_os/c/syscalls.c
+R  test_outputs/minimal_os/c/syscalls.h -> tests/test_outputs/minimal_os/c/syscalls.h
+R  test_outputs/minimal_os/c/timer.c -> tests/test_outputs/minimal_os/c/timer.c
+R  test_outputs/minimal_os/c/timer.h -> tests/test_outputs/minimal_os/c/timer.h
+R  test_outputs/minimal_os/c/types.h -> tests/test_outputs/minimal_os/c/types.h
+R  test_outputs/minimal_os/ir/manifest.json -> tests/test_outputs/minimal_os/ir/manifest.json
+R  test_outputs/python_pipeline/ir.json -> tests/test_outputs/python_pipeline/ir.json
+R  test_outputs/python_pipeline/mavlink_handler.c -> tests/test_outputs/python_pipeline/mavlink_handler.c
+R  test_outputs/python_pipeline/mavlink_handler.py -> tests/test_outputs/python_pipeline/mavlink_handler.py
+R  test_outputs/python_pipeline/mavlink_handler.rs -> tests/test_outputs/python_pipeline/mavlink_handler.rs
+R  test_outputs/python_pipeline/test_log.txt -> tests/test_outputs/python_pipeline/test_log.txt
+R  test_outputs/python_pipeline_v2/mavlink_handler.c -> tests/test_outputs/python_pipeline_v2/mavlink_handler.c
+R  test_outputs/python_pipeline_v2/test_compile -> tests/test_outputs/python_pipeline_v2/test_compile
+R  test_outputs/python_pipeline_v2/test_compile.c -> tests/test_outputs/python_pipeline_v2/test_compile.c
+R  test_outputs/python_test/ir.json -> tests/test_outputs/python_test/ir.json
+R  test_outputs/rust_function_bodies/output.c -> tests/test_outputs/rust_function_bodies/output.c
+R  test_outputs/rust_multifile/ir.json -> tests/test_outputs/rust_multifile/ir.json
+R  test_outputs/rust_pipeline/ir.json -> tests/test_outputs/rust_pipeline/ir.json
+R  test_outputs/rust_pipeline/output.c -> tests/test_outputs/rust_pipeline/output.c
+R  test_outputs/spark_function_bodies/mavlink_handler.c -> tests/test_outputs/spark_function_bodies/mavlink_handler.c
+R  test_outputs/spark_multifile/ir.json -> tests/test_outputs/spark_multifile/ir.json
+R  test_outputs/spark_pipeline/ir.json -> tests/test_outputs/spark_pipeline/ir.json
+R  test_outputs/spark_pipeline/output.c -> tests/test_outputs/spark_pipeline/output.c
+R  test_outputs/spark_test/ir.json -> tests/test_outputs/spark_test/ir.json
+R  test_outputs/spark_test/output.c -> tests/test_outputs/spark_test/output.c
+R  test_outputs/test_flat_ir.json -> tests/test_outputs/test_flat_ir.json
+R  test_outputs/test_nested_ir.json -> tests/test_outputs/test_nested_ir.json
+R  test_outputs/v0.6.1_test/ir.json -> tests/test_outputs/v0.6.1_test/ir.json
+R  test_outputs/v0.6.1_test/ir_flat.json -> tests/test_outputs/v0.6.1_test/ir_flat.json
+R  test_outputs/v0.6.1_test/output_spark.c -> tests/test_outputs/v0.6.1_test/output_spark.c
+R  test_outputs/v0.6.1_test/test_ir.json -> tests/test_outputs/v0.6.1_test/test_ir.json
+R  test_outputs/v0.6.1_test/test_ir_flat.json -> tests/test_outputs/v0.6.1_test/test_ir_flat.json
+R  test_outputs/v0.8.0_ir/01_basic_ir.json -> tests/test_outputs/v0.8.0_ir/01_basic_ir.json
+R  test_outputs/v0.8.2_nested_2_ir.json -> tests/test_outputs/v0.8.2_nested_2_ir.json
+R  test_outputs/v0.8.2_nested_2_ir_flat.json -> tests/test_outputs/v0.8.2_nested_2_ir_flat.json
+R  test_outputs/v0.8.3/final_level_2/ir_spark.json -> tests/test_outputs/v0.8.3/final_level_2/ir_spark.json
+R  test_outputs/v0.8.3/final_level_2/nested_2_levels_spec.json -> tests/test_outputs/v0.8.3/final_level_2/nested_2_levels_spec.json
+R  test_outputs/v0.8.3/final_level_2/output.c -> tests/test_outputs/v0.8.3/final_level_2/output.c
+R  test_outputs/v0.8.3/final_level_3/ir_spark.json -> tests/test_outputs/v0.8.3/final_level_3/ir_spark.json
+R  test_outputs/v0.8.3/final_level_3/nested_3_levels_spec.json -> tests/test_outputs/v0.8.3/final_level_3/nested_3_levels_spec.json
+R  test_outputs/v0.8.3/final_level_3/output.c -> tests/test_outputs/v0.8.3/final_level_3/output.c
+R  test_outputs/v0.8.3/final_level_4/ir_spark.json -> tests/test_outputs/v0.8.3/final_level_4/ir_spark.json
+R  test_outputs/v0.8.3/final_level_4/nested_4_levels_spec.json -> tests/test_outputs/v0.8.3/final_level_4/nested_4_levels_spec.json
+R  test_outputs/v0.8.3/final_level_4/output.c -> tests/test_outputs/v0.8.3/final_level_4/output.c
+R  test_outputs/v0.8.3/final_level_5/ir_python_bench.json -> tests/test_outputs/v0.8.3/final_level_5/ir_python_bench.json
+R  test_outputs/v0.8.3/final_level_5/ir_spark.json -> tests/test_outputs/v0.8.3/final_level_5/ir_spark.json
+R  test_outputs/v0.8.3/final_level_5/ir_spark_bench.json -> tests/test_outputs/v0.8.3/final_level_5/ir_spark_bench.json
+R  test_outputs/v0.8.3/final_level_5/nested_5_levels_spec.json -> tests/test_outputs/v0.8.3/final_level_5/nested_5_levels_spec.json
+R  test_outputs/v0.8.3/final_level_5/output.c -> tests/test_outputs/v0.8.3/final_level_5/output.c
+R  test_outputs/v0.8.3/final_mixed/ir_spark.json -> tests/test_outputs/v0.8.3/final_mixed/ir_spark.json
+R  test_outputs/v0.8.3/final_mixed/mixed_nesting_spec.json -> tests/test_outputs/v0.8.3/final_mixed/mixed_nesting_spec.json
+R  test_outputs/v0.8.3/final_mixed/output.c -> tests/test_outputs/v0.8.3/final_mixed/output.c
+R  test_outputs/v0.8.3/isolated_level_3/nested_3_levels_spec.json -> tests/test_outputs/v0.8.3/isolated_level_3/nested_3_levels_spec.json
+R  test_outputs/v0.8.3/isolated_level_5/nested_5_levels_spec.json -> tests/test_outputs/v0.8.3/isolated_level_5/nested_5_levels_spec.json
+R  test_outputs/v0.8.3/level_2/ir_spark.json -> tests/test_outputs/v0.8.3/level_2/ir_spark.json
+R  test_outputs/v0.8.3/level_2/nested_2_levels_spec.json -> tests/test_outputs/v0.8.3/level_2/nested_2_levels_spec.json
+R  test_outputs/v0.8.3/level_2/output.c -> tests/test_outputs/v0.8.3/level_2/output.c
+R  test_outputs/v0.8.3/level_2_clean/ir_spark.json -> tests/test_outputs/v0.8.3/level_2_clean/ir_spark.json
+R  test_outputs/v0.8.3/level_2_clean/nested_2_levels_spec.json -> tests/test_outputs/v0.8.3/level_2_clean/nested_2_levels_spec.json
+R  test_outputs/v0.8.3/level_2_clean/output.c -> tests/test_outputs/v0.8.3/level_2_clean/output.c
+R  test_outputs/v0.8.3/level_3/nested_3_levels_spec.json -> tests/test_outputs/v0.8.3/level_3/nested_3_levels_spec.json
+R  test_outputs/v0.8.3/level_4/ir_spark.json -> tests/test_outputs/v0.8.3/level_4/ir_spark.json
+R  test_outputs/v0.8.3/level_4/nested_4_levels_spec.json -> tests/test_outputs/v0.8.3/level_4/nested_4_levels_spec.json
+R  test_outputs/v0.8.3/level_4/output.c -> tests/test_outputs/v0.8.3/level_4/output.c
+R  test_outputs/v0.8.3/level_5/nested_5_levels_spec.json -> tests/test_outputs/v0.8.3/level_5/nested_5_levels_spec.json
+R  test_outputs/v0.8.3/mixed/ir_spark.json -> tests/test_outputs/v0.8.3/mixed/ir_spark.json
+R  test_outputs/v0.8.3/mixed/mixed_nesting_spec.json -> tests/test_outputs/v0.8.3/mixed/mixed_nesting_spec.json
+R  test_outputs/v0.8.3/mixed/output.c -> tests/test_outputs/v0.8.3/mixed/output.c
+R  test_outputs/v0.8.3/multi_level/ir_mixed_spark.json -> tests/test_outputs/v0.8.3/multi_level/ir_mixed_spark.json
+R  test_outputs/v0.8.3/multi_level/ir_nested_2_spark.json -> tests/test_outputs/v0.8.3/multi_level/ir_nested_2_spark.json
+R  test_outputs/v0.8.3/multi_level/ir_nested_4_spark.json -> tests/test_outputs/v0.8.3/multi_level/ir_nested_4_spark.json
+R  test_outputs/v0.8.3/multi_level/ir_nested_5_spark.json -> tests/test_outputs/v0.8.3/multi_level/ir_nested_5_spark.json
+R  test_outputs/v0.8.3/multi_level/mixed_nesting_spec.json -> tests/test_outputs/v0.8.3/multi_level/mixed_nesting_spec.json
+R  test_outputs/v0.8.3/single_level/ir_python.json -> tests/test_outputs/v0.8.3/single_level/ir_python.json
+R  test_outputs/v0.8.3/single_level/ir_spark.json -> tests/test_outputs/v0.8.3/single_level/ir_spark.json
+R  test_outputs/v0.8.3/single_level/output_spark.c -> tests/test_outputs/v0.8.3/single_level/output_spark.c
+R  test_outputs/v0.8.3/single_level/output_spark_fixed.c -> tests/test_outputs/v0.8.3/single_level/output_spark_fixed.c
+R  test_outputs/v0.8.3/single_level/single_level_control_flow.json -> tests/test_outputs/v0.8.3/single_level/single_level_control_flow.json
+R  test_outputs/v0.8.3/single_level/test_program -> tests/test_outputs/v0.8.3/single_level/test_program
+R  test_outputs/v0.8.4_spark/all_tests.c -> tests/test_outputs/v0.8.4_spark/all_tests.c
+R  test_outputs/v0.8.4_spark/break_while.c -> tests/test_outputs/v0.8.4_spark/break_while.c
+R  test_outputs/v0.8.4_spark/break_while_ir.json -> tests/test_outputs/v0.8.4_spark/break_while_ir.json
+R  test_outputs/v0.8.4_spark/break_while_single_ir.json -> tests/test_outputs/v0.8.4_spark/break_while_single_ir.json
+R  test_outputs/v0.8.4_spark/single_tests/break_nested/break_nested.json -> tests/test_outputs/v0.8.4_spark/single_tests/break_nested/break_nested.json
+R  test_outputs/v0.8.4_spark/single_tests/break_while/break_while.json -> tests/test_outputs/v0.8.4_spark/single_tests/break_while/break_while.json
+R  test_outputs/v0.8.4_spark/single_tests/combined_features/combined_features.json -> tests/test_outputs/v0.8.4_spark/single_tests/combined_features/combined_features.json
+R  test_outputs/v0.8.4_spark/single_tests/continue_for/continue_for.json -> tests/test_outputs/v0.8.4_spark/single_tests/continue_for/continue_for.json
+R  test_outputs/v0.8.4_spark/single_tests/switch_fallthrough/switch_fallthrough.json -> tests/test_outputs/v0.8.4_spark/single_tests/switch_fallthrough/switch_fallthrough.json
+R  test_outputs/v0.8.4_spark/single_tests/switch_simple/switch_simple.json -> tests/test_outputs/v0.8.4_spark/single_tests/switch_simple/switch_simple.json
+R  test_outputs/v0.8.4_spark/switch_simple.c -> tests/test_outputs/v0.8.4_spark/switch_simple.c
+R  test_outputs/v0.8.4_spark/switch_simple_ir.json -> tests/test_outputs/v0.8.4_spark/switch_simple_ir.json
+R  test_outputs/v0.8.4_spark_final/TEST_REPORT.md -> tests/test_outputs/v0.8.4_spark_final/TEST_REPORT.md
+R  test_outputs/v0.8.4_spark_final/TEST_REPORT.pdf -> tests/test_outputs/v0.8.4_spark_final/TEST_REPORT.pdf
+R  test_outputs/v0.8.4_spark_final/break_nested.c -> tests/test_outputs/v0.8.4_spark_final/break_nested.c
+R  test_outputs/v0.8.4_spark_final/break_nested_ir.json -> tests/test_outputs/v0.8.4_spark_final/break_nested_ir.json
+R  test_outputs/v0.8.4_spark_final/break_nested_spec/break_nested.json -> tests/test_outputs/v0.8.4_spark_final/break_nested_spec/break_nested.json
+R  test_outputs/v0.8.4_spark_final/break_while.c -> tests/test_outputs/v0.8.4_spark_final/break_while.c
+R  test_outputs/v0.8.4_spark_final/break_while_ir.json -> tests/test_outputs/v0.8.4_spark_final/break_while_ir.json
+R  test_outputs/v0.8.4_spark_final/break_while_spec/break_while.json -> tests/test_outputs/v0.8.4_spark_final/break_while_spec/break_while.json
+R  test_outputs/v0.8.4_spark_final/combined_features.c -> tests/test_outputs/v0.8.4_spark_final/combined_features.c
+R  test_outputs/v0.8.4_spark_final/combined_features_ir.json -> tests/test_outputs/v0.8.4_spark_final/combined_features_ir.json
+R  test_outputs/v0.8.4_spark_final/combined_features_spec/combined_features.json -> tests/test_outputs/v0.8.4_spark_final/combined_features_spec/combined_features.json
+R  test_outputs/v0.8.4_spark_final/continue_for.c -> tests/test_outputs/v0.8.4_spark_final/continue_for.c
+R  test_outputs/v0.8.4_spark_final/continue_for_ir.json -> tests/test_outputs/v0.8.4_spark_final/continue_for_ir.json
+R  test_outputs/v0.8.4_spark_final/continue_for_spec/continue_for.json -> tests/test_outputs/v0.8.4_spark_final/continue_for_spec/continue_for.json
+R  test_outputs/v0.8.4_spark_final/switch_fallthrough.c -> tests/test_outputs/v0.8.4_spark_final/switch_fallthrough.c
+R  test_outputs/v0.8.4_spark_final/switch_fallthrough_ir.json -> tests/test_outputs/v0.8.4_spark_final/switch_fallthrough_ir.json
+R  test_outputs/v0.8.4_spark_final/switch_fallthrough_spec/switch_fallthrough.json -> tests/test_outputs/v0.8.4_spark_final/switch_fallthrough_spec/switch_fallthrough.json
+R  test_outputs/v0.8.4_spark_final/switch_simple.c -> tests/test_outputs/v0.8.4_spark_final/switch_simple.c
+R  test_outputs/v0.8.4_spark_final/switch_simple_ir.json -> tests/test_outputs/v0.8.4_spark_final/switch_simple_ir.json
+R  test_outputs/v0.8.4_spark_final/switch_simple_spec/switch_simple.json -> tests/test_outputs/v0.8.4_spark_final/switch_simple_spec/switch_simple.json
+R  test_outputs/v0.8.9_test/ir.json -> tests/test_outputs/v0.8.9_test/ir.json
+R  test_outputs/v0.8.9_test/ir_rust.json -> tests/test_outputs/v0.8.9_test/ir_rust.json
+R  test_outputs/v0.8.9_test/ir_spark.json -> tests/test_outputs/v0.8.9_test/ir_spark.json
+R  test_outputs/v0.8.9_test/output_spark.c -> tests/test_outputs/v0.8.9_test/output_spark.c
+R  test_outputs/v088_python_c/mavlink_handler.c -> tests/test_outputs/v088_python_c/mavlink_handler.c
+R  test_outputs/v088_python_ir.json -> tests/test_outputs/v088_python_ir.json
+R  test_outputs/v088_rust_c.c -> tests/test_outputs/v088_rust_c.c
+R  test_outputs/v088_rust_ir.json -> tests/test_outputs/v088_rust_ir.json
+R  test_outputs/v088_spark_c.c -> tests/test_outputs/v088_spark_c.c
+R  test_outputs/v088_spark_ir.json -> tests/test_outputs/v088_spark_ir.json
+R  test_outputs/v0_8_1/ir.json -> tests/test_outputs/v0_8_1/ir.json
+R  test_outputs/v0_8_1/ir_flat.json -> tests/test_outputs/v0_8_1/ir_flat.json
+R  test_outputs/week12_test/ir.json -> tests/test_outputs/week12_test/ir.json
+R  test_outputs/week12_test/python_output.c/call_operations_test.c -> tests/test_outputs/week12_test/python_output.c/call_operations_test.c
+R  test_outputs/week12_test/rust_output.c -> tests/test_outputs/week12_test/rust_output.c
+R  test_outputs/week12_test/spark_output.c -> tests/test_outputs/week12_test/spark_output.c
+R  test_outputs/week13_python/control_flow_test.c -> tests/test_outputs/week13_python/control_flow_test.c
+R  test_outputs/week13_rust/control_flow.c -> tests/test_outputs/week13_rust/control_flow.c
+R  test_outputs/week13_spark/control_flow.c -> tests/test_outputs/week13_spark/control_flow.c
+R  test_pipeline/python/ir.json -> tests/test_pipeline/python/ir.json
+R  test_pipeline/rust/ir.json -> tests/test_pipeline/rust/ir.json
+R  test_pipeline/rust/output.py -> tests/test_pipeline/rust/output.py
+R  test_pipeline/spark/ir.json -> tests/test_pipeline/spark/ir.json
+R  test_pipeline/spark/output.py -> tests/test_pipeline/spark/output.py
+R  test_pipeline/spark/test_spec.json -> tests/test_pipeline/spark/test_spec.json
+R  test_python_pipeline/ardupilot_c/mavlink_handler.c -> tests/test_python_pipeline/ardupilot_c/mavlink_handler.c
+R  test_python_pipeline/ardupilot_ir.json -> tests/test_python_pipeline/ardupilot_ir.json
+R  test_python_pipeline/ardupilot_javascript/mavlink_handler.js -> tests/test_python_pipeline/ardupilot_javascript/mavlink_handler.js
+R  test_python_pipeline/ardupilot_python/mavlink_handler.py -> tests/test_python_pipeline/ardupilot_python/mavlink_handler.py
+R  test_python_pipeline/ardupilot_python_ir.json -> tests/test_python_pipeline/ardupilot_python_ir.json
+R  test_python_pipeline/ardupilot_python_ir_v2.json -> tests/test_python_pipeline/ardupilot_python_ir_v2.json
+R  test_python_pipeline/ardupilot_rust/mavlink_handler.rs -> tests/test_python_pipeline/ardupilot_rust/mavlink_handler.rs
+R  test_python_pipeline/ardupilot_wasm/mavlink_handler.wat -> tests/test_python_pipeline/ardupilot_wasm/mavlink_handler.wat
+R  test_python_pipeline/c_output/database_example.c -> tests/test_python_pipeline/c_output/database_example.c
+R  test_python_pipeline/embedded_output/Makefile -> tests/test_python_pipeline/embedded_output/Makefile
+R  test_python_pipeline/embedded_output/README.md -> tests/test_python_pipeline/embedded_output/README.md
+R  test_python_pipeline/embedded_output/config.h -> tests/test_python_pipeline/embedded_output/config.h
+R  test_python_pipeline/embedded_output/manifest.json -> tests/test_python_pipeline/embedded_output/manifest.json
+R  test_python_pipeline/embedded_output/module.c -> tests/test_python_pipeline/embedded_output/module.c
+R  test_python_pipeline/embedded_output/module.h -> tests/test_python_pipeline/embedded_output/module.h
+R  test_python_pipeline/embedded_output/module.ld -> tests/test_python_pipeline/embedded_output/module.ld
+R  test_python_pipeline/embedded_output/startup.c -> tests/test_python_pipeline/embedded_output/startup.c
+R  test_python_pipeline/ir.json -> tests/test_python_pipeline/ir.json
+R  test_python_pipeline/js_output/database_example.js -> tests/test_python_pipeline/js_output/database_example.js
+R  test_python_pipeline/multi_category/database_example_c/database_example.c -> tests/test_python_pipeline/multi_category/database_example_c/database_example.c
+R  test_python_pipeline/multi_category/database_example_ir.json -> tests/test_python_pipeline/multi_category/database_example_ir.json
+R  test_python_pipeline/multi_category/database_example_py/database_example.py -> tests/test_python_pipeline/multi_category/database_example_py/database_example.py
+R  test_python_pipeline/multi_category/database_example_python/database_example.py -> tests/test_python_pipeline/multi_category/database_example_python/database_example.py
+R  test_python_pipeline/multi_category/database_example_rust/database_example.rs -> tests/test_python_pipeline/multi_category/database_example_rust/database_example.rs
+R  test_python_pipeline/multi_category/functional_example_c/functional_example.c -> tests/test_python_pipeline/multi_category/functional_example_c/functional_example.c
+R  test_python_pipeline/multi_category/functional_example_ir.json -> tests/test_python_pipeline/multi_category/functional_example_ir.json
+R  test_python_pipeline/multi_category/functional_example_py/database_example.py -> tests/test_python_pipeline/multi_category/functional_example_py/database_example.py
+R  test_python_pipeline/multi_category/functional_example_python/functional_example.py -> tests/test_python_pipeline/multi_category/functional_example_python/functional_example.py
+R  test_python_pipeline/multi_category/functional_example_rust/functional_example.rs -> tests/test_python_pipeline/multi_category/functional_example_rust/functional_example.rs
+R  test_python_pipeline/multi_category/gpu_example_c/gpu_example.c -> tests/test_python_pipeline/multi_category/gpu_example_c/gpu_example.c
+R  test_python_pipeline/multi_category/gpu_example_ir.json -> tests/test_python_pipeline/multi_category/gpu_example_ir.json
+R  test_python_pipeline/multi_category/gpu_example_py/database_example.py -> tests/test_python_pipeline/multi_category/gpu_example_py/database_example.py
+R  test_python_pipeline/multi_category/gpu_example_python/gpu_example.py -> tests/test_python_pipeline/multi_category/gpu_example_python/gpu_example.py
+R  test_python_pipeline/multi_category/gpu_example_rust/gpu_example.rs -> tests/test_python_pipeline/multi_category/gpu_example_rust/gpu_example.rs
+R  test_python_pipeline/multi_category/scientific_example_c/scientific_example.c -> tests/test_python_pipeline/multi_category/scientific_example_c/scientific_example.c
+R  test_python_pipeline/multi_category/scientific_example_ir.json -> tests/test_python_pipeline/multi_category/scientific_example_ir.json
+R  test_python_pipeline/multi_category/scientific_example_py/database_example.py -> tests/test_python_pipeline/multi_category/scientific_example_py/database_example.py
+R  test_python_pipeline/multi_category/scientific_example_python/scientific_example.py -> tests/test_python_pipeline/multi_category/scientific_example_python/scientific_example.py
+R  test_python_pipeline/multi_category/scientific_example_rust/scientific_example.rs -> tests/test_python_pipeline/multi_category/scientific_example_rust/scientific_example.rs
+R  test_python_pipeline/multi_category/web_example_c/web_example.c -> tests/test_python_pipeline/multi_category/web_example_c/web_example.c
+R  test_python_pipeline/multi_category/web_example_ir.json -> tests/test_python_pipeline/multi_category/web_example_ir.json
+R  test_python_pipeline/multi_category/web_example_py/database_example.py -> tests/test_python_pipeline/multi_category/web_example_py/database_example.py
+R  test_python_pipeline/multi_category/web_example_python/web_example.py -> tests/test_python_pipeline/multi_category/web_example_python/web_example.py
+R  test_python_pipeline/multi_category/web_example_rust/web_example.rs -> tests/test_python_pipeline/multi_category/web_example_rust/web_example.rs
+R  test_python_pipeline/output/arm_asm/README.md -> tests/test_python_pipeline/output/arm_asm/README.md
+R  test_python_pipeline/output/arm_asm/build.sh -> tests/test_python_pipeline/output/arm_asm/build.sh
+R  test_python_pipeline/output/arm_asm/manifest.json -> tests/test_python_pipeline/output/arm_asm/manifest.json
+R  test_python_pipeline/output/arm_asm/module.s -> tests/test_python_pipeline/output/arm_asm/module.s
+R  test_python_pipeline/output/c/mavlink_handler.c -> tests/test_python_pipeline/output/c/mavlink_handler.c
+R  test_python_pipeline/output/embedded/Makefile -> tests/test_python_pipeline/output/embedded/Makefile
+R  test_python_pipeline/output/embedded/README.md -> tests/test_python_pipeline/output/embedded/README.md
+R  test_python_pipeline/output/embedded/config.h -> tests/test_python_pipeline/output/embedded/config.h
+R  test_python_pipeline/output/embedded/manifest.json -> tests/test_python_pipeline/output/embedded/manifest.json
+R  test_python_pipeline/output/embedded/module.c -> tests/test_python_pipeline/output/embedded/module.c
+R  test_python_pipeline/output/embedded/module.h -> tests/test_python_pipeline/output/embedded/module.h
+R  test_python_pipeline/output/embedded/module.ld -> tests/test_python_pipeline/output/embedded/module.ld
+R  test_python_pipeline/output/embedded/startup.c -> tests/test_python_pipeline/output/embedded/startup.c
+R  test_python_pipeline/output/fpga/README.md -> tests/test_python_pipeline/output/fpga/README.md
+R  test_python_pipeline/output/fpga/arm_vehicle.v -> tests/test_python_pipeline/output/fpga/arm_vehicle.v
+R  test_python_pipeline/output/fpga/disarm_vehicle.v -> tests/test_python_pipeline/output/fpga/disarm_vehicle.v
+R  test_python_pipeline/output/fpga/get_battery_status.v -> tests/test_python_pipeline/output/fpga/get_battery_status.v
+R  test_python_pipeline/output/fpga/get_position.v -> tests/test_python_pipeline/output/fpga/get_position.v
+R  test_python_pipeline/output/fpga/init_mavlink.v -> tests/test_python_pipeline/output/fpga/init_mavlink.v
+R  test_python_pipeline/output/fpga/manifest.json -> tests/test_python_pipeline/output/fpga/manifest.json
+R  test_python_pipeline/output/fpga/module.xdc -> tests/test_python_pipeline/output/fpga/module.xdc
+R  test_python_pipeline/output/fpga/module_tb.v -> tests/test_python_pipeline/output/fpga/module_tb.v
+R  test_python_pipeline/output/fpga/module_top.v -> tests/test_python_pipeline/output/fpga/module_top.v
+R  test_python_pipeline/output/fpga/parse_heartbeat.v -> tests/test_python_pipeline/output/fpga/parse_heartbeat.v
+R  test_python_pipeline/output/fpga/request_heartbeat.v -> tests/test_python_pipeline/output/fpga/request_heartbeat.v
+R  test_python_pipeline/output/fpga/send_heartbeat.v -> tests/test_python_pipeline/output/fpga/send_heartbeat.v
+R  test_python_pipeline/output/fpga/send_land_cmd.v -> tests/test_python_pipeline/output/fpga/send_land_cmd.v
+R  test_python_pipeline/output/fpga/send_takeoff_cmd.v -> tests/test_python_pipeline/output/fpga/send_takeoff_cmd.v
+R  test_python_pipeline/output/fpga/set_mode.v -> tests/test_python_pipeline/output/fpga/set_mode.v
+R  test_python_pipeline/output/gpu/README.md -> tests/test_python_pipeline/output/gpu/README.md
+R  test_python_pipeline/output/gpu/build.sh -> tests/test_python_pipeline/output/gpu/build.sh
+R  test_python_pipeline/output/gpu/manifest.json -> tests/test_python_pipeline/output/gpu/manifest.json
+R  test_python_pipeline/output/gpu/module.cu -> tests/test_python_pipeline/output/gpu/module.cu
+R  test_python_pipeline/output/gpu/module_host.cpp -> tests/test_python_pipeline/output/gpu/module_host.cpp
+R  test_python_pipeline/output/javascript/mavlink_handler.js -> tests/test_python_pipeline/output/javascript/mavlink_handler.js
+R  test_python_pipeline/output/python/mavlink_handler.py -> tests/test_python_pipeline/output/python/mavlink_handler.py
+R  test_python_pipeline/output/rust/mavlink_handler.rs -> tests/test_python_pipeline/output/rust/mavlink_handler.rs
+R  test_python_pipeline/output/test_module.py -> tests/test_python_pipeline/output/test_module.py
+R  test_python_pipeline/output/wasm/mavlink_handler.wat -> tests/test_python_pipeline/output/wasm/mavlink_handler.wat
+R  test_python_pipeline/output/wasm_target/README.md -> tests/test_python_pipeline/output/wasm_target/README.md
+R  test_python_pipeline/output/wasm_target/build.sh -> tests/test_python_pipeline/output/wasm_target/build.sh
+R  test_python_pipeline/output/wasm_target/manifest.json -> tests/test_python_pipeline/output/wasm_target/manifest.json
+R  test_python_pipeline/output/wasm_target/module.wat -> tests/test_python_pipeline/output/wasm_target/module.wat
+R  test_python_pipeline/output/x86_asm/README.md -> tests/test_python_pipeline/output/x86_asm/README.md
+R  test_python_pipeline/output/x86_asm/build.sh -> tests/test_python_pipeline/output/x86_asm/build.sh
+R  test_python_pipeline/output/x86_asm/manifest.json -> tests/test_python_pipeline/output/x86_asm/manifest.json
+R  test_python_pipeline/output/x86_asm/module.asm -> tests/test_python_pipeline/output/x86_asm/module.asm
+R  test_python_pipeline/output_asm/test_module.s -> tests/test_python_pipeline/output_asm/test_module.s
+R  test_python_pipeline/output_c/test_module.c -> tests/test_python_pipeline/output_c/test_module.c
+R  test_python_pipeline/output_js/test_module.js -> tests/test_python_pipeline/output_js/test_module.js
+R  test_python_pipeline/output_rust/test_module.rs -> tests/test_python_pipeline/output_rust/test_module.rs
+R  test_python_pipeline/output_wasm/test_module.wat -> tests/test_python_pipeline/output_wasm/test_module.wat
+R  test_python_pipeline/python_output/database_example.py -> tests/test_python_pipeline/python_output/database_example.py
+R  test_python_pipeline/rust_output/database_example.rs -> tests/test_python_pipeline/rust_output/database_example.rs
+R  test_python_pipeline/spec/test_module.json -> tests/test_python_pipeline/spec/test_module.json
+R  test_python_pipeline/specs/database_example.json -> tests/test_python_pipeline/specs/database_example.json
+R  test_python_pipeline/specs/functional_example.json -> tests/test_python_pipeline/specs/functional_example.json
+R  test_python_pipeline/specs/gpu_example.json -> tests/test_python_pipeline/specs/gpu_example.json
+R  test_python_pipeline/specs/scientific_example.json -> tests/test_python_pipeline/specs/scientific_example.json
+R  test_python_pipeline/specs/simple_test.json -> tests/test_python_pipeline/specs/simple_test.json
+R  test_python_pipeline/specs/web_example.json -> tests/test_python_pipeline/specs/web_example.json
+R  test_python_pipeline/specs_individual/database_example/database_example.json -> tests/test_python_pipeline/specs_individual/database_example/database_example.json
+R  test_python_pipeline/specs_individual/functional_example/functional_example.json -> tests/test_python_pipeline/specs_individual/functional_example/functional_example.json
+R  test_python_pipeline/specs_individual/gpu_example/gpu_example.json -> tests/test_python_pipeline/specs_individual/gpu_example/gpu_example.json
+R  test_python_pipeline/specs_individual/scientific_example/scientific_example.json -> tests/test_python_pipeline/specs_individual/scientific_example/scientific_example.json
+R  test_python_pipeline/specs_individual/web_example/web_example.json -> tests/test_python_pipeline/specs_individual/web_example/web_example.json
+R  test_python_pipeline/test_all_emitters.sh -> tests/test_python_pipeline/test_all_emitters.sh
+R  test_python_pipeline/wasm_output/database_example.wat -> tests/test_python_pipeline/wasm_output/database_example.wat
+R  test_recursive/nested_2_levels.c -> tests/test_recursive/nested_2_levels.c
+R  test_recursive/nested_2_levels.json -> tests/test_recursive/nested_2_levels.json
+R  test_recursive/nested_3_levels.c -> tests/test_recursive/nested_3_levels.c
+R  test_recursive/nested_3_levels.json -> tests/test_recursive/nested_3_levels.json
+R  test_recursive/nested_4_levels.c -> tests/test_recursive/nested_4_levels.c
+R  test_recursive/nested_4_levels.json -> tests/test_recursive/nested_4_levels.json
+R  test_recursive/nested_5_levels.c -> tests/test_recursive/nested_5_levels.c
+R  test_recursive/nested_5_levels.json -> tests/test_recursive/nested_5_levels.json
+R  test_recursive/test_runner -> tests/test_recursive/test_runner
+R  test_recursive/test_runner.c -> tests/test_recursive/test_runner.c
+R  test_spark_pipeline/comprehensive_tests/ir_c.json -> tests/test_spark_pipeline/comprehensive_tests/ir_c.json
+R  test_spark_pipeline/comprehensive_tests/ir_cpp.json -> tests/test_spark_pipeline/comprehensive_tests/ir_cpp.json
+R  test_spark_pipeline/comprehensive_tests/ir_csharp.json -> tests/test_spark_pipeline/comprehensive_tests/ir_csharp.json
+R  test_spark_pipeline/comprehensive_tests/ir_go.json -> tests/test_spark_pipeline/comprehensive_tests/ir_go.json
+R  test_spark_pipeline/comprehensive_tests/ir_java.json -> tests/test_spark_pipeline/comprehensive_tests/ir_java.json
+R  test_spark_pipeline/comprehensive_tests/ir_javascript.json -> tests/test_spark_pipeline/comprehensive_tests/ir_javascript.json
+R  test_spark_pipeline/comprehensive_tests/ir_python.json -> tests/test_spark_pipeline/comprehensive_tests/ir_python.json
+R  test_spark_pipeline/comprehensive_tests/ir_rust.json -> tests/test_spark_pipeline/comprehensive_tests/ir_rust.json
+R  test_spark_pipeline/comprehensive_tests/ir_typescript.json -> tests/test_spark_pipeline/comprehensive_tests/ir_typescript.json
+R  test_spark_pipeline/comprehensive_tests/output_c -> tests/test_spark_pipeline/comprehensive_tests/output_c
+R  test_spark_pipeline/comprehensive_tests/output_cpp -> tests/test_spark_pipeline/comprehensive_tests/output_cpp
+R  test_spark_pipeline/comprehensive_tests/output_csharp -> tests/test_spark_pipeline/comprehensive_tests/output_csharp
+R  test_spark_pipeline/comprehensive_tests/output_go -> tests/test_spark_pipeline/comprehensive_tests/output_go
+R  test_spark_pipeline/comprehensive_tests/output_java -> tests/test_spark_pipeline/comprehensive_tests/output_java
+R  test_spark_pipeline/comprehensive_tests/output_javascript -> tests/test_spark_pipeline/comprehensive_tests/output_javascript
+R  test_spark_pipeline/comprehensive_tests/output_python -> tests/test_spark_pipeline/comprehensive_tests/output_python
+R  test_spark_pipeline/comprehensive_tests/output_rust -> tests/test_spark_pipeline/comprehensive_tests/output_rust
+R  test_spark_pipeline/comprehensive_tests/output_typescript -> tests/test_spark_pipeline/comprehensive_tests/output_typescript
+R  test_spark_pipeline/comprehensive_tests/test_all_categories.sh -> tests/test_spark_pipeline/comprehensive_tests/test_all_categories.sh
+R  test_spark_pipeline/ir.json -> tests/test_spark_pipeline/ir.json
+R  test_spark_pipeline/output.py -> tests/test_spark_pipeline/output.py
+R  test_spark_pipeline/output_c -> tests/test_spark_pipeline/output_c
+R  test_spark_pipeline/output_cpp -> tests/test_spark_pipeline/output_cpp
+R  test_spark_pipeline/output_go -> tests/test_spark_pipeline/output_go
+R  test_spark_pipeline/output_javascript -> tests/test_spark_pipeline/output_javascript
+R  test_spark_pipeline/output_rust -> tests/test_spark_pipeline/output_rust
+R  test_spark_pipeline/specs/test_spec.json -> tests/test_spark_pipeline/specs/test_spec.json
+R  test_specs/single_level_control_flow.json -> tests/test_specs/single_level_control_flow.json
+R  test_specs/v0.8.2_multi_level/mixed_nesting_spec.json -> tests/test_specs/v0.8.2_multi_level/mixed_nesting_spec.json
+R  test_specs/v0.8.2_multi_level/nested_2_levels_spec.json -> tests/test_specs/v0.8.2_multi_level/nested_2_levels_spec.json
+R  test_specs/v0.8.2_multi_level/nested_3_levels_spec.json -> tests/test_specs/v0.8.2_multi_level/nested_3_levels_spec.json
+R  test_specs/v0.8.2_multi_level/nested_4_levels_spec.json -> tests/test_specs/v0.8.2_multi_level/nested_4_levels_spec.json
+R  test_specs/v0.8.2_multi_level/nested_5_levels_spec.json -> tests/test_specs/v0.8.2_multi_level/nested_5_levels_spec.json
+R  test_specs/v0.8.4/break_nested.json -> tests/test_specs/v0.8.4/break_nested.json
+R  test_specs/v0.8.4/break_while.json -> tests/test_specs/v0.8.4/break_while.json
+R  test_specs/v0.8.4/combined_features.json -> tests/test_specs/v0.8.4/combined_features.json
+R  test_specs/v0.8.4/continue_for.json -> tests/test_specs/v0.8.4/continue_for.json
+R  test_specs/v0.8.4/switch_fallthrough.json -> tests/test_specs/v0.8.4/switch_fallthrough.json
+R  test_specs/v0.8.4/switch_simple.json -> tests/test_specs/v0.8.4/switch_simple.json
+R  test_specs/v0.8.7/exception_propagation.json -> tests/test_specs/v0.8.7/exception_propagation.json
+R  test_specs/v0.8.7/nested_try.json -> tests/test_specs/v0.8.7/nested_try.json
+R  test_specs/v0.8.7/try_catch.json -> tests/test_specs/v0.8.7/try_catch.json
+R  test_specs/v0.8.7/try_catch_finally.json -> tests/test_specs/v0.8.7/try_catch_finally.json
+R  test_specs/v0.8.7/try_finally.json -> tests/test_specs/v0.8.7/try_finally.json
+R  test_specs/v0.8.8/arrays.json -> tests/test_specs/v0.8.8/arrays.json
+R  test_specs/v0.8.8/combined_structures.json -> tests/test_specs/v0.8.8/combined_structures.json
+R  test_specs/v0.8.8/maps.json -> tests/test_specs/v0.8.8/maps.json
+R  test_specs/v0.8.8/sets.json -> tests/test_specs/v0.8.8/sets.json
+R  test_specs/v0.8.8/structs.json -> tests/test_specs/v0.8.8/structs.json
+R  test_specs/v0.8.9/combined_optimization.json -> tests/test_specs/v0.8.9/combined_optimization.json
+R  test_specs/v0.8.9/generics.json -> tests/test_specs/v0.8.9/generics.json
+R  test_specs/v0.8.9/optimization_constant_fold.json -> tests/test_specs/v0.8.9/optimization_constant_fold.json
+R  test_specs/v0.8.9/optimization_dead_code.json -> tests/test_specs/v0.8.9/optimization_dead_code.json
+R  test_specs/v0.8.9/templates.json -> tests/test_specs/v0.8.9/templates.json
+R  test_v084_python_output/break_while.c/break_while_test.c -> tests/test_v084_python_output/break_while.c/break_while_test.c
+R  test_v084_python_output/break_while_ir.json -> tests/test_v084_python_output/break_while_ir.json
+R  test_v084_python_output/break_while_spec/break_while.json -> tests/test_v084_python_output/break_while_spec/break_while.json
+R  test_v084_python_output/switch_simple.c/switch_simple_test.c -> tests/test_v084_python_output/switch_simple.c/switch_simple_test.c
+R  test_v084_python_output/switch_simple_ir.json -> tests/test_v084_python_output/switch_simple_ir.json
+R  test_v084_python_output/switch_simple_spec/switch_simple.json -> tests/test_v084_python_output/switch_simple_spec/switch_simple.json
+R  test_v084_rust_output/break_nested.c -> tests/test_v084_rust_output/break_nested.c
+R  test_v084_rust_output/break_nested_ir.json -> tests/test_v084_rust_output/break_nested_ir.json
+R  test_v084_rust_output/break_while.c -> tests/test_v084_rust_output/break_while.c
+R  test_v084_rust_output/break_while_ir.json -> tests/test_v084_rust_output/break_while_ir.json
+R  test_v084_rust_output/combined_features.c -> tests/test_v084_rust_output/combined_features.c
+R  test_v084_rust_output/combined_features_ir.json -> tests/test_v084_rust_output/combined_features_ir.json
+R  test_v084_rust_output/continue_for.c -> tests/test_v084_rust_output/continue_for.c
+R  test_v084_rust_output/continue_for_ir.json -> tests/test_v084_rust_output/continue_for_ir.json
+R  test_v084_rust_output/python_merged.c/break_nested_test.c -> tests/test_v084_rust_output/python_merged.c/break_nested_test.c
+R  test_v084_rust_output/python_merged_ir.json -> tests/test_v084_rust_output/python_merged_ir.json
+R  test_v084_rust_output/switch_fallthrough.c -> tests/test_v084_rust_output/switch_fallthrough.c
+R  test_v084_rust_output/switch_fallthrough_ir.json -> tests/test_v084_rust_output/switch_fallthrough_ir.json
+R  test_v084_rust_output/switch_simple.c -> tests/test_v084_rust_output/switch_simple.c
+R  test_v084_rust_output/switch_simple_ir.json -> tests/test_v084_rust_output/switch_simple_ir.json
+R  test_vectors/README.md -> tests/test_vectors/README.md
+R  test_vectors/__init__.py -> tests/test_vectors/__init__.py
+R  test_vectors/asp/hello.lp -> tests/test_vectors/asp/hello.lp
+R  test_vectors/asp/index.machine.json -> tests/test_vectors/asp/index.machine.json
+R  test_vectors/asp/manifest.machine.json -> tests/test_vectors/asp/manifest.machine.json
+R  test_vectors/base.py -> tests/test_vectors/base.py
+R  test_vectors/c/hello.c -> tests/test_vectors/c/hello.c
+R  test_vectors/c/index.machine.json -> tests/test_vectors/c/index.machine.json
+R  test_vectors/c/manifest.machine.json -> tests/test_vectors/c/manifest.machine.json
+R  test_vectors/chaos/index.machine.json -> tests/test_vectors/chaos/index.machine.json
+R  test_vectors/chaos/manifest.machine.json -> tests/test_vectors/chaos/manifest.machine.json
+R  test_vectors/conformance_0001.sha256 -> tests/test_vectors/conformance_0001.sha256
+R  test_vectors/contracts/README.md -> tests/test_vectors/contracts/README.md
+R  test_vectors/contracts/gen_vectors.py -> tests/test_vectors/contracts/gen_vectors.py
+R  test_vectors/contracts/index.machine.json -> tests/test_vectors/contracts/index.machine.json
+R  test_vectors/contracts/manifest.json -> tests/test_vectors/contracts/manifest.json
+R  test_vectors/contracts/manifest.machine.json -> tests/test_vectors/contracts/manifest.machine.json
+R  test_vectors/contracts/tv_contracts_001.json -> tests/test_vectors/contracts/tv_contracts_001.json
+R  test_vectors/contracts/tv_contracts_002.json -> tests/test_vectors/contracts/tv_contracts_002.json
+R  test_vectors/contracts/tv_contracts_003.json -> tests/test_vectors/contracts/tv_contracts_003.json
+R  test_vectors/contracts/tv_contracts_004.json -> tests/test_vectors/contracts/tv_contracts_004.json
+R  test_vectors/contracts/tv_contracts_005.json -> tests/test_vectors/contracts/tv_contracts_005.json
+R  test_vectors/contracts/validate.py -> tests/test_vectors/contracts/validate.py
+R  test_vectors/datalog/hello.dl -> tests/test_vectors/datalog/hello.dl
+R  test_vectors/datalog/index.machine.json -> tests/test_vectors/datalog/index.machine.json
+R  test_vectors/datalog/manifest.machine.json -> tests/test_vectors/datalog/manifest.machine.json
+R  test_vectors/dotnet/Hello/Hello.csproj -> tests/test_vectors/dotnet/Hello/Hello.csproj
+R  test_vectors/dotnet/Hello/Program.cs -> tests/test_vectors/dotnet/Hello/Program.cs
+R  test_vectors/dotnet/Hello/index.machine.json -> tests/test_vectors/dotnet/Hello/index.machine.json
+R  test_vectors/dotnet/Hello/manifest.machine.json -> tests/test_vectors/dotnet/Hello/manifest.machine.json
+R  test_vectors/dotnet/index.machine.json -> tests/test_vectors/dotnet/index.machine.json
+R  test_vectors/dotnet/manifest.machine.json -> tests/test_vectors/dotnet/manifest.machine.json
+R  test_vectors/edge_cases/README.md -> tests/test_vectors/edge_cases/README.md
+R  test_vectors/edge_cases/gen_vectors.py -> tests/test_vectors/edge_cases/gen_vectors.py
+R  test_vectors/edge_cases/index.machine.json -> tests/test_vectors/edge_cases/index.machine.json
+R  test_vectors/edge_cases/manifest.json -> tests/test_vectors/edge_cases/manifest.json
+R  test_vectors/edge_cases/manifest.machine.json -> tests/test_vectors/edge_cases/manifest.machine.json
+R  test_vectors/edge_cases/tv_edge_cases_001.json -> tests/test_vectors/edge_cases/tv_edge_cases_001.json
+R  test_vectors/edge_cases/tv_edge_cases_002.json -> tests/test_vectors/edge_cases/tv_edge_cases_002.json
+R  test_vectors/edge_cases/tv_edge_cases_003.json -> tests/test_vectors/edge_cases/tv_edge_cases_003.json
+R  test_vectors/edge_cases/tv_edge_cases_004.json -> tests/test_vectors/edge_cases/tv_edge_cases_004.json
+R  test_vectors/edge_cases/tv_edge_cases_005.json -> tests/test_vectors/edge_cases/tv_edge_cases_005.json
+R  test_vectors/edge_cases/tv_edge_cases_006.json -> tests/test_vectors/edge_cases/tv_edge_cases_006.json
+R  test_vectors/edge_cases/tv_edge_cases_007.json -> tests/test_vectors/edge_cases/tv_edge_cases_007.json
+R  test_vectors/edge_cases/validate.py -> tests/test_vectors/edge_cases/validate.py
+R  test_vectors/full_pipeline/index.machine.json -> tests/test_vectors/full_pipeline/index.machine.json
+R  test_vectors/full_pipeline/manifest.machine.json -> tests/test_vectors/full_pipeline/manifest.machine.json
+R  test_vectors/fuzz/index.machine.json -> tests/test_vectors/fuzz/index.machine.json
+R  test_vectors/fuzz/manifest.machine.json -> tests/test_vectors/fuzz/manifest.machine.json
+R  test_vectors/go/hello/go.mod -> tests/test_vectors/go/hello/go.mod
+R  test_vectors/go/hello/index.machine.json -> tests/test_vectors/go/hello/index.machine.json
+R  test_vectors/go/hello/main.go -> tests/test_vectors/go/hello/main.go
+R  test_vectors/go/hello/manifest.machine.json -> tests/test_vectors/go/hello/manifest.machine.json
+R  test_vectors/go/index.machine.json -> tests/test_vectors/go/index.machine.json
+R  test_vectors/go/manifest.machine.json -> tests/test_vectors/go/manifest.machine.json
+R  test_vectors/haskell/Hello.hs -> tests/test_vectors/haskell/Hello.hs
+R  test_vectors/haskell/index.machine.json -> tests/test_vectors/haskell/index.machine.json
+R  test_vectors/haskell/manifest.machine.json -> tests/test_vectors/haskell/manifest.machine.json
+R  test_vectors/index.machine.json -> tests/test_vectors/index.machine.json
+R  test_vectors/ir_001_basic.expected.json -> tests/test_vectors/ir_001_basic.expected.json
+R  test_vectors/java/Hello.java -> tests/test_vectors/java/Hello.java
+R  test_vectors/java/index.machine.json -> tests/test_vectors/java/index.machine.json
+R  test_vectors/java/manifest.machine.json -> tests/test_vectors/java/manifest.machine.json
+R  test_vectors/julia/index.machine.json -> tests/test_vectors/julia/index.machine.json
+R  test_vectors/julia/manifest.machine.json -> tests/test_vectors/julia/manifest.machine.json
+R  test_vectors/julia/write_out.jl -> tests/test_vectors/julia/write_out.jl
+R  test_vectors/lisp/hello_sbcl.lisp -> tests/test_vectors/lisp/hello_sbcl.lisp
+R  test_vectors/lisp/index.machine.json -> tests/test_vectors/lisp/index.machine.json
+R  test_vectors/lisp/manifest.machine.json -> tests/test_vectors/lisp/manifest.machine.json
+R  test_vectors/lua/index.machine.json -> tests/test_vectors/lua/index.machine.json
+R  test_vectors/lua/manifest.machine.json -> tests/test_vectors/lua/manifest.machine.json
+R  test_vectors/lua/write_out.lua -> tests/test_vectors/lua/write_out.lua
+R  test_vectors/manifest.machine.json -> tests/test_vectors/manifest.machine.json
+R  test_vectors/minizinc/hello.mzn -> tests/test_vectors/minizinc/hello.mzn
+R  test_vectors/minizinc/index.machine.json -> tests/test_vectors/minizinc/index.machine.json
+R  test_vectors/minizinc/manifest.machine.json -> tests/test_vectors/minizinc/manifest.machine.json
+R  test_vectors/mutation/index.machine.json -> tests/test_vectors/mutation/index.machine.json
+R  test_vectors/mutation/manifest.machine.json -> tests/test_vectors/mutation/manifest.machine.json
+R  test_vectors/native/README.md -> tests/test_vectors/native/README.md
+R  test_vectors/native/gen_vectors.py -> tests/test_vectors/native/gen_vectors.py
+R  test_vectors/native/index.machine.json -> tests/test_vectors/native/index.machine.json
+R  test_vectors/native/manifest.json -> tests/test_vectors/native/manifest.json
+R  test_vectors/native/manifest.machine.json -> tests/test_vectors/native/manifest.machine.json
+R  test_vectors/native/tv_native_001.json -> tests/test_vectors/native/tv_native_001.json
+R  test_vectors/native/tv_native_002.json -> tests/test_vectors/native/tv_native_002.json
+R  test_vectors/native/tv_native_003.json -> tests/test_vectors/native/tv_native_003.json
+R  test_vectors/native/tv_native_004.json -> tests/test_vectors/native/tv_native_004.json
+R  test_vectors/native/tv_native_005.json -> tests/test_vectors/native/tv_native_005.json
+R  test_vectors/native/validate.py -> tests/test_vectors/native/validate.py
+R  test_vectors/node/index.machine.json -> tests/test_vectors/node/index.machine.json
+R  test_vectors/node/manifest.machine.json -> tests/test_vectors/node/manifest.machine.json
+R  test_vectors/node/write_out.js -> tests/test_vectors/node/write_out.js
+R  test_vectors/pack_0001.dcbor.sha256 -> tests/test_vectors/pack_0001.dcbor.sha256
+R  test_vectors/pack_0001.json -> tests/test_vectors/pack_0001.json
+R  test_vectors/performance/index.machine.json -> tests/test_vectors/performance/index.machine.json
+R  test_vectors/performance/manifest.machine.json -> tests/test_vectors/performance/manifest.machine.json
+R  test_vectors/php/index.machine.json -> tests/test_vectors/php/index.machine.json
+R  test_vectors/php/manifest.machine.json -> tests/test_vectors/php/manifest.machine.json
+R  test_vectors/php/write_out.php -> tests/test_vectors/php/write_out.php
+R  test_vectors/pipeline/expected_pipeline.sha256 -> tests/test_vectors/pipeline/expected_pipeline.sha256
+R  test_vectors/pipeline/index.machine.json -> tests/test_vectors/pipeline/index.machine.json
+R  test_vectors/pipeline/manifest.machine.json -> tests/test_vectors/pipeline/manifest.machine.json
+R  test_vectors/pipeline/spec_pipeline_001.json -> tests/test_vectors/pipeline/spec_pipeline_001.json
+R  test_vectors/polyglot/README.md -> tests/test_vectors/polyglot/README.md
+R  test_vectors/polyglot/gen_vectors.py -> tests/test_vectors/polyglot/gen_vectors.py
+R  test_vectors/polyglot/index.machine.json -> tests/test_vectors/polyglot/index.machine.json
+R  test_vectors/polyglot/manifest.json -> tests/test_vectors/polyglot/manifest.json
+R  test_vectors/polyglot/manifest.machine.json -> tests/test_vectors/polyglot/manifest.machine.json
+R  test_vectors/polyglot/tv_polyglot_001.json -> tests/test_vectors/polyglot/tv_polyglot_001.json
+R  test_vectors/polyglot/tv_polyglot_002.json -> tests/test_vectors/polyglot/tv_polyglot_002.json
+R  test_vectors/polyglot/tv_polyglot_003.json -> tests/test_vectors/polyglot/tv_polyglot_003.json
+R  test_vectors/polyglot/tv_polyglot_004.json -> tests/test_vectors/polyglot/tv_polyglot_004.json
+R  test_vectors/polyglot/tv_polyglot_005.json -> tests/test_vectors/polyglot/tv_polyglot_005.json
+R  test_vectors/polyglot/validate.py -> tests/test_vectors/polyglot/validate.py
+R  test_vectors/prolog/hello.pl -> tests/test_vectors/prolog/hello.pl
+R  test_vectors/prolog/index.machine.json -> tests/test_vectors/prolog/index.machine.json
+R  test_vectors/prolog/manifest.machine.json -> tests/test_vectors/prolog/manifest.machine.json
+R  test_vectors/property/README.md -> tests/test_vectors/property/README.md
+R  test_vectors/property/gen_vectors.py -> tests/test_vectors/property/gen_vectors.py
+R  test_vectors/property/index.machine.json -> tests/test_vectors/property/index.machine.json
+R  test_vectors/property/manifest.json -> tests/test_vectors/property/manifest.json
+R  test_vectors/property/manifest.machine.json -> tests/test_vectors/property/manifest.machine.json
+R  test_vectors/property/tv_property_001.json -> tests/test_vectors/property/tv_property_001.json
+R  test_vectors/property/tv_property_002.json -> tests/test_vectors/property/tv_property_002.json
+R  test_vectors/property/tv_property_003.json -> tests/test_vectors/property/tv_property_003.json
+R  test_vectors/property/tv_property_004.json -> tests/test_vectors/property/tv_property_004.json
+R  test_vectors/property/tv_property_005.json -> tests/test_vectors/property/tv_property_005.json
+R  test_vectors/property/tv_property_006.json -> tests/test_vectors/property/tv_property_006.json
+R  test_vectors/property/tv_property_007.json -> tests/test_vectors/property/tv_property_007.json
+R  test_vectors/property/validate.py -> tests/test_vectors/property/validate.py
+R  test_vectors/python/index.machine.json -> tests/test_vectors/python/index.machine.json
+R  test_vectors/python/manifest.machine.json -> tests/test_vectors/python/manifest.machine.json
+R  test_vectors/python/write_out.py -> tests/test_vectors/python/write_out.py
+R  test_vectors/r/index.machine.json -> tests/test_vectors/r/index.machine.json
+R  test_vectors/r/manifest.machine.json -> tests/test_vectors/r/manifest.machine.json
+R  test_vectors/r/write_out.R -> tests/test_vectors/r/write_out.R
+R  test_vectors/receipts/README.md -> tests/test_vectors/receipts/README.md
+R  test_vectors/receipts/gen_vectors.py -> tests/test_vectors/receipts/gen_vectors.py
+R  test_vectors/receipts/index.machine.json -> tests/test_vectors/receipts/index.machine.json
+R  test_vectors/receipts/manifest.json -> tests/test_vectors/receipts/manifest.json
+R  test_vectors/receipts/manifest.machine.json -> tests/test_vectors/receipts/manifest.machine.json
+R  test_vectors/receipts/tv_receipts_001.json -> tests/test_vectors/receipts/tv_receipts_001.json
+R  test_vectors/receipts/tv_receipts_002.json -> tests/test_vectors/receipts/tv_receipts_002.json
+R  test_vectors/receipts/tv_receipts_003.json -> tests/test_vectors/receipts/tv_receipts_003.json
+R  test_vectors/receipts/tv_receipts_004.json -> tests/test_vectors/receipts/tv_receipts_004.json
+R  test_vectors/receipts/tv_receipts_005.json -> tests/test_vectors/receipts/tv_receipts_005.json
+R  test_vectors/receipts/validate.py -> tests/test_vectors/receipts/validate.py
+R  test_vectors/ruby/index.machine.json -> tests/test_vectors/ruby/index.machine.json
+R  test_vectors/ruby/manifest.machine.json -> tests/test_vectors/ruby/manifest.machine.json
+R  test_vectors/ruby/write_out.rb -> tests/test_vectors/ruby/write_out.rb
+R  test_vectors/rust/hello_rust/Cargo.lock -> tests/test_vectors/rust/hello_rust/Cargo.lock
+R  test_vectors/rust/hello_rust/Cargo.toml -> tests/test_vectors/rust/hello_rust/Cargo.toml
+R  test_vectors/rust/hello_rust/index.machine.json -> tests/test_vectors/rust/hello_rust/index.machine.json
+R  test_vectors/rust/hello_rust/manifest.machine.json -> tests/test_vectors/rust/hello_rust/manifest.machine.json
+R  test_vectors/rust/hello_rust/src/index.machine.json -> tests/test_vectors/rust/hello_rust/src/index.machine.json
+R  test_vectors/rust/hello_rust/src/main.rs -> tests/test_vectors/rust/hello_rust/src/main.rs
+R  test_vectors/rust/hello_rust/src/manifest.machine.json -> tests/test_vectors/rust/hello_rust/src/manifest.machine.json
+R  test_vectors/rust/index.machine.json -> tests/test_vectors/rust/index.machine.json
+R  test_vectors/rust/manifest.machine.json -> tests/test_vectors/rust/manifest.machine.json
+R  test_vectors/smt/hello.smt2 -> tests/test_vectors/smt/hello.smt2
+R  test_vectors/smt/index.machine.json -> tests/test_vectors/smt/index.machine.json
+R  test_vectors/smt/manifest.machine.json -> tests/test_vectors/smt/manifest.machine.json
+R  test_vectors/spec_001_basic.json -> tests/test_vectors/spec_001_basic.json
+R  test_vectors/wasm/hello.wat -> tests/test_vectors/wasm/hello.wat
+R  test_vectors/wasm/index.machine.json -> tests/test_vectors/wasm/index.machine.json
+R  test_vectors/wasm/manifest.machine.json -> tests/test_vectors/wasm/manifest.machine.json
+
+STDERR:
+warning: in the working copy of '.abacusai/tmp/terminal_output_2_1771285868485.txt', LF will be replaced by CRLF the next time Git touches it
