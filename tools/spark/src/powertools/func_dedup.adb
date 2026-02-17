@@ -62,9 +62,9 @@ procedure Func_Dedup is
      "}";
 
    package String_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => String,
+     (Key_Type        => Unbounded_String,
       Element_Type    => Unbounded_String,
-      Hash            => Ada.Strings.Hash,
+      Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=");
 
    procedure Print_Usage;
@@ -230,23 +230,22 @@ procedure Func_Dedup is
                Functions_Count := Functions_Count + 1;
 
                declare
-                  Key_Str : constant String := To_String (Current_Key);
-                  Obj_Str : constant String := To_String (Current_Object);
+                  Key_Str : constant Unbounded_String := Current_Key;
                begin
-                  if Key_Str'Length = 0 then
+                  if Length (Key_Str) = 0 then
                      --  No key, always include
                      if Length (Result_Array) > 1 then
                         Append (Result_Array, ",");
                      end if;
-                     Append (Result_Array, Obj_Str);
+                     Append (Result_Array, Current_Object);
                   elsif String_Maps.Contains (Seen, Key_Str) then
                      Duplicates_Count := Duplicates_Count + 1;
                      if not Keep_First then
                         --  Replace with last occurrence
-                        String_Maps.Replace (Seen, Key_Str, To_Unbounded_String (Obj_Str));
+                        String_Maps.Replace (Seen, Key_Str, Current_Object);
                      end if;
                   else
-                     String_Maps.Insert (Seen, Key_Str, To_Unbounded_String (Obj_Str));
+                     String_Maps.Insert (Seen, Key_Str, Current_Object);
                   end if;
                end;
 

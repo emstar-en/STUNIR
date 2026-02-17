@@ -161,7 +161,7 @@ begin
          Content : constant String := Read_Stdin;
          Out_File : File_Type;
       begin
-         Create (Out_File, Out_File, Path);
+         Create (Out_File, Ada.Text_IO.Out_File, Path);
          Put (Out_File, Content);
          Close (Out_File);
          Put_Line ("Written: " & Path);

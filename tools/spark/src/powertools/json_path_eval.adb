@@ -131,7 +131,7 @@ procedure JSON_Path_Eval is
 
                   declare
                      Property : constant String := Path (Path_Pos .. Prop_End - 1);
-                     Search_Str : constant String := '"' & Property & "":";
+                     Search_Str : constant String := """" & Property & """:";
                      Found_Pos : Integer := 0;
                   begin
                      --  Search for property in JSON

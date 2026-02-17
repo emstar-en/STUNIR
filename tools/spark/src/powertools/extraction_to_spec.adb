@@ -160,7 +160,7 @@ procedure Extraction_To_Spec is
             when '"' =>
                Append (Result, '\');
                Append (Result, '"');
-            when '\\' =>
+            when '\' =>
                Append (Result, '\');
                Append (Result, '\');
             when ASCII.BS =>
@@ -201,9 +201,10 @@ procedure Extraction_To_Spec is
 
    function Convert_To_Spec (Content : String) return String is
       use STUNIR_JSON_Parser;
+      use STUNIR_Types;
       State  : Parser_State;
-      Status : STUNIR_Types.Status_Code;
-      Input_Str : STUNIR_Types.JSON_String;
+      Status : Status_Code;
+      Input_Str : JSON_String;
 
       Result : Unbounded_String := Null_Unbounded_String;
       Functions_Array : Unbounded_String := Null_Unbounded_String;
@@ -240,7 +241,7 @@ procedure Extraction_To_Spec is
 
          if State.Current_Token = Token_String then
             declare
-               Key : constant String := STUNIR_Types.JSON_Strings.To_String (State.Token_Value);
+               Key : constant String := To_String (State.Token_Value);
             begin
                if Key = "functions" then
                   Expect_Token (State, Token_Colon, Status);

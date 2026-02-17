@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with GNAT.Command_Line;
 with GNAT.OS_Lib;
 with GNAT.Strings;
+with Command_Utils;
 
 procedure Type_Resolver is
    use Ada.Command_Line;
@@ -69,28 +70,15 @@ procedure Type_Resolver is
    end Print_Error;
 
    function Run_Command (Cmd : String; Input : String := "") return String is
-      use GNAT.OS_Lib;
-      Args    : Argument_List_Access;
       Success : aliased Boolean;
+      Result  : constant String :=
+        Command_Utils.Get_Command_Output (Cmd, Input, Success'Access);
    begin
-      Args := Argument_String_To_List (Cmd);
-      declare
-         Result : constant String :=
-           Get_Command_Output ("sh", Args.all, Input, Success'Access);
-      begin
-         Free (Args);
-         if Success then
-            return Result;
-         else
-            return "";
-         end if;
-      end;
-   exception
-      when others =>
-         if Args /= null then
-            Free (Args);
-         end if;
+      if Success then
+         return Result;
+      else
          return "";
+      end if;
    end Run_Command;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;

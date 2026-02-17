@@ -86,7 +86,7 @@ procedure IR_Check_Types is
       --  Check for types array
       if IR'Length > 0 then
          declare
-            Types_Pattern : constant String := '"types"';
+            Types_Pattern : constant String := """types""";
             Found : Boolean := False;
          begin
             for I in IR'First .. IR'Last - Types_Pattern'Length + 1 loop

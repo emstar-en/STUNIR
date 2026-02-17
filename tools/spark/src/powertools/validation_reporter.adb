@@ -80,9 +80,9 @@ procedure Validation_Reporter is
    begin
       if JSON_Output then
          Put_Line ("{");
-         Put_Line ("  \"status\": \"validation_report\",");
-         Put_Line ("  \"results\": [");
-         Put_Line ("    \"Validation completed\"");
+         Put_Line ("  ""status"": ""validation_report"",");
+         Put_Line ("  ""results"": [");
+         Put_Line ("    ""Validation completed""");
          Put_Line ("  ]");
          Put_Line ("}");
       else

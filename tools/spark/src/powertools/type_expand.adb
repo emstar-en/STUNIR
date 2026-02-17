@@ -6,7 +6,9 @@ pragma SPARK_Mode (Off);
 
 with Ada.Command_Line;
 with Ada.Text_IO;
+with Ada.Strings;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Fixed;
 
 procedure Type_Expand is
    use Ada.Command_Line;

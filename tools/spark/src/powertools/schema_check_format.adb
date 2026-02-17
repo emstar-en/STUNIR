@@ -91,7 +91,7 @@ procedure Schema_Check_Format is
       --  Check version follows semantic versioning (simplified)
       if JSON'Length > 0 then
          declare
-            Version_Pattern : constant String := '"version"';
+            Version_Pattern : constant String := """version""";
          begin
             for I in JSON'First .. JSON'Last - Version_Pattern'Length + 1 loop
                if JSON (I .. I + Version_Pattern'Length - 1) = Version_Pattern then

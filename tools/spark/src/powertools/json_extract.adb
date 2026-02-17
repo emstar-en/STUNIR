@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with GNAT.Command_Line;
 with GNAT.OS_Lib;
 with GNAT.Strings;
+with Command_Utils;
 
 procedure JSON_Extract is
    use Ada.Command_Line;
@@ -89,25 +90,11 @@ procedure JSON_Extract is
    end Read_Stdin;
 
    function Run_Command (Cmd : String; Input : String) return String is
-      use GNAT.OS_Lib;
-      Args : Argument_List_Access;
       Success : aliased Boolean;
-      Output : Unbounded_String := Null_Unbounded_String;
+      Result  : constant String :=
+        Command_Utils.Get_Command_Output (Cmd, Input, Success'Access);
    begin
-      Args := Argument_String_To_List (Cmd);
-      declare
-         Result : constant String :=
-           Get_Command_Output ("sh", Args.all, Input, Success'Access);
-      begin
-         Free (Args);
-         return Result;
-      end;
-   exception
-      when others =>
-         if Args /= null then
-            Free (Args);
-         end if;
-         return "";
+      return Result;
    end Run_Command;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;

@@ -9,6 +9,7 @@ with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with Ada.Characters.Handling;
 with GNAT.Command_Line;
+with GNAT.Strings;
 
 procedure Type_Map_Target is
    use Ada.Command_Line;
@@ -21,10 +22,10 @@ procedure Type_Map_Target is
    Exit_Error   : constant := 1;
 
    --  Configuration
-   Target_Lang   : Unbounded_String := Null_Unbounded_String;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
+   Target_Lang   : aliased GNAT.Strings.String_Access := null;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
 
@@ -166,7 +167,7 @@ begin
       return;
    end if;
 
-   if Target_Lang = Null_Unbounded_String then
+   if Target_Lang = null then
       Print_Error ("Target language required (--target)");
       Set_Exit_Status (Exit_Error);
       return;
@@ -174,7 +175,7 @@ begin
 
    declare
       Input_Type : constant String := Read_Stdin;
-      Lang : constant String := To_Lower (To_String (Target_Lang));
+      Lang : constant String := To_Lower (Target_Lang.all);
    begin
       if Input_Type'Length = 0 then
          Print_Error ("Empty input");

@@ -6,7 +6,9 @@ pragma SPARK_Mode (Off);
 
 with Ada.Command_Line;
 with Ada.Text_IO;
+with Ada.Strings;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Fixed;
 
 procedure Type_Lookup is
    use Ada.Command_Line;
@@ -138,9 +140,9 @@ begin
       Name : constant String := Ada.Strings.Fixed.Trim (To_String (Type_Name), Ada.Strings.Both);
    begin
       Put_Line ("{");
-      Put_Line ("  \"name\": \"" & Name & "\",");
-      Put_Line ("  \"found\": true,");
-      Put_Line ("  \"definition\": null");
+      Put_Line ("  ""name"": """ & Name & """,");
+      Put_Line ("  ""found"": true,");
+      Put_Line ("  ""definition"": null");
       Put_Line ("}");
       Set_Exit_Status (Exit_Success);
    end;

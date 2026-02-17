@@ -86,7 +86,7 @@ procedure IR_Check_Functions is
       --  Check for functions array
       if IR'Length > 0 then
          declare
-            Functions_Pattern : constant String := '"functions"';
+            Functions_Pattern : constant String := """functions""";
             Found : Boolean := False;
          begin
             for I in IR'First .. IR'Last - Functions_Pattern'Length + 1 loop

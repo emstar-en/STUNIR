@@ -40,7 +40,7 @@ procedure JSON_Merge_Objects is
      "    ""type"": ""json""," & ASCII.LF &
      "    ""source"": ""stdin""," & ASCII.LF &
      "    ""required"": true," & ASCII.LF &
-     "    ""description"": ""One JSON object per line"" & ASCII.LF &
+     "    ""description"": ""One JSON object per line""," & ASCII.LF &
      "  }]," & ASCII.LF &
      "  ""outputs"": [{" & ASCII.LF &
      "    ""name"": ""merged_object""," & ASCII.LF &

@@ -97,7 +97,7 @@ procedure Cpp_Impl_Gen is
    begin
       --  Add header include if specified
       if Header'Length > 0 then
-         Append (Result, "#include """ & Header & """"" & ASCII.LF);
+         Append (Result, "#include """ & Header & """" & ASCII.LF);
          Append (Result, ASCII.LF);
       end if;
 

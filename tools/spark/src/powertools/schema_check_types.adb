@@ -93,7 +93,7 @@ procedure Schema_Check_Types is
       --  Check version is string
       if JSON'Length > 0 then
          declare
-            Version_Pattern : constant String := '"version"';
+            Version_Pattern : constant String := """version""";
             Version_Found   : Boolean := False;
          begin
             for I in JSON'First .. JSON'Last - Version_Pattern'Length + 1 loop

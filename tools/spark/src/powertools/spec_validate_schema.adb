@@ -9,6 +9,8 @@ with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with GNAT.Command_Line;
 with GNAT.OS_Lib;
+with GNAT.Strings;
+with Command_Utils;
 
 procedure Spec_Validate_Schema is
    use Ada.Command_Line;
@@ -20,12 +22,12 @@ procedure Spec_Validate_Schema is
    Exit_Invalid    : constant := 1;
 
    --  Configuration
-   Schema_File   : Unbounded_String := Null_Unbounded_String;
-   Report_Format : Unbounded_String := To_Unbounded_String ("text");
-   Verbose       : Boolean := False;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
+   Schema_File   : aliased GNAT.Strings.String_Access := null;
+   Report_Format : aliased GNAT.Strings.String_Access := new String'("text");
+   Verbose       : aliased Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
 
@@ -82,23 +84,11 @@ procedure Spec_Validate_Schema is
    end Read_Stdin;
 
    function Run_Command (Cmd : String; Input : String := "") return String is
-      use GNAT.OS_Lib;
-      Args : Argument_List_Access;
+      Success : aliased Boolean;
+      Result  : constant String :=
+        Command_Utils.Get_Command_Output (Cmd, Input, Success'Access);
    begin
-      Args := Argument_String_To_List (Cmd);
-      declare
-         Result : constant String :=
-           Get_Command_Output ("sh", Args.all, Input, Success'Access);
-      begin
-         Free (Args);
-         return Result;
-      end;
-   exception
-      when others =>
-         if Args /= null then
-            Free (Args);
-         end if;
-         return "";
+      return Result;
    end Run_Command;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;
@@ -150,7 +140,7 @@ begin
       --  Run validation checks
       declare
          Schema_Flag : constant String :=
-           (if Schema_File = Null_Unbounded_String then "" else " --schema " & To_String (Schema_File));
+           (if Schema_File = null then "" else " --schema " & Schema_File.all);
          Required_Result : constant String :=
            Run_Command ("schema_check_required" & Schema_Flag, Spec_JSON);
          Types_Result : constant String :=
@@ -159,7 +149,7 @@ begin
            Run_Command ("schema_check_format" & Schema_Flag, Spec_JSON);
          All_Results : constant String :=
            "[" & Required_Result & "," & Types_Result & "," & Format_Result & "]";
-         Format_Flag : constant String := " --format " & To_String (Report_Format);
+         Format_Flag : constant String := " --format " & Report_Format.all;
          Verbose_Flag : constant String := (if Verbose then " --verbose" else "");
          Report : constant String :=
            Run_Command ("validation_reporter" & Format_Flag & Verbose_Flag, All_Results);

@@ -119,7 +119,7 @@ begin
       end if;
 
       Put_Line ("[");
-      Put_Line ("  \"Dependency order computation not yet implemented\"");
+      Put_Line ("  ""Dependency order computation not yet implemented""");
       Put_Line ("]");
       Set_Exit_Status (Exit_Success);
    end;

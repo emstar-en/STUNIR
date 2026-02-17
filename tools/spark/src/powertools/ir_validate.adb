@@ -6,6 +6,7 @@ with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with GNAT.OS_Lib;
+with Command_Utils;
 
 procedure IR_Validate is
    use Ada.Command_Line;
@@ -58,23 +59,11 @@ procedure IR_Validate is
    end Read_Stdin;
 
    function Run_Command (Cmd : String; Input : String) return String is
-      use GNAT.OS_Lib;
-      Args : Argument_List_Access;
+      Success : aliased Boolean;
+      Result  : constant String :=
+        Command_Utils.Get_Command_Output (Cmd, Input, Success'Access);
    begin
-      Args := Argument_String_To_List (Cmd);
-      declare
-         Result : constant String :=
-           Get_Command_Output ("sh", Args.all, Input, Success'Access);
-      begin
-         Free (Args);
-         return Result;
-      end;
-   exception
-      when others =>
-         if Args /= null then
-            Free (Args);
-         end if;
-         return "";
+      return Result;
    end Run_Command;
 
 begin

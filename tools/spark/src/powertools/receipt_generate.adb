@@ -2,6 +2,7 @@ with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with Ada.IO_Exceptions;
+with Ada.Streams;
 with GNAT.SHA256;
 
 procedure Receipt_Generate is

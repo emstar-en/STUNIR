@@ -10,13 +10,13 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 | Tool | Status | Issues | Notes |
 |------|--------|--------|-------|
 | json_read | ✅ FIXED | None | Fully regenerated with proper structure |
-| json_validate | ✅ FIXED | None | Spec files exist in src/ |
+| json_validate | ⚠️ PARTIAL | Missing types from stunir_types | Parser_State, Status_Code, Max_JSON_Length, etc. |
 | json_extract | ✅ FIXED | None | Fixed String_Access, aliased keywords, Success variable |
 | json_merge | ✅ FIXED | None | Fixed Success variable with aliased keyword |
 | json_value_format | ✅ FIXED | None | Fixed mixed logical operators (and → and then) |
-| json_merge_objects | ✅ FIXED | None | Fixed quote escaping in line 197 |
+| json_merge_objects | ✅ FIXED | None | Fixed missing comma at line 43 |
 | json_merge_arrays | ✅ FIXED | None | Fixed missing quote in line 42 |
-| json_path_eval | ⚠️ PARTIAL | Line 134: quote escaping issue | Fixed line 127, line 134 needs manual fix: "":" → """:" |
+| json_path_eval | ✅ FIXED | None | Fixed quote escaping at line 134 |
 | ir_validate_schema | ✅ FIXED | None | Fully regenerated |
 | ir_extract_module | ✅ FIXED | None | Fully regenerated |
 | ir_extract_funcs | ✅ FIXED | None | Fully regenerated |
@@ -29,9 +29,9 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 | Tool | Status | Issues | Notes |
 |------|--------|--------|-------|
 | spec_extract_module | ✅ FIXED | None | Fixed Success variable with aliased keyword |
-| func_dedup | ✅ FIXED | None | Spec files exist in src/ |
+| func_dedup | ⚠️ PARTIAL | Unconstrained subtype error | Line 64-65: Hash map instantiation issue |
 | format_detect | ✅ FIXED | None | Spec files exist in src/ |
-| extraction_to_spec | ✅ FIXED | None | Spec files exist in src/ |
+| extraction_to_spec | ✅ FIXED | None | Fixed character literal escaping |
 
 ## Phase 3 Powertools (Code Generation)
 
@@ -45,6 +45,7 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 | code_add_comments | ✅ FIXED | None | Fully regenerated |
 | sig_gen_cpp | ✅ FIXED | None | Fixed Success variable with aliased keyword |
 | sig_gen_rust | ✅ FIXED | None | Spec files exist in src/ |
+| cpp_impl_gen | ✅ FIXED | None | Fixed quote escaping at line 100 |
 
 ## Type System Powertools
 
@@ -57,9 +58,9 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 ## Summary Statistics
 
 - **Total Tools:** 25
-- **Fully Fixed:** 24 (96%)
-- **Partially Fixed:** 1 (4%)
-- **Remaining Issues:** 1 file needs manual quote fix
+- **Fully Fixed:** 22 (88%)
+- **Partially Fixed:** 2 (8%)
+- **Remaining Issues:** 2 files need additional work
 
 ## Common Issues Fixed
 
@@ -69,21 +70,24 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 4. **Missing imports** - Added `GNAT.Strings` where needed
 5. **Mixed logical operators** - Changed `and` to `and then` for consistency
 6. **String quote escaping** - Fixed malformed string literals in JSON output
+7. **Character literal escaping** - Fixed C-style `\` to Ada-style `'\'`
+8. **Get_Command_Output undefined** - Created Command_Utils package
 
 ## Remaining Work
 
-### Critical Issue:
-1. **json_path_eval.adb:134** - Manual fix needed: Change `"":` to `""":` in Search_Str constant
+### Critical Issues:
+1. **json_validate.adb** - Requires full stunir_types spec with:
+   - Parser_State type
+   - Status_Code type  
+   - Max_JSON_Length constant
+   - JSON_Strings type
+   - Initialize_Parser procedure
+   - Next_Token function
+   - Token_EOF constant
 
-### Manual Fix Required:
-```ada
--- Line 134 in json_path_eval.adb
--- CURRENT (WRONG):
-Search_Str : constant String := '"' & Property & "":";
-
--- SHOULD BE:
-Search_Str : constant String := '"' & Property & """:";
-```
+2. **func_dedup.adb** - Hash map instantiation error:
+   - Line 64: Unconstrained subtype in component declaration
+   - Line 65: Key_Type must be a definite subtype
 
 ## Architecture Decisions
 
@@ -93,16 +97,9 @@ Search_Str : constant String := '"' & Property & """:";
 4. **Error handling:** Errors written to stderr with descriptive messages
 5. **'Access attribute:** All variables used with 'Access must be declared as `aliased`
 
-## Commit History
-
-**Latest Commit:** Fix compilation errors in powertools
-- Fixed Get_Command_Output errors: added 'aliased' keyword to Success variable
-- Fixed syntax errors: mixed logical operators in json_value_format.adb, json_path_eval.adb
-- Fixed string quote errors in json_merge_objects.adb, json_merge_arrays.adb
-- NOTE: json_path_eval.adb:134 still has a quote escaping issue that needs manual fix
-
 ## Next Steps
 
-1. **Priority 1:** Manually fix json_path_eval.adb:134 quote escaping
-2. **Priority 2:** Full integration testing once all compilation succeeds
-3. **Priority 3:** Performance testing and optimization
+1. **Priority 1:** Complete stunir_types.ads with all required types for json_validate
+2. **Priority 2:** Fix func_dedup.adb hash map instantiation
+3. **Priority 3:** Full integration testing once all compilation succeeds
+4. **Priority 4:** Performance testing and optimization

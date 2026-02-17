@@ -146,9 +146,10 @@ procedure Format_Detect is
 
    function Detect_Format (Content : String) return Extraction_Format is
       use STUNIR_JSON_Parser;
+      use STUNIR_Types;
       State  : Parser_State;
-      Status : STUNIR_Types.Status_Code;
-      Input_Str : STUNIR_Types.JSON_String;
+      Status : Status_Code;
+      Input_Str : JSON_String;
       Has_Files : Boolean := False;
       Has_Functions : Boolean := False;
       Has_Project : Boolean := False;
@@ -177,7 +178,7 @@ procedure Format_Detect is
 
          if State.Current_Token = Token_String then
             declare
-               Key : constant String := STUNIR_Types.JSON_Strings.To_String (State.Token_Value);
+               Key : constant String := To_String (State.Token_Value);
             begin
                if Key = "files" then
                   Has_Files := True;

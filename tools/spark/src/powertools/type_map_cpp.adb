@@ -7,6 +7,7 @@ pragma SPARK_Mode (Off);
 with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Fixed;
 with Ada.Characters.Handling;
 
 procedure Type_Map_Cpp is

@@ -9,6 +9,8 @@ with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with GNAT.Command_Line;
 with GNAT.OS_Lib;
+with GNAT.Strings;
+with Command_Utils;
 
 procedure IR_Gen_Functions is
    use Ada.Command_Line;
@@ -20,10 +22,10 @@ procedure IR_Gen_Functions is
    Exit_Generation_Error : constant := 1;
 
    --  Configuration
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
-   Module_Name   : Unbounded_String := Null_Unbounded_String;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
+   Module_Name   : aliased GNAT.Strings.String_Access := new String'("");
 
    Version : constant String := "0.1.0-alpha";
 
@@ -78,23 +80,11 @@ procedure IR_Gen_Functions is
    end Read_Stdin;
 
    function Run_Command (Cmd : String; Input : String := "") return String is
-      use GNAT.OS_Lib;
-      Args : Argument_List_Access;
+      Success : aliased Boolean;
+      Result  : constant String :=
+        Command_Utils.Get_Command_Output (Cmd, Input, Success'Access);
    begin
-      Args := Argument_String_To_List (Cmd);
-      declare
-         Result : constant String :=
-           Get_Command_Output ("sh", Args.all, Input, Success'Access);
-      begin
-         Free (Args);
-         return Result;
-      end;
-   exception
-      when others =>
-         if Args /= null then
-            Free (Args);
-         end if;
-         return "";
+      return Result;
    end Run_Command;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;
@@ -154,7 +144,7 @@ begin
 
          --  Get module name (or use override)
          declare
-            Mod_Name : Unbounded_String := Module_Name;
+            Mod_Name : Unbounded_String := To_Unbounded_String (Module_Name.all);
          begin
             if Mod_Name = Null_Unbounded_String then
                declare
