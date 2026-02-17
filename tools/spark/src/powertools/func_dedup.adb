@@ -2,13 +2,12 @@
 --  Removes duplicate functions from extraction data
 --  Phase 1 Powertool for STUNIR
 
-pragma SPARK_Mode (Off);
+pragma SPARK_Mode (On);
 
 with Ada.Command_Line;
 with Ada.Text_IO;
-with Ada.Strings.Unbounded;
-with Ada.Strings.Fixed;
-with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Strings.Bounded;
+with Ada.Containers.Bounded_Hashed_Maps;
 with Ada.Strings.Hash;
 
 with GNAT.Command_Line;
@@ -20,7 +19,6 @@ with STUNIR_Types;
 procedure Func_Dedup is
    use Ada.Command_Line;
    use Ada.Text_IO;
-   use Ada.Strings.Unbounded;
    use STUNIR_JSON_Parser;
    use STUNIR_Types;
 
@@ -29,8 +27,30 @@ procedure Func_Dedup is
    Exit_Validation_Error : constant := 1;
    Exit_Processing_Error : constant := 2;
 
+   --  Bounded string for function keys (max 512 chars per key)
+   package Key_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (512);
+   subtype Key_String is Key_Strings.Bounded_String;
+
+   --  Bounded string for accumulated objects (max 16KB per object)
+   package Object_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length (16384);
+   subtype Object_String is Object_Strings.Bounded_String;
+
+   --  Hash function for bounded strings
+   function Hash_Key (Key : Key_String) return Ada.Containers.Hash_Type is
+   begin
+      return Ada.Strings.Hash (Key_Strings.To_String (Key));
+   end Hash_Key;
+
+   --  Bounded hash map: capacity 10000, stores object content indexed by key
+   package Function_Maps is new Ada.Containers.Bounded_Hashed_Maps
+     (Key_Type        => Key_String,
+      Element_Type    => Object_String,
+      Hash            => Hash_Key,
+      Equivalent_Keys => Key_Strings."=",
+      "="             => Object_Strings."=");
+
    --  Configuration
-   Input_File    : Unbounded_String := Null_Unbounded_String;
+   Input_File    : Key_String := Key_Strings.Null_Bounded_String;
    Output_File   : aliased GNAT.Strings.String_Access := null;
    Key_Field     : aliased GNAT.Strings.String_Access := new String'("name");
    Verbose_Mode  : aliased Boolean := False;
@@ -63,13 +83,6 @@ procedure Func_Dedup is
      "    ""--help"", ""--version"", ""--describe"", ""--key"", ""--output"", ""--last"", ""--verbose""" & ASCII.LF &
      "  ]" & ASCII.LF &
      "}";
-
-
-   package String_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (Key_Type        => String,
-      Element_Type    => Natural,
-      Hash            => Ada.Strings.Hash,
-      Equivalent_Keys => "=");
    procedure Print_Usage;
    procedure Print_Error (Msg : String);
    procedure Print_Info (Msg : String);
@@ -110,17 +123,17 @@ procedure Func_Dedup is
    end Print_Info;
 
    function Read_Input return String is
-      Result : Unbounded_String := Null_Unbounded_String;
+      Result : Object_String := Object_Strings.Null_Bounded_String;
    begin
-      if Input_File = Null_Unbounded_String then
+      if Key_Strings.Length (Input_File) = 0 then
          while not End_Of_File loop
             declare
                Line : String (1 .. 4096);
                Last : Natural;
             begin
                Get_Line (Line, Last);
-               Append (Result, Line (1 .. Last));
-               Append (Result, ASCII.LF);
+               Object_Strings.Append (Result, Line (1 .. Last));
+               Object_Strings.Append (Result, ASCII.LF & "");
             end;
          end loop;
       else
@@ -129,25 +142,25 @@ procedure Func_Dedup is
             Line : String (1 .. 4096);
             Last : Natural;
          begin
-            Open (File, In_File, To_String (Input_File));
+            Open (File, In_File, Key_Strings.To_String (Input_File));
             while not End_Of_File (File) loop
                Get_Line (File, Line, Last);
-               Append (Result, Line (1 .. Last));
-               Append (Result, ASCII.LF);
+               Object_Strings.Append (Result, Line (1 .. Last));
+               Object_Strings.Append (Result, ASCII.LF & "");
             end loop;
             Close (File);
          exception
             when others =>
-               Print_Error ("Cannot read: " & To_String (Input_File));
+               Print_Error ("Cannot read: " & Key_Strings.To_String (Input_File));
                return "";
          end;
       end if;
-      return To_String (Result);
+      return Object_Strings.To_String (Result);
    end Read_Input;
 
    procedure Write_Output (Content : String) is
    begin
-      if Output_File = null then
+      if GNAT.Strings."=" (Output_File, null) then
          Put_Line (Content);
       else
          declare
@@ -169,11 +182,11 @@ procedure Func_Dedup is
       Status : Status_Code;
       Input_Str : STUNIR_Types.JSON_String;
 
-      Seen : String_Maps.Map;
-      Result_Array : Unbounded_String := Null_Unbounded_String;
+      Seen : Function_Maps.Map (Capacity => 10000, Modulus => 10007);
+      Result_Array : Object_String := Object_Strings.Null_Bounded_String;
       In_Functions_Array : Boolean := False;
-      Current_Object : Unbounded_String := Null_Unbounded_String;
-      Current_Key : Unbounded_String := Null_Unbounded_String;
+      Current_Object : Object_String := Object_Strings.Null_Bounded_String;
+      Current_Key : Key_String := Key_Strings.Null_Bounded_String;
       Object_Depth : Natural := 0;
       Functions_Count : Natural := 0;
       Duplicates_Count : Natural := 0;
@@ -188,7 +201,7 @@ procedure Func_Dedup is
          return "[]";
       end if;
 
-      Append (Result_Array, "[");
+      Object_Strings.Append (Result_Array, "[");
 
       loop
          Next_Token (State, Status);
@@ -212,7 +225,8 @@ procedure Func_Dedup is
                   if Status = STUNIR_Types.Success then
                      Next_Token (State, Status);
                      if Status = STUNIR_Types.Success and then State.Current_Token = Token_String then
-                        Current_Key := State.Token_Value;
+                        Current_Key := Key_Strings.To_Bounded_String
+                          (JSON_Strings.To_String (State.Token_Value));
                      end if;
                   end if;
                end if;
@@ -220,60 +234,62 @@ procedure Func_Dedup is
          elsif State.Current_Token = Token_Object_Start and then In_Functions_Array then
             Object_Depth := Object_Depth + 1;
             if Object_Depth = 1 then
-               Current_Object := To_Unbounded_String ("{");
-               Current_Key := Null_Unbounded_String;
+               Current_Object := Object_Strings.To_Bounded_String ("{");
+               Current_Key := Key_Strings.Null_Bounded_String;
             else
-               Append (Current_Object, "{");
+               Object_Strings.Append (Current_Object, "{");
             end if;
          elsif State.Current_Token = Token_Object_End and then In_Functions_Array then
             Object_Depth := Object_Depth - 1;
             if Object_Depth = 0 then
-               Append (Current_Object, "}");
+               Object_Strings.Append (Current_Object, "}");
                Functions_Count := Functions_Count + 1;
 
                declare
-                  Key_Str : constant Unbounded_String := Current_Key;
+                  Key_Str : constant Key_String := Current_Key;
                begin
-                  if Length (Key_Str) = 0 then
+                  if Key_Strings.Length (Key_Str) = 0 then
                      --  No key, always include
-                     if Length (Result_Array) > 1 then
-                        Append (Result_Array, ",");
+                     if Object_Strings.Length (Result_Array) > 1 then
+                        Object_Strings.Append (Result_Array, ",");
                      end if;
-                     Append (Result_Array, Current_Object);
-                  elsif String_Maps.Contains (Seen, Key_Str) then
+                     Object_Strings.Append (Result_Array, Current_Object);
+                  elsif Function_Maps.Contains (Seen, Key_Str) then
                      Duplicates_Count := Duplicates_Count + 1;
                      if not Keep_First then
                         --  Replace with last occurrence
-                        String_Maps.Replace (Seen, Key_Str, Current_Object);
+                        Function_Maps.Replace (Seen, Key_Str, Current_Object);
                      end if;
                   else
-                     String_Maps.Insert (Seen, Key_Str, Current_Object);
+                     Function_Maps.Insert (Seen, Key_Str, Current_Object);
                   end if;
                end;
 
-               Current_Object := Null_Unbounded_String;
+               Current_Object := Object_Strings.Null_Bounded_String;
             else
-               Append (Current_Object, "}");
+               Object_Strings.Append (Current_Object, "}");
             end if;
          elsif In_Functions_Array and then Object_Depth > 0 then
             --  Accumulate object content
             case State.Current_Token is
                when Token_String =>
-                  Append (Current_Object, """" & To_String (State.Token_Value) & """");
+                  Object_Strings.Append (Current_Object,
+                    """" & JSON_Strings.To_String (State.Token_Value) & """");
                when Token_Number | Token_True | Token_False | Token_Null =>
-                  Append (Current_Object, To_String (State.Token_Value));
+                  Object_Strings.Append (Current_Object,
+                    JSON_Strings.To_String (State.Token_Value));
                when Token_Object_Start =>
-                  Append (Current_Object, "{");
+                  Object_Strings.Append (Current_Object, "{");
                when Token_Object_End =>
-                  Append (Current_Object, "}");
+                  Object_Strings.Append (Current_Object, "}");
                when Token_Array_Start =>
-                  Append (Current_Object, "[");
+                  Object_Strings.Append (Current_Object, "[");
                when Token_Array_End =>
-                  Append (Current_Object, "]");
+                  Object_Strings.Append (Current_Object, "]");
                when Token_Colon =>
-                  Append (Current_Object, ":");
+                  Object_Strings.Append (Current_Object, ":");
                when Token_Comma =>
-                  Append (Current_Object, ",");
+                  Object_Strings.Append (Current_Object, ",");
                when others =>
                   null;
             end case;
@@ -281,18 +297,18 @@ procedure Func_Dedup is
       end loop;
 
       --  Build output from seen map
-      for Cursor in String_Maps.Iterate (Seen) loop
-         if Length (Result_Array) > 1 then
-            Append (Result_Array, ",");
+      for Cursor in Function_Maps.Iterate (Seen) loop
+         if Object_Strings.Length (Result_Array) > 1 then
+            Object_Strings.Append (Result_Array, ",");
          end if;
-         Append (Result_Array, String_Maps.Element (Cursor));
+         Object_Strings.Append (Result_Array, Function_Maps.Element (Cursor));
       end loop;
 
-      Append (Result_Array, "]");
+      Object_Strings.Append (Result_Array, "]");
 
       Print_Info ("Processed" & Functions_Count'Img & " functions, removed" & Duplicates_Count'Img & " duplicates");
 
-      return To_String (Result_Array);
+      return Object_Strings.To_String (Result_Array);
    end Deduplicate_Functions;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;
@@ -302,7 +318,7 @@ begin
    GNAT.Command_Line.Define_Switch (Config, Show_Version'Access, "-v", "--version");
    GNAT.Command_Line.Define_Switch (Config, Show_Describe'Access, "", "--describe");
    GNAT.Command_Line.Define_Switch (Config, Verbose_Mode'Access, "", "--verbose");
-   GNAT.Command_Line.Define_Switch (Config, Keep_First'Access, "", "--last", "", GNAT.Command_Line.Enable_Abbr);
+   GNAT.Command_Line.Define_Switch (Config, Keep_First'Access, "", "--last");
    GNAT.Command_Line.Define_Switch (Config, Key_Field'Access, "", "--key=");
    GNAT.Command_Line.Define_Switch (Config, Output_File'Access, "-o:", "--output=");
 
@@ -337,7 +353,7 @@ begin
       Arg : String := GNAT.Command_Line.Get_Argument;
    begin
       if Arg'Length > 0 then
-         Input_File := To_Unbounded_String (Arg);
+            Input_File := Key_Strings.To_Bounded_String (Arg);
       end if;
    end;
 
