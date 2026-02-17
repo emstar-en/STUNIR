@@ -2,47 +2,24 @@ func_dedup.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnat
 func_dedup.adb:12:17: warning: unit "Ada.Strings.Hash" is not referenced [-gnatwu]
 func_dedup.adb:70:47: error: "Hash" not declared in "Unbounded"
 func_dedup.adb:70:47: error: instantiation abandoned
+func_dedup.adb:150:22: error: operator for type "System.Strings.String_Access" is not directly visible
+func_dedup.adb:150:22: error: use clause would make operation legal
+func_dedup.adb:156:48: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:156:48: error: found type "System.Strings.String_Access"
+func_dedup.adb:156:48: error:   ==> in call to "To_String" at a-strunb.ads:135
+func_dedup.adb:161:59: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:161:59: error: found type "System.Strings.String_Access"
+func_dedup.adb:161:59: error:   ==> in call to "To_String" at a-strunb.ads:135
 func_dedup.adb:167:11: warning: "Stunir_JSON_Parser" is already use-visible through previous use_clause at line 24 [-gnatwr]
 func_dedup.adb:172:14: error: "String_Maps" is undefined
 func_dedup.adb:195:81: error: "Token_EOF" is not visible
 func_dedup.adb:195:81: error: multiple use clauses cause hiding
-func_dedup.adb:195:81: error: hidden declaration at stunir_json_parser.ads:15
-func_dedup.adb:195:81: error: hidden declaration at stunir_types.ads:22
-func_dedup.adb:199:83: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:17
-func_dedup.adb:199:83: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:199:83: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:17
-func_dedup.adb:216:70: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:17
-func_dedup.adb:216:70: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:216:70: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:17
-func_dedup.adb:244:25: error: "String_Maps" is undefined
-func_dedup.adb:248:25: error: "String_Maps" is undefined
-func_dedup.adb:251:22: error: "String_Maps" is undefined
-func_dedup.adb:263:19: error: ambiguous expression (cannot resolve "Append")
-func_dedup.adb:263:19: error: possible interpretation at a-strunb.ads:159
-func_dedup.adb:263:19: error: possible interpretation at a-strunb.ads:149
-func_dedup.adb:263:92: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:17
-func_dedup.adb:263:92: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:263:92: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:17
-func_dedup.adb:265:85: error: expected private type "Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:17
-func_dedup.adb:265:85: error: found private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:265:85: error:   ==> in call to "To_String" at a-strbou.ads:129, instance at stunir_types.ads:17
-func_dedup.adb:285:21: error: "String_Maps" is undefined
-func_dedup.adb:285:32: error: invalid subtype mark in discrete range
-func_dedup.adb:289:32: error: "String_Maps" is undefined
-func_dedup.adb:306:99: error: "Enable_Abbr" not declared in "Command_Line"
-func_dedup.adb:308:21: error: no candidate interpretations match the actuals:
-func_dedup.adb:308:56: error: expected type "Value_Callback" defined at g-comlin.ads:692
-func_dedup.adb:308:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 308
-func_dedup.adb:308:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:694
-func_dedup.adb:308:56: error: expected an access type with designated type "System.Strings.String_Access"
-func_dedup.adb:308:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:308:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:678
-func_dedup.adb:308:56: error: expected an access type with designated type "Standard.Integer"
-func_dedup.adb:308:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:308:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:659
-func_dedup.adb:308:56: error: expected an access type with designated type "Standard.Boolean"
-func_dedup.adb:308:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
-func_dedup.adb:308:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:640
-func_dedup.adb:308:56: error: expected type "Standard.String"
-func_dedup.adb:308:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 308
-func_dedup.adb:308:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:608
+func_dedup.adb:195:81: error: hidden declaration at stunir_json_parser.ads:19
+func_dedup.adb:195:81: error: hidden declaration at stunir_types.ads:27
+func_dedup.adb:243:25: error: "String_Maps" is undefined
+func_dedup.adb:247:25: error: "String_Maps" is undefined
+func_dedup.adb:250:22: error: "String_Maps" is undefined
+func_dedup.adb:284:21: error: "String_Maps" is undefined
+func_dedup.adb:284:32: error: invalid subtype mark in discrete range
+func_dedup.adb:288:32: error: "String_Maps" is undefined
+func_dedup.adb:305:99: error: "Enable_Abbr" not declared in "Command_Line"

@@ -1,6 +1,2 @@
 format_detect.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
-format_detect.adb:241:45: error: prefix of "Access" attribute must be aliased
-format_detect.adb:242:45: error: prefix of "Access" attribute must be aliased
-format_detect.adb:243:45: error: prefix of "Access" attribute must be aliased
-format_detect.adb:244:45: error: prefix of "Access" attribute must be aliased
-format_detect.adb:245:45: error: prefix of "Access" attribute must be aliased
+format_detect.adb:275:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

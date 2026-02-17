@@ -196,7 +196,7 @@ procedure Func_Dedup is
 
          if State.Current_Token = Token_String then
             declare
-               Val : constant String := STUNIR_Types.JSON_Strings.To_String (State.Token_Value);
+               Val : constant String := To_String (State.Token_Value);
             begin
                if Val = "functions" then
                   Expect_Token (State, Token_Colon, Status);
@@ -212,8 +212,7 @@ procedure Func_Dedup is
                   if Status = STUNIR_Types.Success then
                      Next_Token (State, Status);
                      if Status = STUNIR_Types.Success and then State.Current_Token = Token_String then
-                        Current_Key := To_Unbounded_String
-                          (STUNIR_Types.JSON_Strings.To_String (State.Token_Value));
+                        Current_Key := State.Token_Value;
                      end if;
                   end if;
                end if;
@@ -260,9 +259,9 @@ procedure Func_Dedup is
             --  Accumulate object content
             case State.Current_Token is
                when Token_String =>
-                  Append (Current_Object, """" & STUNIR_Types.JSON_Strings.To_String (State.Token_Value) & """");
+                  Append (Current_Object, """" & To_String (State.Token_Value) & """");
                when Token_Number | Token_True | Token_False | Token_Null =>
-                  Append (Current_Object, STUNIR_Types.JSON_Strings.To_String (State.Token_Value));
+                  Append (Current_Object, To_String (State.Token_Value));
                when Token_Object_Start =>
                   Append (Current_Object, "{");
                when Token_Object_End =>
