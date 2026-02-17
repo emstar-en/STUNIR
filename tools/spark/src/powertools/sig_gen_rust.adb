@@ -34,7 +34,7 @@ procedure Sig_Gen_Rust is
    Show_Describe : Boolean := False;
    Unsafe_FFI    : Boolean := True;
 
-   Version : constant String := "1.0.0";
+   Version : constant String := "0.1.0-alpha";
 
    --  Description output
    Describe_Output : constant String :=

@@ -34,7 +34,7 @@ procedure Extraction_To_Spec is
    Show_Describe : Boolean := False;
    Pretty_Print  : Boolean := False;
 
-   Version : constant String := "1.0.0";
+   Version : constant String := "0.1.0-alpha";
 
    --  Description output
    Describe_Output : constant String :=

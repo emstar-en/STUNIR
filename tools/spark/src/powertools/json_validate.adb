@@ -34,7 +34,7 @@ procedure JSON_Validate is
    Show_Help      : Boolean := False;
    Show_Describe  : Boolean := False;
 
-   Version : constant String := "1.0.0";
+   Version : constant String := "0.1.0-alpha";
 
    --  Description output for --describe
    Describe_Output : constant String :=

@@ -41,7 +41,7 @@ procedure Format_Detect is
    Show_Describe : Boolean := False;
    Output_Json   : Boolean := False;
 
-   Version : constant String := "1.0.0";
+   Version : constant String := "0.1.0-alpha";
 
    --  Description output
    Describe_Output : constant String :=
