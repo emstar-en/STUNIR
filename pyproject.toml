@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stunir"
-version = "0.8.9"
-description = "STUNIR - Deterministic IR Generation and Verification Toolkit"
+version = "0.1.0-alpha"
+description = "STUNIR - Deterministic IR Generation and Verification Toolkit (ALPHA Prototype)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
