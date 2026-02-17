@@ -1,2 +1,2 @@
-json_validate.adb:14:06: error: file "stunir_json_parser.ads" not found
-json_validate.adb:15:06: error: file "stunir_types.ads" not found
+json_validate.adb:129:11: warning: "Stunir_JSON_Parser" is already use-visible through previous use_clause at line 21 [-gnatwr]
+json_validate.adb:210:07: warning: "Remaining" is not modified, could be declared constant [-gnatwk]

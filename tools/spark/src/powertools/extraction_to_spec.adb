@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
 with GNAT.Command_Line;
+with GNAT.Strings;
 
 with STUNIR_JSON_Parser;
 with STUNIR_Types;
@@ -18,6 +19,8 @@ procedure Extraction_To_Spec is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use STUNIR_JSON_Parser;
+   use STUNIR_Types;
 
    --  Exit codes
    Exit_Success          : constant := 0;
@@ -27,12 +30,12 @@ procedure Extraction_To_Spec is
    --  Configuration
    Input_File    : Unbounded_String := Null_Unbounded_String;
    Output_File   : Unbounded_String := Null_Unbounded_String;
-   Source_Lang   : Unbounded_String := To_Unbounded_String ("c");
-   Verbose_Mode  : Boolean := False;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
-   Pretty_Print  : Boolean := False;
+   Source_Lang   : aliased GNAT.Strings.String_Access := new String'("c");
+   Verbose_Mode  : aliased Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
+   Pretty_Print  : aliased Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
 
@@ -218,9 +221,9 @@ procedure Extraction_To_Spec is
          return "{}";
       end if;
 
-      Input_Str := STUNIR_Types.JSON_Strings.To_Bounded_String (Content);
+      Input_Str := JSON_Strings.To_Bounded_String (Content);
       Initialize_Parser (State, Input_Str, Status);
-      if Status /= STUNIR_Types.Success then
+      if Status /= Success then
          return "{}";
       end if;
 
@@ -237,7 +240,7 @@ procedure Extraction_To_Spec is
       --  Parse and extract functions
       loop
          Next_Token (State, Status);
-         exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_EOF;
+         exit when Status /= Success or else State.Current_Token = Token_EOF;
 
          if State.Current_Token = Token_String then
             declare
@@ -245,9 +248,9 @@ procedure Extraction_To_Spec is
             begin
                if Key = "functions" then
                   Expect_Token (State, Token_Colon, Status);
-                  if Status = STUNIR_Types.Success then
+                  if Status = Success then
                      Expect_Token (State, Token_Array_Start, Status);
-                     if Status = STUNIR_Types.Success then
+                     if Status = Success then
                         In_Functions := True;
                      end if;
                   end if;
@@ -270,17 +273,17 @@ procedure Extraction_To_Spec is
             begin
                loop
                   Next_Token (State, Status);
-                  exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_Object_End;
+                  exit when Status /= Success or else State.Current_Token = Token_Object_End;
 
                   if State.Current_Token = Token_String then
                      declare
-                        Member_Key : constant String := STUNIR_Types.JSON_Strings.To_String (State.Token_Value);
+                        Member_Key : constant String := JSON_Strings.To_String (State.Token_Value);
                      begin
                         Expect_Token (State, Token_Colon, Status);
-                        exit when Status /= STUNIR_Types.Success;
+                        exit when Status /= Success;
 
                         Next_Token (State, Status);
-                        exit when Status /= STUNIR_Types.Success;
+                        exit when Status /= Success;
 
                         if not First_Member then
                            Append (Result, ",");
@@ -292,9 +295,9 @@ procedure Extraction_To_Spec is
 
                         case State.Current_Token is
                            when Token_String =>
-                              Append (Result, """" & Escape_Json_String (STUNIR_Types.JSON_Strings.To_String (State.Token_Value)) & """");
+                              Append (Result, """" & Escape_Json_String (JSON_Strings.To_String (State.Token_Value)) & """");
                            when Token_Number | Token_True | Token_False | Token_Null =>
-                              Append (Result, STUNIR_Types.JSON_Strings.To_String (State.Token_Value));
+                              Append (Result, JSON_Strings.To_String (State.Token_Value));
                            when Token_Array_Start =>
                               Append (Result, "[");
                               declare
@@ -302,7 +305,7 @@ procedure Extraction_To_Spec is
                               begin
                                  loop
                                     Next_Token (State, Status);
-                                    exit when Status /= STUNIR_Types.Success or else Depth = 0;
+                                    exit when Status /= Success or else Depth = 0;
                                     case State.Current_Token is
                                        when Token_Array_Start =>
                                           Depth := Depth + 1;
@@ -313,9 +316,17 @@ procedure Extraction_To_Spec is
                                              Append (Result, "]");
                                           end if;
                                        when Token_String =>
-                                          Append (Result, """" & Escape_Json_String (STUNIR_Types.JSON_Strings.To_String (State.Token_Value)) & """");
+                                          declare
+                                             Array_String : constant String := JSON_Strings.To_String (State.Token_Value);
+                                          begin
+                                             Append (Result, """" & Escape_Json_String (Array_String) & """");
+                                          end;
                                        when others =>
-                                          Append (Result, STUNIR_Types.JSON_Strings.To_String (State.Token_Value));
+                                          declare
+                                             Array_Value : constant String := JSON_Strings.To_String (State.Token_Value);
+                                          begin
+                                             Append (Result, Array_Value);
+                                          end;
                                     end case;
                                     if Depth > 0 then
                                        Append (Result, ",");
@@ -329,7 +340,7 @@ procedure Extraction_To_Spec is
                         end case;
                      end;
                   elsif State.Current_Token = Token_Comma then
-                     continue;
+                     null;
                   else
                      exit;
                   end if;

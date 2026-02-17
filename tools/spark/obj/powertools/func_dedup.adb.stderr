@@ -1,2 +1,25 @@
-func_dedup.adb:16:06: error: file "stunir_json_parser.ads" not found
-func_dedup.adb:17:06: error: file "stunir_types.ads" not found
+func_dedup.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
+func_dedup.adb:12:17: warning: unit "Ada.Strings.Hash" is not referenced [-gnatwu]
+func_dedup.adb:70:47: error: "Hash" not declared in "Unbounded"
+func_dedup.adb:70:47: error: instantiation abandoned
+func_dedup.adb:150:22: error: operator for type "System.Strings.String_Access" is not directly visible
+func_dedup.adb:150:22: error: use clause would make operation legal
+func_dedup.adb:156:48: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:156:48: error: found type "System.Strings.String_Access"
+func_dedup.adb:156:48: error:   ==> in call to "To_String" at a-strunb.ads:135
+func_dedup.adb:161:59: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
+func_dedup.adb:161:59: error: found type "System.Strings.String_Access"
+func_dedup.adb:161:59: error:   ==> in call to "To_String" at a-strunb.ads:135
+func_dedup.adb:167:11: warning: "Stunir_JSON_Parser" is already use-visible through previous use_clause at line 24 [-gnatwr]
+func_dedup.adb:172:14: error: "String_Maps" is undefined
+func_dedup.adb:195:81: error: "Token_EOF" is not visible
+func_dedup.adb:195:81: error: multiple use clauses cause hiding
+func_dedup.adb:195:81: error: hidden declaration at stunir_json_parser.ads:19
+func_dedup.adb:195:81: error: hidden declaration at stunir_types.ads:27
+func_dedup.adb:243:25: error: "String_Maps" is undefined
+func_dedup.adb:247:25: error: "String_Maps" is undefined
+func_dedup.adb:250:22: error: "String_Maps" is undefined
+func_dedup.adb:284:21: error: "String_Maps" is undefined
+func_dedup.adb:284:32: error: invalid subtype mark in discrete range
+func_dedup.adb:288:32: error: "String_Maps" is undefined
+func_dedup.adb:305:99: error: "Enable_Abbr" not declared in "Command_Line"

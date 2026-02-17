@@ -1,0 +1,1 @@
+spec_validate.adb:44:04: warning: variable "Strict_Mode" is assigned but never read [-gnatwm]

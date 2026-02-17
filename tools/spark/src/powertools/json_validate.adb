@@ -18,6 +18,8 @@ procedure JSON_Validate is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use STUNIR_JSON_Parser;
+   use STUNIR_Types;
 
    --  Exit codes per powertools spec
    Exit_Success         : constant := 0;
@@ -27,11 +29,11 @@ procedure JSON_Validate is
 
    --  Configuration
    Input_File     : Unbounded_String := Null_Unbounded_String;
-   Strict_Mode    : Boolean := False;
-   Verbose_Mode   : Boolean := False;
-   Show_Version   : Boolean := False;
-   Show_Help      : Boolean := False;
-   Show_Describe  : Boolean := False;
+   Strict_Mode    : aliased Boolean := False;
+   Verbose_Mode   : aliased Boolean := False;
+   Show_Version   : aliased Boolean := False;
+   Show_Help      : aliased Boolean := False;
+   Show_Describe  : aliased Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
 
@@ -244,7 +246,7 @@ begin
       declare
          Result : constant Integer := Validate_JSON (To_String (Content));
       begin
-         Set_Exit_Status (Result);
+         Set_Exit_Status (Ada.Command_Line.Exit_Status (Result));
       end;
    end;
 

@@ -18,6 +18,8 @@ procedure Sig_Gen_Rust is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use STUNIR_JSON_Parser;
+   use STUNIR_Types;
 
    --  Exit codes
    Exit_Success          : constant := 0;
@@ -154,7 +156,7 @@ procedure Sig_Gen_Rust is
    end Write_Output;
 
    function Map_C_To_Rust (C_Type : String) return String is
-      Trimmed : constant String := Trim (C_Type, Ada.Strings.Both);
+      Trimmed : constant String := Ada.Strings.Fixed.Trim (C_Type, Ada.Strings.Both);
    begin
       --  Basic C to Rust FFI type mappings
       if Trimmed = "void" then
@@ -240,7 +242,7 @@ procedure Sig_Gen_Rust is
       --  Parse functions
       loop
          Next_Token (State, Status);
-         exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_EOF;
+         exit when Status /= STUNIR_Types.Success or else State.Current_Token = STUNIR_Types.Token_EOF;
 
          if State.Current_Token = Token_String then
             declare
@@ -315,7 +317,7 @@ procedure Sig_Gen_Rust is
                                        end if;
                                     end;
                                  elsif State.Current_Token = Token_Comma then
-                                    continue;
+                                    null;
                                  end if;
                               end loop;
 

@@ -1,2 +1,2 @@
-format_detect.adb:14:06: error: file "stunir_json_parser.ads" not found
-format_detect.adb:15:06: error: file "stunir_types.ads" not found
+format_detect.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
+format_detect.adb:275:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

@@ -1,14 +1,14 @@
---  stunir_json_parser - JSON parsing utilities implementation
+--  STUNIR_JSON_Parser - JSON parsing utilities implementation
+--  SPARK-compliant implementation
 
-pragma SPARK_Mode (Off);
+pragma SPARK_Mode (On);
 
 with Ada.Characters.Handling;
-with Ada.Strings.Bounded;
 
-package body Stunir_JSON_Parser is
+package body STUNIR_JSON_Parser is
 
    use Ada.Characters.Handling;
-   use Stunir_Types;
+   use STUNIR_Types;
 
    --  Helper functions
    function Is_Whitespace (C : Character) return Boolean is
@@ -43,7 +43,8 @@ package body Stunir_JSON_Parser is
 
    procedure Parse_String (State : in out Parser_State; Status : out Status_Code) is
       Pos : Natural := State.Position + 1;  --  Skip opening quote
-      Result : Unbounded_String := Null_Unbounded_String;
+      Result : JSON_String := JSON_Strings.Null_Bounded_String;
+      Result_Len : Natural := 0;
    begin
       while Pos <= JSON_Strings.Length (State.Input) loop
          declare
@@ -62,20 +63,28 @@ package body Stunir_JSON_Parser is
                if Pos <= JSON_Strings.Length (State.Input) then
                   declare
                      Next_C : constant Character := JSON_Strings.Element (State.Input, Pos);
+                     Escape_Char : Character;
                   begin
                      case Next_C is
-                        when '"' => Append (Result, '"');
-                        when '\' => Append (Result, '\');
-                        when '/' => Append (Result, '/');
-                        when 'b' => Append (Result, ASCII.BS);
-                        when 'f' => Append (Result, ASCII.FF);
-                        when 'n' => Append (Result, ASCII.LF);
-                        when 'r' => Append (Result, ASCII.CR);
-                        when 't' => Append (Result, ASCII.HT);
+                        when '"' => Escape_Char := '"';
+                        when '\' => Escape_Char := '\';
+                        when '/' => Escape_Char := '/';
+                        when 'b' => Escape_Char := ASCII.BS;
+                        when 'f' => Escape_Char := ASCII.FF;
+                        when 'n' => Escape_Char := ASCII.LF;
+                        when 'r' => Escape_Char := ASCII.CR;
+                        when 't' => Escape_Char := ASCII.HT;
                         when others =>
                            Status := Error;
                            return;
                      end case;
+                     if Result_Len < JSON_Strings.Max_Length (Result) then
+                        Result := JSON_Strings.Insert (Result, Result_Len + 1, Escape_Char);
+                        Result_Len := Result_Len + 1;
+                     else
+                        Status := Error;
+                        return;
+                     end if;
                   end;
                else
                   Status := Error;
@@ -86,7 +95,13 @@ package body Stunir_JSON_Parser is
                Status := Error;
                return;
             else
-               Append (Result, C);
+               if Result_Len < JSON_Strings.Max_Length (Result) then
+                  Result := JSON_Strings.Insert (Result, Result_Len + 1, C);
+                  Result_Len := Result_Len + 1;
+               else
+                  Status := Error;
+                  return;
+               end if;
             end if;
             Pos := Pos + 1;
          end;
@@ -97,6 +112,8 @@ package body Stunir_JSON_Parser is
    procedure Parse_Number (State : in out Parser_State; Status : out Status_Code) is
       Pos : Natural := State.Position;
       Has_Digits : Boolean := False;
+      Num_Str : JSON_String;
+      Num_Len : Natural;
    begin
       --  Optional minus sign
       if Pos <= JSON_Strings.Length (State.Input) and then
@@ -152,11 +169,14 @@ package body Stunir_JSON_Parser is
       end if;
 
       --  Extract the number string
-      declare
-         Num_Str : constant String := JSON_Strings.Slice (State.Input, State.Position, Pos - 1);
-      begin
-         State.Token_Value := To_Unbounded_String (Num_Str);
-      end;
+      Num_Len := Pos - State.Position;
+      if Num_Len > 0 and Num_Len <= JSON_Strings.Max_Length (Num_Str) then
+         Num_Str := JSON_Strings.Slice (State.Input, State.Position, Pos - 1);
+         State.Token_Value := Num_Str;
+      else
+         Status := Error;
+         return;
+      end if;
 
       State.Column := State.Column + (Pos - State.Position);
       State.Position := Pos;
@@ -167,6 +187,7 @@ package body Stunir_JSON_Parser is
    procedure Parse_Keyword (State : in out Parser_State; Status : out Status_Code) is
       Pos : Natural := State.Position;
       C : Character;
+      Keyword_Value : JSON_String;
    begin
       if Pos > JSON_Strings.Length (State.Input) then
          Status := Error;
@@ -181,7 +202,8 @@ package body Stunir_JSON_Parser is
                JSON_Strings.Slice (State.Input, Pos, Pos + 3) = "true"
             then
                State.Current_Token := Token_True;
-               State.Token_Value := To_Unbounded_String ("true");
+               Keyword_Value := JSON_Strings.To_Bounded_String ("true");
+               State.Token_Value := Keyword_Value;
                State.Position := Pos + 4;
                State.Column := State.Column + 4;
                Status := Success;
@@ -194,7 +216,8 @@ package body Stunir_JSON_Parser is
                JSON_Strings.Slice (State.Input, Pos, Pos + 4) = "false"
             then
                State.Current_Token := Token_False;
-               State.Token_Value := To_Unbounded_String ("false");
+               Keyword_Value := JSON_Strings.To_Bounded_String ("false");
+               State.Token_Value := Keyword_Value;
                State.Position := Pos + 5;
                State.Column := State.Column + 5;
                Status := Success;
@@ -207,7 +230,8 @@ package body Stunir_JSON_Parser is
                JSON_Strings.Slice (State.Input, Pos, Pos + 3) = "null"
             then
                State.Current_Token := Token_Null;
-               State.Token_Value := To_Unbounded_String ("null");
+               Keyword_Value := JSON_Strings.To_Bounded_String ("null");
+               State.Token_Value := Keyword_Value;
                State.Position := Pos + 4;
                State.Column := State.Column + 4;
                Status := Success;
@@ -233,7 +257,7 @@ package body Stunir_JSON_Parser is
       State.Line := 1;
       State.Column := 1;
       State.Current_Token := Token_EOF;
-      State.Token_Value := Null_Unbounded_String;
+      State.Token_Value := JSON_Strings.Null_Bounded_String;
       Status := Success;
    end Initialize_Parser;
 
@@ -242,6 +266,7 @@ package body Stunir_JSON_Parser is
       Status : out Status_Code)
    is
       C : Character;
+      Token_Value : JSON_String;
    begin
       Skip_Whitespace (State);
 
@@ -256,42 +281,48 @@ package body Stunir_JSON_Parser is
       case C is
          when '{' =>
             State.Current_Token := Token_LBrace;
-            State.Token_Value := To_Unbounded_String ("{");
+            Token_Value := JSON_Strings.To_Bounded_String ("{");
+            State.Token_Value := Token_Value;
             State.Position := State.Position + 1;
             State.Column := State.Column + 1;
             Status := Success;
 
          when '}' =>
             State.Current_Token := Token_RBrace;
-            State.Token_Value := To_Unbounded_String ("}");
+            Token_Value := JSON_Strings.To_Bounded_String ("}");
+            State.Token_Value := Token_Value;
             State.Position := State.Position + 1;
             State.Column := State.Column + 1;
             Status := Success;
 
          when '[' =>
             State.Current_Token := Token_LBracket;
-            State.Token_Value := To_Unbounded_String ("[");
+            Token_Value := JSON_Strings.To_Bounded_String ("[");
+            State.Token_Value := Token_Value;
             State.Position := State.Position + 1;
             State.Column := State.Column + 1;
             Status := Success;
 
          when ']' =>
             State.Current_Token := Token_RBracket;
-            State.Token_Value := To_Unbounded_String ("]");
+            Token_Value := JSON_Strings.To_Bounded_String ("]");
+            State.Token_Value := Token_Value;
             State.Position := State.Position + 1;
             State.Column := State.Column + 1;
             Status := Success;
 
          when ':' =>
             State.Current_Token := Token_Colon;
-            State.Token_Value := To_Unbounded_String (":");
+            Token_Value := JSON_Strings.To_Bounded_String (":");
+            State.Token_Value := Token_Value;
             State.Position := State.Position + 1;
             State.Column := State.Column + 1;
             Status := Success;
 
          when ',' =>
             State.Current_Token := Token_Comma;
-            State.Token_Value := To_Unbounded_String (",");
+            Token_Value := JSON_Strings.To_Bounded_String (",");
+            State.Token_Value := Token_Value;
             State.Position := State.Position + 1;
             State.Column := State.Column + 1;
             Status := Success;
@@ -364,4 +395,20 @@ package body Stunir_JSON_Parser is
       return Depth = 0;  --  All brackets matched
    end Validate_JSON;
 
-end Stunir_JSON_Parser;
+   procedure Expect_Token
+     (State    : in out Parser_State;
+      Expected : Token_Type;
+      Status   : out Status_Code)
+   is
+   begin
+      Next_Token (State, Status);
+      if Status /= Success then
+         return;
+      end if;
+
+      if State.Current_Token /= Expected then
+         Status := Error;
+      end if;
+   end Expect_Token;
+
+end STUNIR_JSON_Parser;
