@@ -1,0 +1,999 @@
+[devsite 0b0610e] Cleanup: Consolidate repository structure and remove build artifacts
+ 998 files changed, 1840 insertions(+), 402287 deletions(-)
+ create mode 100644 .abacusai/tmp/terminal_output_2_1771285868485.txt
+ create mode 100644 .abacusai/tmp/terminal_output_2_1771286328731.txt
+ delete mode 100644 .coverage
+ delete mode 100644 STUNIR-devsite/issues/native/haskell/build_integration.machine.json
+ delete mode 100644 STUNIR-devsite/issues/native/haskell/compiler_determinism.machine.json
+ delete mode 100644 STUNIR-devsite/issues/native/haskell/error_handling.machine.json
+ delete mode 100644 STUNIR-devsite/issues/native/haskell/index.machine.json
+ delete mode 100644 STUNIR-devsite/issues/native/haskell/manifest.machine.json
+ delete mode 100644 STUNIR-devsite/issues/scripts/build_pipeline/index.machine.json
+ delete mode 100644 STUNIR-devsite/issues/scripts/build_pipeline/manifest.machine.json
+ delete mode 100644 STUNIR-devsite/issues/scripts/build_pipeline/path_alignment.machine.json
+ delete mode 160000 STUNIR-main
+ delete mode 100644 __pycache__/extract_bc_functions.cpython-314.pyc
+ delete mode 100644 ardupilot_crc.cpp
+ delete mode 100644 coverage.xml
+ delete mode 100644 dist/index.machine.json
+ delete mode 100644 dist/manifest.machine.json
+ delete mode 100644 dist/manifest_scripts.txt
+ rename {manifests => docs/manifests}/README.md (100%)
+ rename {manifests => docs/manifests}/__init__.py (100%)
+ rename {manifests => docs/manifests}/base.py (100%)
+ rename {manifests => docs/manifests}/contracts/gen_contracts_manifest.py (100%)
+ rename {manifests => docs/manifests}/contracts/verify_contracts_manifest.py (100%)
+ rename {manifests => docs/manifests}/index.machine.json (100%)
+ rename {manifests => docs/manifests}/ir/gen_ir_manifest.py (100%)
+ rename {manifests => docs/manifests}/ir/verify_ir_manifest.py (100%)
+ rename {manifests => docs/manifests}/manifest.machine.json (100%)
+ rename {manifests => docs/manifests}/performance/gen_performance_manifest.py (100%)
+ rename {manifests => docs/manifests}/performance/verify_performance_manifest.py (100%)
+ rename {manifests => docs/manifests}/pipeline/gen_pipeline_manifest.py (100%)
+ rename {manifests => docs/manifests}/pipeline/verify_pipeline_manifest.py (100%)
+ rename {manifests => docs/manifests}/runtime/gen_runtime_manifest.py (100%)
+ rename {manifests => docs/manifests}/runtime/verify_runtime_manifest.py (100%)
+ rename {manifests => docs/manifests}/security/gen_security_manifest.py (100%)
+ rename {manifests => docs/manifests}/security/verify_security_manifest.py (100%)
+ rename {manifests => docs/manifests}/stunir_complete_v1.json (100%)
+ rename {manifests => docs/manifests}/targets/gen_targets_manifest.py (100%)
+ rename {manifests => docs/manifests}/targets/verify_targets_manifest.py (100%)
+ rename {meta => docs/meta}/INDEX.json (100%)
+ rename {meta => docs/meta}/ai_bins/A_TASK.md (100%)
+ rename {meta => docs/meta}/ai_bins/B_CONTEXT.md (100%)
+ rename {meta => docs/meta}/ai_bins/C_DRAFT.md (100%)
+ rename {meta => docs/meta}/ai_bins/D_ERRORS.md (100%)
+ rename {meta => docs/meta}/ai_bins/E_DECISIONS.md (100%)
+ rename {meta => docs/meta}/ai_bins/README.md (100%)
+ rename {meta => docs/meta}/ai_bins/index.machine.json (100%)
+ rename {meta => docs/meta}/ai_bins/manifest.machine.json (100%)
+ rename {meta => docs/meta}/build_sh_original.sh (100%)
+ rename {meta => docs/meta}/build_sh_patch_report.json (100%)
+ rename {meta => docs/meta}/build_sh_patched.sh (100%)
+ rename {meta => docs/meta}/index.machine.json (100%)
+ rename {meta => docs/meta}/manifest.machine.json (100%)
+ rename {meta => docs/meta}/run_index.json (100%)
+ rename {meta => docs/meta}/tools_original/epoch.py (100%)
+ rename {meta => docs/meta}/tools_original/gen_provenance.py (100%)
+ rename {meta => docs/meta}/tools_original/index.machine.json (100%)
+ rename {meta => docs/meta}/tools_original/ir_to_python.py (100%)
+ rename {meta => docs/meta}/tools_original/ir_to_smt2.py (100%)
+ rename {meta => docs/meta}/tools_original/manifest.machine.json (100%)
+ rename {meta => docs/meta}/tools_original/record_receipt.py (100%)
+ rename {meta => docs/meta}/tools_original/resolve_requirements.py (100%)
+ rename {meta => docs/meta}/tools_used/epoch.py (100%)
+ rename {meta => docs/meta}/tools_used/gen_provenance.py (100%)
+ rename {meta => docs/meta}/tools_used/index.machine.json (100%)
+ rename {meta => docs/meta}/tools_used/ir_to_lisp.py (100%)
+ rename {meta => docs/meta}/tools_used/ir_to_python.py (100%)
+ rename {meta => docs/meta}/tools_used/ir_to_smt2.py (100%)
+ rename {meta => docs/meta}/tools_used/manifest.machine.json (100%)
+ rename {meta => docs/meta}/tools_used/record_receipt.py (100%)
+ rename {plans => docs/plans}/index.machine.json (100%)
+ rename {plans => docs/plans}/manifest.machine.json (100%)
+ rename {plans => docs/plans}/stunir_code_emission_plan.json (100%)
+ delete mode 100644 dummy.sig
+ delete mode 100644 fix_codegen_plan.json
+ delete mode 100644 lua-5.4.6.tar.gz
+ delete mode 100644 param_parsing_fix_plan.json
+ delete mode 100644 spark_arith.stunir
+ delete mode 100644 stunir/__init__.py
+ delete mode 100644 stunir/deprecation.py
+ delete mode 100644 stunir_execution_workspace/execution_report.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/convert_to_ir.py
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/extraction.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/extractions/bc_extraction.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/extractions/execute.c
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/generated.cpp
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/generated/execute.cpp
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/ir.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/ir_new.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.cpp
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.go
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.py
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/bc_batch_01.rs
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.c
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.cpp
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.cs
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.go
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.java
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.js
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.kt
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.py
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.rs
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/generated.swift
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/ir.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/output/spec.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/spec.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/batch_01/spec_new.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/build_result.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/codegen_result.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/corpus_manifest.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/environment.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/extraction_result.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/metadata.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/triage_result.json
+ delete mode 100644 stunir_execution_workspace/gnu_bc/verification_result.json
+ delete mode 100644 stunir_execution_workspace/golden/bc/array.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/arrayp.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/aryprm.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/atan.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/checklib.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/div.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/exp.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/fact.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/jn.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/ln.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/mul.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/raise.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/sine.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/sqrt.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/sqrt1.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/sqrt2.b.out
+ delete mode 100644 stunir_execution_workspace/golden/bc/testfn.b.out
+ delete mode 100644 stunir_execution_workspace/lua_5.4/build_result.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/codegen_result.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/corpus_manifest.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/environment.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/extraction_result.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/metadata.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/triage_result.json
+ delete mode 100644 stunir_execution_workspace/lua_5.4/verification_result.json
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1.tar.gz
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/AUTHORS
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/COPYING
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/COPYING.LIB
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/ChangeLog
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Examples/ckbook.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Examples/pi.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Examples/primes.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Examples/twins.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/FAQ
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/INSTALL
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Makefile.am
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Makefile.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/NEWS
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/README
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/BUG.bc
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/array.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/arrayp.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/aryprm.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/atan.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/checklib.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/div.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/exp.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/fact.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/jn.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/ln.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/mul.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/raise.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/signum
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/sine.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/sqrt.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/sqrt1.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/sqrt2.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/testfn.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/Test/timetest
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/aclocal.m4
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/ar-lib
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/Makefile.am
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/Makefile.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/bc.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/bc.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/bc.y
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/bcdefs.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/const.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/execute.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/fix-libmath_h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/global.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/global.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/libmath.b
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/load.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/main.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/proto.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/sbc.y
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/scan.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/scan.l
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/storage.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/util.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/bc/warranty.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/compile
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/config.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/config.h.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/configure
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/configure.ac
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/Makefile.am
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/Makefile.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/array.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/dc-proto.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/dc-regdef.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/dc.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/dc.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/eval.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/misc.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/numeric.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/stack.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/dc/string.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/depcomp
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/Makefile.am
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/Makefile.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/bc.1
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/bc.info
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/bc.texi
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/dc.1
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/dc.info
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/dc.texi
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/texi-ver.incl.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/doc/texinfo.tex
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/h/getopt.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/h/number.h
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/install-sh
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/Makefile.am
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/Makefile.in
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/getopt.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/getopt1.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/number.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/testmul.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/lib/vfprintf.c
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/missing
+ delete mode 100644 stunir_execution_workspace/sources/bc-1.07.1/ylwrap
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6.tar.gz
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/Makefile
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/README
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/contents.html
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/index.css
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/logo.gif
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/lua.1
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/lua.css
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/luac.1
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/manual.css
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/manual.html
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/osi-certified-72x60.png
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/doc/readme.html
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/Makefile
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lapi.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lapi.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lauxlib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lauxlib.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lbaselib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lcode.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lcode.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lcorolib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lctype.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lctype.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ldblib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ldebug.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ldebug.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ldo.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ldo.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ldump.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lfunc.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lfunc.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lgc.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lgc.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/linit.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/liolib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ljumptab.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/llex.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/llex.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/llimits.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lmathlib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lmem.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lmem.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/loadlib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lobject.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lobject.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lopcodes.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lopcodes.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lopnames.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/loslib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lparser.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lparser.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lprefix.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lstate.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lstate.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lstring.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lstring.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lstrlib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ltable.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ltable.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ltablib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ltm.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/ltm.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lua.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lua.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lua.hpp
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/luac.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/luaconf.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lualib.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lundump.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lundump.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lutf8lib.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lvm.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lvm.h
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lzio.c
+ delete mode 100644 stunir_execution_workspace/sources/lua-5.4.6/src/lzio.h
+ delete mode 100644 stunir_execution_workspace/sources/sqlite-amalgamation-3450000.zip
+ delete mode 100644 stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/shell.c
+ delete mode 100644 stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/sqlite3.c
+ delete mode 100644 stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/sqlite3.h
+ delete mode 100644 stunir_execution_workspace/sources/sqlite-src/sqlite-amalgamation-3450000/sqlite3ext.h
+ delete mode 100644 stunir_execution_workspace/sqlite/build_result.json
+ delete mode 100644 stunir_execution_workspace/sqlite/codegen_result.json
+ delete mode 100644 stunir_execution_workspace/sqlite/corpus_manifest.json
+ delete mode 100644 stunir_execution_workspace/sqlite/environment.json
+ delete mode 100644 stunir_execution_workspace/sqlite/extraction_result.json
+ delete mode 100644 stunir_execution_workspace/sqlite/metadata.json
+ delete mode 100644 stunir_execution_workspace/sqlite/triage_result.json
+ delete mode 100644 stunir_execution_workspace/sqlite/verification_result.json
+ delete mode 100644 stunir_pipeline_fix_plan.json
+ delete mode 100644 stunir_refinement_plan.json
+ delete mode 100644 stunir_runs/ardupilot_crc/code_slice.json
+ delete mode 100644 stunir_runs/ardupilot_full/baseline_signatures.txt
+ delete mode 100644 stunir_runs/ardupilot_full/code_slice.json
+ delete mode 100644 stunir_runs/ardupilot_full/extraction.json
+ delete mode 100644 stunir_runs/ardupilot_full/extractions/extraction.json
+ delete mode 100644 stunir_runs/ardupilot_full/generated.cpp
+ delete mode 100644 stunir_runs/ardupilot_full/generated_final.cpp
+ delete mode 100644 stunir_runs/ardupilot_full/generated_full.cpp
+ delete mode 100644 stunir_runs/ardupilot_full/ir.json
+ delete mode 100644 stunir_runs/ardupilot_full/ir_clean.json
+ delete mode 100644 stunir_runs/ardupilot_full/ir_final.json
+ delete mode 100644 stunir_runs/ardupilot_full/ir_fixed.json
+ delete mode 100644 stunir_runs/ardupilot_full/ir_formatted.json
+ delete mode 100644 stunir_runs/ardupilot_full/ir_full.json
+ delete mode 100644 stunir_runs/ardupilot_full/local_toolchain.lock.json
+ delete mode 100644 stunir_runs/ardupilot_full/spec.json
+ delete mode 100644 stunir_runs/ardupilot_full/spec_only/local_toolchain.lock.json
+ delete mode 100644 stunir_runs/ardupilot_full/spec_only/spec.json
+ delete mode 100644 stunir_runs/index.json
+ delete mode 100644 stunir_spark_implementation_plan.json
+ delete mode 100644 stunir_spark_powertools_plan.json
+ delete mode 100644 test_confluence/confluence_run.log
+ delete mode 100644 test_outputs/ardupilot_production/generated_c/imu_health_monitor.o
+ delete mode 100644 test_outputs/ardupilot_production/generated_c/imu_health_monitor_strict.o
+ delete mode 100644 test_outputs/confluence_run.log
+ delete mode 100644 test_outputs/python_pipeline_v2/test_compile.o
+ delete mode 100644 test_outputs/v0.8.4_spark_final/break_while.o
+ delete mode 100644 test_outputs/week12_test/python_test.o
+ delete mode 100644 test_recursive/nested_2_levels.o
+ delete mode 100644 test_recursive/nested_3_levels.o
+ delete mode 100644 test_recursive/nested_4_levels.o
+ delete mode 100644 test_recursive/nested_5_levels.o
+ delete mode 100644 test_v084_rust_output/combined_features.o
+ delete mode 100644 test_v084_rust_output/switch_simple.o
+ rename {test_confluence => tests/test_confluence}/CONFLUENCE_REPORT.md (100%)
+ rename {test_confluence => tests/test_confluence}/WEEK2_STATUS.md (100%)
+ rename {test_confluence => tests/test_confluence}/WEEK2_STATUS.pdf (100%)
+ rename {test_confluence => tests/test_confluence}/confluence_results.json (100%)
+ rename {test_confluence => tests/test_confluence}/confluence_test_output.txt (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/asmIR/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/asp/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/assembly/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/beam/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/business/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/bytecode/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/constraints/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/embedded/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/expert/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/fpga/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/functional/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/gpu/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/grammar/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/lexer/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/lisp/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/mobile/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/oop/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/parser/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/planning/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/polyglot/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/prolog/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/scientific/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/systems/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/outputs/rust/wasm/ir.json (100%)
+ rename {test_confluence => tests/test_confluence}/specs/ardupilot_test/mavlink_handler.json (100%)
+ rename {test_confluence => tests/test_confluence}/specs/ardupilot_test/mavproxy_tool.json (100%)
+ rename {test_confluence => tests/test_confluence}/specs/asmIR_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/asp_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/assembly_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/beam_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/business_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/bytecode_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/constraints_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/embedded_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/expert_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/fpga_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/functional_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/gpu_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/grammar_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/lexer_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/lisp_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/mobile_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/oop_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/parser_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/planning_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/polyglot_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/prolog_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/scientific_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/systems_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/specs/wasm_test.stunir (100%)
+ rename {test_confluence => tests/test_confluence}/test_confluence.py (100%)
+ rename {test_harness => tests/test_harness}/haskell_pipeline_test.sh (100%)
+ rename {test_harness => tests/test_harness}/index.machine.json (100%)
+ rename {test_harness => tests/test_harness}/manifest.machine.json (100%)
+ rename {test_nested_control => tests/test_nested_control}/nested_if_flattened_ir.json (100%)
+ rename {test_nested_control => tests/test_nested_control}/nested_if_ir.json (100%)
+ rename {test_nested_control => tests/test_nested_control}/nested_if_ir_manual.json (100%)
+ rename {test_nested_control => tests/test_nested_control}/nested_if_spec.json (100%)
+ rename {test_nested_control => tests/test_nested_control}/output_python.c/nested_control_test.c (100%)
+ rename {test_nested_control => tests/test_nested_control}/output_spark.c (100%)
+ rename {test_nested_control => tests/test_nested_control}/simple_if_ir.json (100%)
+ rename {test_nested_control => tests/test_nested_control}/simple_output.c (100%)
+ rename {test_nested_control => tests/test_nested_control}/spark_output/nested_control_test.c (100%)
+ rename {test_outputs => tests/test_outputs}/PIPELINE_COMPARISON.md (100%)
+ rename {test_outputs => tests/test_outputs}/PIPELINE_COMPARISON.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/WEEK10_FEATURE_PARITY.md (100%)
+ rename {test_outputs => tests/test_outputs}/WEEK10_FEATURE_PARITY.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/WEEK11_FEATURE_PARITY_COMPARISON.md (100%)
+ rename {test_outputs => tests/test_outputs}/WEEK11_FEATURE_PARITY_COMPARISON.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/ARDUPILOT_TEST_REPORT.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/generated_code/manifest.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/generated_code/mavlink_handler.c (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/generated_code/mavlink_handler.h (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/ir_new.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot/test_result.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/README.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/asm/ardupilot_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/asm/stunir.emit.v1.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/generated_code/ada/ap_math_crc.adb (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/generated_code/c/ap_math_crc.c (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/generated_code/c_new/ap_math_crc.c (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/generated_code/rust/ap_math_crc.rs (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/generated_code/rust_new/ap_math_crc.rs (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/generated_code/spark_c/ap_math_crc.c (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/specs/ap_math_crc.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_do178c_test/specs/ap_math_vector2.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/README.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/design.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/design.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/integration.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/integration.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/requirements.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/docs/requirements.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/generated_c/imu_health_monitor.c (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/generated_c/imu_health_monitor.h (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/generated_c/manifest.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/generated_c/traceability.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/verification/do178c_verification_report.md (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/verification/do178c_verification_report.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/ardupilot_production/verification/sha256_manifest.txt (100%)
+ rename {test_outputs => tests/test_outputs}/code_to_spec_test/example_crc.c (100%)
+ rename {test_outputs => tests/test_outputs}/code_to_spec_test/test_toolchain.sh (100%)
+ rename {test_outputs => tests/test_outputs}/comparison/mavlink_handler.c (100%)
+ rename {test_outputs => tests/test_outputs}/comparison/mavlink_rust.c (100%)
+ rename {test_outputs => tests/test_outputs}/comparison/mavlink_spark.c (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/confluence_results.json (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/ir_python.json (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/ir_rust.json (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/output_python.c (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/output_spark.c (100%)
+ rename {test_outputs => tests/test_outputs}/confluence/python_out/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/fixtures/ardupilot_spark_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/generated/c/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/generated/c/stunir.emit.v1.json (100%)
+ rename {test_outputs => tests/test_outputs}/generated/rust/output.rs (100%)
+ rename {test_outputs => tests/test_outputs}/mini_os/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/Makefile (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/README.md (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/init.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/interrupts.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/interrupts.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/io.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/pmm.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/pmm.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/scheduler.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/scheduler.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/serial.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/serial.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/syscalls.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/syscalls.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/timer.c (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/timer.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/c/types.h (100%)
+ rename {test_outputs => tests/test_outputs}/minimal_os/ir/manifest.json (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline/mavlink_handler.c (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline/mavlink_handler.py (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline/mavlink_handler.rs (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline/test_log.txt (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline_v2/mavlink_handler.c (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline_v2/test_compile (100%)
+ rename {test_outputs => tests/test_outputs}/python_pipeline_v2/test_compile.c (100%)
+ rename {test_outputs => tests/test_outputs}/python_test/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/rust_function_bodies/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/rust_multifile/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/rust_pipeline/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/rust_pipeline/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/spark_function_bodies/mavlink_handler.c (100%)
+ rename {test_outputs => tests/test_outputs}/spark_multifile/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/spark_pipeline/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/spark_pipeline/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/spark_test/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/spark_test/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/test_flat_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/test_nested_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.6.1_test/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.6.1_test/ir_flat.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.6.1_test/output_spark.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.6.1_test/test_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.6.1_test/test_ir_flat.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.0_ir/01_basic_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.2_nested_2_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.2_nested_2_ir_flat.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_2/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_2/nested_2_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_2/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_3/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_3/nested_3_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_3/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_4/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_4/nested_4_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_4/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_5/ir_python_bench.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_5/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_5/ir_spark_bench.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_5/nested_5_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_level_5/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_mixed/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_mixed/mixed_nesting_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/final_mixed/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/isolated_level_3/nested_3_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/isolated_level_5/nested_5_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_2/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_2/nested_2_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_2/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_2_clean/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_2_clean/nested_2_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_2_clean/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_3/nested_3_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_4/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_4/nested_4_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_4/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/level_5/nested_5_levels_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/mixed/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/mixed/mixed_nesting_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/mixed/output.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/multi_level/ir_mixed_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/multi_level/ir_nested_2_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/multi_level/ir_nested_4_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/multi_level/ir_nested_5_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/multi_level/mixed_nesting_spec.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/single_level/ir_python.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/single_level/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/single_level/output_spark.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/single_level/output_spark_fixed.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/single_level/single_level_control_flow.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.3/single_level/test_program (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/all_tests.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/break_while.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/break_while_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/break_while_single_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/single_tests/break_nested/break_nested.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/single_tests/break_while/break_while.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/single_tests/combined_features/combined_features.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/single_tests/continue_for/continue_for.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/single_tests/switch_fallthrough/switch_fallthrough.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/single_tests/switch_simple/switch_simple.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/switch_simple.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark/switch_simple_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/TEST_REPORT.md (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/TEST_REPORT.pdf (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/break_nested.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/break_nested_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/break_nested_spec/break_nested.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/break_while.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/break_while_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/break_while_spec/break_while.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/combined_features.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/combined_features_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/combined_features_spec/combined_features.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/continue_for.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/continue_for_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/continue_for_spec/continue_for.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/switch_fallthrough.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/switch_fallthrough_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/switch_fallthrough_spec/switch_fallthrough.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/switch_simple.c (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/switch_simple_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.4_spark_final/switch_simple_spec/switch_simple.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.9_test/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.9_test/ir_rust.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.9_test/ir_spark.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0.8.9_test/output_spark.c (100%)
+ rename {test_outputs => tests/test_outputs}/v088_python_c/mavlink_handler.c (100%)
+ rename {test_outputs => tests/test_outputs}/v088_python_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v088_rust_c.c (100%)
+ rename {test_outputs => tests/test_outputs}/v088_rust_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v088_spark_c.c (100%)
+ rename {test_outputs => tests/test_outputs}/v088_spark_ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0_8_1/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/v0_8_1/ir_flat.json (100%)
+ rename {test_outputs => tests/test_outputs}/week12_test/ir.json (100%)
+ rename {test_outputs => tests/test_outputs}/week12_test/python_output.c/call_operations_test.c (100%)
+ rename {test_outputs => tests/test_outputs}/week12_test/rust_output.c (100%)
+ rename {test_outputs => tests/test_outputs}/week12_test/spark_output.c (100%)
+ rename {test_outputs => tests/test_outputs}/week13_python/control_flow_test.c (100%)
+ rename {test_outputs => tests/test_outputs}/week13_rust/control_flow.c (100%)
+ rename {test_outputs => tests/test_outputs}/week13_spark/control_flow.c (100%)
+ rename {test_pipeline => tests/test_pipeline}/python/ir.json (100%)
+ rename {test_pipeline => tests/test_pipeline}/rust/ir.json (100%)
+ rename {test_pipeline => tests/test_pipeline}/rust/output.py (100%)
+ rename {test_pipeline => tests/test_pipeline}/spark/ir.json (100%)
+ rename {test_pipeline => tests/test_pipeline}/spark/output.py (100%)
+ rename {test_pipeline => tests/test_pipeline}/spark/test_spec.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_c/mavlink_handler.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_javascript/mavlink_handler.js (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_python/mavlink_handler.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_python_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_python_ir_v2.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_rust/mavlink_handler.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ardupilot_wasm/mavlink_handler.wat (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/c_output/database_example.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/Makefile (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/config.h (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/module.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/module.h (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/module.ld (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/embedded_output/startup.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/js_output/database_example.js (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/database_example_c/database_example.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/database_example_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/database_example_py/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/database_example_python/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/database_example_rust/database_example.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/functional_example_c/functional_example.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/functional_example_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/functional_example_py/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/functional_example_python/functional_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/functional_example_rust/functional_example.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/gpu_example_c/gpu_example.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/gpu_example_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/gpu_example_py/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/gpu_example_python/gpu_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/gpu_example_rust/gpu_example.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/scientific_example_c/scientific_example.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/scientific_example_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/scientific_example_py/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/scientific_example_python/scientific_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/scientific_example_rust/scientific_example.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/web_example_c/web_example.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/web_example_ir.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/web_example_py/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/web_example_python/web_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/multi_category/web_example_rust/web_example.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/arm_asm/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/arm_asm/build.sh (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/arm_asm/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/arm_asm/module.s (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/c/mavlink_handler.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/Makefile (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/config.h (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/module.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/module.h (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/module.ld (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/embedded/startup.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/arm_vehicle.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/disarm_vehicle.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/get_battery_status.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/get_position.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/init_mavlink.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/module.xdc (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/module_tb.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/module_top.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/parse_heartbeat.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/request_heartbeat.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/send_heartbeat.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/send_land_cmd.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/send_takeoff_cmd.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/fpga/set_mode.v (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/gpu/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/gpu/build.sh (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/gpu/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/gpu/module.cu (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/gpu/module_host.cpp (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/javascript/mavlink_handler.js (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/python/mavlink_handler.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/rust/mavlink_handler.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/test_module.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/wasm/mavlink_handler.wat (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/wasm_target/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/wasm_target/build.sh (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/wasm_target/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/wasm_target/module.wat (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/x86_asm/README.md (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/x86_asm/build.sh (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/x86_asm/manifest.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output/x86_asm/module.asm (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output_asm/test_module.s (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output_c/test_module.c (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output_js/test_module.js (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output_rust/test_module.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/output_wasm/test_module.wat (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/python_output/database_example.py (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/rust_output/database_example.rs (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/spec/test_module.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs/database_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs/functional_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs/gpu_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs/scientific_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs/simple_test.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs/web_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs_individual/database_example/database_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs_individual/functional_example/functional_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs_individual/gpu_example/gpu_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs_individual/scientific_example/scientific_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/specs_individual/web_example/web_example.json (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/test_all_emitters.sh (100%)
+ rename {test_python_pipeline => tests/test_python_pipeline}/wasm_output/database_example.wat (100%)
+ rename {test_recursive => tests/test_recursive}/nested_2_levels.c (100%)
+ rename {test_recursive => tests/test_recursive}/nested_2_levels.json (100%)
+ rename {test_recursive => tests/test_recursive}/nested_3_levels.c (100%)
+ rename {test_recursive => tests/test_recursive}/nested_3_levels.json (100%)
+ rename {test_recursive => tests/test_recursive}/nested_4_levels.c (100%)
+ rename {test_recursive => tests/test_recursive}/nested_4_levels.json (100%)
+ rename {test_recursive => tests/test_recursive}/nested_5_levels.c (100%)
+ rename {test_recursive => tests/test_recursive}/nested_5_levels.json (100%)
+ rename {test_recursive => tests/test_recursive}/test_runner (100%)
+ rename {test_recursive => tests/test_recursive}/test_runner.c (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_c.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_cpp.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_csharp.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_go.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_java.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_javascript.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_python.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_rust.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/ir_typescript.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_c (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_cpp (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_csharp (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_go (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_java (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_javascript (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_python (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_rust (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/output_typescript (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/comprehensive_tests/test_all_categories.sh (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/ir.json (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/output.py (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/output_c (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/output_cpp (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/output_go (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/output_javascript (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/output_rust (100%)
+ rename {test_spark_pipeline => tests/test_spark_pipeline}/specs/test_spec.json (100%)
+ rename {test_specs => tests/test_specs}/single_level_control_flow.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.2_multi_level/mixed_nesting_spec.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.2_multi_level/nested_2_levels_spec.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.2_multi_level/nested_3_levels_spec.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.2_multi_level/nested_4_levels_spec.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.2_multi_level/nested_5_levels_spec.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.4/break_nested.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.4/break_while.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.4/combined_features.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.4/continue_for.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.4/switch_fallthrough.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.4/switch_simple.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.7/exception_propagation.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.7/nested_try.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.7/try_catch.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.7/try_catch_finally.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.7/try_finally.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.8/arrays.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.8/combined_structures.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.8/maps.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.8/sets.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.8/structs.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.9/combined_optimization.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.9/generics.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.9/optimization_constant_fold.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.9/optimization_dead_code.json (100%)
+ rename {test_specs => tests/test_specs}/v0.8.9/templates.json (100%)
+ rename {test_v084_python_output => tests/test_v084_python_output}/break_while.c/break_while_test.c (100%)
+ rename {test_v084_python_output => tests/test_v084_python_output}/break_while_ir.json (100%)
+ rename {test_v084_python_output => tests/test_v084_python_output}/break_while_spec/break_while.json (100%)
+ rename {test_v084_python_output => tests/test_v084_python_output}/switch_simple.c/switch_simple_test.c (100%)
+ rename {test_v084_python_output => tests/test_v084_python_output}/switch_simple_ir.json (100%)
+ rename {test_v084_python_output => tests/test_v084_python_output}/switch_simple_spec/switch_simple.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/break_nested.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/break_nested_ir.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/break_while.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/break_while_ir.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/combined_features.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/combined_features_ir.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/continue_for.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/continue_for_ir.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/python_merged.c/break_nested_test.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/python_merged_ir.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/switch_fallthrough.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/switch_fallthrough_ir.json (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/switch_simple.c (100%)
+ rename {test_v084_rust_output => tests/test_v084_rust_output}/switch_simple_ir.json (100%)
+ rename {test_vectors => tests/test_vectors}/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/__init__.py (100%)
+ rename {test_vectors => tests/test_vectors}/asp/hello.lp (100%)
+ rename {test_vectors => tests/test_vectors}/asp/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/asp/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/base.py (100%)
+ rename {test_vectors => tests/test_vectors}/c/hello.c (100%)
+ rename {test_vectors => tests/test_vectors}/c/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/c/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/chaos/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/chaos/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/conformance_0001.sha256 (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/gen_vectors.py (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/manifest.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/tv_contracts_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/tv_contracts_002.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/tv_contracts_003.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/tv_contracts_004.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/tv_contracts_005.json (100%)
+ rename {test_vectors => tests/test_vectors}/contracts/validate.py (100%)
+ rename {test_vectors => tests/test_vectors}/datalog/hello.dl (100%)
+ rename {test_vectors => tests/test_vectors}/datalog/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/datalog/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/dotnet/Hello/Hello.csproj (100%)
+ rename {test_vectors => tests/test_vectors}/dotnet/Hello/Program.cs (100%)
+ rename {test_vectors => tests/test_vectors}/dotnet/Hello/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/dotnet/Hello/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/dotnet/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/dotnet/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/gen_vectors.py (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/manifest.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_002.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_003.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_004.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_005.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_006.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/tv_edge_cases_007.json (100%)
+ rename {test_vectors => tests/test_vectors}/edge_cases/validate.py (100%)
+ rename {test_vectors => tests/test_vectors}/full_pipeline/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/full_pipeline/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/fuzz/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/fuzz/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/go/hello/go.mod (100%)
+ rename {test_vectors => tests/test_vectors}/go/hello/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/go/hello/main.go (100%)
+ rename {test_vectors => tests/test_vectors}/go/hello/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/go/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/go/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/haskell/Hello.hs (100%)
+ rename {test_vectors => tests/test_vectors}/haskell/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/haskell/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/ir_001_basic.expected.json (100%)
+ rename {test_vectors => tests/test_vectors}/java/Hello.java (100%)
+ rename {test_vectors => tests/test_vectors}/java/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/java/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/julia/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/julia/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/julia/write_out.jl (100%)
+ rename {test_vectors => tests/test_vectors}/lisp/hello_sbcl.lisp (100%)
+ rename {test_vectors => tests/test_vectors}/lisp/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/lisp/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/lua/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/lua/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/lua/write_out.lua (100%)
+ rename {test_vectors => tests/test_vectors}/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/minizinc/hello.mzn (100%)
+ rename {test_vectors => tests/test_vectors}/minizinc/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/minizinc/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/mutation/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/mutation/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/native/gen_vectors.py (100%)
+ rename {test_vectors => tests/test_vectors}/native/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/manifest.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/tv_native_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/tv_native_002.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/tv_native_003.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/tv_native_004.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/tv_native_005.json (100%)
+ rename {test_vectors => tests/test_vectors}/native/validate.py (100%)
+ rename {test_vectors => tests/test_vectors}/node/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/node/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/node/write_out.js (100%)
+ rename {test_vectors => tests/test_vectors}/pack_0001.dcbor.sha256 (100%)
+ rename {test_vectors => tests/test_vectors}/pack_0001.json (100%)
+ rename {test_vectors => tests/test_vectors}/performance/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/performance/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/php/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/php/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/php/write_out.php (100%)
+ rename {test_vectors => tests/test_vectors}/pipeline/expected_pipeline.sha256 (100%)
+ rename {test_vectors => tests/test_vectors}/pipeline/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/pipeline/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/pipeline/spec_pipeline_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/gen_vectors.py (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/manifest.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/tv_polyglot_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/tv_polyglot_002.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/tv_polyglot_003.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/tv_polyglot_004.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/tv_polyglot_005.json (100%)
+ rename {test_vectors => tests/test_vectors}/polyglot/validate.py (100%)
+ rename {test_vectors => tests/test_vectors}/prolog/hello.pl (100%)
+ rename {test_vectors => tests/test_vectors}/prolog/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/prolog/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/property/gen_vectors.py (100%)
+ rename {test_vectors => tests/test_vectors}/property/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/manifest.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_002.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_003.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_004.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_005.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_006.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/tv_property_007.json (100%)
+ rename {test_vectors => tests/test_vectors}/property/validate.py (100%)
+ rename {test_vectors => tests/test_vectors}/python/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/python/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/python/write_out.py (100%)
+ rename {test_vectors => tests/test_vectors}/r/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/r/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/r/write_out.R (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/README.md (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/gen_vectors.py (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/manifest.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/tv_receipts_001.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/tv_receipts_002.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/tv_receipts_003.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/tv_receipts_004.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/tv_receipts_005.json (100%)
+ rename {test_vectors => tests/test_vectors}/receipts/validate.py (100%)
+ rename {test_vectors => tests/test_vectors}/ruby/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/ruby/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/ruby/write_out.rb (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/Cargo.lock (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/Cargo.toml (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/src/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/src/main.rs (100%)
+ rename {test_vectors => tests/test_vectors}/rust/hello_rust/src/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/rust/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/rust/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/smt/hello.smt2 (100%)
+ rename {test_vectors => tests/test_vectors}/smt/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/smt/manifest.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/spec_001_basic.json (100%)
+ rename {test_vectors => tests/test_vectors}/wasm/hello.wat (100%)
+ rename {test_vectors => tests/test_vectors}/wasm/index.machine.json (100%)
+ rename {test_vectors => tests/test_vectors}/wasm/manifest.machine.json (100%)
