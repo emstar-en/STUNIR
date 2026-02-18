@@ -194,7 +194,7 @@ package body STUNIR_Code_Index is
          return;
       end if;
 
-      Start_Search (Search, Root, "*", [Directory => True, others => True]);
+      Start_Search (Search, Root, "*", (Directory => True, others => True));
 
       while More_Entries (Search) loop
          Get_Next_Entry (Search, Dir_Ent);

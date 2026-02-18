@@ -1,0 +1,28 @@
+ir_converter_main.adb:48:41: error: "Max_Path_Length" is undefined (more references follow)
+ir_converter_main.adb:88:41: error: "Max_Identifier_Length" is undefined
+ir_converter.ads:22:14: error: "Identifier_String" is undefined (more references follow)
+ir_converter.ads:23:18: error: "Type_Name_String" is undefined (more references follow)
+ir_converter.ads:28:21: error: "Parameter_List" is undefined (more references follow)
+ir_converter.ads:38:19: error: "Function_Collection" is undefined
+ir_converter.ads:59:21: error: "Step_Index" is undefined
+ir_converter.ads:66:24: error: "IR_Function_Collection" is undefined
+ir_converter.ads:88:21: error: "Identifier_Strings" is undefined (more references follow)
+ir_converter.ads:113:25: error: "Parameter" is undefined (more references follow)
+ir_converter.ads:118:18: error: invalid prefix in selected component "IR_Arg"
+ir_converter.ads:118:24: error: prefixed call is only allowed for objects of a tagged type unless -gnatX is used
+ir_converter.ads:118:32: error: invalid prefix in selected component "Spec_Arg"
+ir_converter.ads:118:40: error: prefixed call is only allowed for objects of a tagged type unless -gnatX is used
+ir_converter.ads:119:18: error: invalid prefix in selected component "IR_Arg"
+ir_converter.ads:119:38: error: invalid prefix in selected component "Spec_Arg"
+ir_converter.ads:122:26: error: "Function_Signature" is undefined
+ir_converter.ads:123:26: error: "IR_Function" is undefined (more references follow)
+ir_converter.ads:127:18: error: invalid prefix in selected component "IR_Func"
+ir_converter.ads:127:25: error: prefixed call is only allowed for objects of a tagged type unless -gnatX is used
+ir_converter.ads:127:33: error: invalid prefix in selected component "Spec_Func"
+ir_converter.ads:127:42: error: prefixed call is only allowed for objects of a tagged type unless -gnatX is used
+ir_converter.ads:128:18: error: invalid prefix in selected component "IR_Func"
+ir_converter.ads:128:40: error: invalid prefix in selected component "Spec_Func"
+ir_converter.ads:135:18: error: invalid prefix in selected component "IR_Func"
+ir_converter.ads:135:40: error: invalid prefix in selected component "IR_Func"
+ir_converter.ads:142:28: error: "Path_String" is undefined (more references follow)
+ir_converter.ads:147:15: error: "Path_Strings" is undefined (more references follow)

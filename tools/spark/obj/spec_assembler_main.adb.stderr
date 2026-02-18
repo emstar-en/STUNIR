@@ -1,0 +1,13 @@
+spec_assembler_main.adb:87:07: error: "Is_Success" is undefined
+spec_assembler_main.adb:90:24: error: "Success" is not visible
+spec_assembler_main.adb:90:24: error: multiple use clauses cause hiding
+spec_assembler_main.adb:90:24: error: hidden declaration at stunir_types.ads:56
+spec_assembler_main.adb:90:24: error: hidden declaration at a-comlin.ads:76
+spec_assembler_main.adb:92:29: error: "Status_Code_Image" is undefined
+spec_assembler.ads:22:21: error: "Identifier_String" is undefined (more references follow)
+spec_assembler.ads:23:21: error: "Type_Name_String" is undefined (more references follow)
+spec_assembler.ads:24:21: error: "Parameter_List" is undefined (more references follow)
+spec_assembler.ads:35:21: error: "Path_String" is undefined (more references follow)
+spec_assembler.ads:66:19: error: "Function_Collection" is undefined
+spec_assembler.ads:105:15: error: "Identifier_Strings" is undefined (more references follow)
+spec_assembler.ads:128:15: error: "Path_Strings" is undefined (more references follow)

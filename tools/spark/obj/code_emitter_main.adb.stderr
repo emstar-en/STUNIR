@@ -1,0 +1,22 @@
+code_emitter_main.adb:32:17: error: "Target_CPP" is undefined (more references follow)
+code_emitter_main.adb:34:17: error: "Target_C" is undefined
+code_emitter_main.adb:36:17: error: "Target_Python" is undefined
+code_emitter_main.adb:38:17: error: "Target_Rust" is undefined
+code_emitter_main.adb:40:17: error: "Target_Go" is undefined
+code_emitter_main.adb:42:17: error: "Target_Java" is undefined
+code_emitter_main.adb:44:17: error: "Target_JavaScript" is undefined (more references follow)
+code_emitter_main.adb:48:17: error: "Target_SPARK" is undefined (more references follow)
+code_emitter_main.adb:80:41: error: "Max_Path_Length" is undefined (more references follow)
+code_emitter_main.adb:123:41: error: "Max_Identifier_Length" is undefined
+code_emitter.ads:33:16: error: "IR_Opcode" is undefined
+code_emitter.ads:37:18: error: "Identifier_String" is undefined (more references follow)
+code_emitter.ads:38:18: error: "Type_Name_String" is undefined (more references follow)
+code_emitter.ads:44:21: error: "Parameter_List" is undefined
+code_emitter.ads:45:21: error: "Step_Collection" is undefined
+code_emitter.ads:52:24: error: "IR_Function_Collection" is undefined
+code_emitter.ads:61:24: error: "Target_Language" is undefined (more references follow)
+code_emitter.ads:66:18: error: "Type_Name_Strings" is undefined
+code_emitter.ads:73:26: error: "IR_Function" is undefined
+code_emitter.ads:139:15: error: "Identifier_Strings" is undefined (more references follow)
+code_emitter.ads:146:29: error: "Path_String" is undefined (more references follow)
+code_emitter.ads:151:15: error: "Path_Strings" is undefined (more references follow)

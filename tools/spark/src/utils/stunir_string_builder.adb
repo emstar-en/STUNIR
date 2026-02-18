@@ -13,7 +13,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 package body STUNIR_String_Builder is
 
    --  Newline character constant
-   NL : constant String := [1 => Character'Val (10)];
+   NL : constant String := (1 => Character'Val (10));
 
    --  Initialize a new string builder
    procedure Initialize (Builder : out String_Builder) is
