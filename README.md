@@ -68,17 +68,17 @@ Think of it as a **safety harness for AI code generation**:
 
 ## Ada SPARK is the Default Implementation Language
 
-**STUNIR uses Ada SPARK as its DEFAULT implementation language for all tools.**
+**STUNIR uses Ada SPARK as its PRIMARY and AUTHORITATIVE implementation language for all tools.**
 
-Python implementations are fully functional alternatives suitable for many use cases.
+Python implementations serve as **reference documentation only** to illustrate the algorithms. For production use, AI orchestration, or any deterministic pipeline execution, use the Ada SPARK tools.
 
 ### Tool Options: Choose Based on Your Needs
 
-| Priority | Implementation | Best For | Tools |
-|----------|---------------|----------|-------|
-| **1. DEFAULT** | **Ada SPARK** | Safety-critical, formal verification, DO-178C Level A | Precompiled binaries (recommended) or build from source |
-| 2. Alternative | Python | Rapid prototyping, development, ease of modification | `tools/scripts/spec_to_ir.py`, `tools/scripts/ir_to_code.py` |
-| 3. Native | Rust/Haskell | High-performance verification | `stunir-native` (when available) |
+| Priority | Implementation | Purpose | Status |
+|----------|---------------|---------|--------|
+| **1. PRIMARY** | **Ada SPARK** | Production use, formal verification, deterministic receipts, DO-178C Level A | ✅ Functional (basic pipeline) |
+| 2. Reference | Python | Algorithm documentation, understanding tool behavior | ⚠️ Reference only - not for production |
+| 3. Native | Rust/Haskell | High-performance verification (future) | ⏳ Planned |
 
 ### Precompiled SPARK Binaries (Recommended for ALPHA Testing)
 
@@ -118,23 +118,26 @@ gprbuild -P stunir_tools.gpr
 - GNAT compiler with SPARK support (FSF GNAT 12+ or GNAT Community Edition)
 - See [`tools/spark/README.md`](tools/spark/README.md) for detailed build instructions
 
-### Python Tools (Alternative Pipeline)
+### Python Tools (Reference Documentation Only)
 
-Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a fully functional alternative:
+**CRITICAL: Python implementations (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) are REFERENCE DOCUMENTATION, not production tools.**
 
-**When to use Python:**
-- ✅ Rapid prototyping and development workflows
-- ✅ Easier to read, understand, and modify
-- ✅ When GNAT/SPARK toolchain is unavailable
-- ✅ CI/CD pipelines where speed matters more than formal verification
-- ✅ Learning and experimentation
+**Purpose of Python implementations:**
+- 📖 Illustrate the spec→IR and IR→code algorithms in readable form
+- 🔍 Help AI models understand what the Ada tools do
+- 📚 Provide clear, commented examples of the transformation logic
+- 🎓 Educational reference for understanding the pipeline
 
-**When to prefer Ada SPARK:**
-- Safety-critical applications requiring DO-178C compliance
-- ALPHA prototype systems requiring formal verification
-- Reproducible builds with maximum determinism
+**For production use, ALWAYS use Ada SPARK binaries** (`tools/spark/bin/stunir_spec_to_ir_main`, `stunir_ir_to_code_main`)
 
-**Both pipelines produce identical IR output** - choose based on your verification and workflow needs.
+**Why Ada SPARK is required for production:**
+- ✅ Deterministic execution with formal verification
+- ✅ Receipt generation with cryptographic binding
+- ✅ Hash-stable canonical output
+- ✅ No runtime variations between executions
+- ✅ DO-178C compliance support
+
+Python tools may produce functionally similar output but lack the determinism guarantees and receipt attestation required by STUNIR's architecture.
 
 ---
 
