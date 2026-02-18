@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
 with GNAT.Command_Line;
+with GNAT.Strings;
 
 with STUNIR_JSON_Parser;
 with STUNIR_Types;
@@ -18,6 +19,7 @@ procedure Sig_Gen_Rust is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use GNAT.Strings;
    use STUNIR_JSON_Parser;
    use STUNIR_Types;
 
@@ -28,13 +30,13 @@ procedure Sig_Gen_Rust is
 
    --  Configuration
    Input_File    : Unbounded_String := Null_Unbounded_String;
-   Output_File   : Unbounded_String := Null_Unbounded_String;
-   Module_Name   : Unbounded_String := Null_Unbounded_String;
-   Verbose_Mode  : Boolean := False;
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
-   Unsafe_FFI    : Boolean := True;
+   Output_File   : aliased GNAT.Strings.String_Access := new String'("");
+   Module_Name   : aliased GNAT.Strings.String_Access := new String'("");
+   Verbose_Mode  : aliased Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
+   Unsafe_FFI    : aliased Boolean := True;
 
    Version : constant String := "0.1.0-alpha";
 
@@ -139,18 +141,18 @@ procedure Sig_Gen_Rust is
 
    procedure Write_Output (Content : String) is
    begin
-      if Output_File = Null_Unbounded_String then
+      if Output_File.all'Length = 0 then
          Put_Line (Content);
       else
          declare
             File : File_Type;
          begin
-            Create (File, Out_File, To_String (Output_File));
+            Create (File, Out_File, Output_File.all);
             Put (File, Content);
             Close (File);
          exception
             when others =>
-               Print_Error ("Cannot write: " & To_String (Output_File));
+               Print_Error ("Cannot write: " & Output_File.all);
          end;
       end if;
    end Write_Output;
@@ -213,7 +215,7 @@ procedure Sig_Gen_Rust is
 
       Current_Func : JSON_String := JSON_Strings.Null_Bounded_String;
       Current_Return : JSON_String := JSON_Strings.To_Bounded_String ("c_void");
-      Current_Params : JSON_String := JSON_Strings.Null_Bounded_String;
+      Current_Params : Unbounded_String := Null_Unbounded_String;
    begin
       if Spec_JSON'Length = 0 then
          return "// Empty spec";
@@ -231,8 +233,8 @@ procedure Sig_Gen_Rust is
       Append (Result, ASCII.LF);
 
       --  Module start
-      if Module_Name /= Null_Unbounded_String then
-         Append (Result, "pub mod " & To_String (Module_Name) & " {" & ASCII.LF);
+      if Module_Name.all'Length > 0 then
+         Append (Result, "pub mod " & Module_Name.all & " {" & ASCII.LF);
          Append (Result, ASCII.LF);
          Append (Result, "    use std::os::raw::{c_void, c_int, c_char, c_float, c_double};" & ASCII.LF);
          Append (Result, "    use std::os::raw::{c_short, c_long, c_uint, c_uchar, c_ushort, c_ulong};" & ASCII.LF);
@@ -309,7 +311,7 @@ procedure Sig_Gen_Rust is
                                        exit when Status /= STUNIR_Types.Success;
 
                                        if PKey = "name" and then State.Current_Token = Token_String then
-                                          Param_Name := State.Token_Value;
+                                          Param_Name := To_Unbounded_String (STUNIR_Types.JSON_Strings.To_String (State.Token_Value));
                                        elsif PKey = "type" and then State.Current_Token = Token_String then
                                           Param_Type := To_Unbounded_String (Map_C_To_Rust (STUNIR_Types.JSON_Strings.To_String (State.Token_Value)));
                                        else
@@ -325,9 +327,9 @@ procedure Sig_Gen_Rust is
                                  Append (Current_Params, ", ");
                               end if;
                               First_Param := False;
-                              Append (Current_Params, STUNIR_Types.JSON_Strings.To_String (Param_Name));
+                              Append (Current_Params, To_String (Param_Name));
                               Append (Current_Params, ": ");
-                              Append (Current_Params, STUNIR_Types.JSON_Strings.To_String (Param_Type));
+                              Append (Current_Params, To_String (Param_Type));
                            end;
                         elsif State.Current_Token = Token_Array_End then
                            Param_Depth := Param_Depth - 1;
@@ -340,10 +342,10 @@ procedure Sig_Gen_Rust is
             end;
          elsif State.Current_Token = Token_Object_End and then In_Functions then
             --  End of function - generate signature
-            if Current_Func /= JSON_Strings.Null_Bounded_String then
+            if JSON_Strings."/=" (Current_Func, JSON_Strings.Null_Bounded_String) then
                Function_Count := Function_Count + 1;
 
-               if Module_Name /= Null_Unbounded_String then
+               if Module_Name.all'Length > 0 then
                   Append (Result, "    ");
                end if;
 
@@ -360,13 +362,13 @@ procedure Sig_Gen_Rust is
                   Append (Result, "(" & To_String (Current_Params) & ")");
                   Append (Result, " -> " & STUNIR_Types.JSON_Strings.To_String (Current_Return));
                   Append (Result, " {" & ASCII.LF);
-                  if Module_Name /= Null_Unbounded_String then
+                  if Module_Name.all'Length > 0 then
                      Append (Result, "        ");
                   else
                      Append (Result, "    ");
                   end if;
                   Append (Result, "// TODO: Safe wrapper implementation" & ASCII.LF);
-                  if Module_Name /= Null_Unbounded_String then
+                  if Module_Name.all'Length > 0 then
                      Append (Result, "    }" & ASCII.LF);
                   else
                      Append (Result, "}" & ASCII.LF);
@@ -380,8 +382,8 @@ procedure Sig_Gen_Rust is
       end loop;
 
       --  Module end
-      if Module_Name /= Null_Unbounded_String then
-         Append (Result, "} // mod " & To_String (Module_Name) & ASCII.LF);
+      if Module_Name.all'Length > 0 then
+         Append (Result, "} // mod " & Module_Name.all & ASCII.LF);
       end if;
 
       Print_Info ("Generated" & Function_Count'Img & " Rust signatures");
@@ -396,7 +398,7 @@ begin
    GNAT.Command_Line.Define_Switch (Config, Show_Version'Access, "-v", "--version");
    GNAT.Command_Line.Define_Switch (Config, Show_Describe'Access, "", "--describe");
    GNAT.Command_Line.Define_Switch (Config, Verbose_Mode'Access, "", "--verbose");
-   GNAT.Command_Line.Define_Switch (Config, Unsafe_FFI'Access, "", "--safe", "", GNAT.Command_Line.Disable_Abbr);
+   GNAT.Command_Line.Define_Switch (Config, Unsafe_FFI'Access, "", "--safe");
    GNAT.Command_Line.Define_Switch (Config, Module_Name'Access, "-m:", "--module=");
    GNAT.Command_Line.Define_Switch (Config, Output_File'Access, "-o:", "--output=");
 
@@ -434,6 +436,10 @@ begin
          Input_File := To_Unbounded_String (Arg);
       end if;
    end;
+
+   if Module_Name.all'Length > 0 then
+      null;  --  Module name is set
+   end if;
 
    declare
       Content : constant String := Read_Input;
