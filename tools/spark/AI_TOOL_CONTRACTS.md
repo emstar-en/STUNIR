@@ -4,17 +4,29 @@
 
 **For AI Models**: Read these contracts to understand what each tool does, then invoke the actual Ada SPARK binaries. Do NOT reimplement these tools - orchestrate them.
 
+**IMPORTANT - Development Status**:
+- **Ada SPARK**: PRIMARY implementation, PARTIALLY FUNCTIONAL, being developed NOW
+- **Python**: INCOMPLETE, development planned AFTER SPARK completion
+- Both pipelines are under active development
+- SPARK is the focus TODAY, Python will be focus LATER
+
 ---
 
 ## Tool: stunir_spec_to_ir
 
-**Binary Location**: 
+**Binary Location**:
 - Precompiled: `precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main`
 - Source build: `tools/spark/bin/stunir_spec_to_ir_main`
 
 **Purpose**: Converts specification JSON files to canonical Intermediate Reference (IR) format.
 
 **Implementation**: `tools/spark/src/stunir_spec_to_ir.adb` (lines 1-475)
+
+**Development Status**:
+- 🔨 PARTIALLY FUNCTIONAL - basic pipeline works
+- 🔨 Active development in progress
+- ✅ Basic spec→IR conversion functional
+- 🔨 Complete transformation logic in development
 
 ### Command Line Interface
 
@@ -389,15 +401,29 @@ Output JSON:
 4. **Chain tools**: spec → IR → code
 5. **Report errors** with context from stderr
 
-**Remember**: These Ada SPARK tools are AUTHORITATIVE and PRODUCTION-READY. They provide:
-- ✅ Deterministic execution
-- ✅ Formal verification guarantees
-- ✅ Receipt generation (planned)
-- ✅ Hash-stable outputs
-- ✅ Complete functional pipeline NOW
+**Remember**: These Ada SPARK tools are the PRIMARY IMPLEMENTATION (partially functional):
+- 🔨 UNDER ACTIVE DEVELOPMENT - being completed NOW
+- ✅ Basic pipeline functional (spec→IR→code stubs)
+- ✅ Deterministic execution architecture in place
+- 🔨 Complete IR transformation logic in development
+- 🔨 Full code generation in development
+- 🔨 Receipt generation planned (Phase 3)
+- 🔨 Formal verification with SPARK proofs in progress
+
+**Current Capabilities**:
+- Can convert specs to IR (basic functionality)
+- Can generate code stubs in multiple languages
+- Command-line tools functional
+- Deterministic processing enforced
+
+**In Development**:
+- Complete transformation pipeline
+- Full code body generation
+- Receipt and verification system
+- SPARK formal proofs
 
 **Python implementations** in `tools/*.py` are **UNDER DEVELOPMENT** (incomplete):
-- Status: Partial functionality, not fully aligned with SPARK pipeline
+- Status: Partial functionality, not aligned with current SPARK development
 - Purpose: Will become full production alternative when complete
-- Timeline: Future release - many users waiting for completion
-- Current use: Can read for algorithm understanding, but not for production orchestration
+- Timeline: Development begins AFTER SPARK completion
+- Current use: Can read for algorithm understanding only

@@ -70,19 +70,19 @@ Think of it as a **safety harness for AI code generation**:
 
 **STUNIR uses Ada SPARK as its PRIMARY implementation language for all tools.**
 
-**Current Status**: Ada SPARK is the ONLY fully functional pipeline. Python and other language implementations are under active development.
+**Current Status**: Both Ada SPARK and Python pipelines are under active development. SPARK is the PRIMARY FOCUS being developed NOW.
 
 ### Tool Options: Choose Based on Your Needs
 
-| Priority | Implementation | Status | Timeline |
-|----------|---------------|--------|----------|
-| **1. PRIMARY** | **Ada SPARK** | ✅ **Complete and functional** | Available now |
-| 2. Alternative | Python | 🔨 **Under development** (incomplete) | Future release |
+| Priority | Implementation | Status | Development Focus |
+|----------|---------------|--------|-------------------|
+| **1. PRIMARY** | **Ada SPARK** | 🔨 **Partially functional** (active development) | **Being developed NOW** |
+| 2. Alternative | Python | 🔨 **Incomplete** (future development) | Development planned after SPARK |
 | 3. Native | Rust/Haskell | ⏳ Planned | Future |
 
 ### Precompiled SPARK Binaries (Recommended for ALPHA Testing)
 
-STUNIR provides **precompiled Ada SPARK binaries** that eliminate the need for GNAT compiler installation:
+STUNIR provides **precompiled Ada SPARK binaries** for testing current functionality:
 
 ```bash
 # Spec to IR conversion
@@ -118,15 +118,40 @@ gprbuild -P stunir_tools.gpr
 - GNAT compiler with SPARK support (FSF GNAT 12+ or GNAT Community Edition)
 - See [`tools/spark/README.md`](tools/spark/README.md) for detailed build instructions
 
-### Python Tools (Under Development)
-
-**STATUS: Python implementations (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) are INCOMPLETE and under active development.**
+### Ada SPARK Status (Primary Development - Active NOW)
 
 **Current State:**
-- ⚠️ Partial functionality implemented
-- ⚠️ Not fully aligned with Ada SPARK pipeline
-- ⚠️ Missing receipt generation and verification
+- 🔨 Basic pipeline partially functional
+- 🔨 Core tools implemented but incomplete
+- 🔨 Active development in progress
+- 🎯 Primary focus for completion
+
+**What Works:**
+- ✅ Spec to IR conversion (basic functionality)
+- ✅ IR to code emission (stub generation)
+- ✅ Command-line interfaces functional
+
+**In Development:**
+- 🔨 Complete IR transformation logic
+- 🔨 Full code generation for all targets
+- 🔨 Receipt generation and verification
+- 🔨 Formal verification with SPARK proofs
+
+**Why SPARK is the Priority:**
+- Deterministic execution with formal verification
+- DO-178C compliance support
+- Hash-stable canonical output
+- Foundation for all other pipelines
+
+### Python Tools (Future Development)
+
+**STATUS: Python implementations (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) are INCOMPLETE. Development will begin after SPARK completion.**
+
+**Current State:**
+- ⚠️ Partial functionality exists
+- ⚠️ Not aligned with current SPARK development
 - ⚠️ Not production-ready
+- 📅 Scheduled for development AFTER SPARK
 
 **Intended Purpose (when complete):**
 - Full production pipeline alternative to Ada SPARK
@@ -134,16 +159,7 @@ gprbuild -P stunir_tools.gpr
 - Suitable for rapid prototyping and development
 - Lower barrier to entry (no GNAT toolchain required)
 
-**For production use NOW, use Ada SPARK binaries** (`tools/spark/bin/stunir_spec_to_ir_main`, `stunir_ir_to_code_main`)
-
-**Why Ada SPARK is production-ready:**
-- ✅ Deterministic execution with formal verification
-- ✅ Complete spec→IR→code pipeline functional
-- ✅ Hash-stable canonical output
-- ✅ No runtime variations between executions
-- ✅ DO-178C compliance support
-
-**Python pipeline completion is planned** and many users are waiting for it. It will provide full production capability when development is complete.
+**Timeline:** Python pipeline development is planned and many users are waiting for it. It will be developed after the SPARK pipeline is complete.
 
 ---
 
