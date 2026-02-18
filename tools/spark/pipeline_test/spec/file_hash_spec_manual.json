@@ -1,0 +1,59 @@
+{
+  "spec_version": "1.0.0",
+  "tool_name": "file_hash",
+  "version": "0.1.0",
+  "description": "Compute SHA-256 hash of files",
+  "source_language": "Ada",
+  "functions": [
+    {
+      "name": "Compute_Hash",
+      "description": "Computes SHA-256 hash of a file",
+      "parameters": [
+        {
+          "name": "file_name",
+          "type": "String",
+          "description": "Path to file to hash"
+        }
+      ],
+      "return_type": "String",
+      "return_description": "SHA-256 hash as hex string (64 characters)"
+    }
+  ],
+  "cli": {
+    "usage": "file_hash [--describe] <file_path>",
+    "arguments": [
+      {
+        "name": "file_path",
+        "type": "positional",
+        "required": true,
+        "description": "Path to file to hash"
+      }
+    ],
+    "options": [
+      {
+        "name": "--describe",
+        "type": "flag",
+        "description": "Show metadata about hash computation"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "hash",
+        "type": "stdout",
+        "format": "hex_string",
+        "description": "SHA-256 hash of file"
+      }
+    ],
+    "exit_codes": [
+      {"code": 0, "description": "Success"},
+      {"code": 1, "description": "File not found"},
+      {"code": 2, "description": "Permission denied or invalid usage"},
+      {"code": 3, "description": "IO error or invalid hash format"}
+    ]
+  },
+  "algorithm": {
+    "name": "SHA-256",
+    "chunk_size": 8192,
+    "output_format": "lowercase hexadecimal"
+  }
+}

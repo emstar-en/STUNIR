@@ -98,12 +98,38 @@ procedure JSON_Path_Eval is
    end Read_Stdin;
 
    function Eval_Path (JSON : String; Path : String) return String is
-      --  Simplified JSONPath evaluation
       --  Supports: $.property, $[index], $.property[index]
-      Result : Unbounded_String := Null_Unbounded_String;
+      --  Also supports json_path_parser output: ["key1","key2",...]
+      Result      : Unbounded_String := Null_Unbounded_String;
       Current_Pos : Integer := JSON'First;
-      In_String : Boolean := False;
+      In_String   : Boolean := False;
    begin
+      --  Support array-format path from json_path_parser: ["key1","key2"]
+      if Path'Length > 0 and then Path (Path'First) = '[' then
+         declare
+            Converted : Unbounded_String := To_Unbounded_String ("$");
+            Pos       : Integer := Path'First + 1;
+            K_Start   : Integer;
+            K_End     : Integer;
+         begin
+            while Pos <= Path'Last loop
+               if Path (Pos) = '"' then
+                  K_Start := Pos + 1;
+                  K_End := K_Start;
+                  while K_End <= Path'Last and then Path (K_End) /= '"' loop
+                     K_End := K_End + 1;
+                  end loop;
+                  if K_End > Path'Last then exit; end if;
+                  Append (Converted, "." & Path (K_Start .. K_End - 1));
+                  Pos := K_End + 1;
+               else
+                  Pos := Pos + 1;
+               end if;
+            end loop;
+            return Eval_Path (JSON, To_String (Converted));
+         end;
+      end if;
+
       if Path'Length = 0 or Path (Path'First) /= '$' then
          return "";
       end if;
@@ -146,28 +172,54 @@ procedure JSON_Path_Eval is
                         return "null";
                      end if;
 
-                     --  Find value end
+                     --  Find value end: skip whitespace, then extract complete value
                      Current_Pos := Found_Pos;
+                     while Current_Pos <= JSON'Last and then
+                           (JSON (Current_Pos) = ' ' or
+                            JSON (Current_Pos) = ASCII.HT or
+                            JSON (Current_Pos) = ASCII.LF or
+                            JSON (Current_Pos) = ASCII.CR) loop
+                        Current_Pos := Current_Pos + 1;
+                     end loop;
+                     Found_Pos := Current_Pos;
+
                      declare
-                        Depth : Natural := 0;
-                        In_Str : Boolean := False;
+                        Depth  : Natural := 0;
+                        InStr  : Boolean := False;
+                        InVal  : Boolean := False;
                      begin
                         while Current_Pos <= JSON'Last loop
-                           if JSON (Current_Pos) = '"' and then
-                              (Current_Pos = JSON'First or else JSON (Current_Pos - 1) /= '\') then
-                              In_Str := not In_Str;
-                           elsif not In_Str then
-                              if JSON (Current_Pos) = '{' or JSON (Current_Pos) = '[' then
-                                 Depth := Depth + 1;
-                              elsif JSON (Current_Pos) = '}' or JSON (Current_Pos) = ']' then
+                           if InStr then
+                              if JSON (Current_Pos) = '"' and then
+                                 (Current_Pos = JSON'First or else
+                                  JSON (Current_Pos - 1) /= '\') then
+                                 InStr := False;
                                  if Depth = 0 then
+                                    Current_Pos := Current_Pos + 1;
                                     exit;
                                  end if;
-                                 Depth := Depth - 1;
-                              elsif Depth = 0 and (JSON (Current_Pos) = ',' or
-                                                    JSON (Current_Pos) = '}') then
+                              end if;
+                           elsif not InVal and JSON (Current_Pos) = '"' then
+                              InStr := True; InVal := True;
+                           elsif JSON (Current_Pos) = '{' or
+                                 JSON (Current_Pos) = '[' then
+                              InVal := True;
+                              Depth := Depth + 1;
+                           elsif JSON (Current_Pos) = '}' or
+                                 JSON (Current_Pos) = ']' then
+                              if Depth = 0 then exit; end if;
+                              Depth := Depth - 1;
+                              if Depth = 0 then
+                                 Current_Pos := Current_Pos + 1;
                                  exit;
                               end if;
+                           elsif not InVal then
+                              InVal := True;
+                           elsif Depth = 0 and
+                                 (JSON (Current_Pos) = ',' or
+                                  JSON (Current_Pos) = '}' or
+                                  JSON (Current_Pos) = ']') then
+                              exit;
                            end if;
                            Current_Pos := Current_Pos + 1;
                         end loop;

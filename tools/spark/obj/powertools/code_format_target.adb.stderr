@@ -1,0 +1,2 @@
+code_format_target.adb:9:09: warning: unit "Ada.Exceptions" is not referenced [-gnatwu]
+code_format_target.adb:80:41: warning: formal parameter "Lang" is not referenced [-gnatwf]

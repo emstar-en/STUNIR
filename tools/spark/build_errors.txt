@@ -1,0 +1,410 @@
+﻿gprbuild : powertools.gpr:18:27: warning: file name does not match project 
+name, should be "stunir_powertools.gpr"
+At line:1 char:17
++ cd tools/spark; gprbuild -P powertools.gpr 2>&1 | Out-File -FilePath  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (powertools.gpr:...powertools.gpr" 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Compile
+   [Ada]          func_to_ir.adb
+   [Ada]          extraction_to_spec.adb
+   [Ada]          spec_extract_funcs.adb
+   [Ada]          spec_extract_types.adb
+   [Ada]          ir_extract_funcs.adb
+   [Ada]          ir_validate_schema.adb
+   [Ada]          ir_add_metadata.adb
+   [Ada]          ir_merge_funcs.adb
+   [Ada]          module_to_ir.adb
+   [Ada]          sig_gen_rust.adb
+   [Ada]          cpp_impl_gen.adb
+   [Ada]          cpp_sig_normalize.adb
+   [Ada]          code_add_comments.adb
+   [Ada]          code_format_target.adb
+   [Ada]          code_gen_func_body.adb
+   [Ada]          code_gen_func_sig.adb
+func_to_ir.adb:38:48: error: binary operator expected
+func_to_ir.adb:38:52: error: illegal character
+func_to_ir.adb:38:60: error: missing string quote
+func_to_ir.adb:40:43: error: illegal character
+func_to_ir.adb:40:47: error: illegal character
+func_to_ir.adb:40:62: error: missing ")"
+func_to_ir.adb:40:62: error: ":" should be ";"
+func_to_ir.adb:40:64: error: illegal character
+func_to_ir.adb:40:65: error: statement expected
+func_to_ir.adb:42:43: error: illegal character
+func_to_ir.adb:42:47: error: illegal character
+func_to_ir.adb:42:59: error: missing string quote
+func_to_ir.adb:58:71: error: binary operator expected
+func_to_ir.adb:58:75: error: illegal character
+func_to_ir.adb:58:83: error: missing string quote
+func_to_ir.adb:60:61: error: illegal character
+func_to_ir.adb:60:69: error: missing ")"
+func_to_ir.adb:60:69: error: ":" should be ";"
+func_to_ir.adb:60:71: error: illegal character
+func_to_ir.adb:60:72: error: statement expected
+func_to_ir.adb:62:59: error: illegal character, replaced by ")"
+func_to_ir.adb:62:62: error: missing string quote
+func_to_ir.adb:68:67: error: binary operator expected
+func_to_ir.adb:68:72: error: illegal character
+func_to_ir.adb:68:94: error: illegal character
+spec_extract_funcs.adb:5:08: error: keyword "body" expected here [see file 
+name]
+spec_extract_funcs.adb:5:08: error: missing "body"
+spec_extract_funcs.adb:10:01: error: "private" not allowed in body
+spec_extract_funcs.adb:47:57: error: missing string quote
+spec_extract_types.adb:9:32: error: subtype indication expected
+spec_extract_types.adb:9:33: error: declaration expected
+spec_extract_types.adb:10:37: error: subtype indication expected
+spec_extract_types.adb:10:38: error: declaration expected
+spec_extract_types.adb:64:38: error: unrecognized attribute "Find"
+ir_validate_schema.adb:85:50: error: missing string quote
+ir_validate_schema.adb:85:50: error: missing ")"
+ir_validate_schema.adb:85:50: error: missing "then"
+ir_validate_schema.adb:89:54: error: missing string quote
+ir_validate_schema.adb:89:54: error: missing ")"
+ir_validate_schema.adb:89:54: error: missing "then"
+ir_validate_schema.adb:93:55: error: missing string quote
+ir_validate_schema.adb:93:55: error: missing ")"
+ir_validate_schema.adb:93:55: error: missing "then"
+ir_validate_schema.adb:97:53: error: missing string quote
+ir_validate_schema.adb:97:53: error: missing ")"
+ir_validate_schema.adb:97:53: error: missing "then"
+ir_add_metadata.adb:1:01: error: compilation unit expected
+ir_merge_funcs.adb:3:14: error: file "ir_merge_funcs.ads" not found
+ir_merge_funcs.adb:11:44: error: missing ";"
+module_to_ir.adb:10:48: error: binary operator expected
+module_to_ir.adb:10:54: error: illegal character
+module_to_ir.adb:10:77: error: illegal character
+module_to_ir.adb:10:96: error: illegal character
+module_to_ir.adb:10:105: error: numeric literal cannot start with point
+module_to_ir.adb:10:107: error: illegal character
+module_to_ir.adb:10:127: error: illegal character
+module_to_ir.adb:10:135: error: missing string quote
+module_to_ir.adb:12:43: error: illegal character
+module_to_ir.adb:12:47: error: illegal character
+module_to_ir.adb:12:62: error: missing ")"
+module_to_ir.adb:12:62: error: ":" should be ";"
+module_to_ir.adb:12:64: error: illegal character
+module_to_ir.adb:12:65: error: statement expected
+module_to_ir.adb:14:42: error: illegal character
+module_to_ir.adb:14:44: error: illegal character, replaced by ")"
+module_to_ir.adb:14:47: error: missing string quote
+ir_extract_funcs.adb:9:09: warning: unit "Ada.Exceptions" is not referenced 
+[-gnatwu]
+ir_extract_funcs.adb:80:17: error: no candidate interpretations match the 
+actuals:
+ir_extract_funcs.adb:80:17: error: missing argument for parameter "From" in 
+call to "Index" declared at a-strunb.ads:655
+ir_extract_funcs.adb:80:17: error: missing argument for parameter "From" in 
+call to "Index" declared at a-strunb.ads:591
+ir_extract_funcs.adb:80:17: error: missing argument for parameter "From" in 
+call to "Index" declared at a-strunb.ads:528
+ir_extract_funcs.adb:80:17: error: missing argument for parameter "Mapping" in 
+call to "Index" declared at a-strunb.ads:431
+ir_extract_funcs.adb:80:24: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+ir_extract_funcs.adb:80:24: error: found type "Standard.String"
+ir_extract_funcs.adb:80:24: error:   ==> in call to "Index" at a-strunb.ads:484
+ir_extract_funcs.adb:80:24: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+ir_extract_funcs.adb:80:24: error: found type "Standard.String"
+ir_extract_funcs.adb:80:24: error:   ==> in call to "Index" at a-strunb.ads:378
+code_add_comments.adb:9:09: warning: unit "Ada.Exceptions" is not referenced 
+[-gnatwu]
+code_add_comments.adb:96:45: error: prefix of "Access" attribute must be 
+aliased
+code_add_comments.adb:97:45: error: prefix of "Access" attribute must be 
+aliased
+code_add_comments.adb:98:45: error: prefix of "Access" attribute must be 
+aliased
+code_format_target.adb:9:09: warning: unit "Ada.Exceptions" is not referenced 
+[-gnatwu]
+code_format_target.adb:89:45: error: prefix of "Access" attribute must be 
+aliased
+code_format_target.adb:90:45: error: prefix of "Access" attribute must be 
+aliased
+code_format_target.adb:91:45: error: prefix of "Access" attribute must be 
+aliased
+code_gen_func_body.adb:9:09: warning: unit "Ada.Exceptions" is not referenced 
+[-gnatwu]
+code_gen_func_body.adb:103:45: error: prefix of "Access" attribute must be 
+aliased
+code_gen_func_body.adb:104:45: error: prefix of "Access" attribute must be 
+aliased
+code_gen_func_body.adb:105:45: error: prefix of "Access" attribute must be 
+aliased
+code_gen_func_sig.adb:9:09: warning: unit "Ada.Exceptions" is not referenced 
+[-gnatwu]
+code_gen_func_sig.adb:95:45: error: prefix of "Access" attribute must be 
+aliased
+code_gen_func_sig.adb:96:45: error: prefix of "Access" attribute must be 
+aliased
+code_gen_func_sig.adb:97:45: error: prefix of "Access" attribute must be 
+aliased
+cpp_impl_gen.adb:95:28: warning: formal parameter "IR" is not referenced 
+[-gnatwf]
+cpp_sig_normalize.adb:10:17: warning: unit "Ada.Strings.Fixed" is not 
+referenced [-gnatwu]
+cpp_sig_normalize.adb:19:04: warning: named number "Exit_Processing_Error" is 
+not referenced [-gnatwu]
+extraction_to_spec.adb:10:17: warning: unit "Ada.Strings.Fixed" is not 
+referenced [-gnatwu]
+extraction_to_spec.adb:206:11: warning: "STUNIR_JSON_Parser" is already 
+use-visible through previous use_clause at line 22 [-gnatwr]
+extraction_to_spec.adb:207:11: warning: "STUNIR_Types" is already use-visible 
+through previous use_clause at line 23 [-gnatwr]
+extraction_to_spec.adb:235:07: error: ambiguous expression (cannot resolve 
+"Append")
+extraction_to_spec.adb:235:07: error: possible interpretation at 
+a-strunb.ads:159
+extraction_to_spec.adb:235:07: error: possible interpretation at 
+a-strunb.ads:149
+extraction_to_spec.adb:235:71: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:235:71: error: found type "System.Strings.String_Access"
+extraction_to_spec.adb:235:71: error:   ==> in call to "To_String" at 
+a-strunb.ads:135
+extraction_to_spec.adb:253:34: error: "Success" is not visible
+extraction_to_spec.adb:253:34: error: multiple use clauses cause hiding
+extraction_to_spec.adb:253:34: error: hidden declaration at stunir_types.ads:56
+extraction_to_spec.adb:253:34: error: hidden declaration at a-comlin.ads:76
+extraction_to_spec.adb:276:39: error: "Success" is not visible
+extraction_to_spec.adb:276:39: error: multiple use clauses cause hiding
+extraction_to_spec.adb:276:39: error: hidden declaration at stunir_types.ads:56
+extraction_to_spec.adb:276:39: error: hidden declaration at a-comlin.ads:76
+extraction_to_spec.adb:283:45: error: "Success" is not visible
+extraction_to_spec.adb:283:45: error: multiple use clauses cause hiding
+extraction_to_spec.adb:283:45: error: hidden declaration at stunir_types.ads:56
+extraction_to_spec.adb:283:45: error: hidden declaration at a-comlin.ads:76
+extraction_to_spec.adb:286:45: error: "Success" is not visible
+extraction_to_spec.adb:286:45: error: multiple use clauses cause hiding
+extraction_to_spec.adb:286:45: error: hidden declaration at stunir_types.ads:56
+extraction_to_spec.adb:286:45: error: hidden declaration at a-comlin.ads:76
+extraction_to_spec.adb:308:57: error: "Success" is not visible
+extraction_to_spec.adb:308:57: error: multiple use clauses cause hiding
+extraction_to_spec.adb:308:57: error: hidden declaration at stunir_types.ads:56
+extraction_to_spec.adb:308:57: error: hidden declaration at a-comlin.ads:76
+extraction_to_spec.adb:376:21: error: no candidate interpretations match the 
+actuals:
+extraction_to_spec.adb:376:56: error: expected type "Value_Callback" defined 
+at g-comlin.ads:692
+extraction_to_spec.adb:376:56: error: found type access to 
+"Ada.Strings.Unbounded.Unbounded_String" defined at line 376
+extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:694
+extraction_to_spec.adb:376:56: error: expected an access type with designated 
+type "System.Strings.String_Access"
+extraction_to_spec.adb:376:56: error: found an access type with designated 
+private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:678
+extraction_to_spec.adb:376:56: error: expected an access type with designated 
+type "Standard.Integer"
+extraction_to_spec.adb:376:56: error: found an access type with designated 
+private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:659
+extraction_to_spec.adb:376:56: error: expected an access type with designated 
+type "Standard.Boolean"
+extraction_to_spec.adb:376:56: error: found an access type with designated 
+private type "Ada.Strings.Unbounded.Unbounded_String"
+extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:640
+extraction_to_spec.adb:376:56: error: expected type "Standard.String"
+extraction_to_spec.adb:376:56: error: found type access to 
+"Ada.Strings.Unbounded.Unbounded_String" defined at line 376
+extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:608
+sig_gen_rust.adb:205:11: warning: "STUNIR_JSON_Parser" is already use-visible 
+through previous use_clause at line 21 [-gnatwr]
+sig_gen_rust.adb:265:31: error: expected private type "JSON_String" defined at 
+stunir_types.ads:20
+sig_gen_rust.adb:265:31: error: found private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:312:62: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:312:62: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:34: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:325:42: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:325:42: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:42: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:325:42: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:325:42: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:42: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:325:42: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:325:42: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:325:42: error:   ==> in call to "Append" at a-strunb.ads:149
+sig_gen_rust.adb:328:31: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:328:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:39: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:328:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:39: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:328:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:39: error:   ==> in call to "Append" at a-strunb.ads:149
+sig_gen_rust.adb:328:92: error: expected private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:328:92: error: found private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:328:92: error:   ==> in call to "To_String" at 
+a-strbou.ads:129, instance at stunir_types.ads:19
+sig_gen_rust.adb:329:31: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:329:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:329:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:329:39: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:329:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:329:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:329:39: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:329:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:329:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:329:39: error:   ==> in call to "Append" at a-strunb.ads:149
+sig_gen_rust.adb:330:31: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:330:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:39: error:   ==> in call to "Append" at a-strunb.ads:168
+sig_gen_rust.adb:330:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:39: error:   ==> in call to "Append" at a-strunb.ads:159
+sig_gen_rust.adb:330:39: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:39: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:39: error:   ==> in call to "Append" at a-strunb.ads:149
+sig_gen_rust.adb:330:92: error: expected private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:330:92: error: found private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:330:92: error:   ==> in call to "To_String" at 
+a-strbou.ads:129, instance at stunir_types.ads:19
+sig_gen_rust.adb:343:29: error: operator for private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19 is 
+not directly visible
+sig_gen_rust.adb:343:29: error: use clause would make operation legal
+sig_gen_rust.adb:353:19: error: ambiguous expression (cannot resolve "Append")
+sig_gen_rust.adb:353:19: error: possible interpretation at a-strunb.ads:159
+sig_gen_rust.adb:353:19: error: possible interpretation at a-strunb.ads:149
+sig_gen_rust.adb:353:52: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:353:52: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:353:52: error:   ==> in call to "To_String" at 
+a-strunb.ads:135
+sig_gen_rust.adb:360:19: error: ambiguous expression (cannot resolve "Append")
+sig_gen_rust.adb:360:19: error: possible interpretation at a-strunb.ads:159
+sig_gen_rust.adb:360:19: error: possible interpretation at a-strunb.ads:149
+sig_gen_rust.adb:360:52: error: expected private type 
+"Ada.Strings.Unbounded.Unbounded_String"
+
+sig_gen_rust.adb:360:52: error: found private type 
+"Ada.Strings.Bounded.Bounded_String" from instance at stunir_types.ads:19
+sig_gen_rust.adb:360:52: error:   ==> in call to "To_String" at 
+a-strunb.ads:135
+sig_gen_rust.adb:395:45: error: prefix of "Access" attribute must be aliased
+   compilation of func_to_ir.adb failed
+   compilation of extraction_to_spec.adb failed
+sig_gen_rust.adb:396:45: error: prefix of "Access" attribute must be aliased
+sig_gen_rust.adb:397:45: error: prefix of "Access" attribute must be aliased
+sig_gen_rust.adb:398:45: error: prefix of "Access" attribute must be aliased
+sig_gen_rust.adb:399:45: error: prefix of "Access" attribute must be aliased
+sig_gen_rust.adb:399:99: error: "Disable_Abbr" not declared in "Command_Line"
+sig_gen_rust.adb:400:21: error: no candidate interpretations match the actuals:
+   compilation of spec_extract_funcs.adb failed
+sig_gen_rust.adb:400:56: error: expected type "Value_Callback" defined at 
+g-comlin.ads:692
+sig_gen_rust.adb:400:56: error: found type access to 
+"Ada.Strings.Unbounded.Unbounded_String" defined at line 400
+   compilation of spec_extract_types.adb failed
+   compilation of ir_extract_funcs.adb failed
+   compilation of ir_validate_schema.adb failed
+   compilation of ir_add_metadata.adb failed
+   compilation of ir_merge_funcs.adb failed
+   compilation of module_to_ir.adb failed
+sig_gen_rust.adb:400:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:694
+sig_gen_rust.adb:400:56: error: expected an access type with designated type 
+"System.Strings.String_Access"
+sig_gen_rust.adb:400:56: error: found an access type with designated private 
+type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:400:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:678
+sig_gen_rust.adb:400:56: error: expected an access type with designated type 
+"Standard.Integer"
+sig_gen_rust.adb:400:56: error: found an access type with designated private 
+type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:400:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:659
+sig_gen_rust.adb:400:56: error: expected an access type with designated type 
+"Standard.Boolean"
+sig_gen_rust.adb:400:56: error: found an access type with designated private 
+type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:400:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:640
+sig_gen_rust.adb:400:56: error: expected type "Standard.String"
+sig_gen_rust.adb:400:56: error: found type access to 
+"Ada.Strings.Unbounded.Unbounded_String" defined at line 400
+sig_gen_rust.adb:400:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:608
+sig_gen_rust.adb:401:21: error: no candidate interpretations match the actuals:
+sig_gen_rust.adb:401:56: error: expected type "Value_Callback" defined at 
+g-comlin.ads:692
+sig_gen_rust.adb:401:56: error: found type access to 
+"Ada.Strings.Unbounded.Unbounded_String" defined at line 401
+sig_gen_rust.adb:401:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:694
+sig_gen_rust.adb:401:56: error: expected an access type with designated type 
+"System.Strings.String_Access"
+sig_gen_rust.adb:401:56: error: found an access type with designated private 
+type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:401:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:678
+sig_gen_rust.adb:401:56: error: expected an access type with designated type 
+"Standard.Integer"
+sig_gen_rust.adb:401:56: error: found an access type with designated private 
+type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:401:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:659
+sig_gen_rust.adb:401:56: error: expected an access type with designated type 
+"Standard.Boolean"
+sig_gen_rust.adb:401:56: error: found an access type with designated private 
+type "Ada.Strings.Unbounded.Unbounded_String"
+sig_gen_rust.adb:401:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:640
+sig_gen_rust.adb:401:56: error: expected type "Standard.String"
+sig_gen_rust.adb:401:56: error: found type access to 
+"Ada.Strings.Unbounded.Unbounded_String" defined at line 401
+sig_gen_rust.adb:401:56: error:   ==> in call to "Define_Switch" at 
+g-comlin.ads:608
+   compilation of sig_gen_rust.adb failed
+   compilation of code_add_comments.adb failed
+   compilation of code_format_target.adb failed
+   compilation of code_gen_func_body.adb failed
+   compilation of code_gen_func_sig.adb failed
+
+gprbuild: *** compilation phase failed

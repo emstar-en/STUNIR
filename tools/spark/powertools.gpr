@@ -31,69 +31,92 @@ project STUNIR_Powertools is
 
    --  All powertools (working set)
    for Main use (
-      --  Phase 1: Foundation Tools (JSON & Type utilities)
-      "json_validate.adb",      -- Validate JSON syntax and structure
-      "json_extract.adb",       -- Extract values from JSON by path
-      "json_merge.adb",         -- Merge multiple JSON documents
-      "json_formatter.adb",     -- Format JSON with indentation
-      "json_path_parser.adb",   -- Parse dot-notation JSON paths
-      "json_value_format.adb",  -- Format extracted JSON values
-      "json_merge_objects.adb", -- Merge JSON objects with conflict resolution
-      "json_merge_arrays.adb",  -- Merge JSON arrays
-      "json_path_eval.adb",     -- Evaluate JSONPath expressions
-      "type_normalize.adb",     -- Normalize type names across languages
-      "type_map.adb",           -- Map types between languages
-      "type_resolver.adb",      -- Resolve type references
-      "func_dedup.adb",         -- Deduplicate function signatures
+      --  Phase 1: JSON Utilities
+      "json_validate.adb",       -- Validate JSON syntax and structure
+      "json_extract.adb",        -- Extract values from JSON by path
+      "json_merge.adb",          -- Merge multiple JSON documents
+      "json_formatter.adb",      -- Format JSON with indentation
+      "json_path_parser.adb",    -- Parse dot-notation JSON paths
+      "json_path_eval.adb",      -- Evaluate JSONPath expressions
+      "json_value_format.adb",   -- Format extracted JSON values
+      "json_merge_objects.adb",  -- Merge JSON objects
+      "json_merge_arrays.adb",   -- Merge JSON arrays
+      "json_validator.adb",      -- JSON validation tool
 
-      --  Phase 2: Code Analysis Tools
-      "format_detect.adb",      -- Detect source code format/language
-      "lang_detect.adb",        -- Language detection for source files
-      "extraction_to_spec.adb", -- Extract spec from existing code
-      "spec_extract_module.adb", -- Extract module info from spec
+      --  Phase 2: Type System Utilities
+      "type_normalize.adb",      -- Normalize type names across languages
+      "type_map.adb",            -- Map types between languages
+      "type_map_target.adb",     -- Map types to target language
+      "type_map_cpp.adb",        -- Map types to C++
+      "type_resolver.adb",       -- Resolve type references
+      "type_resolve.adb",        -- Resolve type dependencies
+      "type_lookup.adb",         -- Look up type definitions
+      "type_expand.adb",         -- Expand type aliases
+      "type_dependency.adb",     -- Resolve dependency order
 
-      --  Phase 3: Code Generation Tools
-      "sig_gen_cpp.adb",        -- Generate C++ function signatures
-      "sig_gen_rust.adb",       -- Generate Rust function signatures
-      "sig_gen_python.adb",     -- Generate Python function signatures
-      "type_resolve.adb",       -- Resolve type dependencies
-      "type_map_cpp.adb",       -- Map types to C++
-      "cpp_sig_normalize.adb",  -- Normalize C++ signatures
-      "cpp_header_gen.adb",     -- Generate C++ headers
-      "cpp_impl_gen.adb",       -- Generate C++ implementations
-      "ir_gen_functions.adb",   -- Generate IR function representations
+      --  Phase 3: Spec Processing (spec → functions)
+      "spec_validate.adb",           -- Validate spec JSON against schema
+      "spec_validate_schema.adb",    -- Validate spec against schema (orchestrator)
+      "spec_extract_module.adb",     -- Extract module info from spec
+      "spec_extract_funcs.adb",      -- Extract functions array from spec
+      "spec_extract_types.adb",      -- Extract type definitions from spec
 
-      --  Phase 4: Verification & Attestation Tools
-      "hash_compute.adb",       -- Compute SHA-256 hashes
-      "receipt_generate.adb",   -- Generate verification receipts
-      "toolchain_verify.adb",   -- Verify toolchain.lock integrity
-      "spec_validate.adb",      -- Validate spec JSON against schema
-      "spec_validate_schema.adb", -- Validate spec against schema (orchestrator)
-      "ir_validate.adb",        -- Validate IR JSON against schema
+      --  Phase 4: Spec → IR Conversion
+      "func_to_ir.adb",          -- Convert spec functions array to IR functions array
+      "module_to_ir.adb",        -- Extract module metadata from spec module object
+      "func_dedup.adb",          -- Deduplicate function signatures
+      "func_parse_sig.adb",      -- Parse function signature from IR function
+      "func_parse_body.adb",     -- Parse function body/steps from IR function
 
-      --  Phase 5: Validation Utilities
-      "schema_check_required.adb", -- Check required fields
-      "schema_check_types.adb",    -- Validate field types
-      "schema_check_format.adb",   -- Validate formats/patterns
-      "validation_reporter.adb",   -- Format validation reports
-      "ir_check_required.adb",     -- Check required IR fields
-      "ir_check_functions.adb",    -- Validate function structures
-      "ir_check_types.adb",        -- Validate type definitions
+      --  Phase 5: IR Assembly
+      "ir_add_metadata.adb",     -- Wrap IR functions array into complete IR document
+      "ir_merge_funcs.adb",      -- Merge multiple IR function arrays into one
 
-      --  Phase 6: Type Utilities
-      "type_lookup.adb",        -- Look up type definitions
-      "type_expand.adb",        -- Expand type aliases
-      "type_dependency.adb",    -- Resolve dependency order
+      --  Phase 6: IR Processing (IR → code)
+      "ir_validate.adb",         -- Validate IR JSON against schema
+      "ir_validate_schema.adb",  -- Validate IR schema (orchestrator)
+      "ir_extract_module.adb",   -- Extract module metadata from IR
+      "ir_extract_funcs.adb",    -- Extract functions array from IR
+      "ir_check_required.adb",   -- Check required IR fields
+      "ir_check_functions.adb",  -- Validate function structures
+      "ir_check_types.adb",      -- Validate type definitions
 
-      --  Phase 7: File Utilities
-      "file_writer.adb",        -- Write files with error handling
-      "file_find.adb",          -- Find files matching pattern recursively
-      "file_hash.adb",          -- Compute SHA-256 hash of files
+      --  Phase 7: Code Generation
+      "code_gen_preamble.adb",   -- Generate code preamble (headers/imports)
+      "code_gen_func_sig.adb",   -- Generate function signature in target language
+      "code_gen_func_body.adb",  -- Generate function body stub in target language
+      "code_add_comments.adb",   -- Add comments to generated code
+      "code_format_target.adb",  -- Format code for target language
+      "code_write.adb",          -- Write code to output file
+      "cpp_header_gen.adb",      -- Generate C++ headers
+      "cpp_impl_gen.adb",        -- Generate C++ implementations
+      "cpp_sig_normalize.adb",   -- Normalize C++ signatures
+      "sig_gen_cpp.adb",         -- Generate C++ function signatures (FFI)
+      "sig_gen_rust.adb",        -- Generate Rust function signatures (FFI)
+      "sig_gen_python.adb",      -- Generate Python bindings stub (FFI)
+      "ir_gen_functions.adb",    -- Generate IR function representations
 
-      --  Additional working tools
-      "json_validator.adb",     -- JSON validation tool
-      "type_map_target.adb",    -- Map types to target language
-      "manifest_generate.adb"   -- Generate JSON manifest with file hashes
+      --  Phase 8: Verification & Attestation
+      "hash_compute.adb",        -- Compute SHA-256 hashes
+      "receipt_generate.adb",    -- Generate verification receipts
+      "manifest_generate.adb",   -- Generate JSON manifest with file hashes
+      "toolchain_verify.adb",    -- Verify toolchain.lock integrity
+
+      --  Phase 9: Validation Utilities
+      "schema_check_required.adb",  -- Check required fields
+      "schema_check_types.adb",     -- Validate field types
+      "schema_check_format.adb",    -- Validate formats/patterns
+      "validation_reporter.adb",    -- Format validation reports
+
+      --  Phase 10: Detection
+      "format_detect.adb",       -- Detect source code format/language
+      "lang_detect.adb",         -- Language detection for source files
+      "extraction_to_spec.adb",  -- Convert extraction JSON to spec format
+
+      --  Phase 11: File Utilities
+      "file_writer.adb",         -- Write files with error handling
+      "file_find.adb",           -- Find files matching pattern recursively
+      "file_hash.adb"            -- Compute SHA-256 hash of files
    );
 
    package Compiler is

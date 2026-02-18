@@ -21,9 +21,9 @@ procedure Code_Write is
 
    --  Configuration
    Output_File   : aliased GNAT.Strings.String_Access := new String'("");
-   Show_Version  : Boolean := False;
-   Show_Help     : Boolean := False;
-   Show_Describe : Boolean := False;
+   Show_Version  : aliased Boolean := False;
+   Show_Help     : aliased Boolean := False;
+   Show_Describe : aliased Boolean := False;
 
    Version : constant String := "0.1.0-alpha";
 

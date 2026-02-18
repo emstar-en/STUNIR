@@ -1,45 +1,6 @@
 extraction_to_spec.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
-extraction_to_spec.adb:206:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 22 [-gnatwr]
-extraction_to_spec.adb:207:11: warning: "STUNIR_Types" is already use-visible through previous use_clause at line 23 [-gnatwr]
-extraction_to_spec.adb:235:07: error: ambiguous expression (cannot resolve "Append")
-extraction_to_spec.adb:235:07: error: possible interpretation at a-strunb.ads:159
-extraction_to_spec.adb:235:07: error: possible interpretation at a-strunb.ads:149
-extraction_to_spec.adb:235:71: error: expected private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:235:71: error: found type "System.Strings.String_Access"
-extraction_to_spec.adb:235:71: error:   ==> in call to "To_String" at a-strunb.ads:135
-extraction_to_spec.adb:253:34: error: "Success" is not visible
-extraction_to_spec.adb:253:34: error: multiple use clauses cause hiding
-extraction_to_spec.adb:253:34: error: hidden declaration at stunir_types.ads:56
-extraction_to_spec.adb:253:34: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:276:39: error: "Success" is not visible
-extraction_to_spec.adb:276:39: error: multiple use clauses cause hiding
-extraction_to_spec.adb:276:39: error: hidden declaration at stunir_types.ads:56
-extraction_to_spec.adb:276:39: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:283:45: error: "Success" is not visible
-extraction_to_spec.adb:283:45: error: multiple use clauses cause hiding
-extraction_to_spec.adb:283:45: error: hidden declaration at stunir_types.ads:56
-extraction_to_spec.adb:283:45: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:286:45: error: "Success" is not visible
-extraction_to_spec.adb:286:45: error: multiple use clauses cause hiding
-extraction_to_spec.adb:286:45: error: hidden declaration at stunir_types.ads:56
-extraction_to_spec.adb:286:45: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:308:57: error: "Success" is not visible
-extraction_to_spec.adb:308:57: error: multiple use clauses cause hiding
-extraction_to_spec.adb:308:57: error: hidden declaration at stunir_types.ads:56
-extraction_to_spec.adb:308:57: error: hidden declaration at a-comlin.ads:76
-extraction_to_spec.adb:376:21: error: no candidate interpretations match the actuals:
-extraction_to_spec.adb:376:56: error: expected type "Value_Callback" defined at g-comlin.ads:692
-extraction_to_spec.adb:376:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 376
-extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:694
-extraction_to_spec.adb:376:56: error: expected an access type with designated type "System.Strings.String_Access"
-extraction_to_spec.adb:376:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:678
-extraction_to_spec.adb:376:56: error: expected an access type with designated type "Standard.Integer"
-extraction_to_spec.adb:376:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:659
-extraction_to_spec.adb:376:56: error: expected an access type with designated type "Standard.Boolean"
-extraction_to_spec.adb:376:56: error: found an access type with designated private type "Ada.Strings.Unbounded.Unbounded_String"
-extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:640
-extraction_to_spec.adb:376:56: error: expected type "Standard.String"
-extraction_to_spec.adb:376:56: error: found type access to "Ada.Strings.Unbounded.Unbounded_String" defined at line 376
-extraction_to_spec.adb:376:56: error:   ==> in call to "Define_Switch" at g-comlin.ads:608
+extraction_to_spec.adb:28:04: warning: named number "Exit_Validation_Error" is not referenced [-gnatwu]
+extraction_to_spec.adb:207:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 23 [-gnatwr]
+extraction_to_spec.adb:208:11: warning: "STUNIR_Types" is already use-visible through previous use_clause at line 24 [-gnatwr]
+extraction_to_spec.adb:214:07: warning: variable "Functions_Array" is not referenced [-gnatwu]
+extraction_to_spec.adb:407:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]
