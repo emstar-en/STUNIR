@@ -2,6 +2,7 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 with Ada.Directories;
+with Ada.Streams.Stream_IO;
 with STUNIR_JSON_Parser;
 with STUNIR_Types;
 
@@ -9,6 +10,7 @@ procedure Toolchain_Verify is
    use Ada.Text_IO;
    use Ada.Command_Line;
    use Ada.Strings.Unbounded;
+   use Ada.Streams.Stream_IO;
    use STUNIR_JSON_Parser;
    use STUNIR_Types;
 
@@ -47,7 +49,7 @@ procedure Toolchain_Verify is
    Output_Json : Boolean := False;
 
    function Read_File (Path : String) return String is
-      File : Ada.Text_IO.File_Type;
+      File : Ada.Streams.Stream_IO.File_Type;
       Len  : Long_Integer;
    begin
       begin
@@ -55,12 +57,11 @@ procedure Toolchain_Verify is
          Len := Long_Integer (Ada.Directories.Size (Path));
          declare
             Content : String (1 .. Integer (Len));
-            Last    : Natural;
          begin
-             String'Read (Stream (File), Content, Last);
+            String'Read (Stream (File), Content);
             Close (File);
             --  Strip trailing NULLs or generic cleanup if needed
-            return Content (1 .. Last);
+            return Content;
          end;
       exception
          when others => 

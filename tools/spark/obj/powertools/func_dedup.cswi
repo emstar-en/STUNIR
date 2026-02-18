@@ -1,0 +1,12 @@
+20260217202602
+-c
+-x
+ada
+-gnatA
+-gnat2022
+-gnatwa
+-gnatVa
+-gnatf
+-gnato
+-fstack-check
+-g

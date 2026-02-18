@@ -1,0 +1,10 @@
+project File_Hash is
+   for Source_Dirs use ("src/core", "src/files");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   for Main use ("file_hash.adb");
+   
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnatwa", "-g");
+   end Compiler;
+end File_Hash;

@@ -11,7 +11,21 @@
 
 project STUNIR_Powertools is
 
-   for Source_Dirs use ("src/powertools");
+   --  Orthogonal directory structure for micronized tools
+   for Source_Dirs use (
+      "src/core",         -- Core parser and utilities
+      "src/json",         -- JSON manipulation tools
+      "src/types",        -- Type system tools
+      "src/functions",    -- Function manipulation tools
+      "src/detection",    -- Format and language detection
+      "src/spec",         -- Spec extraction and validation
+      "src/ir",           -- Intermediate representation tools
+      "src/codegen",      -- Code generation tools
+      "src/validation",   -- Schema and data validation
+      "src/files",        -- File manipulation utilities
+      "src/verification", -- Hashing and verification tools
+      "src/utils"         -- General utilities
+   );
    for Object_Dir use "obj/powertools";
    for Exec_Dir use "bin";
 
@@ -56,7 +70,6 @@ project STUNIR_Powertools is
       "spec_validate.adb",      -- Validate spec JSON against schema
       "spec_validate_schema.adb", -- Validate spec against schema (orchestrator)
       "ir_validate.adb",        -- Validate IR JSON against schema
-      "file_indexer.adb",       -- Index files for verification
 
       --  Phase 5: Validation Utilities
       "schema_check_required.adb", -- Check required fields
@@ -74,10 +87,13 @@ project STUNIR_Powertools is
 
       --  Phase 7: File Utilities
       "file_writer.adb",        -- Write files with error handling
+      "file_find.adb",          -- Find files matching pattern recursively
+      "file_hash.adb",          -- Compute SHA-256 hash of files
 
       --  Additional working tools
       "json_validator.adb",     -- JSON validation tool
-      "type_map_target.adb"     -- Map types to target language
+      "type_map_target.adb",    -- Map types to target language
+      "manifest_generate.adb"   -- Generate JSON manifest with file hashes
    );
 
    package Compiler is

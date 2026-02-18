@@ -19,6 +19,7 @@ procedure Extraction_To_Spec is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
+   use GNAT.Strings;
    use STUNIR_JSON_Parser;
    use STUNIR_Types;
 
@@ -29,7 +30,7 @@ procedure Extraction_To_Spec is
 
    --  Configuration
    Input_File    : Unbounded_String := Null_Unbounded_String;
-   Output_File   : Unbounded_String := Null_Unbounded_String;
+   Output_File   : aliased GNAT.Strings.String_Access := new String'("");
    Source_Lang   : aliased GNAT.Strings.String_Access := new String'("c");
    Verbose_Mode  : aliased Boolean := False;
    Show_Version  : aliased Boolean := False;
@@ -139,18 +140,18 @@ procedure Extraction_To_Spec is
 
    procedure Write_Output (Content : String) is
    begin
-      if Output_File = Null_Unbounded_String then
+      if Output_File = null or else Output_File.all = "" then
          Put_Line (Content);
       else
          declare
             File : File_Type;
          begin
-            Create (File, Out_File, To_String (Output_File));
+            Create (File, Out_File, Output_File.all);
             Put (File, Content);
             Close (File);
          exception
             when others =>
-               Print_Error ("Cannot write: " & To_String (Output_File));
+               Print_Error ("Cannot write: " & Output_File.all);
          end;
       end if;
    end Write_Output;
@@ -232,7 +233,7 @@ procedure Extraction_To_Spec is
       Append (Result, Newline);
       Append (Result, Indent & """spec_version"": ""1.0.0"",");
       Append (Result, Newline);
-      Append (Result, Indent & """source_language"": """ & To_String (Source_Lang) & """,");
+      Append (Result, Indent & """source_language"": """ & Source_Lang.all & """,");
       Append (Result, Newline);
       Append (Result, Indent & """functions"": [");
       Append (Result, Newline);
@@ -250,7 +251,7 @@ procedure Extraction_To_Spec is
                   Expect_Token (State, Token_Colon, Status);
                   if Status = STUNIR_Types.Success then
                      Expect_Token (State, Token_Array_Start, Status);
-                     if Status = Success then
+                     if Status = STUNIR_Types.Success then
                         In_Functions := True;
                      end if;
                   end if;
@@ -273,17 +274,17 @@ procedure Extraction_To_Spec is
             begin
                loop
                   Next_Token (State, Status);
-                  exit when Status /= Success or else State.Current_Token = Token_Object_End;
+                  exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_Object_End;
 
                   if State.Current_Token = Token_String then
                      declare
                         Member_Key : constant String := JSON_Strings.To_String (State.Token_Value);
                      begin
                         Expect_Token (State, Token_Colon, Status);
-                        exit when Status /= Success;
+                        exit when Status /= STUNIR_Types.Success;
 
                         Next_Token (State, Status);
-                        exit when Status /= Success;
+                        exit when Status /= STUNIR_Types.Success;
 
                         if not First_Member then
                            Append (Result, ",");
@@ -305,7 +306,7 @@ procedure Extraction_To_Spec is
                               begin
                                  loop
                                     Next_Token (State, Status);
-                                    exit when Status /= Success or else Depth = 0;
+                                    exit when Status /= STUNIR_Types.Success or else Depth = 0;
                                     case State.Current_Token is
                                        when Token_Array_Start =>
                                           Depth := Depth + 1;
