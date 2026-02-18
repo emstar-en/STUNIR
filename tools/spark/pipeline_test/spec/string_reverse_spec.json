@@ -1,0 +1,41 @@
+{
+  "tool_name": "string_reverse",
+  "description": "Reverses a string",
+  "language": "python",
+  "function": {
+    "name": "reverse_string",
+    "parameters": [
+      {
+        "name": "text",
+        "type": "str",
+        "description": "The string to reverse"
+      }
+    ],
+    "returns": {
+      "type": "str",
+      "description": "The reversed string"
+    },
+    "implementation": {
+      "algorithm": "slice_reverse",
+      "description": "Use Python slice notation [::-1] to reverse the string"
+    }
+  },
+  "cli": {
+    "usage": "string_reverse [--describe] <text>",
+    "arguments": [
+      {
+        "name": "text",
+        "position": 1,
+        "required": true,
+        "description": "Text to reverse"
+      }
+    ],
+    "options": [
+      {
+        "name": "--describe",
+        "flag": true,
+        "description": "Show tool metadata"
+      }
+    ]
+  }
+}

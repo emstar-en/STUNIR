@@ -68,21 +68,21 @@ Think of it as a **safety harness for AI code generation**:
 
 ## Ada SPARK is the Default Implementation Language
 
-**STUNIR uses Ada SPARK as its DEFAULT implementation language for all tools.**
+**STUNIR uses Ada SPARK as its PRIMARY implementation language for all tools.**
 
-Python implementations are fully functional alternatives suitable for many use cases.
+**Current Status**: Both Ada SPARK and Python pipelines are under active development. SPARK is the PRIMARY FOCUS being developed NOW.
 
 ### Tool Options: Choose Based on Your Needs
 
-| Priority | Implementation | Best For | Tools |
-|----------|---------------|----------|-------|
-| **1. DEFAULT** | **Ada SPARK** | Safety-critical, formal verification, DO-178C Level A | Precompiled binaries (recommended) or build from source |
-| 2. Alternative | Python | Rapid prototyping, development, ease of modification | `tools/scripts/spec_to_ir.py`, `tools/scripts/ir_to_code.py` |
-| 3. Native | Rust/Haskell | High-performance verification | `stunir-native` (when available) |
+| Priority | Implementation | Status | Development Focus |
+|----------|---------------|--------|-------------------|
+| **1. PRIMARY** | **Ada SPARK** | 🔨 **Partially functional** (active development) | **Being developed NOW** |
+| 2. Alternative | Python | 🔨 **Incomplete** (future development) | Development planned after SPARK |
+| 3. Native | Rust/Haskell | ⏳ Planned | Future |
 
 ### Precompiled SPARK Binaries (Recommended for ALPHA Testing)
 
-STUNIR provides **precompiled Ada SPARK binaries** that eliminate the need for GNAT compiler installation:
+STUNIR provides **precompiled Ada SPARK binaries** for testing current functionality:
 
 ```bash
 # Spec to IR conversion
@@ -118,23 +118,48 @@ gprbuild -P stunir_tools.gpr
 - GNAT compiler with SPARK support (FSF GNAT 12+ or GNAT Community Edition)
 - See [`tools/spark/README.md`](tools/spark/README.md) for detailed build instructions
 
-### Python Tools (Alternative Pipeline)
+### Ada SPARK Status (Primary Development - Active NOW)
 
-Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a fully functional alternative:
+**Current State:**
+- 🔨 Basic pipeline partially functional
+- 🔨 Core tools implemented but incomplete
+- 🔨 Active development in progress
+- 🎯 Primary focus for completion
 
-**When to use Python:**
-- ✅ Rapid prototyping and development workflows
-- ✅ Easier to read, understand, and modify
-- ✅ When GNAT/SPARK toolchain is unavailable
-- ✅ CI/CD pipelines where speed matters more than formal verification
-- ✅ Learning and experimentation
+**What Works:**
+- ✅ Spec to IR conversion (basic functionality)
+- ✅ IR to code emission (stub generation)
+- ✅ Command-line interfaces functional
 
-**When to prefer Ada SPARK:**
-- Safety-critical applications requiring DO-178C compliance
-- ALPHA prototype systems requiring formal verification
-- Reproducible builds with maximum determinism
+**In Development:**
+- 🔨 Complete IR transformation logic
+- 🔨 Full code generation for all targets
+- 🔨 Receipt generation and verification
+- 🔨 Formal verification with SPARK proofs
 
-**Both pipelines produce identical IR output** - choose based on your verification and workflow needs.
+**Why SPARK is the Priority:**
+- Deterministic execution with formal verification
+- DO-178C compliance support
+- Hash-stable canonical output
+- Foundation for all other pipelines
+
+### Python Tools (Future Development)
+
+**STATUS: Python implementations (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) are INCOMPLETE. Development will begin after SPARK completion.**
+
+**Current State:**
+- ⚠️ Partial functionality exists
+- ⚠️ Not aligned with current SPARK development
+- ⚠️ Not production-ready
+- 📅 Scheduled for development AFTER SPARK
+
+**Intended Purpose (when complete):**
+- Full production pipeline alternative to Ada SPARK
+- Easier to modify and extend
+- Suitable for rapid prototyping and development
+- Lower barrier to entry (no GNAT toolchain required)
+
+**Timeline:** Python pipeline development is planned and many users are waiting for it. It will be developed after the SPARK pipeline is complete.
 
 ---
 

@@ -1,0 +1,11 @@
+{
+  "toolchain_version": "0.1.0-alpha",
+  "timestamp": "2025-02-18T12:00:00Z",
+  "tools": {
+    "stunir_spec_to_ir_main": {
+      "version": "0.7.1",
+      "hash": "verified"
+    }
+  },
+  "verified": true
+}

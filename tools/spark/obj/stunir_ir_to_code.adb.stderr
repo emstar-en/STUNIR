@@ -1,6 +1,0 @@
-stunir_ir_to_code.adb:18:06: warning: unit "STUNIR_String_Builder" is not referenced [-gnatwu]
-stunir_ir_to_code.adb:102:11: warning: "STUNIR_JSON_Utils" is already use-visible through previous use_clause at line 25 [-gnatwr]
-stunir_ir_to_code.adb:683:07: warning: variable "Local_Types" is assigned but never read [-gnatwm]
-stunir_ir_to_code.adb:733:16: warning: condition can only be True if invalid values present [-gnatwc]
-stunir_ir_to_code.adb:1778:07: warning: formal parameter "Func" is not referenced [-gnatwf]
-stunir_ir_to_code.adb:1779:07: warning: formal parameter "Target" is not referenced [-gnatwf]

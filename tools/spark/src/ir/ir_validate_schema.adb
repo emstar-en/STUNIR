@@ -82,19 +82,19 @@ procedure IR_Validate_Schema is
    function Is_Valid_IR (Content : String) return Boolean is
    begin
       --  Check for required fields
-      if not Contains (Content, """schema"") then
+      if not Contains (Content, """schema""") then
          return False;
       end if;
 
-      if not Contains (Content, """ir_version"") then
+      if not Contains (Content, """ir_version""") then
          return False;
       end if;
 
-      if not Contains (Content, """module_name"") then
+      if not Contains (Content, """module_name""") then
          return False;
       end if;
 
-      if not Contains (Content, """functions"") then
+      if not Contains (Content, """functions""") then
          return False;
       end if;
 

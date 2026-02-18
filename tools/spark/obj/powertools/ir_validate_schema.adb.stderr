@@ -1,0 +1,1 @@
+ir_validate_schema.adb:10:09: warning: unit "Ada.Exceptions" is not referenced [-gnatwu]
