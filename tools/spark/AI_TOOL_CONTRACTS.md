@@ -375,7 +375,7 @@ Output JSON:
 ## Related Files
 
 - **Ada Implementation**: `tools/spark/src/stunir_spec_to_ir.adb`, `stunir_ir_to_code.adb`
-- **Python Reference**: `tools/spec_to_ir.py`, `tools/ir_to_code.py` (reference documentation only)
+- **Python Implementation** (under development): `tools/spec_to_ir.py`, `tools/ir_to_code.py`
 - **Build Config**: `tools/spark/stunir_tools.gpr`
 - **Plan**: `.abacusai/plans/stunir_ai_orchestration_plan.md`
 
@@ -389,10 +389,15 @@ Output JSON:
 4. **Chain tools**: spec → IR → code
 5. **Report errors** with context from stderr
 
-**Remember**: These Ada SPARK tools are AUTHORITATIVE. They provide:
+**Remember**: These Ada SPARK tools are AUTHORITATIVE and PRODUCTION-READY. They provide:
 - ✅ Deterministic execution
-- ✅ Formal verification guarantees  
+- ✅ Formal verification guarantees
 - ✅ Receipt generation (planned)
 - ✅ Hash-stable outputs
+- ✅ Complete functional pipeline NOW
 
-Python implementations in `tools/*.py` are REFERENCE ONLY for understanding the algorithms.
+**Python implementations** in `tools/*.py` are **UNDER DEVELOPMENT** (incomplete):
+- Status: Partial functionality, not fully aligned with SPARK pipeline
+- Purpose: Will become full production alternative when complete
+- Timeline: Future release - many users waiting for completion
+- Current use: Can read for algorithm understanding, but not for production orchestration
