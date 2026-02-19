@@ -133,7 +133,7 @@ package body Pipeline_Driver is
       else
          Code_Emitter.Process_IR_File
            (Input_Path  => IR_Path,
-            Output_Path => Config.Output_Dir,
+            Output_Dir  => Config.Output_Dir,
             Target      => Config.Targets,
             Status      => Emit_Status);
       end if;

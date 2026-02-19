@@ -30,7 +30,7 @@ package Code_Emitter is
    --  ========================================================================
 
    type IR_Step_Detail is record
-      Opcode : IR_Opcode;
+      Step_Type : Step_Type_Enum;
    end record;
 
    type IR_Argument_Detail is record

@@ -10,6 +10,8 @@ with STUNIR_JSON_Parser;
 use STUNIR_JSON_Parser;
 
 with Ada.Strings.Fixed;
+with Ada.Text_IO;
+use Ada.Text_IO;
 
 package body IR_Converter is
 
@@ -321,7 +323,7 @@ package body IR_Converter is
    begin
       Spec := (Schema_Version => Identifier_Strings.Null_Bounded_String,
                Module => (Name => Identifier_Strings.Null_Bounded_String,
-                         Functions => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String)))))));
+                         Functions => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))))))));
       Status := Success;
 
       Initialize_Parser (Parser, JSON_Content, Status);
@@ -502,7 +504,7 @@ package body IR_Converter is
       IR := (Schema_Version => Spec.Schema_Version,
              IR_Version => Identifier_Strings.To_Bounded_String ("1.0"),
              Module_Name => Module_Name,
-             Functions => (Count => 0, IR_Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))), Steps => (Count => 0, Steps => (others => (Step_Type => Step_Noop, Target => Identifier_Strings.Null_Bounded_String, Source => Identifier_Strings.Null_Bounded_String, Value => Identifier_Strings.Null_Bounded_String)))))));
+             Functions => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))), Steps => (Count => 0, Steps => (others => (Step_Type => Step_Noop, Target => Identifier_Strings.Null_Bounded_String, Source => Identifier_Strings.Null_Bounded_String, Value => Identifier_Strings.Null_Bounded_String)))))));
       Status := Success;
 
       --  Copy functions with IR structure
@@ -524,7 +526,7 @@ package body IR_Converter is
                                         Source => Identifier_Strings.Null_Bounded_String,
                                         Value => Identifier_Strings.To_Bounded_String ("placeholder"));
 
-            IR.Functions.IR_Functions (I) := IR_Func;
+            IR.Functions.Functions (I) := IR_Func;
          end;
       end loop;
    end Convert_Spec_To_IR;
@@ -549,17 +551,17 @@ package body IR_Converter is
       procedure Append_Identifier (Id : Identifier_String) is
          Str : constant String := Identifier_Strings.To_String (Id);
       begin
-         Append (""");
+         Append ("""");
          Append (Str);
-         Append (""");
+         Append ("""");
       end Append_Identifier;
 
       procedure Append_Type_Name (T : Type_Name_String) is
          Str : constant String := Type_Name_Strings.To_String (T);
       begin
-         Append (""");
+         Append ("""");
          Append (Str);
-         Append (""");
+         Append ("""");
       end Append_Type_Name;
 
       procedure Append_Parameter (Param : Parameter; Is_Last : Boolean) is
@@ -635,7 +637,7 @@ package body IR_Converter is
       Append (",""functions"":[");
 
       for I in 1 .. IR.Functions.Count loop
-         Append_IR_Function (IR.Functions.IR_Functions (I), I = IR.Functions.Count);
+         Append_IR_Function (IR.Functions.Functions (I), I = IR.Functions.Count);
       end loop;
 
       Append ("]}");

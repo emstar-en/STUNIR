@@ -20,6 +20,7 @@ package STUNIR_Types is
    Max_JSON_Length       : constant := 1_000_000;  --  1MB for JSON content
    Max_Identifier_Length : constant := 256;        --  Function/variable names
    Max_Type_Length       : constant := 128;        --  Type names
+   Max_Type_Name_Length  : constant := 128;        --  Type names (alias)
    Max_Path_Length       : constant := 4096;       --  File paths
    Max_Error_Length      : constant := 512;        --  Error messages
 
@@ -66,7 +67,9 @@ package STUNIR_Types is
       Error_Invalid_Format,
       Error_Empty_Extraction,
       Error_Too_Large,
-      Error_Parse
+      Error_Parse,
+      Error_File_IO,
+      Error_Invalid_Input
    );
 
    --  Status code helper functions
@@ -156,18 +159,11 @@ package STUNIR_Types is
    --  IR Step Types (for IR representation)
    --  ========================================================================
 
-   type IR_Opcode is (
-      Op_Noop,
-      Op_Add,
-      Op_Sub,
-      Op_Mul,
-      Op_Div,
-      Op_Load,
-      Op_Store,
-      Op_Call,
-      Op_Return,
-      Op_Branch,
-      Op_Compare
+   type Step_Type_Enum is (
+      Step_Noop,
+      Step_Assign,
+      Step_Call,
+      Step_Return
    );
 
    Max_Steps : constant := 10000;
@@ -175,8 +171,10 @@ package STUNIR_Types is
    type Step_Index is range 0 .. Max_Steps;
 
    type IR_Step is record
-      Opcode : IR_Opcode;
-      --  Additional fields for operands would go here
+      Step_Type : Step_Type_Enum;
+      Target    : Identifier_String;
+      Source    : Identifier_String;
+      Value     : Identifier_String;
    end record;
 
    type Step_Array is array (Step_Index range <>) of IR_Step;
@@ -237,4 +235,5 @@ package STUNIR_Types is
    Null_Error_String : constant Error_String :=
      Error_Strings.Null_Bounded_String;
 
+   --  ========================================================================
 end STUNIR_Types;

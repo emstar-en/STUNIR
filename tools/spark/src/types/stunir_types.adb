@@ -28,6 +28,8 @@ package body STUNIR_Types is
          when Error_Empty_Extraction  => return "Error: Empty extraction";
          when Error_Too_Large         => return "Error: Too large";
          when Error_Parse             => return "Error: Parse";
+         when Error_File_IO           => return "Error: File I/O failed";
+         when Error_Invalid_Input     => return "Error: Invalid input";
       end case;
    end Status_Code_Image;
 

@@ -20,22 +20,23 @@ package body Spec_Assembler is
    is
       Parser     : Parser_State;
       Temp_Status : Status_Code;
-   begin
+begin
       --  Initialize extraction data
       Extraction := Extraction_Data'(
          Schema_Version => Null_Identifier,
          Source_Index   => Path_Strings.Null_Bounded_String,
+         File_Count     => 0,
          Files          => (others => Extraction_File'(
             Source_File => Path_Strings.Null_Bounded_String,
+            Count       => 0,
             Functions   => (others => Extraction_Function'(
                Name        => Null_Identifier,
                Return_Type => Null_Type_Name,
-               Parameters  => Parameter_List'(Params => (others => Parameter'(
-                  Name       => Null_Identifier,
-                  Param_Type => Null_Type_Name)),
-               Count => 0)),
-            Count => 0)),
-         File_Count => 0);
+               Parameters  => Parameter_List'(
+                  Count => 0,
+                  Params => (others => Parameter'(
+                     Name       => Null_Identifier,
+                     Param_Type => Null_Type_Name))))))));
 
       --  Initialize parser
       Initialize_Parser (Parser, JSON_Content, Temp_Status);
@@ -151,14 +152,15 @@ package body Spec_Assembler is
          Module         => Spec_Module'(
             Name      => Module_Name,
             Functions => Function_Collection'(
+               Count => 0,
                Functions => (others => Function_Signature'(
                   Name        => Null_Identifier,
                   Return_Type => Null_Type_Name,
-                  Parameters  => Parameter_List'(Params => (others => Parameter'(
-                     Name       => Null_Identifier,
-                     Param_Type => Null_Type_Name)),
-                  Count => 0)),
-               Count => 0)));
+                  Parameters  => Parameter_List'(
+                     Count => 0,
+                     Params => (others => Parameter'(
+                        Name       => Null_Identifier,
+                        Param_Type => Null_Type_Name))))))));
 
       --  Collect all functions from all extraction files
       for File_Idx in 1 .. Extraction.File_Count loop
@@ -202,28 +204,28 @@ package body Spec_Assembler is
    begin
       --  Build JSON output string
       Append (Output, "{");
-      Append (Output, """schema_version":"");
+      Append (Output, """schema_version"":");
       Append (Output, Identifier_Strings.To_String (Spec.Schema_Version));
       Append (Output, """,");
 
-      Append (Output, """origin":"");
+      Append (Output, """origin"":");
       Append (Output, Identifier_Strings.To_String (Spec.Origin));
       Append (Output, """,");
 
-      Append (Output, """spec_hash":"");
+      Append (Output, """spec_hash"":");
       Append (Output, Identifier_Strings.To_String (Spec.Spec_Hash));
       Append (Output, """,");
 
-      Append (Output, """source_index":"");
+      Append (Output, """source_index"":");
       Append (Output, Path_Strings.To_String (Spec.Source_Index));
       Append (Output, """,");
 
-      Append (Output, """module":{");
-      Append (Output, """name":"");
+      Append (Output, """module"":{");
+      Append (Output, """name"":");
       Append (Output, Identifier_Strings.To_String (Spec.Module.Name));
       Append (Output, """,");
 
-      Append (Output, """functions":[");
+      Append (Output, """functions"":[");
 
       --  Add functions
       for I in 1 .. Spec.Module.Functions.Count loop
@@ -232,15 +234,15 @@ package body Spec_Assembler is
          end if;
 
          Append (Output, "{");
-         Append (Output, """name":"");
+         Append (Output, """name"":");
          Append (Output, Identifier_Strings.To_String (Spec.Module.Functions.Functions (I).Name));
          Append (Output, """,");
 
-         Append (Output, """return_type":"");
+         Append (Output, """return_type"":");
          Append (Output, Type_Name_Strings.To_String (Spec.Module.Functions.Functions (I).Return_Type));
          Append (Output, """,");
 
-         Append (Output, """parameters":[");
+         Append (Output, """parameters"":[");
 
          declare
             Params : Parameter_List renames
@@ -252,10 +254,10 @@ package body Spec_Assembler is
                end if;
 
                Append (Output, "{");
-               Append (Output, """name":"");
+               Append (Output, """name"":");
                Append (Output, Identifier_Strings.To_String (Params.Params (P).Name));
                Append (Output, """,");
-               Append (Output, """type":"");
+               Append (Output, """type"":");
                Append (Output, Type_Name_Strings.To_String (Params.Params (P).Param_Type));
                Append (Output, """}");
             end loop;
