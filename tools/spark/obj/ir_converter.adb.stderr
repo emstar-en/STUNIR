@@ -1,0 +1,5 @@
+ir_converter.adb:324:334: error: missing ")"
+ir_converter.adb:552:21: error: missing string quote
+ir_converter.adb:554:21: error: missing string quote
+ir_converter.adb:560:21: error: missing string quote
+ir_converter.adb:562:21: error: missing string quote

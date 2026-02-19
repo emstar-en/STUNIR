@@ -133,9 +133,9 @@ begin
    end;
 
    if Is_Success (Status) then
-      Set_Exit_Status (Success);
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Success);
    else
-      Put_Line (Standard_Error, "Error: " & Status_Code_Image (Status));
-      Set_Exit_Status (Failure);
+      Put_Line (Standard_Error, "[ERROR] Pipeline failed: " & Status_Code_Image (Status));
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
    end if;
 end Pipeline_Driver_Main;
