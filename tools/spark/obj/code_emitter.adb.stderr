@@ -1,0 +1,41 @@
+code_emitter.adb:74:07: error: missing case values: "Target_Cpp" .. "Target_Spark"
+code_emitter.adb:75:15: error: "Lang_CPP" is undefined (more references follow)
+code_emitter.adb:114:15: error: "Lang_Python" is undefined (more references follow)
+code_emitter.adb:145:15: error: "Lang_C" is undefined (more references follow)
+code_emitter.adb:165:15: error: "Lang_Rust" is undefined (more references follow)
+code_emitter.adb:203:15: error: "Lang_Go" is undefined (more references follow)
+code_emitter.adb:218:15: error: "Lang_Java" is undefined (more references follow)
+code_emitter.adb:233:15: error: "Lang_JavaScript" is undefined (more references follow)
+code_emitter.adb:236:15: error: "Lang_TypeScript" is undefined (more references follow)
+code_emitter.adb:251:15: error: "Lang_Ada" is undefined (more references follow)
+code_emitter.adb:266:15: error: "Lang_SPARK" is undefined (more references follow)
+code_emitter.adb:594:07: warning: useless assignment to "Status", value overwritten at line 625 [-gnatwm]
+code_emitter.adb:636:07: warning: useless assignment to "Status", value overwritten at line 648 [-gnatwm]
+code_emitter.adb:680:46: error: no selector "IR_Functions" for type "IR_Function_Collection" defined at stunir_types.ads:202
+code_emitter.adb:756:07: error: missing case values: "Target_Cpp" .. "Target_Spark"
+code_emitter.adb:784:32: error: no value supplied for component "Functions"
+code_emitter.adb:784:45: error: "IR_Functions" is not a component of type "IR_Function_Collection" defined at stunir_types.ads:202
+code_emitter.adb:799:10: error: "Current_Token" is undefined (more references follow)
+code_emitter.adb:799:36: error: "Token_Object_Start" is undefined
+code_emitter.adb:810:39: error: "Token_Object_End" is undefined
+code_emitter.adb:815:13: error: "Parse_String_Member" is undefined
+code_emitter.adb:842:41: error: "Token_Comma" is undefined
+code_emitter.adb:863:22: error: "File_Type" is undefined (more references follow)
+code_emitter.adb:876:10: error: "Open" is undefined
+code_emitter.adb:877:20: error: "End_Of_File" is undefined
+code_emitter.adb:879:42: error: "Get_Line" is undefined
+code_emitter.adb:886:19: error: "Close" is undefined (more references follow)
+code_emitter.adb:887:29: error: "Error_File_IO" is undefined (more references follow)
+code_emitter.adb:900:20: error: "Error_Invalid_Input" is undefined
+code_emitter.adb:935:10: error: "Create" is undefined
+code_emitter.adb:936:10: error: "Put" is not visible
+code_emitter.adb:936:10: error: non-visible declaration at a-sttebu.ads:134
+code_emitter.adb:936:10: error: non-visible declaration at a-sttebu.ads:29
+stunir_json_parser.ads:18:25: error: "Token_Type" is undefined (more references follow)
+stunir_json_parser.ads:18:51: error: "Token_EOF" not declared in "STUNIR_Types"
+stunir_json_parser.ads:22:23: error: "Parser_State" is undefined (more references follow)
+stunir_json_parser.ads:27:41: error: invalid prefix in selected component "State"
+stunir_json_parser.ads:34:15: error: invalid prefix in selected component "State"
+stunir_json_parser.ads:44:15: error: invalid prefix in selected component "State"
+stunir_json_parser.ads:52:15: error: invalid prefix in selected component "State"
+stunir_json_parser.ads:53:41: error: invalid prefix in selected component "State"

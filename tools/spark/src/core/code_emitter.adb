@@ -11,6 +11,8 @@ use STUNIR_JSON_Parser;
 
 with Ada.Strings.Fixed;
 with Ada.Characters.Handling;
+with Ada.Text_IO;
+use Ada.Text_IO;
 
 package body Code_Emitter is
 
@@ -72,7 +74,7 @@ package body Code_Emitter is
       Status := Success;
 
       case Target is
-         when Lang_CPP =>
+         when Target_CPP =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("int");
             elsif Type_Str = "float" then
@@ -111,7 +113,7 @@ package body Code_Emitter is
                end;
             end if;
 
-         when Lang_Python =>
+         when Target_Python =>
             --  Python is dynamically typed, but we keep type hints
             --  Strip C pointer syntax and map to Python types
             declare
@@ -142,7 +144,7 @@ package body Code_Emitter is
                end if;
             end;
 
-         when Lang_C =>
+         when Target_C =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("int");
             elsif Type_Str = "float" then
@@ -162,7 +164,7 @@ package body Code_Emitter is
             end if;
 
 
-         when Lang_Rust =>
+         when Target_Rust =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("i32");
             elsif Type_Str = "float" then
@@ -200,7 +202,7 @@ package body Code_Emitter is
                end;
             end if;
 
-         when Lang_Go =>
+         when Target_Go =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("int");
             elsif Type_Str = "float" then
@@ -215,7 +217,7 @@ package body Code_Emitter is
                Mapped := IR_Type;
             end if;
 
-         when Lang_Java =>
+         when Target_Java =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("int");
             elsif Type_Str = "float" then
@@ -230,10 +232,7 @@ package body Code_Emitter is
                Mapped := IR_Type;
             end if;
 
-         when Lang_JavaScript =>
-            Mapped := IR_Type;
-
-         when Lang_TypeScript =>
+         when Target_JavaScript =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("number");
             elsif Type_Str = "float" then
@@ -248,22 +247,52 @@ package body Code_Emitter is
                Mapped := IR_Type;
             end if;
 
-         when Lang_Ada =>
+         when Target_CSharp =>
             if Type_Str = "int" then
-               Mapped := Type_Name_Strings.To_Bounded_String ("Integer");
+               Mapped := Type_Name_Strings.To_Bounded_String ("int");
             elsif Type_Str = "float" then
-               Mapped := Type_Name_Strings.To_Bounded_String ("Float");
+               Mapped := Type_Name_Strings.To_Bounded_String ("double");
+            elsif Type_Str = "string" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("string");
+            elsif Type_Str = "bool" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("bool");
+            elsif Type_Str = "void" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("void");
+            else
+               Mapped := IR_Type;
+            end if;
+
+         when Target_Swift =>
+            if Type_Str = "int" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("Int");
+            elsif Type_Str = "float" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("Double");
+            elsif Type_Str = "string" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("String");
+            elsif Type_Str = "bool" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("Bool");
+            elsif Type_Str = "void" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("Void");
+            else
+               Mapped := IR_Type;
+            end if;
+
+         when Target_Kotlin =>
+            if Type_Str = "int" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("Int");
+            elsif Type_Str = "float" then
+               Mapped := Type_Name_Strings.To_Bounded_String ("Double");
             elsif Type_Str = "string" then
                Mapped := Type_Name_Strings.To_Bounded_String ("String");
             elsif Type_Str = "bool" then
                Mapped := Type_Name_Strings.To_Bounded_String ("Boolean");
             elsif Type_Str = "void" then
-               Mapped := Type_Name_Strings.To_Bounded_String ("");
+               Mapped := Type_Name_Strings.To_Bounded_String ("Unit");
             else
                Mapped := IR_Type;
             end if;
 
-         when Lang_SPARK =>
+         when Target_SPARK =>
             if Type_Str = "int" then
                Mapped := Type_Name_Strings.To_Bounded_String ("Integer");
             elsif Type_Str = "float" then
@@ -296,12 +325,12 @@ package body Code_Emitter is
       Status := Success;
 
       case Target is
-         when Lang_CPP =>
+         when Target_CPP =>
             --  Return type
             declare
                Mapped_Type : Type_Name_String;
             begin
-               Map_Type_To_Target (Func.Return_Type, Lang_CPP, Mapped_Type, Temp_Status);
+               Map_Type_To_Target (Func.Return_Type, Target_CPP, Mapped_Type, Temp_Status);
                if Temp_Status /= Success then
                   Status := Temp_Status;
                   return;
@@ -327,7 +356,7 @@ package body Code_Emitter is
                   Param : constant Parameter := Func.Parameters.Params (I);
                   Mapped_Type : Type_Name_String;
                begin
-                  Map_Type_To_Target (Param.Param_Type, Lang_CPP, Mapped_Type, Temp_Status);
+                  Map_Type_To_Target (Param.Param_Type, Target_CPP, Mapped_Type, Temp_Status);
                   if Temp_Status /= Success then
                      Status := Temp_Status;
                      return;
@@ -358,7 +387,7 @@ package body Code_Emitter is
             Append_To_Code (Code, "    return 0;" & ASCII.LF, Temp_Status);
             Append_To_Code (Code, "}" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_Python =>
+         when Target_Python =>
             Append_To_Code (Code, "def ", Temp_Status);
             Append_To_Code (Code, Identifier_Strings.To_String (Func.Name), Temp_Status);
             Append_To_Code (Code, "(", Temp_Status);
@@ -376,7 +405,7 @@ package body Code_Emitter is
             Append_To_Code (Code, "    # TODO: Implement function body" & ASCII.LF, Temp_Status);
             Append_To_Code (Code, "    pass" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_Rust =>
+         when Target_Rust =>
             --  Function signature: pub fn name(param: type, ...) -> ret_type
             Append_To_Code (Code, "pub fn ", Temp_Status);
             Append_To_Code (Code, Identifier_Strings.To_String (Func.Name), Temp_Status);
@@ -396,7 +425,7 @@ package body Code_Emitter is
                   end if;
 
                   --  Then type with colon separator
-                  Map_Type_To_Target (Param.Param_Type, Lang_Rust, Mapped_Type, Temp_Status);
+                  Map_Type_To_Target (Param.Param_Type, Target_Rust, Mapped_Type, Temp_Status);
                   if Temp_Status /= Success then
                      Status := Temp_Status;
                      return;
@@ -426,7 +455,7 @@ package body Code_Emitter is
             declare
                Mapped_Type : Type_Name_String;
             begin
-               Map_Type_To_Target (Func.Return_Type, Lang_Rust, Mapped_Type, Temp_Status);
+               Map_Type_To_Target (Func.Return_Type, Target_Rust, Mapped_Type, Temp_Status);
                if Temp_Status /= Success then
                   Status := Temp_Status;
                   return;
@@ -455,7 +484,7 @@ package body Code_Emitter is
             declare
                Mapped_Type : Type_Name_String;
             begin
-               Map_Type_To_Target (Func.Return_Type, Lang_Rust, Mapped_Type, Temp_Status);
+               Map_Type_To_Target (Func.Return_Type, Target_Rust, Mapped_Type, Temp_Status);
                declare
                   Ret_Str : constant String := Type_Name_Strings.To_String (Mapped_Type);
                begin
@@ -477,7 +506,7 @@ package body Code_Emitter is
             end;
             Append_To_Code (Code, "}" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_Go =>
+         when Target_Go =>
             --  Function signature: func name(param type) ret_type
             Append_To_Code (Code, "func ", Temp_Status);
             Append_To_Code (Code, Identifier_Strings.To_String (Func.Name), Temp_Status);
@@ -494,7 +523,7 @@ package body Code_Emitter is
                      Status := Temp_Status;
                      return;
                   end if;
-                  Map_Type_To_Target (Param.Param_Type, Lang_Go, Mapped_Type, Temp_Status);
+                  Map_Type_To_Target (Param.Param_Type, Target_Go, Mapped_Type, Temp_Status);
                   if Temp_Status /= Success then
                      Status := Temp_Status;
                      return;
@@ -523,7 +552,7 @@ package body Code_Emitter is
             declare
                Mapped_Type : Type_Name_String;
             begin
-               Map_Type_To_Target (Func.Return_Type, Lang_Go, Mapped_Type, Temp_Status);
+               Map_Type_To_Target (Func.Return_Type, Target_Go, Mapped_Type, Temp_Status);
                if Temp_Status /= Success then
                   Status := Temp_Status;
                   return;
@@ -552,7 +581,7 @@ package body Code_Emitter is
             declare
                Mapped_Type : Type_Name_String;
             begin
-               Map_Type_To_Target (Func.Return_Type, Lang_Go, Mapped_Type, Temp_Status);
+               Map_Type_To_Target (Func.Return_Type, Target_Go, Mapped_Type, Temp_Status);
                declare
                   Ret_Str : constant String := Type_Name_Strings.To_String (Mapped_Type);
                begin
@@ -594,25 +623,25 @@ package body Code_Emitter is
       Status := Success;
 
       case Target is
-         when Lang_CPP =>
+         when Target_CPP =>
             Append_To_Code (Header, "// Generated by STUNIR Code Emitter" & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "// DO NOT EDIT MANUALLY" & ASCII.LF & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "#include <string>" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_C =>
+         when Target_C =>
             Append_To_Code (Header, "/* Generated by STUNIR Code Emitter */" & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "/* DO NOT EDIT MANUALLY */" & ASCII.LF & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "#include <stdio.h>" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_Python =>
+         when Target_Python =>
             Append_To_Code (Header, "# Generated by STUNIR Code Emitter" & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "# DO NOT EDIT MANUALLY" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_Rust =>
+         when Target_Rust =>
             Append_To_Code (Header, "// Generated by STUNIR Code Emitter" & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "// DO NOT EDIT MANUALLY" & ASCII.LF & ASCII.LF, Temp_Status);
 
-         when Lang_Go =>
+         when Target_Go =>
             Append_To_Code (Header, "// Generated by STUNIR Code Emitter" & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "// DO NOT EDIT MANUALLY" & ASCII.LF & ASCII.LF, Temp_Status);
             Append_To_Code (Header, "package main" & ASCII.LF & ASCII.LF, Temp_Status);
@@ -636,7 +665,7 @@ package body Code_Emitter is
       Status := Success;
 
       case Target is
-         when Lang_Go =>
+         when Target_Go =>
             Append_To_Code (Footer, ASCII.LF & "func main() {" & ASCII.LF, Temp_Status);
             Append_To_Code (Footer, "    // Entry point" & ASCII.LF, Temp_Status);
             Append_To_Code (Footer, "}" & ASCII.LF, Temp_Status);
@@ -677,7 +706,7 @@ package body Code_Emitter is
 
       --  Generate code for each function
       for I in 1 .. IR.Functions.Count loop
-         Generate_Function_Code (IR.Functions.IR_Functions (I), Target, Func_Code, Temp_Status);
+         Generate_Function_Code (IR.Functions.Functions (I), Target, Func_Code, Temp_Status);
          if Temp_Status /= Success then
             Status := Temp_Status;
             return;
@@ -706,7 +735,7 @@ package body Code_Emitter is
       Status :    out Status_Code)
    is
    begin
-      Generate_All_Code (IR, Lang_CPP, Code, Status);
+      Generate_All_Code (IR, Target_CPP, Code, Status);
    end Generate_CPP_Code;
 
    procedure Generate_C_Code
@@ -715,7 +744,7 @@ package body Code_Emitter is
       Status :    out Status_Code)
    is
    begin
-      Generate_All_Code (IR, Lang_C, Code, Status);
+      Generate_All_Code (IR, Target_C, Code, Status);
    end Generate_C_Code;
 
    procedure Generate_Python_Code
@@ -724,7 +753,7 @@ package body Code_Emitter is
       Status :    out Status_Code)
    is
    begin
-      Generate_All_Code (IR, Lang_Python, Code, Status);
+      Generate_All_Code (IR, Target_Python, Code, Status);
    end Generate_Python_Code;
 
    procedure Generate_Rust_Code
@@ -733,7 +762,7 @@ package body Code_Emitter is
       Status :    out Status_Code)
    is
    begin
-      Generate_All_Code (IR, Lang_Rust, Code, Status);
+      Generate_All_Code (IR, Target_Rust, Code, Status);
    end Generate_Rust_Code;
 
    procedure Generate_Go_Code
@@ -742,7 +771,7 @@ package body Code_Emitter is
       Status :    out Status_Code)
    is
    begin
-      Generate_All_Code (IR, Lang_Go, Code, Status);
+      Generate_All_Code (IR, Target_Go, Code, Status);
    end Generate_Go_Code;
 
    --  =======================================================================
@@ -754,16 +783,17 @@ package body Code_Emitter is
    is
    begin
       case Target is
-         when Lang_CPP       => return Identifier_Strings.To_Bounded_String (".cpp");
-         when Lang_C         => return Identifier_Strings.To_Bounded_String (".c");
-         when Lang_Python    => return Identifier_Strings.To_Bounded_String (".py");
-         when Lang_Rust      => return Identifier_Strings.To_Bounded_String (".rs");
-         when Lang_Go        => return Identifier_Strings.To_Bounded_String (".go");
-         when Lang_Java      => return Identifier_Strings.To_Bounded_String (".java");
-         when Lang_JavaScript=> return Identifier_Strings.To_Bounded_String (".js");
-         when Lang_TypeScript=> return Identifier_Strings.To_Bounded_String (".ts");
-         when Lang_Ada       => return Identifier_Strings.To_Bounded_String (".adb");
-         when Lang_SPARK     => return Identifier_Strings.To_Bounded_String (".adb");
+         when Target_CPP       => return Identifier_Strings.To_Bounded_String (".cpp");
+         when Target_C         => return Identifier_Strings.To_Bounded_String (".c");
+         when Target_Python    => return Identifier_Strings.To_Bounded_String (".py");
+         when Target_Rust      => return Identifier_Strings.To_Bounded_String (".rs");
+         when Target_Go        => return Identifier_Strings.To_Bounded_String (".go");
+         when Target_Java      => return Identifier_Strings.To_Bounded_String (".java");
+         when Target_JavaScript=> return Identifier_Strings.To_Bounded_String (".js");
+         when Target_CSharp    => return Identifier_Strings.To_Bounded_String (".cs");
+         when Target_Swift     => return Identifier_Strings.To_Bounded_String (".swift");
+         when Target_Kotlin    => return Identifier_Strings.To_Bounded_String (".kt");
+         when Target_SPARK     => return Identifier_Strings.To_Bounded_String (".adb");
       end case;
    end Get_File_Extension;
 
@@ -781,7 +811,7 @@ package body Code_Emitter is
       IR := (Schema_Version => Identifier_Strings.Null_Bounded_String,
              IR_Version     => Identifier_Strings.Null_Bounded_String,
              Module_Name    => Identifier_Strings.Null_Bounded_String,
-             Functions      => (Count => 0, IR_Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))), Steps => (Count => 0, Steps => (others => (Step_Type => Step_Noop, Target => Identifier_Strings.Null_Bounded_String, Source => Identifier_Strings.Null_Bounded_String, Value => Identifier_Strings.Null_Bounded_String)))))));
+             Functions      => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))), Steps => (Count => 0, Steps => (others => (Step_Type => Step_Noop, Target => Identifier_Strings.Null_Bounded_String, Source => Identifier_Strings.Null_Bounded_String, Value => Identifier_Strings.Null_Bounded_String)))))));
       Status := Success;
 
       Initialize_Parser (Parser, JSON_Content, Status);

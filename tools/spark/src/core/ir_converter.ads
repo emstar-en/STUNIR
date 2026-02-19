@@ -11,10 +11,10 @@ pragma SPARK_Mode (On);
 
 with STUNIR_Types;
 use STUNIR_Types;
+use type Identifier_Strings.Bounded_String;
+use type Type_Name_Strings.Bounded_String;
 
 package IR_Converter is
-
-   pragma Pure;
 
    --  ========================================================================
    --  Spec Types (Input)

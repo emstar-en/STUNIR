@@ -87,10 +87,10 @@ begin
    if Is_Success (Status) then
       Put_Line ("Successfully converted extraction.json to spec.json");
       Put_Line ("Output: " & Path_Strings.To_String (Output_Path));
-      Set_Exit_Status (Success);
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Success);
    else
       Put_Line ("Error: " & Status_Code_Image (Status));
-      Set_Exit_Status (Failure);
+      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
    end if;
 
 end Spec_Assembler_Main;

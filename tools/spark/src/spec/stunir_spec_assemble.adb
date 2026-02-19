@@ -214,7 +214,7 @@ package body STUNIR_Spec_Assemble is
          return;
       end if;
 
-      Start_Search (Search, Root, "*.json", [Directory => False, others => True]);
+      Start_Search (Search, Root, "*.json", (Directory => False, others => True));
       while More_Entries (Search) loop
          Get_Next_Entry (Search, Dir_Ent);
          Parse_Element_File (Full_Name (Dir_Ent), Result.Module);

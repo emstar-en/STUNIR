@@ -14,7 +14,6 @@ use STUNIR_Types;
 
 package STUNIR_JSON_Parser is
 
-   pragma Pure;
 
    --  ========================================================================
    --  JSON Token Types

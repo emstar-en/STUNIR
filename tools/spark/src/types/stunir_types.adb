@@ -24,6 +24,12 @@ package body STUNIR_Types is
          when Error_Conversion_Failed => return "Error: Conversion failed";
          when Error_Emission_Failed   => return "Error: Code emission failed";
          when Error_Not_Implemented   => return "Error: Not implemented";
+         when Error_Invalid_Format    => return "Error: Invalid format";
+         when Error_Empty_Extraction  => return "Error: Empty extraction";
+         when Error_Too_Large         => return "Error: Too large";
+         when Error_Parse             => return "Error: Parse";
+         when Error_File_IO           => return "Error: File I/O failed";
+         when Error_Invalid_Input     => return "Error: Invalid input";
       end case;
    end Status_Code_Image;
 
