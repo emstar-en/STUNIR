@@ -6,6 +6,9 @@
 
 pragma SPARK_Mode (On);
 
+with STUNIR_Types;
+use STUNIR_Types;
+
 with Spec_Assembler;
 with IR_Converter;
 with Code_Emitter;

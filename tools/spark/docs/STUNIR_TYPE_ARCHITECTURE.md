@@ -1,3 +1,9 @@
+> **SUPERSEDED** — This document has been superseded by `tools/spark/ARCHITECTURE.md`
+> (Section 4: Type System). The analysis here is preserved for historical reference.
+> When this document and `ARCHITECTURE.md` conflict, `ARCHITECTURE.md` is correct.
+
+---
+
 # STUNIR Type System Architecture
 
 ## Overview

@@ -1,6 +1,11 @@
 --  schema_check_format - Validate formats/patterns in JSON against schema
 --  Format validation utility for STUNIR powertools
 --  Phase 3 Utility for STUNIR
+--
+--  REGEX_IR_REF: schema/stunir_regex_ir_v1.dcbor.json
+--               group: validation.identifier / pattern_id: identifier_start
+--  The 'version' field name check uses literal substring matching.
+--  See regex IR for the formal definition of valid identifier format.
 
 pragma SPARK_Mode (Off);
 

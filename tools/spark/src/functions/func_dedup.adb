@@ -205,7 +205,7 @@ procedure Func_Dedup is
 
       loop
          Next_Token (State, Status);
-         exit when Status /= STUNIR_Types.Success or else State.Current_Token = STUNIR_Types.Token_EOF;
+         exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_EOF;
 
          if State.Current_Token = Token_String then
             declare

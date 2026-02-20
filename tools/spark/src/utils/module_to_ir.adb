@@ -1,6 +1,29 @@
---  module_to_ir - Extract module metadata from spec module object
---  Input:  Module spec JSON object (stdin, from spec_extract_module)
---  Output: Module metadata JSON for use with ir_add_metadata (stdout)
+-------------------------------------------------------------------------------
+--  module_to_ir.adb — Module Spec to IR Metadata Extractor
+--
+--  PURPOSE: Extract module metadata from a spec module object and produce
+--           module metadata JSON for use with ir_add_metadata.
+--
+--  PIPELINE POSITION: Phase 2 — IR Pipeline
+--    spec_extract_module → [module_to_ir] → ir_add_metadata → ir_converter
+--
+--  INPUTS:  stdin  — module spec JSON object (from spec_extract_module)
+--  OUTPUTS: stdout — module metadata JSON for ir_add_metadata
+--
+--  EXIT CODES (per ARCHITECTURE.core.json):
+--    0 = success
+--    1 = validation error (bad input format)
+--    2 = processing error
+--
+--  REGEX_IR_REF: tools/spark/schema/stunir_regex_ir_v1.dcbor.json
+--               group: validation.identifier (module_name pattern)
+--               pattern_id: identifier_start
+--
+--  GOVERNANCE: Do NOT add new source directories without updating
+--              stunir_tools.gpr. See CONTRIBUTING.md.
+--
+--  See: stunir_tools.gpr, tools/spark/ARCHITECTURE.md (Phase 2)
+-------------------------------------------------------------------------------
 
 pragma SPARK_Mode (Off);
 

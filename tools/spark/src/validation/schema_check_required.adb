@@ -1,6 +1,12 @@
 --  schema_check_required - Check required fields in JSON against schema
 --  Schema validation utility for STUNIR powertools
 --  Phase 3 Utility for STUNIR
+--
+--  REGEX_IR_REF: schema/stunir_regex_ir_v1.dcbor.json
+--               group: validation.identifier / pattern_id: identifier_start
+--  Required fields checked: version, module, types, functions, metadata.
+--  Ada implementation uses literal substring scan (equivalent to regex for
+--  this fixed finite set). See regex IR for formal definition.
 
 pragma SPARK_Mode (Off);
 

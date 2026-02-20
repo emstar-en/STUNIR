@@ -11,6 +11,7 @@ use STUNIR_JSON_Parser;
 with Semantic_IR.JSON;
 with Semantic_IR.Modules;
 with STUNIR.Emitters.Node_Table;
+with STUNIR.Emitters.CodeGen;
 with STUNIR.Emitters.Lisp;
 with STUNIR.Emitters.Python;
 with STUNIR.Emitters.CFamily;

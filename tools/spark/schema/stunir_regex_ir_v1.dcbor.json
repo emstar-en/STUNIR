@@ -1,0 +1,627 @@
+{
+  "ir_version": "v1",
+  "schema": "stunir_regex_ir_v1",
+  "module_name": "stunir_regex_ir",
+  "generated_epoch": 0,
+  "stunir_version": "1.0.0",
+
+  "philosophy": {
+    "summary": "All regular expressions in the STUNIR harness are formal objects, not ad-hoc strings. Each pattern is a member of a regular language over a defined alphabet, with explicit closure properties and a declared use-mode (acceptance or transformation). This grounds pattern matching in the same mathematical framework as the rest of the pipeline: deterministic, canonical, hash-stable.",
+    "formal_basis": {
+      "model": "Deterministic Finite Automaton (DFA)",
+      "equivalence": "Two patterns are equivalent iff their minimal DFAs are isomorphic (Myhill-Nerode theorem). The canonical form of a pattern is its minimal DFA's transition table, not its regex string.",
+      "closure_properties": "Regular languages are closed under union, intersection, complement, concatenation, and Kleene star. Patterns in this IR may be composed using these operations; the result is always regular.",
+      "decidability": "Membership, emptiness, finiteness, and equivalence are all decidable for regular languages. This means every pattern in this IR can be mechanically verified.",
+      "alphabet": "Unless otherwise noted, the alphabet is the set of Unicode scalar values restricted to the ASCII subset (U+0000–U+007F). Patterns that accept non-ASCII input are explicitly annotated.",
+      "anchoring": "A pattern marked 'anchored: true' matches the entire input string (implicit ^ and $). A pattern marked 'anchored: false' is a search pattern (matches any substring). Anchoring is a property of the use-site, not the pattern itself; this IR records the canonical intended anchoring.",
+      "transformation_semantics": "Patterns used for substitution (re.sub) are annotated with 'mode: transform' and include a 'replacement' field. The replacement string is a formal object: '$0' refers to the full match, '$1'..'$N' to capture groups. Capture groups are numbered left-to-right by opening parenthesis.",
+      "hash_stability": "The canonical form of this IR document is produced by sorting all JSON object keys lexicographically and using no insignificant whitespace (dCBOR-style). The sha256 of the canonical bytes is the identity of this IR version."
+    },
+    "governance": "This file is the Single Source of Truth (SSoT) for all regular expressions in the STUNIR harness. When adding a new pattern: (1) add it here first, (2) reference it from the using source file with a REGEX_IR_REF comment, (3) update stunir_tools.gpr if a new source directory is involved. Do NOT embed undocumented regex strings in source files."
+  },
+
+  "pattern_groups": [
+
+    {
+      "group_id": "validation.hash",
+      "scope": "schema_validation",
+      "description": "Patterns that validate cryptographic hash strings. All hashes in STUNIR are SHA-256 (256-bit / 64 hex characters). Two canonical forms exist: bare hex and prefixed ('sha256:' + hex).",
+      "formal_language": "regular",
+      "alphabet": "ASCII hexadecimal digits [0-9a-f] plus optional prefix characters",
+      "patterns": [
+        {
+          "id": "sha256_prefixed",
+          "regex": "^sha256:[a-f0-9]{64}$",
+          "anchored": true,
+          "mode": "accept",
+          "description": "Full SHA-256 hash with 'sha256:' prefix. 71 characters total (7 prefix + 64 hex). This is the canonical STUNIR hash format for node IDs and IR object references.",
+          "formal_language_class": "regular",
+          "alphabet": "ASCII: [a-f0-9:] plus anchors",
+          "min_length": 71,
+          "max_length": 71,
+          "capture_groups": 0,
+          "used_in": [
+            "tools/semantic_ir/validation.py:53-54",
+            "tools/semantic_ir/ir_types.py:14",
+            "tools/spark/src/semantic_ir/semantic_ir-nodes.ads:Is_Valid_Hash"
+          ],
+          "spark_equivalent": "Is_Valid_Hash in src/semantic_ir/semantic_ir-nodes.ads (checks Hash_Strings.Length = 71)",
+          "notes": "The Ada SPARK equivalent uses a length check (71 chars) rather than a regex, which is equivalent for this fixed-length pattern."
+        },
+        {
+          "id": "sha256_bare_hex",
+          "regex": "^[a-f0-9]{64}$",
+          "anchored": true,
+          "mode": "accept",
+          "description": "Bare SHA-256 hex digest without prefix. 64 lowercase hex characters. Used in manifest files and receipt fields where the 'sha256:' prefix is implied by context.",
+          "formal_language_class": "regular",
+          "alphabet": "ASCII: [a-f0-9] plus anchors",
+          "min_length": 64,
+          "max_length": 64,
+          "capture_groups": 0,
+          "used_in": [
+            "tools/verify_build.py:42 (HEX_RE)",
+            "tools/spark/schema/ARCHITECTURE.formats.json (manifest_v1 hash field)"
+          ]
+        },
+        {
+          "id": "hex_string_any_length",
+          "regex": "^[0-9a-f]+$",
+          "anchored": true,
+          "mode": "accept",
+          "description": "Any non-empty lowercase hexadecimal string. Used for loose hex validation where length is checked separately.",
+          "formal_language_class": "regular",
+          "alphabet": "ASCII: [0-9a-f] plus anchors",
+          "min_length": 1,
+          "max_length": null,
+          "capture_groups": 0,
+          "used_in": [
+            "tools/verify_build.py:42 (HEX_RE, used for digest field validation)"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "validation.node_id",
+      "scope": "schema_validation",
+      "description": "Patterns that validate AST node identifiers in the Semantic IR. Node IDs are prefixed with 'n_' to distinguish them from other identifiers and to make them visually distinct in IR documents.",
+      "formal_language": "regular",
+      "alphabet": "ASCII alphanumeric plus underscore",
+      "patterns": [
+        {
+          "id": "node_id",
+          "regex": "^n_[a-zA-Z0-9_]+$",
+          "anchored": true,
+          "mode": "accept",
+          "description": "Semantic IR node identifier. Must start with 'n_' followed by one or more alphanumeric or underscore characters. The 'n_' prefix is a namespace marker that prevents collision with other identifier types.",
+          "formal_language_class": "regular",
+          "alphabet": "ASCII: [a-zA-Z0-9_] plus 'n_' prefix and anchors",
+          "min_length": 3,
+          "max_length": 128,
+          "capture_groups": 0,
+          "used_in": [
+            "tools/semantic_ir/validation.py:53-54",
+            "tools/semantic_ir/ir_types.py:16"
+          ],
+          "spark_equivalent": "Is_Valid_Node_ID in src/semantic_ir/semantic_ir-nodes.ads (checks Length > 2)"
+        }
+      ]
+    },
+
+    {
+      "group_id": "validation.identifier",
+      "scope": "schema_validation",
+      "description": "Patterns that validate programming language identifiers and module names. These follow the C/Ada/most-language convention: start with a letter or underscore, followed by letters, digits, or underscores.",
+      "formal_language": "regular",
+      "alphabet": "ASCII alphanumeric plus underscore",
+      "patterns": [
+        {
+          "id": "identifier_start",
+          "regex": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "anchored": true,
+          "mode": "accept",
+          "description": "Standard programming language identifier. Accepts module names, function names, variable names, field names, and argument names. This is the most common identifier pattern in the IR schema.",
+          "formal_language_class": "regular",
+          "alphabet": "ASCII: [A-Za-z0-9_] plus anchors",
+          "min_length": 1,
+          "max_length": 128,
+          "capture_groups": 0,
+          "used_in": [
+            "tools/spark/schemas/stunir_ir_v1.schema.json (module_name, types[].name, functions[].name, args[].name, fields[].name, generic_instantiations[].name)"
+          ]
+        },
+        {
+          "id": "type_param_name",
+          "regex": "^[A-Z][A-Za-z0-9_]*$",
+          "anchored": true,
+          "mode": "accept",
+          "description": "Type parameter name. Must start with an uppercase letter (Ada/Haskell/ML convention for type variables). Used for generic type parameters in the IR schema.",
+          "formal_language_class": "regular",
+          "alphabet": "ASCII: [A-Za-z0-9_] with uppercase-only first character, plus anchors",
+          "min_length": 1,
+          "max_length": 128,
+          "capture_groups": 0,
+          "used_in": [
+            "tools/spark/schemas/stunir_ir_v1.schema.json (type_param.name)"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "extraction.c_function",
+      "scope": "source_extraction",
+      "description": "Patterns used to extract C/C++ function signatures from source code. These are used by the extraction pipeline (tools/scripts/) to produce extraction JSON from raw source files. They are NOT used in the Ada SPARK pipeline directly — the SPARK pipeline consumes pre-extracted JSON.",
+      "formal_language": "regular (with caveats — see notes)",
+      "alphabet": "ASCII source code characters",
+      "notes": "C function signatures are not a regular language in general (nested types, function pointers). These patterns are heuristic approximations that work for the common cases in the STUNIR target codebase. They are not guaranteed to parse all valid C.",
+      "patterns": [
+        {
+          "id": "c_function_definition",
+          "regex": "^(static\\s+|const\\s+|inline\\s+)*([a-zA-Z_][a-zA-Z0-9_]*\\s*\\*?\\s+)\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(([^)]*)\\)\\s*\\{",
+          "anchored": true,
+          "mode": "accept",
+          "description": "C function definition (with opening brace). Captures: (1) optional qualifiers, (2) return type, (3) function name, (4) parameter list. Used with re.MULTILINE.",
+          "formal_language_class": "regular (heuristic)",
+          "capture_groups": 4,
+          "capture_group_names": ["qualifiers", "return_type", "function_name", "parameter_list"],
+          "used_in": [
+            "tools/scripts/extract_bc_functions.py:104-106"
+          ]
+        },
+        {
+          "id": "c_function_signature_prefix",
+          "regex": "^\\s*(uint8_t|uint16_t|uint32_t|uint64_t|void|static|const)\\s+\\w+\\s*\\(",
+          "anchored": true,
+          "mode": "accept",
+          "description": "C function signature line prefix. Matches lines that start a function declaration with a known return type qualifier. Used as a fast pre-filter before full signature parsing.",
+          "formal_language_class": "regular",
+          "capture_groups": 1,
+          "capture_group_names": ["return_type_qualifier"],
+          "used_in": [
+            "tools/scripts/extract_signatures.py:9,14",
+            "tools/scripts/final_comparison.py:15,24"
+          ]
+        },
+        {
+          "id": "c_array_suffix",
+          "regex": "(\\s*\\[[^\\]]*\\])+\\s*$",
+          "anchored": false,
+          "mode": "accept",
+          "description": "C array type suffix detection. Matches one or more array dimension brackets at the end of a type string (e.g., '[10]', '[]', '[MAX_SIZE]'). Used to detect array parameters.",
+          "formal_language_class": "regular",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/scripts/extract_bc_functions.py:38",
+            "tools/scripts/test_extraction_logic.py:119"
+          ]
+        },
+        {
+          "id": "c_function_pointer",
+          "regex": "\\((\\*|&)\\s*(const\\s+|volatile\\s+)*([A-Za-z_][A-Za-z0-9_]*)\\s*\\)",
+          "anchored": false,
+          "mode": "accept",
+          "description": "C function pointer or reference parameter detection. Matches '(*name)' or '(&name)' patterns in parameter strings. Capture group 3 is the pointer/reference name.",
+          "formal_language_class": "regular",
+          "capture_groups": 3,
+          "capture_group_names": ["deref_op", "cv_qualifier", "name"],
+          "used_in": [
+            "tools/scripts/extract_bc_functions.py:44",
+            "tools/scripts/test_extraction_logic.py:126"
+          ]
+        },
+        {
+          "id": "c_identifier_at_end",
+          "regex": "(?<![\\w])([A-Za-z_][A-Za-z0-9_]*)\\s*$",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Extract the last identifier in a parameter string (the parameter name). Uses a negative lookbehind to avoid matching mid-word. Capture group 1 is the identifier.",
+          "formal_language_class": "regular (with lookbehind — implemented as DFA with state)",
+          "capture_groups": 1,
+          "capture_group_names": ["identifier"],
+          "used_in": [
+            "tools/scripts/extract_bc_functions.py:60,188",
+            "tools/scripts/test_extraction_logic.py:146"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "extraction.whitespace",
+      "scope": "source_extraction",
+      "description": "Patterns used to normalize whitespace in extracted type strings and identifiers.",
+      "formal_language": "regular",
+      "alphabet": "ASCII",
+      "patterns": [
+        {
+          "id": "whitespace_collapse",
+          "regex": "\\s+",
+          "anchored": false,
+          "mode": "transform",
+          "replacement": " ",
+          "description": "Collapse any run of whitespace (spaces, tabs, newlines) to a single space. Used to normalize type strings extracted from C source.",
+          "formal_language_class": "regular",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/scripts/extract_bc_functions.py:56,76,90",
+            "tools/scripts/test_extraction_logic.py:141,166,168,183,195"
+          ]
+        },
+        {
+          "id": "pointer_normalize_remove_spaces",
+          "regex": "\\s*\\*\\s*",
+          "anchored": false,
+          "mode": "transform",
+          "replacement": "*",
+          "description": "Remove spaces around pointer asterisks in type strings (step 1 of 2). Applied before pointer_normalize_add_space.",
+          "formal_language_class": "regular",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/scripts/test_extraction_logic.py:196"
+          ]
+        },
+        {
+          "id": "pointer_normalize_add_space",
+          "regex": "\\*",
+          "anchored": false,
+          "mode": "transform",
+          "replacement": " *",
+          "description": "Add a space before pointer asterisks in type strings (step 2 of 2). Produces canonical form 'type *name'. Applied after pointer_normalize_remove_spaces.",
+          "formal_language_class": "regular",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/scripts/test_extraction_logic.py:197"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.x86_registers",
+      "scope": "asm_validation",
+      "description": "Pattern matching x86/x86-64 register names. Used by the ASM validator to detect x86 architecture and validate register usage.",
+      "formal_language": "regular",
+      "alphabet": "ASCII lowercase letters and digits",
+      "patterns": [
+        {
+          "id": "x86_register_names",
+          "regex": "\\b(eax|ebx|ecx|edx|esi|edi|esp|ebp|eip|rax|rbx|rcx|rdx|rsi|rdi|rsp|rbp|rip|r8|r9|r10|r11|r12|r13|r14|r15|ax|bx|cx|dx|si|di|sp|bp|al|bl|cl|dl|ah|bh|ch|dh)\\b",
+          "anchored": false,
+          "mode": "accept",
+          "description": "x86 and x86-64 general-purpose register names. Word-boundary anchored to avoid matching substrings. Covers 8-bit, 16-bit, 32-bit, and 64-bit registers.",
+          "formal_language_class": "regular (finite union of literals)",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:29"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.arm_registers",
+      "scope": "asm_validation",
+      "description": "Pattern matching ARM/AArch64 register names.",
+      "formal_language": "regular",
+      "alphabet": "ASCII lowercase letters and digits",
+      "patterns": [
+        {
+          "id": "arm_register_names",
+          "regex": "\\b(r[0-9]|r1[0-5]|sp|lr|pc|w[0-9]|w[12][0-9]|w30|x[0-9]|x[12][0-9]|x30|xzr|wzr|fp)\\b",
+          "anchored": false,
+          "mode": "accept",
+          "description": "ARM (32-bit) and AArch64 (64-bit) register names. Covers r0-r15, sp, lr, pc (ARM32) and w0-w30, x0-x30, xzr, wzr, fp (AArch64).",
+          "formal_language_class": "regular (finite union of literals and bounded numeric ranges)",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:30"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.x86_instructions",
+      "scope": "asm_validation",
+      "description": "Pattern matching x86 instruction mnemonics.",
+      "formal_language": "regular",
+      "alphabet": "ASCII lowercase letters",
+      "patterns": [
+        {
+          "id": "x86_instruction_mnemonics",
+          "regex": "\\b(mov|push|pop|add|sub|mul|div|and|or|xor|not|cmp|jmp|je|jne|jl|jg|jle|jge|call|ret|nop|lea|inc|dec|shl|shr|sar|rol|ror|test|xchg|imul|idiv|cdq|cqo|movzx|movsx|cmov|setcc|rep|repe|repne|stosb|stosd|lodsb|lodsd|scasb|scasd|movsb|movsd|int|syscall|sysenter|leave|enter)\\b",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Common x86 instruction mnemonics. Used for architecture detection and instruction validation.",
+          "formal_language_class": "regular (finite union of literals)",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:33"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.arm_instructions",
+      "scope": "asm_validation",
+      "description": "Pattern matching ARM instruction mnemonics.",
+      "formal_language": "regular",
+      "alphabet": "ASCII lowercase letters",
+      "patterns": [
+        {
+          "id": "arm_instruction_mnemonics",
+          "regex": "\\b(mov|add|sub|mul|div|and|orr|eor|mvn|cmp|b|bl|bx|blx|ldr|str|ldm|stm|push|pop|swi|svc|nop|adr|adrp|lsl|lsr|asr|ror|rrx|tst|teq|rsb|rsc|sbc|adc|mla|mls|umull|smull|umlal|smlal|clz|bic|orn|cbz|cbnz|tbz|tbnz|ret|ldp|stp|fmov|fadd|fsub|fmul|fdiv|fcmp|fcvt)\\b",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Common ARM and AArch64 instruction mnemonics.",
+          "formal_language_class": "regular (finite union of literals)",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:34"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.wasm_instructions",
+      "scope": "asm_validation",
+      "description": "Pattern matching WebAssembly instruction prefixes and type annotations.",
+      "formal_language": "regular",
+      "alphabet": "ASCII lowercase letters, digits, and dots",
+      "patterns": [
+        {
+          "id": "wasm_type_prefixes",
+          "regex": "\\b(i32|i64|f32|f64|v128|i32x4|i64x2|f32x4|f64x2|funcref|externref)\\b",
+          "anchored": false,
+          "mode": "accept",
+          "description": "WebAssembly value type prefixes and SIMD types. Used for WASM architecture detection.",
+          "formal_language_class": "regular (finite union of literals)",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:35"
+          ]
+        },
+        {
+          "id": "wasm_module_detect",
+          "regex": "\\(module|\\(func|\\(param|i32\\.|i64\\.",
+          "anchored": false,
+          "mode": "accept",
+          "description": "WebAssembly text format (WAT) module structure detection. Matches the opening of a WASM module, function, or parameter declaration, or a typed instruction.",
+          "formal_language_class": "regular (union of literals)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/validators/validate_asm.py:45"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.unsafe_syscall",
+      "scope": "asm_validation",
+      "description": "Patterns that detect potentially unsafe or privileged system call instructions in assembly output.",
+      "formal_language": "regular",
+      "alphabet": "ASCII",
+      "patterns": [
+        {
+          "id": "unsafe_syscall_instructions",
+          "regex": "\\b(int\\s+0x80|syscall|sysenter)\\b",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Detects Linux x86 system call instructions: 'int 0x80' (32-bit legacy), 'syscall' (64-bit), 'sysenter' (fast 32-bit). These are flagged as potentially unsafe in generated code.",
+          "formal_language_class": "regular",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:77"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "asm.directives",
+      "scope": "asm_validation",
+      "description": "Patterns that match assembler directives (pseudo-ops) in assembly source.",
+      "formal_language": "regular",
+      "alphabet": "ASCII",
+      "patterns": [
+        {
+          "id": "asm_section_directives",
+          "regex": "\\.(text|data|bss|section|global|extern|align|byte|word|long|quad|ascii|asciz|space|zero|comm|lcomm|type|size|file|loc|cfi_startproc|cfi_endproc)",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Common GNU assembler (GAS) directives. Matches the dot-prefixed pseudo-ops that control section placement, symbol visibility, and data layout.",
+          "formal_language_class": "regular (finite union of literals with dot prefix)",
+          "capture_groups": 1,
+          "used_in": [
+            "tools/validators/validate_asm.py:69"
+          ]
+        },
+        {
+          "id": "arm_stack_alignment",
+          "regex": "\\bsp\\b.*#[0-9]+",
+          "anchored": false,
+          "mode": "accept",
+          "description": "ARM stack pointer adjustment with immediate offset. Used to detect and validate stack alignment in ARM assembly output.",
+          "formal_language_class": "regular",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/validators/validate_asm.py:93"
+          ]
+        },
+        {
+          "id": "arm_immediate_value",
+          "regex": "#([0-9]+)",
+          "anchored": false,
+          "mode": "accept",
+          "description": "ARM immediate value extraction. Capture group 1 is the decimal integer value of the immediate operand.",
+          "formal_language_class": "regular",
+          "capture_groups": 1,
+          "capture_group_names": ["immediate_value"],
+          "used_in": [
+            "tools/validators/validate_asm.py:94"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "logging.filter",
+      "scope": "logging",
+      "description": "Patterns used by the STUNIR logging subsystem to filter log records by context, include/exclude rules. These are structural patterns — the actual regex strings are supplied at runtime by configuration. This group documents the pattern types and their semantics.",
+      "formal_language": "regular (runtime-supplied)",
+      "alphabet": "ASCII (log message content)",
+      "notes": "Unlike other groups, logging filter patterns are not fixed strings — they are compiled from user/config-supplied strings at runtime. This group documents the pattern slots and their semantics, not specific patterns.",
+      "patterns": [
+        {
+          "id": "context_filter",
+          "regex": "<runtime-supplied>",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Context filter pattern. Applied to log record context fields (module name, function name, etc.). A record passes if any context field matches. Compiled from config dict values.",
+          "formal_language_class": "regular (runtime-supplied)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/stunir_logging/filters.py:52,74"
+          ]
+        },
+        {
+          "id": "include_filter",
+          "regex": "<runtime-supplied>",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Include filter pattern. A log record is included only if it matches at least one include pattern. If no include patterns are configured, all records pass.",
+          "formal_language_class": "regular (runtime-supplied)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/stunir_logging/filters.py:115,127"
+          ]
+        },
+        {
+          "id": "exclude_filter",
+          "regex": "<runtime-supplied>",
+          "anchored": false,
+          "mode": "accept",
+          "description": "Exclude filter pattern. A log record is excluded if it matches any exclude pattern. Exclude takes precedence over include.",
+          "formal_language_class": "regular (runtime-supplied)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/stunir_logging/filters.py:118,136"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "sanitization.identifier",
+      "scope": "code_generation",
+      "description": "Patterns used to sanitize strings into valid programming language identifiers. Applied during code generation to ensure emitted identifiers are syntactically valid.",
+      "formal_language": "regular",
+      "alphabet": "ASCII",
+      "patterns": [
+        {
+          "id": "non_identifier_char",
+          "regex": "[^a-zA-Z0-9_]",
+          "anchored": false,
+          "mode": "transform",
+          "replacement": "_",
+          "description": "Replace any character that is not a valid identifier character (letter, digit, underscore) with an underscore. Applied to arbitrary strings to produce valid identifiers. Note: does not handle leading-digit constraint — caller must prepend '_' if result starts with a digit.",
+          "formal_language_class": "regular (complement of identifier charset)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/semantic_ir/emitters/codegen.py:26"
+          ]
+        },
+        {
+          "id": "non_header_guard_char",
+          "regex": "[^A-Z0-9_]",
+          "anchored": false,
+          "mode": "transform",
+          "replacement": "_",
+          "description": "Replace any character that is not a valid C/C++ header guard character (uppercase letter, digit, underscore) with an underscore. Applied after uppercasing the filename to produce a valid include guard macro name.",
+          "formal_language_class": "regular (complement of uppercase identifier charset)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/semantic_ir/emitters/codegen.py:129"
+          ]
+        }
+      ]
+    },
+
+    {
+      "group_id": "sanitization.tool_name",
+      "scope": "build_system",
+      "description": "Patterns used to normalize tool names in the build system and receipt generation.",
+      "formal_language": "regular",
+      "alphabet": "ASCII",
+      "patterns": [
+        {
+          "id": "non_tool_name_char",
+          "regex": "[^a-z0-9\\-]",
+          "anchored": false,
+          "mode": "transform",
+          "replacement": "",
+          "description": "Remove any character that is not a valid tool name character (lowercase letter, digit, hyphen). Applied to tool names to produce canonical lowercase-hyphenated identifiers for use in receipts and lockfiles.",
+          "formal_language_class": "regular (complement of tool name charset)",
+          "capture_groups": 0,
+          "used_in": [
+            "tools/verify_build.py:284"
+          ]
+        }
+      ]
+    }
+
+  ],
+
+  "cross_references": {
+    "description": "Index of Ada SPARK source files that implement or enforce patterns defined in this IR. Each entry maps a pattern_id to its Ada equivalent.",
+    "entries": [
+      {
+        "pattern_group": "validation.hash",
+        "pattern_id": "sha256_prefixed",
+        "ada_file": "src/semantic_ir/semantic_ir-nodes.ads",
+        "ada_symbol": "Is_Valid_Hash",
+        "ada_implementation": "Hash_Strings.Length (H) = 71",
+        "notes": "Length check is equivalent to the regex for this fixed-length pattern."
+      },
+      {
+        "pattern_group": "validation.node_id",
+        "pattern_id": "node_id",
+        "ada_file": "src/semantic_ir/semantic_ir-nodes.ads",
+        "ada_symbol": "Is_Valid_Node_ID",
+        "ada_implementation": "Name_Strings.Length (ID) > 2",
+        "notes": "Partial check — only verifies minimum length. Full prefix check ('n_') is not yet implemented in SPARK."
+      },
+      {
+        "pattern_group": "validation.identifier",
+        "pattern_id": "identifier_start",
+        "ada_file": "src/validation/schema_check_required.adb",
+        "ada_symbol": "Check_Field_Present",
+        "ada_implementation": "Linear substring scan for '\"fieldname\"'",
+        "notes": "The Ada implementation uses literal string matching, not the full identifier regex. This is sufficient for the fixed set of required field names."
+      },
+      {
+        "pattern_group": "validation.identifier",
+        "pattern_id": "identifier_start",
+        "ada_file": "src/validation/schema_check_format.adb",
+        "ada_symbol": "Check_Version_Format",
+        "ada_implementation": "Linear scan for '\"version\"' key",
+        "notes": "Same as above — literal matching for a fixed field name."
+      }
+    ]
+  },
+
+  "metadata": {
+    "format_version": "stunir_regex_ir_v1",
+    "total_groups": 13,
+    "total_patterns": 27,
+    "scopes": ["schema_validation", "source_extraction", "asm_validation", "logging", "code_generation", "build_system"],
+    "last_updated": "2026-02-20",
+    "maintainer": "STUNIR Project",
+    "notes": "This file is the canonical SSoT for all regex patterns in the STUNIR harness. It is itself a STUNIR IR document and should be treated with the same governance as any other IR artifact: changes require a version bump and a receipt update."
+  }
+}

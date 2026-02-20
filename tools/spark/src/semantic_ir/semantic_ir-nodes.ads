@@ -12,6 +12,13 @@
 --
 --  Copyright (c) 2026 STUNIR Project
 --  License: MIT
+--
+--  REGEX_IR_REF: schema/stunir_regex_ir_v1.dcbor.json
+--               group: validation.hash    / pattern_id: sha256_prefixed
+--               group: validation.node_id / pattern_id: node_id
+--  Is_Valid_Hash  → sha256_prefixed: length check (71 chars = "sha256:" + 64 hex)
+--  Is_Valid_Node_ID → node_id: minimum length check (> 2 chars for "n_" + 1)
+--  See the regex IR for the full formal definitions and Python equivalents.
 -------------------------------------------------------------------------------
 
 pragma SPARK_Mode (On);
