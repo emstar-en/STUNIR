@@ -105,6 +105,37 @@ is
       Kind_Struct_Init              --  Struct initialization
    );
 
+       --  Map JSON schema kind strings to internal enum values
+       function Parse_Node_Kind (Kind_Str : String) return IR_Node_Kind
+          with Global => null;
+
+       function Parse_Binary_Operator (Op_Str : String) return Binary_Operator
+          with Global => null;
+
+       function Parse_Unary_Operator (Op_Str : String) return Unary_Operator
+          with Global => null;
+
+       function Parse_Visibility (Vis_Str : String) return Visibility_Kind
+          with Global => null;
+
+       function Parse_Mutability (Mut_Str : String) return Mutability_Kind
+          with Global => null;
+
+       function Parse_Storage_Class (Storage_Str : String) return Storage_Class
+          with Global => null;
+
+       function Parse_Inline_Hint (Inline_Str : String) return Inline_Hint
+          with Global => null;
+
+       function Parse_Primitive_Type (Prim_Str : String) return IR_Primitive_Type
+          with Global => null;
+
+       function Parse_Target_Category (Cat_Str : String) return Target_Category
+          with Global => null;
+
+       function Parse_Safety_Level (Level_Str : String) return Safety_Level
+          with Global => null;
+
    --  =========================================================================
    --  Operators
    --  =========================================================================
@@ -171,7 +202,24 @@ is
       Target_GPU,
       Target_WASM,
       Target_Native,
-      Target_Functional
+      Target_JIT,
+      Target_Interpreter,
+      Target_Functional,
+      Target_Logic,
+      Target_Constraint,
+      Target_Dataflow,
+      Target_Reactive,
+      Target_Quantum,
+      Target_Neuromorphic,
+      Target_Biocomputing,
+      Target_Molecular,
+      Target_Optical,
+      Target_Reversible,
+      Target_Analog,
+      Target_Stochastic,
+      Target_Fuzzy,
+      Target_Approximate,
+      Target_Probabilistic
    );
    
    -- Safety level

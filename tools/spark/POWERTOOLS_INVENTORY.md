@@ -105,7 +105,7 @@
 
 ---
 
-### 6. Code Generation (12 tools) - `src/codegen/`
+### 6. Emitters (12 tools) - `src/emitters/`
 
 | Tool | Purpose | Lines | Status |
 |------|---------|-------|--------|
@@ -118,9 +118,9 @@
 | `cpp_header_gen` | Generate C++ headers | ~191 | ✅ Good |
 | `cpp_impl_gen` | Generate C++ implementation | ~183 | ✅ Good |
 | `cpp_sig_normalize` | Normalize C++ signatures | ~204 | ✅ Good |
-| `sig_gen_cpp` | Generate C++ signatures | ~445 | ⚠️ Large (but has decomposed helpers) |
-| `sig_gen_python` | Generate Python signatures | ~88 | ✅ Good |
-| `sig_gen_rust` | Generate Rust signatures | ~129 | ✅ Good |
+| `sig_gen_cpp` | Generate C++ signatures | ~445 | 🗑️ Deprecated (retired) |
+| `sig_gen_python` | Generate Python signatures | ~88 | 🗑️ Deprecated (retired) |
+| `sig_gen_rust` | Generate Rust signatures | ~129 | 🗑️ Deprecated (retired) |
 
 **Purpose**: Language-specific code generation
 
@@ -186,7 +186,7 @@
 
 ### Large (300+ lines): 6 tools
 - May benefit from decomposition (but many have helper utilities)
-- `sig_gen_cpp` (445) - has cpp_* helpers
+- `sig_gen_cpp` (445) - deprecated (retired)
 - `json_extract` (410) - has json_path_* helpers  
 - `spec_validate_schema` (407) - has schema_check_* helpers
 - `ir_validate_schema` (375) - has ir_check_* helpers
@@ -200,10 +200,10 @@
 
 ## What's Missing
 
-### ❌ Build System
-- No `powertools.gpr` GNAT project file
+### ⚠️ Build System
+- `powertools.gpr` exists, build status in progress
 - No makefile for batch compilation
-- No way to build all 66 tools
+- Some tools still failing to compile
 
 ### ❌ Testing
 - No test suite for individual tools
@@ -212,19 +212,18 @@
 
 ### ⚠️ Monolithic Tools Still Active
 - `stunir_spec_to_ir` (475 lines) - should orchestrate powertools
-- `stunir_ir_to_code` (1971 lines) - should orchestrate powertools
+- `code_emitter` (core emitter) - should orchestrate powertools
 - These are redundant if powertools work
 
 ---
 
 ## Next Steps
 
-1. **Create `powertools.gpr`** - Build system for all 66 tools
-2. **Build powertools** - Compile all tools to `bin/` directory
-3. **Test individual tools** - Verify each tool works standalone
-4. **Create orchestration scripts** - Shell scripts that chain powertools
-5. **Deprecate monolithic tools** - Remove or refactor as orchestrators
-6. **Document pipelines** - Show how to compose tools
+1. **Build powertools** - Compile all tools to `bin/` directory
+2. **Test individual tools** - Verify each tool works standalone
+3. **Create orchestration scripts** - Shell scripts that chain powertools
+4. **Deprecate monolithic tools** - Remove or refactor as orchestrators
+5. **Document pipelines** - Show how to compose tools
 
 ---
 

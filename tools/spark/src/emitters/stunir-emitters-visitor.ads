@@ -2,7 +2,12 @@
 -- DO-178C Level A
 -- Phase 3a: Core Category Emitters
 
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with Semantic_IR.Modules;
+with Semantic_IR.Declarations;
+with Semantic_IR.Nodes;
+with Semantic_IR.Statements;
+with Semantic_IR.Expressions;
+with STUNIR.Emitters.Node_Table;
 
 package STUNIR.Emitters.Visitor is
    pragma SPARK_Mode (On);
@@ -17,47 +22,60 @@ package STUNIR.Emitters.Visitor is
    -- Virtual methods for visitor callbacks
    procedure On_Module_Start
      (Context : in out Visitor_Context;
-      Module  : in     IR_Module) is null
+      Module  : in     Semantic_IR.Modules.IR_Module) is null
    with
-     Pre'Class => Is_Valid_Module (Module);
+     Pre'Class => Semantic_IR.Modules.Is_Valid_Module (Module);
 
    procedure On_Module_End
      (Context : in out Visitor_Context;
-      Module  : in     IR_Module) is null
+      Module  : in     Semantic_IR.Modules.IR_Module) is null
    with
-     Pre'Class => Is_Valid_Module (Module);
+     Pre'Class => Semantic_IR.Modules.Is_Valid_Module (Module);
 
    procedure On_Type_Start
      (Context : in out Visitor_Context;
-      T       : in     IR_Type_Def) is null
+      T       : in     Semantic_IR.Declarations.Type_Declaration) is null
    with
-     Pre'Class => T.Field_Cnt >= 0;
+     Pre'Class => Semantic_IR.Nodes.Is_Valid_Node_ID (T.Base.Node_ID);
 
    procedure On_Type_End
      (Context : in out Visitor_Context;
-      T       : in     IR_Type_Def) is null
+      T       : in     Semantic_IR.Declarations.Type_Declaration) is null
    with
-     Pre'Class => T.Field_Cnt >= 0;
+     Pre'Class => Semantic_IR.Nodes.Is_Valid_Node_ID (T.Base.Node_ID);
 
    procedure On_Function_Start
      (Context : in out Visitor_Context;
-      Func    : in     IR_Function) is null
+      Func    : in     Semantic_IR.Declarations.Function_Declaration) is null
    with
-     Pre'Class => Func.Arg_Cnt >= 0;
+     Pre'Class => Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Base.Node_ID);
 
    procedure On_Function_End
      (Context : in out Visitor_Context;
-      Func    : in     IR_Function) is null
+      Func    : in     Semantic_IR.Declarations.Function_Declaration) is null
    with
-     Pre'Class => Func.Arg_Cnt >= 0;
+     Pre'Class => Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Base.Node_ID);
+
+   procedure On_Statement
+     (Context : in out Visitor_Context;
+      Stmt    : in     Semantic_IR.Statements.Statement_Node) is null
+   with
+     Pre'Class => Semantic_IR.Nodes.Is_Valid_Node_ID (Stmt.Node_ID);
+
+   procedure On_Expression
+     (Context : in out Visitor_Context;
+      Expr    : in     Semantic_IR.Expressions.Expression_Node) is null
+   with
+     Pre'Class => Semantic_IR.Nodes.Is_Valid_Node_ID (Expr.Node_ID);
 
    -- Main traversal procedure
    procedure Traverse_Module
-     (Module  : in     IR_Module;
+     (Module  : in     Semantic_IR.Modules.IR_Module;
+      Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
       Context : in out Visitor_Context'Class;
       Result  :    out Visit_Result)
    with
-     Pre  => Is_Valid_Module (Module),
+     Pre  => Semantic_IR.Modules.Is_Valid_Module (Module),
      Post => Result in Visit_Result;
 
 end STUNIR.Emitters.Visitor;

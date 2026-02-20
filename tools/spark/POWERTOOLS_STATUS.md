@@ -33,7 +33,7 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 | format_detect | ✅ FIXED | None | Spec files exist in src/ |
 | extraction_to_spec | ✅ FIXED | None | Fixed character literal escaping |
 
-## Phase 3 Powertools (Code Generation)
+## Phase 3 Powertools (Emitters)
 
 | Tool | Status | Issues | Notes |
 |------|--------|--------|-------|
@@ -43,8 +43,8 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 | code_gen_func_body | ✅ FIXED | None | Added GNAT.Strings import |
 | code_format_target | ✅ FIXED | None | Fully regenerated |
 | code_add_comments | ✅ FIXED | None | Fully regenerated |
-| sig_gen_cpp | ✅ FIXED | None | Fixed Success variable with aliased keyword |
-| sig_gen_rust | ✅ FIXED | None | Spec files exist in src/ |
+| sig_gen_cpp | 🗑️ Deprecated | Retired tool | Removed from build |
+| sig_gen_rust | 🗑️ Deprecated | Retired tool | Removed from build |
 | cpp_impl_gen | ✅ FIXED | None | Fixed quote escaping at line 100 |
 
 ## Type System Powertools

@@ -6,7 +6,7 @@
 
 ## Current State
 - **Tools Built**: 6/51 (BROKEN)
-- **Main Programs**: ✅ Still work (stunir_ir_to_code_main.exe, stunir_spec_to_ir_main.exe)
+- **Main Programs**: ✅ Still work (code_emitter.exe, stunir_spec_to_ir_main.exe)
 - **Confluence**: ✅ Already proven (C, x86, ARM from same IR)
 
 ---
@@ -84,8 +84,8 @@ Get-ChildItem bin/*.exe | Select-Object -ExpandProperty Name
 **Test confluence** (verify still works):
 ```powershell
 cd ..\..
-.\tools\spark\bin\stunir_ir_to_code_main.exe --input test_ir.json --output out.c --target c
-.\tools\spark\bin\stunir_ir_to_code_main.exe --input test_ir.json --output out.asm --target x86
+.\tools\spark\bin\code_emitter.exe -i test_ir.json -o out -t c
+.\tools\spark\bin\code_emitter.exe -i test_ir.json -o out -t x86
 ```
 
 **View changes**:

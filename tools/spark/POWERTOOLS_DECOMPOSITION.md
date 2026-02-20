@@ -111,9 +111,9 @@ Spec JSON → [small tools] → IR JSON → [small tools] → Code
 | 4 | `func_parse_sig` | Parse function signature (name, return, args) | Function JSON (stdin) | Signature JSON (stdout) | ~90 |
 | 5 | `func_parse_body` | Parse function body (steps/operations) | Function JSON (stdin) | Steps JSON array (stdout) | ~100 |
 | 6 | `type_map_target` | Map type to target language | Type name + target lang | Target type (stdout) | ~120 |
-| 7 | `code_gen_preamble` | Generate language preamble (imports, headers) | Module meta + target | Preamble code (stdout) | ~110 |
-| 8 | `code_gen_func_sig` | Generate function signature for target | Func sig JSON + target | Function signature code (stdout) | ~130 |
-| 9 | `code_gen_func_body` | Generate function body for target | Steps JSON + target | Function body code (stdout) | ~200 |
+| 7 | `code_gen_preamble` | Generate language preamble (imports, headers) | Module meta + target | Preamble code (stdout) | ~110 (emitters) |
+| 8 | `code_gen_func_sig` | Generate function signature for target | Func sig JSON + target | Function signature code (stdout) | ~130 (emitters) |
+| 9 | `code_gen_func_body` | Generate function body for target | Steps JSON + target | Function body code (stdout) | ~200 (emitters) |
 | 10 | `code_add_comments` | Add comments to generated code | Code (stdin) + metadata | Commented code (stdout) | ~60 |
 | 11 | `code_format_target` | Format code using language formatter | Code (stdin) + target | Formatted code (stdout) | ~80 |
 | 12 | `code_write` | Write code to file with proper encoding | Code (stdin) + path | Written file | ~50 |
@@ -128,8 +128,8 @@ Spec JSON → [small tools] → IR JSON → [small tools] → Code
 ### Old Way (Monolithic):
 ```bash
 # One big tool does everything
-./stunir_spec_to_ir --spec-root specs/ --out output.ir.json
-./stunir_ir_to_code --input output.ir.json --output code.rs --target rust
+./stunir_spec_to_ir_main --spec-root specs/ --out output.ir.json
+./code_emitter -i output.ir.json -o output -t rust
 ```
 
 ### New Way (Unix Philosophy):
@@ -461,7 +461,7 @@ def generate_tests(tool_name):
 ## Migration Plan: Monolithic → Decomposed
 
 ### Step 1: Keep Existing Monolithic Tools
-- `stunir_spec_to_ir` and `stunir_ir_to_code` remain working
+- `stunir_spec_to_ir_main` and `code_emitter` remain working
 - No breaking changes
 
 ### Step 2: Build Decomposed Tools in Parallel

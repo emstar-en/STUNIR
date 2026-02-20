@@ -1527,7 +1527,7 @@ Keep code minimal and focused - target 50 lines
 6. json_merge_arrays
 7. json_conflict_resolver
 
-**Batch 3: C++ Generation Utilities** (for sig_gen_cpp refactor)
+**Batch 3: C++ Generation Utilities** (for code_gen_func_sig and emitters)
 8. type_map_cpp
 9. cpp_signature_gen
 10. cpp_header_gen

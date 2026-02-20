@@ -8,6 +8,15 @@ pragma SPARK_Mode (On);
 
 with STUNIR_JSON_Parser;
 use STUNIR_JSON_Parser;
+with Semantic_IR.JSON;
+with Semantic_IR.Modules;
+with STUNIR.Emitters.Node_Table;
+with STUNIR.Emitters.Lisp;
+with STUNIR.Emitters.Python;
+with STUNIR.Emitters.CFamily;
+with STUNIR.Emitters.Prolog_Family;
+with STUNIR.Emitters.Futhark_Family;
+with STUNIR.Emitters.Lean4_Family;
 
 with Ada.Strings.Fixed;
 with Ada.Characters.Handling;
@@ -794,6 +803,11 @@ package body Code_Emitter is
          when Target_Swift     => return Identifier_Strings.To_Bounded_String (".swift");
          when Target_Kotlin    => return Identifier_Strings.To_Bounded_String (".kt");
          when Target_SPARK     => return Identifier_Strings.To_Bounded_String (".adb");
+         when Target_Clojure   => return Identifier_Strings.To_Bounded_String (".clj");
+         when Target_ClojureScript => return Identifier_Strings.To_Bounded_String (".cljs");
+         when Target_Prolog    => return Identifier_Strings.To_Bounded_String (".pl");
+         when Target_Futhark   => return Identifier_Strings.To_Bounded_String (".fut");
+         when Target_Lean4     => return Identifier_Strings.To_Bounded_String (".lean");
       end case;
    end Get_File_Extension;
 
@@ -806,77 +820,93 @@ package body Code_Emitter is
       IR           :    out IR_Data;
       Status       :    out Status_Code)
    is
-      Parser : Parser_State;
+      Module : Semantic_IR.Modules.IR_Module;
+      Nodes  : STUNIR.Emitters.Node_Table.Node_Table;
    begin
       IR := (Schema_Version => Identifier_Strings.Null_Bounded_String,
              IR_Version     => Identifier_Strings.Null_Bounded_String,
              Module_Name    => Identifier_Strings.Null_Bounded_String,
              Functions      => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))), Steps => (Count => 0, Steps => (others => (Step_Type => Step_Noop, Target => Identifier_Strings.Null_Bounded_String, Source => Identifier_Strings.Null_Bounded_String, Value => Identifier_Strings.Null_Bounded_String)))))));
-      Status := Success;
 
-      Initialize_Parser (Parser, JSON_Content, Status);
+      Semantic_IR.JSON.Parse_IR_JSON (JSON_Content, Module, Nodes, Status);
       if Status /= Success then
          return;
       end if;
 
-      --  Simplified parsing - just extract module name for now
-      Next_Token (Parser, Status);
-      if Status /= Success then
-         return;
-      end if;
-
-      --  Expect object start
-      if Current_Token (Parser) /= Token_Object_Start then
-         Status := Error_Parse;
-         return;
-      end if;
-
-      Next_Token (Parser, Status);
-      if Status /= Success then
-         return;
-      end if;
-
-      --  Parse root object members
-      while Current_Token (Parser) /= Token_Object_End and Status = Success loop
-         declare
-            Member_Name  : Identifier_String;
-            Member_Value : JSON_String;
-         begin
-            Parse_String_Member (Parser, Member_Name, Member_Value, Status);
-            if Status /= Success then
-               return;
-            end if;
-
-            declare
-               Name_Str : constant String := Identifier_Strings.To_String (Member_Name);
-            begin
-               if Name_Str = "ir_version" then
-                  declare
-                     Val_Str : constant String := JSON_Strings.To_String (Member_Value);
-                  begin
-                     if Val_Str'Length <= Max_Identifier_Length then
-                        IR.IR_Version := Identifier_Strings.To_Bounded_String (Val_Str);
-                     end if;
-                  end;
-               elsif Name_Str = "module_name" then
-                  declare
-                     Val_Str : constant String := JSON_Strings.To_String (Member_Value);
-                  begin
-                     if Val_Str'Length <= Max_Identifier_Length then
-                        IR.Module_Name := Identifier_Strings.To_Bounded_String (Val_Str);
-                     end if;
-                  end;
-               end if;
-            end;
-
-            if Current_Token (Parser) = Token_Comma then
-               Next_Token (Parser, Status);
-            end if;
-         end;
-      end loop;
-
+      -- Minimal bridge: fill module name for output path
+      IR.Module_Name := Identifier_Strings.To_Bounded_String (Semantic_IR.Types.Name_Strings.To_String (Module.Module_Name));
+      IR.IR_Version := Identifier_Strings.To_Bounded_String (Semantic_IR.Schema_Version);
+      IR.Schema_Version := Identifier_Strings.To_Bounded_String ("semantic_ir_v1");
       Status := Success;
    end Parse_IR_JSON;
+
+   procedure Emit_AST_Module
+     (Module : in     Semantic_IR.Modules.IR_Module;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Target : in     Target_Language;
+      Output :    out Code_String;
+      Status :    out Status_Code)
+   is
+      Buffer  : STUNIR.Emitters.CodeGen.IR_Code_Buffer;
+      Success : Boolean := False;
+   begin
+      case Target is
+         when Target_Python =>
+            declare
+               E : STUNIR.Emitters.Python.Python_Emitter;
+            begin
+               STUNIR.Emitters.Python.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when Target_C =>
+            declare
+               E : STUNIR.Emitters.CFamily.C_Emitter;
+            begin
+               STUNIR.Emitters.CFamily.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when Target_Clojure =>
+            declare
+               E : STUNIR.Emitters.Lisp.Lisp_Emitter;
+            begin
+               E.Config.Dialect := STUNIR.Emitters.Lisp.Clojure;
+               STUNIR.Emitters.Lisp.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when Target_ClojureScript =>
+            declare
+               E : STUNIR.Emitters.Lisp.Lisp_Emitter;
+            begin
+               E.Config.Dialect := STUNIR.Emitters.Lisp.ClojureScript;
+               STUNIR.Emitters.Lisp.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when Target_Prolog =>
+            declare
+               E : STUNIR.Emitters.Prolog_Family.Prolog_Emitter;
+            begin
+               STUNIR.Emitters.Prolog_Family.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when Target_Futhark =>
+            declare
+               E : STUNIR.Emitters.Futhark_Family.Futhark_Emitter;
+            begin
+               STUNIR.Emitters.Futhark_Family.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when Target_Lean4 =>
+            declare
+               E : STUNIR.Emitters.Lean4_Family.Lean4_Emitter;
+            begin
+               STUNIR.Emitters.Lean4_Family.Emit_Module (E, Module, Nodes, Buffer, Success);
+            end;
+         when others =>
+            Success := False;
+      end case;
+
+      if Success then
+         Output := Code_Strings.To_Bounded_String (STUNIR.Emitters.CodeGen.Code_Buffers.To_String (Buffer));
+         Status := STUNIR_Types.Success;
+      else
+         Output := Code_Strings.Null_Bounded_String;
+         Status := Error_Not_Implemented;
+      end if;
+   end Emit_AST_Module;
 
    --  =======================================================================
    --  Main Entry Points
@@ -933,17 +963,28 @@ package body Code_Emitter is
 
       JSON_Content := JSON_Strings.To_Bounded_String (File_Content (1 .. Content_Len));
 
-      --  Parse IR JSON
+      --  Parse IR JSON into AST and map minimal IR metadata
       Parse_IR_JSON (JSON_Content, IR, Status);
       if Status /= Success then
          return;
       end if;
 
-      --  Generate code for target
-      Generate_All_Code (IR, Target, Code, Status);
-      if Status /= Success then
-         return;
-      end if;
+      --  Re-parse AST for code emission (AST emitters)
+      declare
+         Module : Semantic_IR.Modules.IR_Module;
+         Nodes  : STUNIR.Emitters.Node_Table.Node_Table;
+      begin
+         Semantic_IR.JSON.Parse_IR_JSON (JSON_Content, Module, Nodes, Status);
+         if Status /= Success then
+            return;
+         end if;
+
+         if Target in Target_C | Target_Python | Target_Clojure | Target_ClojureScript | Target_Prolog | Target_Futhark | Target_Lean4 then
+            Emit_AST_Module (Module, Nodes, Target, Code, Status);
+         else
+            Generate_All_Code (IR, Target, Code, Status);
+         end if;
+      end;
 
       --  Construct output path
       declare

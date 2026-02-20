@@ -217,10 +217,15 @@ package STUNIR_Types is
       Target_CSharp,
       Target_Swift,
       Target_Kotlin,
-      Target_SPARK
+      Target_SPARK,
+      Target_Clojure,
+      Target_ClojureScript,
+      Target_Prolog,
+      Target_Futhark,
+      Target_Lean4
    );
 
-   subtype All_Targets is Target_Language range Target_CPP .. Target_SPARK;
+   subtype All_Targets is Target_Language range Target_CPP .. Target_Lean4;
 
    --  ========================================================================
    --  Constants

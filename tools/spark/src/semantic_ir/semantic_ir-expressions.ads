@@ -57,6 +57,46 @@ is
       Array_ID : Node_ID;
       Index_ID : Node_ID;
    end record;
+
+   -- Cast expression
+   type Cast_Expression is record
+      Base        : Expression_Node (Kind_Cast_Expr);
+      Operand_ID  : Node_ID;
+      Target_Type : Type_Reference;
+   end record;
+
+   -- Array initialization expression
+   Max_Array_Elements : constant := 64;
+   type Element_ID_List is array (1 .. Max_Array_Elements) of Node_ID;
+
+   type Array_Init_Expression is record
+      Base        : Expression_Node (Kind_Array_Init);
+      Elem_Count  : Natural range 0 .. Max_Array_Elements := 0;
+      Elements    : Element_ID_List;
+   end record;
+
+   -- Struct initialization expression
+   Max_Struct_Fields : constant := 64;
+   type Struct_Field is record
+      Field_Name : IR_Name;
+      Value_ID   : Node_ID;
+   end record;
+   type Struct_Field_List is array (1 .. Max_Struct_Fields) of Struct_Field;
+
+   type Struct_Init_Expression is record
+      Base        : Expression_Node (Kind_Struct_Init);
+      Struct_Name : IR_Name;
+      Field_Count : Natural range 0 .. Max_Struct_Fields := 0;
+      Fields      : Struct_Field_List;
+   end record;
+
+   -- Ternary expression (condition ? then_expr : else_expr)
+   type Ternary_Expression is record
+      Base        : Expression_Node (Kind_Ternary_Expr);
+      Condition_ID: Node_ID;
+      Then_ID     : Node_ID;
+      Else_ID     : Node_ID;
+   end record;
    
    -- Expression validation
    function Is_Expression_Kind (Kind : IR_Node_Kind) return Boolean is

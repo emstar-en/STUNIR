@@ -228,7 +228,7 @@ extraction_to_spec --lang=Ada extraction.json > spec.json
 **Process:**
 1. Manually write spec JSON based on source code
 2. Validate with `spec_validate`
-3. Generate code with codegen tools
+3. Generate code with emitter tools
 
 **Pros:**
 - Works now

@@ -87,7 +87,7 @@ end record;
 
 ## Build Statistics
 - **Total Tools**: 8
-- **Successfully Building**: 4 (stunir_receipt_link, stunir_code_slice, stunir_code_index, stunir_spec_assemble)
+- **Successfully Building**: 3 (stunir_receipt_link, stunir_code_index, stunir_spec_assemble)
 - **Failing**: 4 (ir_converter, code_emitter, spec_assembler, pipeline_driver)
 - **pipeline_driver**: Should now build (fix applied)
 - **Current Build Success Rate**: 50% → Expected 62.5% after fixes

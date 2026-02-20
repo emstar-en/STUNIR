@@ -54,20 +54,9 @@ stunir_spec_to_ir_main --spec-root <directory> --out <file> [--lockfile <file>]
 ### Output Format
 
 **IR file** (`--out` path):
-- Schema: `stunir_flat_ir_v1` or `stunir_ir_v1` (semantic IR)
+- Schema: `stunir_semantic_ir_v1`
 - Format: Canonical JSON with sorted keys
-- Contains: Functions, types, module metadata
-- Example:
-  ```json
-  {
-    "schema": "stunir_flat_ir_v1",
-    "ir_version": "v1",
-    "module_name": "example",
-    "functions": [
-      {"name": "func1", "args": [...], "return_type": "i32", "steps": [...]}
-    ]
-  }
-  ```
+- Contains: Semantic IR AST (root module, declarations)
 
 ### Processing Steps
 
@@ -107,7 +96,7 @@ The tool executes these operations in order (see stunir_spec_to_ir.adb):
    - Create output directory if needed
    - Write canonical IR JSON
    - Output: `[INFO] Wrote semantic IR to <path>`
-   - Final: `[SUCCESS] Generated semantic IR with schema: stunir_ir_v1`
+  - Final: `[SUCCESS] Generated semantic IR with schema: stunir_semantic_ir_v1`
 
 ### Exit Codes
 
@@ -165,34 +154,31 @@ python3 -m json.tool ./ir/example.json > /dev/null
 
 # Check schema
 jq -r '.schema' ./ir/example.json
-# Expected: "stunir_flat_ir_v1" or "stunir_ir_v1"
-
-# Count functions
-jq '.functions | length' ./ir/example.json
+# Expected: "stunir_semantic_ir_v1"
 ```
 
 ---
 
-## Tool: stunir_ir_to_code
+## Tool: code_emitter
 
 **Binary Location**:
-- Precompiled: `precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main`
-- Source build: `tools/spark/bin/stunir_ir_to_code_main`
+- Precompiled: `precompiled/linux-x86_64/spark/bin/code_emitter`
+- Source build: `tools/spark/bin/code_emitter`
 
 **Purpose**: Generates target language code from STUNIR IR.
 
-**Implementation**: `tools/spark/src/stunir_ir_to_code.adb` (lines 1-1971)
+**Implementation**: `tools/spark/src/core/code_emitter.adb`
 
 ### Command Line Interface
 
 ```bash
-stunir_ir_to_code_main --input <file> --output <file> --target <lang>
+code_emitter -i <file> -o <output_dir> -t <target>
 ```
 
 **Arguments**:
-- `--input <file>` (required): Input IR JSON file
-- `--output <file>` (required): Output code file path
-- `--target <lang>` (required): Target language (see below)
+- `-i <file>` (required): Input IR JSON file
+- `-o <output_dir>` (required): Output directory for generated code
+- `-t <target>` (required): Target language (see below)
 
 ### Supported Target Languages
 
@@ -205,23 +191,27 @@ stunir_ir_to_code_main --input <file> --output <file> --target <lang>
 - `javascript` / `js` → `.js` (JavaScript ES6)
 - `typescript` / `ts` → `.ts` (TypeScript)
 - `java` → `.java` (Java)
-- `csharp` / `cs` → `.cs` (C#)
 
 **Low-Level Targets**:
-- `wasm` → `.wasm` (WebAssembly)
 - `x86` / `asm` → `.asm` (x86 Assembly)
 - `arm` → `.s` (ARM Assembly)
 
+**Other Targets**:
+- `clojure` → `.clj`
+- `cljs` / `clojurescript` → `.cljs`
+- `prolog` → `.pl`
+- `futhark` → `.fut`
+- `lean4` → `.lean`
+
 ### Input Format
 
-**IR file** (`--input` path):
-- Schema: `stunir_flat_ir_v1` (required)
-- Must contain: `functions` array
-- Each function: `name`, `args`, `return_type`, `steps`
+**IR file** (`-i` path):
+- Schema: `stunir_semantic_ir_v1` (AST)
+- Must contain: `root` module with `declarations`
 
 ### Output Format
 
-**Code file** (`--output` path):
+**Code output** (`-o` path):
 - Format: Target language source code
 - Contents: Function declarations/definitions
 - Style: Idiomatic for target language
@@ -230,10 +220,9 @@ stunir_ir_to_code_main --input <file> --output <file> --target <lang>
 
 ### Processing Steps
 
-1. **Parse IR JSON** (lines 97-151)
-   - Read and validate IR file
-   - Check schema is `stunir_flat_ir_v1`
-   - Extract functions
+1. **Parse IR JSON**
+  - Read and validate IR file
+  - Parse Semantic IR AST (root module)
 
 2. **Select Code Generator** (lines 44-94)
    - Map target string to language enum
@@ -261,22 +250,22 @@ stunir_ir_to_code_main --input <file> --output <file> --target <lang>
 
 ```bash
 # Generate C code
-./tools/spark/bin/stunir_ir_to_code_main \
-  --input ./ir/example.json \
-  --output ./generated/example.c \
-  --target c
+./tools/spark/bin/code_emitter \
+  -i ./ir/example.json \
+  -o ./generated \
+  -t c
 
 # Generate Rust code
-./tools/spark/bin/stunir_ir_to_code_main \
-  --input ./ir/example.json \
-  --output ./generated/example.rs \
-  --target rust
+./tools/spark/bin/code_emitter \
+  -i ./ir/example.json \
+  -o ./generated \
+  -t rust
 
 # Generate Python code
-./tools/spark/bin/stunir_ir_to_code_main \
-  --input ./ir/example.json \
-  --output ./generated/example.py \
-  --target python
+./tools/spark/bin/code_emitter \
+  -i ./ir/example.json \
+  -o ./generated \
+  -t python
 ```
 
 ---
@@ -293,10 +282,10 @@ stunir_ir_to_code_main --input <file> --output <file> --target <lang>
 
 # Step 2: IR → Code (multiple targets)
 for target in c rust python; do
-  ./tools/spark/bin/stunir_ir_to_code_main \
-    --input ./build/ir.json \
-    --output ./generated/output.$target \
-    --target $target
+  ./tools/spark/bin/code_emitter \
+    -i ./build/ir.json \
+    -o ./generated \
+    -t $target
 done
 ```
 
@@ -335,9 +324,9 @@ Future: Each tool will support `--emit-receipt` flag to generate:
 - Invalid JSON → Fix spec file syntax
 - Parse errors → Check spec schema version
 
-**ir_to_code**:
+**code_emitter**:
 - IR file missing → Run spec_to_ir first
-- Invalid schema → IR must be `stunir_flat_ir_v1`
+- Invalid schema → IR must be `stunir_semantic_ir_v1`
 - Unknown target → Use supported language names
 - Empty functions → Expected for current version (stubs only)
 
@@ -375,7 +364,7 @@ Output JSON:
     "spec_root": {"type": "directory", "required": true},
     "lockfile": {"type": "file", "default": "local_toolchain.lock.json"}
   },
-  "outputs": {"ir_file": {"type": "file", "format": "stunir_flat_ir_v1"}},
+  "outputs": {"ir_file": {"type": "file", "format": "stunir_semantic_ir_v1"}},
   "operations": ["Verify toolchain", "Collect specs", "Parse JSON", "Generate IR"],
   "determinism": "full",
   "exit_codes": {"0": "success", "1": "failure"}
@@ -386,7 +375,7 @@ Output JSON:
 
 ## Related Files
 
-- **Ada Implementation**: `tools/spark/src/stunir_spec_to_ir.adb`, `stunir_ir_to_code.adb`
+- **Ada Implementation**: `tools/spark/src/stunir_spec_to_ir.adb`, `tools/spark/src/core/code_emitter.adb`
 - **Python Implementation** (under development): `tools/spec_to_ir.py`, `tools/ir_to_code.py`
 - **Build Config**: `tools/spark/stunir_tools.gpr`
 - **Plan**: `.abacusai/plans/stunir_ai_orchestration_plan.md`

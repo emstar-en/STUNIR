@@ -151,7 +151,7 @@ diff <(echo '{"a":1}' | ./bin/json_extract_old --path "a") \
 
 ---
 
-## Tool 2: sig_gen_cpp.adb (406 lines → ~100 lines)
+## Tool 2: sig_gen_cpp.adb (406 lines → ~100 lines) [DEPRECATED]
 
 ### Current Issues
 - 406 lines (3.4x over target)
@@ -167,10 +167,10 @@ Generate these utilities first:
 - cpp_header_gen (60 lines) - Generate header structure
 - cpp_namespace_wrap (40 lines) - Wrap code in namespaces
 
-**Step 2: Create Refactored sig_gen_cpp.adb**
+**Step 2: Create Refactored sig_gen_cpp.adb** [DEPRECATED]
 
 ```
-Generate a refactored Ada SPARK 2014 utility named `sig_gen_cpp` that orchestrates C++ signature file generation.
+Generate a refactored Ada SPARK 2014 utility named `sig_gen_cpp` that orchestrates C++ signature file generation. [DEPRECATED]
 
 Requirements:
 - Version: 0.1.0-alpha

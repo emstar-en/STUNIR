@@ -23,7 +23,7 @@ procedure Code_Emitter_Main is
       Ada.Text_IO.Put_Line ("  -h            Show this help message");
       Ada.Text_IO.Put_Line ("");
       Ada.Text_IO.Put_Line ("Supported targets:");
-      Ada.Text_IO.Put_Line ("  cpp, c, python, rust, go, java, javascript, typescript, ada, spark, all");
+      Ada.Text_IO.Put_Line ("  cpp, c, python, rust, go, java, javascript, typescript, ada, spark, clojure, cljs, prolog, futhark, lean4, all");
    end Print_Usage;
 
    function Parse_Target (Target_Str : String) return Target_Language is
@@ -48,6 +48,16 @@ procedure Code_Emitter_Main is
          return Target_SPARK;
       elsif Target_Str = "spark" then
          return Target_SPARK;
+      elsif Target_Str = "clojure" then
+         return Target_Clojure;
+      elsif Target_Str = "cljs" or Target_Str = "clojurescript" then
+         return Target_ClojureScript;
+      elsif Target_Str = "prolog" then
+         return Target_Prolog;
+      elsif Target_Str = "futhark" then
+         return Target_Futhark;
+      elsif Target_Str = "lean4" then
+         return Target_Lean4;
       else
          return Target_CPP;  --  Default
       end if;
