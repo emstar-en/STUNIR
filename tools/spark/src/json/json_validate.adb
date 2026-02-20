@@ -127,9 +127,9 @@ procedure JSON_Validate is
 
    function Validate_JSON (Content : String) return Integer is
       use STUNIR_JSON_Parser;
-      State  : STUNIR_Types.Parser_State;
-      Status : STUNIR_Types.Status_Code;
-      Input_Str : STUNIR_Types.JSON_String;
+      State  : Parser_State;
+      Status : Status_Code;
+      Input_Str : JSON_String;
    begin
       if Content'Length = 0 then
          Print_Error ("Empty input");
@@ -154,7 +154,7 @@ procedure JSON_Validate is
       --  Parse all tokens
       loop
          Next_Token (State, Status);
-         exit when Status /= STUNIR_Types.Success or else State.Current_Token = STUNIR_Types.Token_EOF;
+         exit when Status /= STUNIR_Types.Success or else State.Current_Token = Token_EOF;
       end loop;
 
       if Status = STUNIR_Types.Success then

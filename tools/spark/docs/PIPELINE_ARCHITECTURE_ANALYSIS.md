@@ -1,6 +1,13 @@
+> **SUPERSEDED** — This document has been superseded by `tools/spark/ARCHITECTURE.md`
+> (Section 2: Pipeline Phases, Section 8: Known Gaps). The analysis here is preserved
+> for historical reference. When this document and `ARCHITECTURE.md` conflict,
+> `ARCHITECTURE.md` is correct.
+
+---
+
 # STUNIR Pipeline Architecture Analysis
 ## Understanding the Tool Flow
-### Date: February 18, 2025
+### Date: February 18, 2025 (archived 2026-02-20)
 
 ---
 

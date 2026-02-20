@@ -1,8 +1,12 @@
 {
-  "schema_version": "2.2.0",
+  "schema_version": "2.3.0",
   "section": "formats",
-  "last_updated": "2026-02-06",
+  "last_updated": "2026-02-20",
   "status": "active_development",
+  "changelog": {
+    "2.3.0": "Added stunir_regex_ir_v1 format registration. Updated last_updated.",
+    "2.2.0": "Initial split-index format."
+  },
   "data_formats": {
     "manifest_v1": {
       "description": "File inventory with metadata",
@@ -277,6 +281,53 @@
     "migration": "Adapters may be provided for one major version back",
     "validation": "Always validate version before processing"
   },
+  "stunir_regex_ir_v1": {
+    "description": "Canonical SSoT for all regular expressions in the STUNIR harness. A normalized semantic AST dCBOR JSON intermediate reference — the same format the pipeline generates. Contains 13 pattern groups covering schema validation, source extraction, ASM validation, logging, code generation, and build system patterns.",
+    "file": "schema/stunir_regex_ir_v1.dcbor.json",
+    "schema_snippet": {
+      "type": "object",
+      "required": ["ir_version", "schema", "module_name", "philosophy", "pattern_groups"],
+      "properties": {
+        "ir_version": {"type": "string", "const": "v1"},
+        "schema": {"type": "string", "const": "stunir_regex_ir_v1"},
+        "module_name": {"type": "string"},
+        "philosophy": {"type": "object"},
+        "pattern_groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["group_id", "scope", "patterns"],
+            "properties": {
+              "group_id": {"type": "string"},
+              "scope": {"type": "string", "enum": ["schema_validation", "source_extraction", "asm_validation", "logging", "code_generation", "build_system"]},
+              "patterns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "regex", "anchored", "mode", "description"],
+                  "properties": {
+                    "id": {"type": "string"},
+                    "regex": {"type": "string"},
+                    "anchored": {"type": "boolean"},
+                    "mode": {"type": "string", "enum": ["accept", "transform"]},
+                    "replacement": {"type": "string"},
+                    "description": {"type": "string"},
+                    "formal_language_class": {"type": "string"},
+                    "capture_groups": {"type": "integer"},
+                    "capture_group_names": {"type": "array", "items": {"type": "string"}},
+                    "used_in": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "governance": "This format is the SSoT for all regex patterns. See stunir_tools.gpr RULE 1 and CONTRIBUTING.md for the update checklist.",
+    "status": "stable"
+  },
+
   "validation_rules": {
     "mandatory_fields": "Reject missing required fields",
     "unknown_fields": "Allowed unless strict mode is enabled",

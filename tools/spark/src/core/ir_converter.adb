@@ -321,9 +321,12 @@ package body IR_Converter is
    is
       Parser : Parser_State;
    begin
-      Spec := (Schema_Version => Identifier_Strings.Null_Bounded_String,
-               Module => (Name => Identifier_Strings.Null_Bounded_String,
-                         Functions => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))))))));
+      --  Use default initialization to avoid Dynamic_Predicate violation on
+      --  Function_Signature (which requires Name to be non-empty at runtime).
+      --  The Count=0 ensures no element is accessed before being populated.
+      Spec.Schema_Version := Identifier_Strings.Null_Bounded_String;
+      Spec.Module.Name    := Identifier_Strings.Null_Bounded_String;
+      Spec.Module.Functions.Count := 0;
       Status := Success;
 
       Initialize_Parser (Parser, JSON_Content, Status);

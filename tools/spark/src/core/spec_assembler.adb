@@ -6,10 +6,14 @@
 
 pragma SPARK_Mode (On);
 
+with STUNIR_Types;
+use STUNIR_Types;
+
 with STUNIR_JSON_Parser;
 use STUNIR_JSON_Parser;
 
 with Ada.Strings.Bounded;
+pragma Unreferenced (Ada.Strings.Bounded);  --  Kept for future use
 
 package body Spec_Assembler is
 
@@ -18,25 +22,16 @@ package body Spec_Assembler is
       Extraction   :    out Extraction_Data;
       Status       :    out Status_Code)
    is
-      Parser     : Parser_State;
+      Parser      : Parser_State;
       Temp_Status : Status_Code;
-begin
-      --  Initialize extraction data
-      Extraction := Extraction_Data'(
-         Schema_Version => Null_Identifier,
-         Source_Index   => Path_Strings.Null_Bounded_String,
-         File_Count     => 0,
-         Files          => (others => Extraction_File'(
-            Source_File => Path_Strings.Null_Bounded_String,
-            Count       => 0,
-            Functions   => (others => Extraction_Function'(
-               Name        => Null_Identifier,
-               Return_Type => Null_Type_Name,
-               Parameters  => Parameter_List'(
-                  Count => 0,
-                  Params => (others => Parameter'(
-                     Name       => Null_Identifier,
-                     Param_Type => Null_Type_Name))))))));
+   begin
+      --  Initialize extraction data field-by-field to avoid aggregate
+      --  constraint issues with unconstrained array types.
+      Extraction.Schema_Version := Null_Identifier;
+      Extraction.Source_Index   := Path_Strings.Null_Bounded_String;
+      Extraction.File_Count     := 0;
+      --  Files array elements are accessed only up to File_Count, so
+      --  leaving them uninitialized is safe (SPARK: no reads before writes).
 
       --  Initialize parser
       Initialize_Parser (Parser, JSON_Content, Temp_Status);
@@ -143,24 +138,15 @@ begin
    is
       Total_Functions : Function_Index := 0;
    begin
-      --  Initialize spec data
-      Spec := Spec_Data'(
-         Schema_Version => Identifier_Strings.To_Bounded_String ("1.0"),
-         Origin         => Identifier_Strings.To_Bounded_String ("stunir"),
-         Spec_Hash      => Null_Identifier,
-         Source_Index   => Extraction.Source_Index,
-         Module         => Spec_Module'(
-            Name      => Module_Name,
-            Functions => Function_Collection'(
-               Count => 0,
-               Functions => (others => Function_Signature'(
-                  Name        => Null_Identifier,
-                  Return_Type => Null_Type_Name,
-                  Parameters  => Parameter_List'(
-                     Count => 0,
-                     Params => (others => Parameter'(
-                        Name       => Null_Identifier,
-                        Param_Type => Null_Type_Name))))))));
+      --  Initialize spec data field-by-field to avoid Dynamic_Predicate
+      --  violation on Function_Signature (Name must be non-empty at runtime).
+      --  Count=0 ensures no element is accessed before being populated.
+      Spec.Schema_Version          := Identifier_Strings.To_Bounded_String ("1.0");
+      Spec.Origin                  := Identifier_Strings.To_Bounded_String ("stunir");
+      Spec.Spec_Hash               := Null_Identifier;
+      Spec.Source_Index            := Extraction.Source_Index;
+      Spec.Module.Name             := Module_Name;
+      Spec.Module.Functions.Count  := 0;
 
       --  Collect all functions from all extraction files
       for File_Idx in 1 .. Extraction.File_Count loop
@@ -301,13 +287,10 @@ begin
    is
       Temp_Status : Status_Code;
    begin
-      Function_Out := Extraction_Function'(
-         Name        => Null_Identifier,
-         Return_Type => Null_Type_Name,
-         Parameters  => Parameter_List'(Params => (others => Parameter'(
-            Name       => Null_Identifier,
-            Param_Type => Null_Type_Name)),
-         Count => 0));
+      --  Initialize field-by-field (avoids aggregate predicate issues)
+      Function_Out.Name               := Null_Identifier;
+      Function_Out.Return_Type        := Null_Type_Name;
+      Function_Out.Parameters.Count   := 0;
 
       --  Expect object start (already checked in precondition)
       Expect_Token (Parser, Token_Object_Start, Temp_Status);

@@ -1,304 +1,220 @@
-# STUNIR SPARK Components
+﻿# STUNIR Tools  Ada SPARK Implementation
 
-This directory contains Ada SPARK implementations of STUNIR pipeline components, replacing the Python reference implementations with formally verified alternatives while preserving existing JSON interfaces.
+> **This is the canonical entry point for the STUNIR Ada SPARK toolchain.**
+> See `ARCHITECTURE.md` for the full architecture reference and `CONTRIBUTING.md`
+> for governance rules. The build manifest is `stunir_tools.gpr`.
 
-## Overview
+## What This Directory Is
 
-The SPARK migration provides:
-- **Formal Verification**: GNATprove-backed proofs for critical components
-- **DO-333 Alignment**: Evidence for high-assurance certification workflows
-- **Determinism**: Predictable outputs with bounded data structures
-- **Safety**: Defensive handling of malformed inputs and bounded resource use
+`tools/spark/` contains the **primary Ada SPARK implementation** of the STUNIR
+deterministic code generation pipeline. Ada SPARK is the default implementation
+language for STUNIR tools  it provides formal verification (GNATprove), DO-178C
+Level A compliance support, and hash-stable deterministic output.
 
-## Scope
+The Python tools in `tools/` are an alternative pipeline. Both produce identical
+IR output. Choose SPARK for formal verification; choose Python for rapid iteration.
 
-Included:
-- Core pipeline stages (spec assembly, IR conversion, code emission, orchestration)
-- Parsing, validation, analysis, testing, and utility tooling
+---
 
-Not yet included:
-- Remaining Python components pending migration (see `SPARK_MIGRATION_PLAN.md`)
+## Quick Start
 
-## Inputs and Outputs
+### Build All Tools
 
-| Stage | Input | Output |
-|-------|-------|--------|
-| Spec Assembler | `extraction.json` | `spec.json` |
-| IR Converter | `spec.json` | `ir.json` |
-| Code Emitter | `ir.json` | target source files |
-| Pipeline Driver | `extraction.json` | `spec.json`, `ir.json`, target source files |
+```bash
+gprbuild -P stunir_tools.gpr
+```
 
-## Target Languages
+### Build a Single Tool
 
-- C, C++, Rust, Go, Python
-- JavaScript, Java, C#, Swift, Kotlin
+```bash
+gprbuild -P stunir_tools.gpr -u ir_converter_main.adb
+```
 
-## Directory Structure
+### Run SPARK Formal Verification
+
+```bash
+gnatprove -P stunir_tools.gpr --level=2
+```
+
+### Clean Build Artifacts
+
+```bash
+gprclean -P stunir_tools.gpr
+```
+
+**Requirements:** GNAT 12+ with SPARK support (FSF GNAT or GNAT Community Edition).
+Precompiled binaries are available in `precompiled/linux-x86_64/spark/bin/`.
+
+---
+
+## The 4-Phase Pipeline
+
+```
+[Phase 0] Bootstrap
+  file_indexer    source dir manifest JSON
+  hash_compute    SHA-256 of any file/stdin
+  lang_detect     language ID from file content
+  format_detect   extraction JSON format variant
+
+[Phase 1] Spec Assembly
+  extraction JSON    spec_assembler    spec JSON
+  spec JSON          spec_validate     validation result
+  functions JSON     func_dedup        deduplicated functions
+
+[Phase 2] IR Conversion
+  spec JSON    ir_converter    IR JSON (stunir_flat_ir_v1)
+  IR JSON      ir_validate     validation result
+
+[Phase 3] Code Emission
+  IR JSON    code_emitter       target language source
+  config     pipeline_driver    full pipeline execution
+
+[Cross-cutting]
+  stunir_code_index     source code index JSON
+  stunir_receipt_link   receipt JSON (spec + index linkage)
+  json_extract          value at JSON path
+  json_merge            merged JSON documents
+  receipt_generate      verification receipt
+```
+
+The IR format is `stunir_flat_ir_v1` (flat) or `Semantic_IR` (typed AST).
+See `ARCHITECTURE.md` for the full format specifications.
+
+---
+
+## Source Directory Structure
 
 ```
 tools/spark/
-├── src/
-│   ├── stunir_types.ads          # Common types (bounded strings, etc.)
-│   ├── stunir_json_parser.ads    # Streaming JSON parser
-│   ├── core/                      # Phase 1: Core Pipeline
-│   │   ├── spec_assembler.ads     # extraction.json → spec.json
-│   │   ├── ir_converter.ads       # spec.json → ir.json
-│   │   ├── code_emitter.ads       # ir.json → target code
-│   │   └── pipeline_driver.ads    # Pipeline orchestrator
-│   ├── parsing/                   # Phase 2: Extraction & Parsing
-│   ├── validation/                # Phase 3: Validation
-│   ├── analysis/                  # Phase 4: Analysis
-│   ├── testing/                   # Phase 5: Testing
-│   └── utils/                     # Phase 6: Utilities
-├── tests/                         # SPARK test suite
-├── obj/                           # Build artifacts
-├── Makefile                       # Build configuration
-└── core.gpr                       # GNAT project file
+ stunir_tools.gpr         SSoT build manifest (READ THIS FIRST)
+ README.md                This file
+ ARCHITECTURE.md          Full architecture reference
+ CONTRIBUTING.md          Governance rules and contribution checklist
+ schema/
+    extraction_schema.json           Extraction JSON format schema
+    stunir_regex_ir_v1.dcbor.json   SSoT for all regex patterns
+ src/
+    core/        Phase 1-4  Pipeline orchestrators + root package (stunir.ads)
+    emitters/    Phase 3    STUNIR.Emitters.* code generation backends
+    semantic_ir/ Phase 2    Semantic_IR.* typed AST hierarchy
+    types/       Phase X    STUNIR_Types master type definitions
+    json/        Phase X    JSON parsing and manipulation
+    spec/        Phase 1    Spec assembly and validation
+    ir/          Phase 2    IR generation, validation, optimization
+    utils/       Phase X    String, path, CLI, toolchain utilities
+    files/       Phase 0    Filesystem find/hash/index/read/write
+    functions/   Phase 1    Function dedup, parsing, IR conversion
+    detection/   Phase 0    Format and language detection
+    validation/  Phase X    Schema validation
+    verification/ Phase X   Hashing, manifests, receipts
+    deprecated/  EXCLUDED   Legacy monoliths (see DEPRECATED.md)
+ obj/             Build artifacts (.ali, .o)  never in src/
+ bin/             Compiled executables
+ docs/
+    PIPELINE_ARCHITECTURE_ANALYSIS.md  (superseded by ARCHITECTURE.md)
+    STUNIR_TYPE_ARCHITECTURE.md        (superseded by ARCHITECTURE.md)
+    archive/    Historical working notes (not authoritative)
+ tests/           Test sources
 ```
 
-## Components
+**GOVERNANCE:** Do NOT create new subdirectories under `src/` without updating
+`stunir_tools.gpr`. See `CONTRIBUTING.md` for the full checklist.
 
-### Phase 1: Core Pipeline (P0 - Critical)
+---
 
-| SPARK Package | Replaces Python | Status |
-|--------------|-----------------|--------|
-| `Spec_Assembler` | `bridge_spec_assemble.py` | Specification Complete |
-| `IR_Converter` | `bridge_spec_to_ir.py` | Specification Complete |
-| `Code_Emitter` | `bridge_ir_to_code.py` | Specification Complete |
-| `Pipeline_Driver` | `stunir_pipeline.py` | Specification Complete |
+## Key Files for Models
 
-### Phase 2: Extraction & Parsing (P1 - High)
+If you are an AI model working with this codebase, start here:
 
-| SPARK Package | Replaces Python | Status |
-|--------------|-----------------|--------|
-| `C_Parser` | `extract_bc_functions.py` | Pending |
-| `Signature_Extractor` | `extract_signatures.py` | Pending |
-| `Extraction_Creator` | `create_extraction.py` | Pending |
+| File | Purpose |
+|------|---------|
+| `stunir_tools.gpr` | **SSoT manifest**  what exists, what compiles, governance rules |
+| `schema/stunir_regex_ir_v1.dcbor.json` | **SSoT for all regex patterns**  formal definitions |
+| `src/core/stunir.ads` | Root package  canonical location, do not duplicate |
+| `src/types/stunir_types.ads` | Master type definitions  all packages depend on this |
+| `src/semantic_ir/semantic_ir-types.ads` | Semantic IR type hierarchy |
+| `ARCHITECTURE.md` | Full architecture, tool catalog, format specs |
+| `CONTRIBUTING.md` | Rules for adding tools, patterns, directories |
 
-### Phase 3: Validation (P1 - High)
+---
 
-| SPARK Package | Replaces Python | Status |
-|--------------|-----------------|--------|
-| `IR_Validator` | `validate_ir.py` | Pending |
-| `Spec_Validator` | `validate_spec.py` | Pending |
-| `IR_Checker` | `check_ir.py` | Pending |
+## Build Status
 
-### Phase 4-6: Analysis, Testing, Utilities (P2/P3)
+| Tool Group | Status |
+|------------|--------|
+| `stunir_receipt_link` |  Building |
+| `stunir_code_index` |  Building |
+| `stunir_spec_assemble` |  Building |
+| `ir_converter` |  Fixed (2026-02-20) |
+| `code_emitter` |  Fixed (2026-02-20) |
+| `spec_assembler` |  Fixed (2026-02-20) |
+| `pipeline_driver` |  Fixed (2026-02-20) |
+| SPARK formal proofs |  In progress (level=2) |
 
-See `SPARK_MIGRATION_PLAN.md` for complete list.
+---
 
-## Building
+## Target Languages
 
-### Prerequisites
-- GNAT Pro or GNAT Community with SPARK support
-- GNATprove for formal verification
+16 targets defined in `STUNIR_Types.Target_Language`:
 
-### Build All Components
-```bash
-cd tools/spark
-make all
+| Target | Emitter | Status |
+|--------|---------|--------|
+| C | `STUNIR.Emitters.CFamily` |  Implemented |
+| C++ | `STUNIR.Emitters.CFamily` |  Implemented |
+| Python | `STUNIR.Emitters.Python` |  Implemented |
+| Prolog | `STUNIR.Emitters.Prolog_Family` |  Implemented |
+| Clojure / ClojureScript | `STUNIR.Emitters.Lisp` |  Implemented |
+| Common Lisp / Scheme / Racket / Emacs Lisp / Guile / Hy / Janet | `STUNIR.Emitters.Lisp` |  Implemented |
+| Futhark | `STUNIR.Emitters.Futhark_Family` |  Implemented |
+| Lean 4 | `STUNIR.Emitters.Lean4_Family` |  Implemented |
+| Rust / Go / Java / C# / Swift / Kotlin / SPARK | `Code_Emitter` (flat IR) |  Partial |
+
+---
+
+## Regex Patterns
+
+All regular expressions used in this toolchain are canonically defined in:
+
+```
+schema/stunir_regex_ir_v1.dcbor.json
 ```
 
-### Build Modes
-```bash
-make core MODE=prove
-make core MODE=debug
-make core MODE=release
-```
+This file is a normalized semantic AST dCBOR JSON intermediate reference  the
+same format the pipeline generates. It covers 13 pattern groups:
 
-### Run Formal Verification
-```bash
-make prove
-```
+- `validation.hash`  SHA-256 hash formats
+- `validation.node_id`  Semantic IR node IDs
+- `validation.identifier`  Programming language identifiers
+- `extraction.c_function`  C function signature extraction
+- `extraction.whitespace`  Whitespace normalization
+- `asm.x86_registers` / `asm.arm_registers` / `asm.wasm_instructions`
+- `asm.x86_instructions` / `asm.arm_instructions`
+- `asm.unsafe_syscall` / `asm.directives`
+- `logging.filter`  Runtime-supplied log filter patterns
+- `sanitization.identifier` / `sanitization.tool_name`
 
-### Prove a Single Phase
-```bash
-make core-prove
-make parsing-prove
-make validation-prove
-```
+When adding a new pattern to any source file, add it to the regex IR first.
 
-### Build Specific Phase
-```bash
-make core          # Phase 1
-make parsing       # Phase 2
-make validation    # Phase 3
-```
+---
 
-### Clean
-```bash
-make clean
-make distclean
-```
+## Ada SPARK Philosophy
 
-### Run Tests
-```bash
-make test
-```
+STUNIR uses Ada SPARK because:
 
-## Usage
+1. **Determinism**  SPARK's formal contracts guarantee the same inputs always
+   produce the same outputs. No hidden state, no undefined behavior.
 
-Once built, the SPARK binaries replace Python scripts:
+2. **DO-178C compliance**  GNATprove can produce evidence for DO-178C Level A
+   (absence of runtime errors, functional correctness proofs).
 
-```bash
-# Instead of:
-python bridge_spec_assemble.py -i extraction.json -o spec.json
+3. **Hash-stable output**  Canonical IR is produced by deterministic SPARK code,
+   not by a model. Models propose; SPARK tools commit.
 
-# Use:
-./bin/spec_assembler -i extraction.json -o spec.json
+4. **Small verifiers**  SPARK's type system and contracts make the verification
+   logic simpler than the generation logic (a key STUNIR design principle).
 
-# Instead of:
-python stunir_pipeline.py --input extraction.json --output ./out
+---
 
-# Use:
-./bin/pipeline_driver -i extraction.json -o ./out
-```
+## Copyright
 
-### Pipeline Flags
-
-```bash
-./bin/pipeline_driver \
-  -i extraction.json \
-  -o ./out \
-  --targets c,cpp,rust,go,python,js,java,csharp,swift,kotlin \
-  --emit-ir \
-  --emit-spec
-```
-
-### Single-Stage Commands
-
-```bash
-./bin/spec_assembler -i extraction.json -o spec.json
-./bin/ir_converter -i spec.json -o ir.json
-./bin/code_emitter -i ir.json -o ./out --targets c,cpp
-```
-
-## Interoperability
-
-- Inputs/outputs are JSON-compatible with existing Python tooling
-- When SPARK binaries are missing, Python scripts remain the fallback
-- All file names and extensions are preserved per target language
-
-## Verification Levels
-
-| Component Level | GNATprove Level | Description |
-|----------------|-----------------|-------------|
-| Gold (P0) | 4 | Full functional correctness proofs |
-| Silver (P1) | 3 | Flow analysis + partial proofs |
-| Bronze (P2/P3) | 1-2 | Basic flow analysis |
-
-### Verification Artifacts
-
-- `obj/` contains `.ali` and proof artifacts per unit
-- GNATprove logs are generated per run and should be archived with build outputs
-- Proof results are required for P0/P1 components before release
-
-## Migration Status
-
-- [x] Analysis of Python components
-- [x] Directory structure created
-- [x] Common types package (`STUNIR_Types`)
-- [x] JSON parser specification
-- [x] Phase 1 specifications complete
-- [ ] Phase 1 implementations
-- [ ] Phase 2-6 specifications
-- [ ] Phase 2-6 implementations
-- [ ] Build system complete
-- [ ] Test suite
-- [ ] Integration with remaining Python tools
-
-## Python Components Status
-
-### Replaced by SPARK
-- `bridge_spec_assemble.py` → `Spec_Assembler`
-- `bridge_spec_to_ir.py` → `IR_Converter`
-- `bridge_ir_to_code.py` → `Code_Emitter`
-- `stunir_pipeline.py` → `Pipeline_Driver`
-
-### Pending Migration
-All other Python files listed in `SPARK_MIGRATION_PLAN.md`
-
-## Developer Workflow
-
-### 1. Adding a New Feature
-1. **Design**: Update `stunir_types.ads` if data structures change.
-2. **Specify**: Write package spec `.ads` with formal contracts (`Pre`, `Post`).
-3. **Verify Spec**: Run `gnatprove` on spec to check contract consistency.
-4. **Implement**: Write package body `.adb`.
-5. **Prove**: Run `gnatprove` iteratively until AoRTE is proven.
-6. **Test**: Add unit tests in `tests/`.
-
-### 2. Common Proof Issues
-- **Loop Invariants**: Required for all loops. Must capture everything that changes.
-- **flow errors**: Often mean uninitialized variables or missing `Global` contracts.
-- **overflow check**: Use saturating arithmetic or preconditions to constrain inputs.
-
-## CI/CD Integration
-
-The build system is designed for easy CI integration:
-
-```yaml
-# Example GitLab CI / GitHub Actions step
-spark-build:
-  image: adacore/gnatpro:25.0
-  script:
-    - cd tools/spark
-    - make all MODE=release
-    - make test
-
-spark-proof:
-  image: adacore/gnatpro:25.0
-  script:
-    - cd tools/spark
-    - make prove PROOF_LEVEL=2
-  artifacts:
-    paths:
-      - tools/spark/gnatprove/
-```
-
-## Troubleshooting
-
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| `medium: overflow check might fail` | Arithmetic without constraints | Add `Pre` condition or use bounded types |
-| `medium: range check might fail` | Array indexing | Assert index is within `'Range` |
-| `high: initialisation of "X" failed` | Variable read before write | Initialize variable at declaration or ensure all paths write to it |
-| `file "X.ads" not found` | Missing dependencies | Check `core.gpr` source dirs |
-
-## Python Components Status
-
-### Replaced by SPARK
-- `bridge_spec_assemble.py` → `Spec_Assembler`
-- `bridge_spec_to_ir.py` → `IR_Converter`
-- `bridge_ir_to_code.py` → `Code_Emitter`
-- `stunir_pipeline.py` → `Pipeline_Driver`
-
-### Pending Migration
-All other Python files listed in `SPARK_MIGRATION_PLAN.md`
-
-## Contributing
-
-When implementing SPARK packages:
-1. Always use `pragma SPARK_Mode (On)`
-2. Use bounded strings from `STUNIR_Types`
-3. Return `Status_Code` instead of raising exceptions
-4. Add pre/post conditions for verification
-5. Avoid dynamic allocation in P0/P1 components
-6. Run `gnatprove` before committing
-7. Capture proof logs with build artifacts
-
-## Artifacts
-
-- `bin/` contains compiled SPARK binaries
-- `obj/` contains `.o`, `.ali`, and proof artifacts
-- Proof logs should be archived per build
-
-## Configuration
-
-- `MODE=prove|debug|release` controls build switches
-- `PROOF_LEVEL=0..4` controls GNATprove effort
-- `--targets` accepts a comma-separated list of target languages
-
-## License
-
-Apache-2.0 - See SPDX-License-Identifier in source files
+Copyright (c) 2026 STUNIR Project  License: MIT

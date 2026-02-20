@@ -14,6 +14,17 @@ src/ada/targets/spark/*/embedded_emitter_main
 src/ada/targets/spark/*/*.ali
 src/ada/targets/spark/*/*.o
 
+# SPARK tools build artifacts (tools/spark/obj/ and compiled binaries)
+tools/spark/obj/
+tools/spark/bin/
+tools/spark/*.cswi
+tools/spark/src/**/*.cswi
+*.cswi
+*.stderr
+*.stdout
+tools/spark/stunir_code_index
+tools/spark/stunir_receipt_link
+
 # Local model workspace
 local_tasks/work/*
 !local_tasks/work/.gitkeep
