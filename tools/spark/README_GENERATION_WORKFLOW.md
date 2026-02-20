@@ -123,7 +123,7 @@ You have everything needed to generate and refactor the STUNIR powertools:
 1. [ ] json_extract.adb (513 → 120 lines)
    - Requires: json_path_parser, json_path_eval, json_value_format
    
-2. [ ] sig_gen_cpp.adb (406 → 100 lines)
+2. [ ] sig_gen_cpp.adb (406 → 100 lines) [DEPRECATED]
    - Requires: type_map_cpp, cpp_signature_gen, cpp_header_gen, cpp_namespace_wrap
    
 3. [ ] spec_validate_schema.adb (365 → 100 lines)

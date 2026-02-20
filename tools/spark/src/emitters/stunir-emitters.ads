@@ -2,54 +2,60 @@
 -- DO-178C Level A
 -- Phase 3a: Core Category Emitters
 
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with Semantic_IR.Modules;
+with Semantic_IR.Declarations;
+with Semantic_IR.Nodes;
+with Semantic_IR.Types;
+with STUNIR.Emitters.CodeGen;
+with STUNIR.Emitters.Node_Table;
 
 package STUNIR.Emitters is
    pragma SPARK_Mode (On);
 
-   type Target_Category is
-     (Category_Embedded, Category_GPU, Category_WASM,
-      Category_Assembly, Category_Polyglot);
+  subtype Target_Category is Semantic_IR.Types.Target_Category;
 
    type Emitter_Status is
      (Status_Success, Status_Error_Parse, Status_Error_Generate, Status_Error_IO);
 
    -- Abstract emitter interface
-   type Base_Emitter is abstract tagged record
-      Category : Target_Category := Category_Embedded;
-      Status   : Emitter_Status := Status_Success;
-   end record;
+  type Base_Emitter is abstract tagged record
+    Category : Target_Category := Semantic_IR.Types.Target_Embedded;
+    Status   : Emitter_Status := Status_Success;
+  end record;
 
    -- Abstract methods (must be overridden by concrete emitters)
    procedure Emit_Module
      (Self   : in out Base_Emitter;
-      Module : in     IR_Module;
-      Output :    out IR_Code_Buffer;
+      Module : in     Semantic_IR.Modules.IR_Module;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is abstract
    with
-     Pre'Class  => Is_Valid_Module (Module),
-     Post'Class => (if Success then Code_Buffers.Length (Output) > 0);
+     Pre'Class  => Semantic_IR.Modules.Is_Valid_Module (Module),
+     Post'Class => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) > 0);
 
    procedure Emit_Type
      (Self   : in out Base_Emitter;
-      T      : in     IR_Type_Def;
-      Output :    out IR_Code_Buffer;
+      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is abstract
    with
-     Pre'Class  => T.Field_Cnt > 0,
-     Post'Class => (if Success then Code_Buffers.Length (Output) >= 0);
+     Pre'Class  => Semantic_IR.Nodes.Is_Valid_Node_ID (T.Base.Node_ID),
+     Post'Class => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
 
    procedure Emit_Function
      (Self   : in out Base_Emitter;
-      Func   : in     IR_Function;
-      Output :    out IR_Code_Buffer;
+      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is abstract
    with
-     Pre'Class  => Func.Arg_Cnt >= 0,
-     Post'Class => (if Success then Code_Buffers.Length (Output) >= 0);
+     Pre'Class  => Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Base.Node_ID),
+     Post'Class => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
 
    -- Common utility functions
    function Get_Category_Name (Cat : Target_Category) return String

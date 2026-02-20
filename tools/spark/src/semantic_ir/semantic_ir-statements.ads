@@ -23,6 +23,12 @@ is
       Statements : Statement_List;
       Scope_ID   : IR_Name;
    end record;
+
+   -- Expression statement
+   type Expr_Statement is record
+      Base       : Statement_Node (Kind_Expr_Stmt);
+      Expr_ID    : Node_ID;
+   end record;
    
    -- If statement
    type If_Statement is record
@@ -57,6 +63,16 @@ is
    type Return_Statement is record
       Base     : Statement_Node (Kind_Return_Stmt);
       Value_ID : Node_ID; -- Can be empty for void returns
+   end record;
+
+   -- Break statement
+   type Break_Statement is record
+      Base : Statement_Node (Kind_Break_Stmt);
+   end record;
+
+   -- Continue statement
+   type Continue_Statement is record
+      Base : Statement_Node (Kind_Continue_Stmt);
    end record;
    
    -- Variable declaration statement

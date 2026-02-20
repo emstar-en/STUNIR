@@ -2,8 +2,12 @@
 -- DO-178C Level A
 -- Phase 3b: Language Family Emitters
 
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
 with STUNIR.Emitters;    use STUNIR.Emitters;
+with STUNIR.Emitters.Node_Table;
+with Semantic_IR.Modules;
+with Semantic_IR.Declarations;
+with Semantic_IR.Types;
+with STUNIR.Emitters.CodeGen;
 
 package STUNIR.Emitters.Lisp is
    pragma SPARK_Mode (On);
@@ -14,6 +18,7 @@ package STUNIR.Emitters.Lisp is
      (Common_Lisp,
       Scheme,
       Clojure,
+      ClojureScript,
       Racket,
       Emacs_Lisp,
       Guile,
@@ -50,8 +55,9 @@ package STUNIR.Emitters.Lisp is
    -- Override abstract methods from Base_Emitter
    overriding procedure Emit_Module
      (Self   : in out Lisp_Emitter;
-      Module : in     IR_Module;
-      Output :    out IR_Code_Buffer;
+      Module : in     Semantic_IR.Modules.IR_Module;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    with
      Pre'Class  => Is_Valid_Module (Module),
@@ -59,8 +65,9 @@ package STUNIR.Emitters.Lisp is
 
    overriding procedure Emit_Type
      (Self   : in out Lisp_Emitter;
-      T      : in     IR_Type_Def;
-      Output :    out IR_Code_Buffer;
+      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    with
      Pre'Class  => T.Field_Cnt > 0,
@@ -68,8 +75,9 @@ package STUNIR.Emitters.Lisp is
 
    overriding procedure Emit_Function
      (Self   : in out Lisp_Emitter;
-      Func   : in     IR_Function;
-      Output :    out IR_Code_Buffer;
+      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    with
      Pre'Class  => Func.Arg_Cnt >= 0,
@@ -87,7 +95,7 @@ package STUNIR.Emitters.Lisp is
      Post => Get_Module_Syntax'Result'Length in 6 .. 20;
 
    function Map_Type_To_Lisp
-     (Prim_Type : IR_Primitive_Type;
+     (Prim_Type : Semantic_IR.Types.IR_Primitive_Type;
       Dialect   : Lisp_Dialect) return String
    with
      Global => null,

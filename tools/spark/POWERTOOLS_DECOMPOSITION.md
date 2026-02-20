@@ -128,8 +128,8 @@ Spec JSON → [small tools] → IR JSON → [small tools] → Code
 ### Old Way (Monolithic):
 ```bash
 # One big tool does everything
-./stunir_spec_to_ir --spec-root specs/ --out output.ir.json
-./stunir_ir_to_code --input output.ir.json --output code.rs --target rust
+./stunir_spec_to_ir_main --spec-root specs/ --out output.ir.json
+./code_emitter -i output.ir.json -o output -t rust
 ```
 
 ### New Way (Unix Philosophy):
@@ -461,7 +461,7 @@ def generate_tests(tool_name):
 ## Migration Plan: Monolithic → Decomposed
 
 ### Step 1: Keep Existing Monolithic Tools
-- `stunir_spec_to_ir` and `stunir_ir_to_code` remain working
+- `stunir_spec_to_ir_main` and `code_emitter` remain working
 - No breaking changes
 
 ### Step 2: Build Decomposed Tools in Parallel

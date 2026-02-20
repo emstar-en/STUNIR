@@ -22,7 +22,7 @@ Generated 49 powertools from sequential guide. Analysis reveals:
 ### Critical: Tools > 300 lines (MUST DECOMPOSE)
 | Tool | Lines | Status | Decomposition Priority |
 |------|-------|--------|------------------------|
-| sig_gen_cpp | 445 | ❌ Too complex | HIGH - Type mapping + signature gen |
+| sig_gen_cpp | 445 | 🗑️ Deprecated | Retired |
 | json_extract | 410 | ❌ Too complex | HIGH - Path parsing + extraction |
 | spec_validate_schema | 407 | ❌ Too complex | HIGH - Schema validation rules |
 | json_merge | 372 | ❌ Too complex | MEDIUM - Merge logic + conflict resolution |
@@ -48,13 +48,13 @@ Generated 49 powertools from sequential guide. Analysis reveals:
 | ir_merge_funcs | 146 | ✓ Good |
 | module_to_ir | 141 | ✓ Good |
 | ir_extract_module | 131 | ✓ Good |
-| sig_gen_rust | 129 | ✓ Good |
+| sig_gen_rust | 129 | 🗑️ Deprecated |
 | type_map | 128 | ✓ Good |
 | file_hash | 127 | ✓ Good |
 | code_write | 123 | ✓ Good |
 | file_indexer | 109 | ✓ Good |
 | type_map_target | 107 | ✓ Good |
-| sig_gen_python | 88 | ✓ Good |
+| sig_gen_python | 88 | 🗑️ Deprecated |
 | spec_validate | 74 | ✓ Good |
 | json_validator | 72 | ✓ Good |
 | func_parse_body | 69 | ✓ Good |
@@ -92,7 +92,7 @@ Generated 49 powertools from sequential guide. Analysis reveals:
 
 ### Phase 1: Critical Tools (>400 lines) - IMMEDIATE
 
-#### 1. **sig_gen_cpp** (445 lines) → 4 utilities
+#### 1. **sig_gen_cpp** (445 lines) → 4 utilities [DEPRECATED]
 Decompose into:
 - `type_map_cpp.adb` (50 lines) - C++ type mapping only
 - `cpp_signature_gen.adb` (80 lines) - Generate C++ function signatures
@@ -267,7 +267,7 @@ Decompose into:
 ## Implementation Priority
 
 ### **IMMEDIATE** (This week)
-1. Create decomposition utilities for sig_gen_cpp
+1. Create decomposition utilities for sig_gen_cpp [DEPRECATED]
 2. Create decomposition utilities for json_extract
 3. Create decomposition utilities for spec_validate_schema
 4. Refactor these 3 tools to use new utilities
@@ -343,8 +343,8 @@ Decompose into:
 | code_gen_preamble | Generate language preamble | (standalone, emitters) |
 | code_gen_func_sig | Generate function signature | type_map_target, cpp_signature_gen (emitters) |
 | code_gen_func_body | Generate function body | (standalone, emitters) |
-| sig_gen_cpp | Generate C++ signatures | type_map_cpp, cpp_signature_gen, cpp_header_gen |
-| sig_gen_rust | Generate Rust signatures | (standalone) |
+| sig_gen_cpp | Generate C++ signatures | Deprecated (retired) |
+| sig_gen_rust | Generate Rust signatures | Deprecated (retired) |
 | code_add_comments | Add metadata comments | (standalone) |
 | code_format_target | Format with external formatter | (standalone) |
 | code_write | Write code to file | file_writer |

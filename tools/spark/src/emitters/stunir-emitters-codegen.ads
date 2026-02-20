@@ -2,15 +2,21 @@
 -- DO-178C Level A
 -- Phase 3a: Core Category Emitters
 
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with Ada.Strings.Bounded;
 
 package STUNIR.Emitters.CodeGen is
    pragma SPARK_Mode (On);
 
+  Max_Code_Length : constant := 8192;
+
+  package Code_Buffers is new Ada.Strings.Bounded.Generic_Bounded_Length (Max_Code_Length);
+  subtype Code_Buffer is Code_Buffers.Bounded_String;
+  subtype IR_Code_Buffer is Code_Buffer;
+
    type Indent_Level is range 0 .. 10;
 
    type Code_Generator is record
-      Buffer       : IR_Code_Buffer;
+    Buffer       : IR_Code_Buffer;
       Indent       : Indent_Level := 0;
       Indent_Width : Positive range 2 .. 8 := 4;
    end record;

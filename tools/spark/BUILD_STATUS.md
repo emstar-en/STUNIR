@@ -1,14 +1,13 @@
 # STUNIR Powertools - Build Status Report
 
-## Current State: Partial Success (4/8 tools building)
+## Current State: Partial Success (3/7 tools building)
 
 ### ✅ Successfully Building Tools
 1. **stunir_receipt_link** - Receipt linking and attestation
-2. **stunir_code_slice** - Code slicing utility  
-3. **stunir_code_index** - Code indexing and hashing
-4. **stunir_spec_assemble** - Spec file assembly
+2. **stunir_code_index** - Code indexing and hashing
+3. **stunir_spec_assemble** - Spec file assembly
 
-### ⚠️ Tools with Compilation Errors (4/8)
+### ⚠️ Tools with Compilation Errors (4/7)
 
 #### 1. **ir_converter** (Spec → IR conversion)
 - **Status**: Minor syntax errors
@@ -77,7 +76,7 @@ The 4 failing tools have **incomplete implementations**:
 5. **Fix code_emitter** (2-3 hours) - Systematic Lang_→Target_, add imports
 
 ### Medium Priority (Validation)
-6. **Build verification** - Compile all 8 tools successfully
+6. **Build verification** - Compile all 7 tools successfully
 7. **Unit testing** - Test at least receipt_link and code_index end-to-end
 8. **Integration test** - Run a small file through the pipeline
 
@@ -93,6 +92,6 @@ The 4 failing tools have **incomplete implementations**:
 - 4 tools have implementation gaps (mostly incomplete code relying on non-existent APIs)
 - Token parsing infrastructure needs to be designed/implemented or simplified
 
-**Build Status**: 4/8 tools (50%) building successfully
+**Build Status**: 3/7 tools (~43%) building successfully
 
 **Time to 100%**: Estimated 4-5 hours of focused work to complete remaining tools

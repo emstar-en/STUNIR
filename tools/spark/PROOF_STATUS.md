@@ -10,7 +10,7 @@ This document describes the SPARK proof status for the STUNIR tools implemented 
 
 ## Code Structure and Contracts
 
-### stunir_ir_to_code.adb
+### code_emitter.adb
 **Recursive Function**: `Translate_Steps_To_C`
 - Bounded recursion with `Max_Recursion_Depth = 6`
 - Depth tracking via `Recursion_Depth` subtype (0 .. 6)

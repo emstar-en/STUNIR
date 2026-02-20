@@ -19,7 +19,7 @@
 ### Critical Findings
 
 **Tools Requiring IMMEDIATE Decomposition** (>300 lines):
-1. `sig_gen_cpp.adb` - 445 lines (C++ signature generation)
+1. `sig_gen_cpp.adb` - 445 lines (C++ signature generation) [DEPRECATED]
 2. `json_extract.adb` - 410 lines (JSON path extraction)
 3. `spec_validate_schema.adb` - 407 lines (spec validation)
 4. `json_merge.adb` - 372 lines (JSON merging)
@@ -111,7 +111,7 @@
 
 ## 🎯 Decomposition Examples
 
-### Example 1: sig_gen_cpp (445 lines → 150 lines + 4 utilities)
+### Example 1: sig_gen_cpp (445 lines → 150 lines + 4 utilities) [DEPRECATED]
 
 **Before** (monolithic):
 ```ada
@@ -203,7 +203,7 @@
 ### Short-term (Next Session)
 5. ⬜ **Generate remaining JSON utilities** (7 total)
 6. ⬜ **Generate C++ utilities** (4 total)
-7. ⬜ **Refactor sig_gen_cpp** - Use new utilities
+7. ⬜ **Refactor sig_gen_cpp** - Use new utilities [DEPRECATED]
 8. ⬜ **Refactor json_extract** - Use new utilities
 9. ⬜ **Test refactored tools** - Ensure functionality preserved
 
@@ -242,8 +242,8 @@ Utility                 → Used By
 json_path_parser        → json_extract, spec_extract_*, ir_extract_*
 json_path_eval          → json_extract, all extractors
 validation_reporter     → spec_validate_schema, ir_validate_schema
-type_map_cpp            → sig_gen_cpp, code_gen_func_sig (emitters)
-cpp_signature_gen       → sig_gen_cpp, code_gen_func_sig (emitters)
+type_map_cpp            → code_gen_func_sig (emitters)
+cpp_signature_gen       → code_gen_func_sig (emitters)
 schema_check_*          → spec_validate_schema (all validators)
 ir_check_*              → ir_validate_schema (all validators)
 ```

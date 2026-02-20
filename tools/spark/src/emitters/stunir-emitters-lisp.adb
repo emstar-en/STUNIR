@@ -2,6 +2,9 @@
 -- DO-178C Level A
 -- Phase 3b: Language Family Emitters
 
+with STUNIR.Emitters.CodeGen;
+with STUNIR.Emitters.AST_Render;
+
 package body STUNIR.Emitters.Lisp is
    pragma SPARK_Mode (On);
 
@@ -14,7 +17,7 @@ package body STUNIR.Emitters.Lisp is
    function Get_Comment_Prefix (Dialect : Lisp_Dialect) return String is
    begin
       case Dialect is
-         when Common_Lisp | Clojure | Racket =>
+         when Common_Lisp | Clojure | ClojureScript | Racket =>
             return ";;; ";
          when Scheme | Emacs_Lisp | Guile =>
             return ";; ";
@@ -35,7 +38,7 @@ package body STUNIR.Emitters.Lisp is
             return "defpackage";
          when Scheme | Guile =>
             return "define-library";
-         when Clojure =>
+         when Clojure | ClojureScript =>
             return "ns";
          when Racket =>
             return "#lang racket";
@@ -52,24 +55,26 @@ package body STUNIR.Emitters.Lisp is
    -- Map_Type_To_Lisp
    ----------------------------------------------------------------------------
    function Map_Type_To_Lisp
-     (Prim_Type : IR_Primitive_Type;
+     (Prim_Type : Semantic_IR.Types.IR_Primitive_Type;
       Dialect   : Lisp_Dialect) return String
    is
       pragma Unreferenced (Dialect);
    begin
       case Prim_Type is
-         when Type_String =>
+         when Semantic_IR.Types.Type_String =>
             return "string";
-         when Type_Int | Type_I8 | Type_I16 | Type_I32 | Type_I64 =>
+         when Semantic_IR.Types.Type_I8 | Semantic_IR.Types.Type_I16 | Semantic_IR.Types.Type_I32 | Semantic_IR.Types.Type_I64 =>
             return "integer";
-         when Type_U8 | Type_U16 | Type_U32 | Type_U64 =>
+         when Semantic_IR.Types.Type_U8 | Semantic_IR.Types.Type_U16 | Semantic_IR.Types.Type_U32 | Semantic_IR.Types.Type_U64 =>
             return "integer";
-         when Type_Float | Type_F32 | Type_F64 =>
+         when Semantic_IR.Types.Type_F32 | Semantic_IR.Types.Type_F64 =>
             return "float";
-         when Type_Bool =>
+         when Semantic_IR.Types.Type_Bool =>
             return "boolean";
-         when Type_Void =>
+         when Semantic_IR.Types.Type_Void =>
             return "nil";
+         when Semantic_IR.Types.Type_Char =>
+            return "char";
       end case;
    end Map_Type_To_Lisp;
 
@@ -142,87 +147,30 @@ package body STUNIR.Emitters.Lisp is
    ----------------------------------------------------------------------------
    procedure Emit_Module
      (Self   : in out Lisp_Emitter;
-      Module : in     IR_Module;
-      Output :    out IR_Code_Buffer;
+      Module : in     Semantic_IR.Modules.IR_Module;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is
       Temp_Success : Boolean;
       Comment_Prefix : constant String := Get_Comment_Prefix (Self.Config.Dialect);
-      Module_Name : constant String := Name_Strings.To_String (Module.Module_Name);
-      Module_Doc  : constant String := Doc_Strings.To_String (Module.Docstring);
+      Module_Name : constant String := Semantic_IR.Types.Name_Strings.To_String (Module.Module_Name);
    begin
       Output := Code_Buffers.Null_Bounded_String;
       Success := False;
 
       -- Header comment
-      Emit_Atom (Output, Comment_Prefix & "STUNIR Generated " &
-        Lisp_Dialect'Image (Self.Config.Dialect) & " Code", Temp_Success);
-      if not Temp_Success then return; end if;
-      Emit_Newline (Output, Temp_Success);
-      if not Temp_Success then return; end if;
-
-      Emit_Atom (Output, Comment_Prefix & "DO-178C Level A Compliant", Temp_Success);
-      if not Temp_Success then return; end if;
-      Emit_Newline (Output, Temp_Success);
+      Emit_Atom (Output, Comment_Prefix & "STUNIR Generated " & Lisp_Dialect'Image (Self.Config.Dialect) & " Code", Temp_Success);
       if not Temp_Success then return; end if;
       Emit_Newline (Output, Temp_Success);
       if not Temp_Success then return; end if;
 
       -- Module/Package/Namespace declaration
       case Self.Config.Dialect is
-         when Common_Lisp =>
+         when Common_Lisp | Clojure | ClojureScript =>
             Emit_List_Start (Output, Temp_Success);
             if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defpackage", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, ":" & Module_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "in-package", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, ":" & Module_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Scheme =>
-            if Self.Config.Scheme_Std = R7RS then
-               Emit_List_Start (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, "define-library", Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Space (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_List_Start (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, Module_Name, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_List_End (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_List_End (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-            end if;
-
-         when Clojure =>
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "ns", Temp_Success);
+            Emit_Atom (Output, Get_Module_Syntax (Self.Config.Dialect), Temp_Success);
             if not Temp_Success then return; end if;
             Emit_Space (Output, Temp_Success);
             if not Temp_Success then return; end if;
@@ -232,85 +180,39 @@ package body STUNIR.Emitters.Lisp is
             if not Temp_Success then return; end if;
             Emit_Newline (Output, Temp_Success);
             if not Temp_Success then return; end if;
-
-         when Racket =>
-            Emit_Atom (Output, "#lang racket/base", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Emacs_Lisp =>
-            Emit_Atom (Output, ";;; " & Module_Name & ".el --- ", Temp_Success);
-            if not Temp_Success then return; end if;
-            if Module_Doc'Length > 0 then
-               Emit_Atom (Output, Module_Doc, Temp_Success);
-               if not Temp_Success then return; end if;
-            end if;
-            Emit_Atom (Output, "  -*- lexical-binding: t; -*-", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Guile =>
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "define-module", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Module_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Hy =>
-            Emit_Atom (Output, ";; Hy Module", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Janet =>
-            Emit_Atom (Output, "# Janet Module: " & Module_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
+         when others =>
+            null;
       end case;
 
       Emit_Newline (Output, Temp_Success);
       if not Temp_Success then return; end if;
 
-      -- Emit types
-      for I in 1 .. Module.Type_Cnt loop
+      -- Emit functions from declarations
+      for I in 1 .. Module.Decl_Count loop
          declare
-            Type_Output : IR_Code_Buffer;
-            Type_Success : Boolean;
+            Decl_Index : constant STUNIR.Emitters.Node_Table.Node_Index :=
+              STUNIR.Emitters.Node_Table.Lookup (Nodes, Module.Declarations (I));
          begin
-            Emit_Type (Self, Module.Types (I), Type_Output, Type_Success);
-            if Type_Success then
-               Code_Buffers.Append (Output, Code_Buffers.To_String (Type_Output));
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-            end if;
-         end;
-      end loop;
-
-      -- Emit functions
-      for I in 1 .. Module.Func_Cnt loop
-         declare
-            Func_Output : IR_Code_Buffer;
-            Func_Success : Boolean;
-         begin
-            Emit_Function (Self, Module.Functions (I), Func_Output, Func_Success);
-            if Func_Success then
-               Code_Buffers.Append (Output, Code_Buffers.To_String (Func_Output));
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
+            if Decl_Index > 0 then
+               declare
+                  Decl : constant STUNIR.Emitters.Node_Table.Declaration_Record :=
+                    STUNIR.Emitters.Node_Table.Get_Declaration (Nodes, Decl_Index);
+               begin
+                  if Decl.Kind = Semantic_IR.Types.Kind_Function_Decl then
+                     declare
+                        Func_Output : IR_Code_Buffer;
+                        Func_Success : Boolean;
+                        F : constant Semantic_IR.Declarations.Function_Declaration := Decl.Func;
+                     begin
+                        Emit_Function (Self, F, Nodes, Func_Output, Func_Success);
+                        if Func_Success then
+                           Code_Buffers.Append (Output, Code_Buffers.To_String (Func_Output));
+                           Emit_Newline (Output, Temp_Success);
+                           if not Temp_Success then return; end if;
+                        end if;
+                     end;
+                  end if;
+               end;
             end if;
          end;
       end loop;
@@ -323,65 +225,14 @@ package body STUNIR.Emitters.Lisp is
    ----------------------------------------------------------------------------
    procedure Emit_Type
      (Self   : in out Lisp_Emitter;
-      T      : in     IR_Type_Def;
-      Output :    out IR_Code_Buffer;
+      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is
-      Temp_Success : Boolean;
-      Type_Name : constant String := Name_Strings.To_String (T.Name);
-      Type_Doc  : constant String := Doc_Strings.To_String (T.Docstring);
+      pragma Unreferenced (Self, Nodes, T);
    begin
       Output := Code_Buffers.Null_Bounded_String;
-      Success := False;
-
-      case Self.Config.Dialect is
-         when Common_Lisp =>
-            -- (defstruct type-name ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defstruct", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Type_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Clojure =>
-            -- (defrecord TypeName [field1 field2])
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defrecord", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Type_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. T.Field_Cnt loop
-               Emit_Atom (Output, Name_Strings.To_String (T.Fields (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-               if I < T.Field_Cnt then
-                  Emit_Space (Output, Temp_Success);
-                  if not Temp_Success then return; end if;
-               end if;
-            end loop;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when others =>
-            -- Generic struct comment
-            Emit_Atom (Output, Get_Comment_Prefix (Self.Config.Dialect) & 
-              "Type: " & Type_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-      end case;
-
       Success := True;
    end Emit_Type;
 
@@ -390,237 +241,19 @@ package body STUNIR.Emitters.Lisp is
    ----------------------------------------------------------------------------
    procedure Emit_Function
      (Self   : in out Lisp_Emitter;
-      Func   : in     IR_Function;
-      Output :    out IR_Code_Buffer;
+      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is
       Temp_Success : Boolean;
-      Func_Name : constant String := Name_Strings.To_String (Func.Name);
-      Func_Doc  : constant String := Doc_Strings.To_String (Func.Docstring);
+      Func_Name : constant String := Semantic_IR.Types.Name_Strings.To_String (Func.Base.Decl_Name);
    begin
       Output := Code_Buffers.Null_Bounded_String;
       Success := False;
 
       case Self.Config.Dialect is
-         when Common_Lisp =>
-            -- (defun function-name (args) ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defun", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            -- Argument list
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-               if I < Func.Arg_Cnt then
-                  Emit_Space (Output, Temp_Success);
-                  if not Temp_Success then return; end if;
-               end if;
-            end loop;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            -- Docstring
-            if Self.Config.Include_Docs and Func_Doc'Length > 0 then
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, "  """ & Func_Doc & """", Temp_Success);
-               if not Temp_Success then return; end if;
-            end if;
-
-            -- Body
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  nil", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Scheme =>
-            -- (define (function-name args) ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "define", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Space (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-            end loop;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  #f", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Clojure =>
-            -- (defn function-name [args] ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defn", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            -- Docstring
-            if Self.Config.Include_Docs and Func_Doc'Length > 0 then
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, "  """ & Func_Doc & """", Temp_Success);
-               if not Temp_Success then return; end if;
-            end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  [", Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-               if I < Func.Arg_Cnt then
-                  Emit_Space (Output, Temp_Success);
-                  if not Temp_Success then return; end if;
-               end if;
-            end loop;
-            Emit_Atom (Output, "]", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  nil", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Racket =>
-            -- (define (function-name args) ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "define", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Space (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-            end loop;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  #f", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Emacs_Lisp =>
-            -- (defun function-name (args) ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defun", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-               if I < Func.Arg_Cnt then
-                  Emit_Space (Output, Temp_Success);
-                  if not Temp_Success then return; end if;
-               end if;
-            end loop;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            if Self.Config.Include_Docs and Func_Doc'Length > 0 then
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, "  """ & Func_Doc & """", Temp_Success);
-               if not Temp_Success then return; end if;
-            end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  nil", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Guile =>
-            -- (define (function-name args) ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "define", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Space (Output, Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-            end loop;
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  #f", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Hy =>
-            -- (defn function-name [args] ...)
+         when Common_Lisp | Scheme | Clojure | ClojureScript =>
             Emit_List_Start (Output, Temp_Success);
             if not Temp_Success then return; end if;
             Emit_Atom (Output, "defn", Temp_Success);
@@ -631,68 +264,31 @@ package body STUNIR.Emitters.Lisp is
             if not Temp_Success then return; end if;
             Emit_Space (Output, Temp_Success);
             if not Temp_Success then return; end if;
-
-            Emit_Atom (Output, "[", Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-               if I < Func.Arg_Cnt then
-                  Emit_Space (Output, Temp_Success);
-                  if not Temp_Success then return; end if;
-               end if;
-            end loop;
-            Emit_Atom (Output, "]", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  None", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_List_End (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-
-         when Janet =>
-            -- (defn function-name [args] ...)
-            Emit_List_Start (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "defn", Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Space (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, Func_Name, Temp_Success);
+            Emit_Atom (Output, "[]", Temp_Success);
             if not Temp_Success then return; end if;
             Emit_Newline (Output, Temp_Success);
             if not Temp_Success then return; end if;
 
-            if Self.Config.Include_Docs and Func_Doc'Length > 0 then
-               Emit_Atom (Output, "  """ & Func_Doc & """", Temp_Success);
-               if not Temp_Success then return; end if;
-               Emit_Newline (Output, Temp_Success);
-               if not Temp_Success then return; end if;
+            if Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Body_ID) then
+               declare
+                  Stmt_Out : IR_Code_Buffer;
+                  Stmt_Ok  : Boolean;
+               begin
+                  STUNIR.Emitters.AST_Render.Render_Statement (Nodes, Func.Body_ID, Stmt_Out, Stmt_Ok);
+                  if Stmt_Ok then
+                     Emit_Atom (Output, "  " & Code_Buffers.To_String (Stmt_Out), Temp_Success);
+                  else
+                     Emit_Atom (Output, "  nil", Temp_Success);
+                  end if;
+               end;
+            else
+               Emit_Atom (Output, "  nil", Temp_Success);
             end if;
 
-            Emit_Atom (Output, "  [", Temp_Success);
-            if not Temp_Success then return; end if;
-            for I in 1 .. Func.Arg_Cnt loop
-               Emit_Atom (Output, Name_Strings.To_String (Func.Args (I).Name), Temp_Success);
-               if not Temp_Success then return; end if;
-               if I < Func.Arg_Cnt then
-                  Emit_Space (Output, Temp_Success);
-                  if not Temp_Success then return; end if;
-               end if;
-            end loop;
-            Emit_Atom (Output, "]", Temp_Success);
-            if not Temp_Success then return; end if;
-
-            Emit_Newline (Output, Temp_Success);
-            if not Temp_Success then return; end if;
-            Emit_Atom (Output, "  nil", Temp_Success);
-            if not Temp_Success then return; end if;
-
             Emit_List_End (Output, Temp_Success);
             if not Temp_Success then return; end if;
+         when others =>
+            Emit_Atom (Output, Get_Comment_Prefix (Self.Config.Dialect) & "Function: " & Func_Name, Temp_Success);
       end case;
 
       Success := True;

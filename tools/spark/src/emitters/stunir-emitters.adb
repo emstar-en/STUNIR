@@ -8,11 +8,13 @@ package body STUNIR.Emitters is
    function Get_Category_Name (Cat : Target_Category) return String is
    begin
       case Cat is
-         when Category_Embedded => return "Embedded";
-         when Category_GPU      => return "GPU";
-         when Category_WASM     => return "WASM";
-         when Category_Assembly => return "Assembly";
-         when Category_Polyglot => return "Polyglot";
+         when Semantic_IR.Types.Target_Embedded      => return "Embedded";
+         when Semantic_IR.Types.Target_Realtime      => return "Realtime";
+         when Semantic_IR.Types.Target_Safety_Critical => return "SafetyCritical";
+         when Semantic_IR.Types.Target_GPU           => return "GPU";
+         when Semantic_IR.Types.Target_WASM          => return "WASM";
+         when Semantic_IR.Types.Target_Native        => return "Native";
+         when Semantic_IR.Types.Target_Functional    => return "Functional";
       end case;
    end Get_Category_Name;
 

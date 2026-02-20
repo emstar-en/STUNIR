@@ -671,13 +671,13 @@ json_extract() {
 }
 ```
 
-### Example 3: sig_gen_cpp using utilities
+### Example 3: sig_gen_cpp using utilities [DEPRECATED]
 
 ```bash
-# Old sig_gen_cpp (445 lines)
+# Old sig_gen_cpp (445 lines) [DEPRECATED]
 cat spec.json | sig_gen_cpp --namespace mylib
 
-# New sig_gen_cpp (150 lines) using utilities
+# New sig_gen_cpp (150 lines) using utilities [DEPRECATED]
 sig_gen_cpp() {
   local namespace="$1"
   spec_extract_funcs | while read func; do

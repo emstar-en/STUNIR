@@ -32,14 +32,13 @@ The `powertools.gpr` GNAT project file builds all powertools:
 gprbuild -P powertools.gpr
 ```
 
-This will compile 137 Ada source files and produce 8 main executables in `bin/`:
+This will compile 137 Ada source files and produce 7 main executables in `bin/`:
 
 - `code_emitter` - Emit code from IR
 - `ir_converter` - Convert between IR formats
 - `pipeline_driver` - Orchestrate full pipeline
 - `spec_assembler` - Assemble specs from parts
 - `receipt_link` - Link receipts for attestation
-- `code_slice` - Extract code slices
 - `code_index` - Index code functions
 - `spec_assemble` - Assemble specification files
 
@@ -54,16 +53,13 @@ Instead of one monolithic tool, the pipeline is composed of small utilities:
 ./bin/code_index input.cpp > funcs.json
 
 # Validate spec schema
-json_validate < spec.json
+./bin/spec_validate < spec.json
 
 # Convert spec to IR
 ./bin/ir_converter --from-spec spec.json > output.ir
 
-# Optimize IR
-ir_optimize < output.ir > optimized.ir
-
 # Generate code
-./bin/code_emitter --lang rust optimized.ir > output.rs
+./bin/code_emitter -i output.ir -o ./generated -t rust
 
 # Generate receipt
 receipt_generate output.rs > receipt.json

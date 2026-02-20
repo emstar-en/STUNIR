@@ -25,7 +25,6 @@ project Powertools is
       "pipeline_driver_main.adb",
       "spec_assembler_main.adb",
       "stunir_receipt_link_main.adb",
-      "stunir_code_slice_main.adb",
       "stunir_code_index_main.adb",
       "stunir_spec_assemble_main.adb"
    );
@@ -49,7 +48,6 @@ project Powertools is
       for Executable ("pipeline_driver_main.adb") use "pipeline_driver";
       for Executable ("spec_assembler_main.adb") use "spec_assembler";
       for Executable ("stunir_receipt_link_main.adb") use "receipt_link";
-      for Executable ("stunir_code_slice_main.adb") use "code_slice";
       for Executable ("stunir_code_index_main.adb") use "code_index";
       for Executable ("stunir_spec_assemble_main.adb") use "spec_assemble";
    end Builder;
