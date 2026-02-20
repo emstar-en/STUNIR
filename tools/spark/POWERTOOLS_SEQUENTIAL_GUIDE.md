@@ -1021,7 +1021,7 @@ Python mappings:
   "outputs": [{"name": "target_type", "type": "text", "source": "stdout"}],
   "options": ["--help", "--version", "--describe", "--target"],
   "complexity": "O(1)",
-  "pipeline_stage": "code_gen"
+  "pipeline_stage": "emitters"
 }
 
 Ada dependencies:
@@ -1086,7 +1086,7 @@ C preamble:
   "outputs": [{"name": "code_preamble", "type": "text", "source": "stdout"}],
   "options": ["--help", "--version", "--describe", "--target"],
   "complexity": "O(1)",
-  "pipeline_stage": "code_gen"
+  "pipeline_stage": "emitters"
 }
 
 Ada dependencies:
@@ -1142,7 +1142,7 @@ def add(a: int, b: int) -> int:
   "options": ["--help", "--version", "--describe", "--target"],
   "complexity": "O(n) where n is number of params",
   "dependencies": ["type_map_target"],
-  "pipeline_stage": "code_gen"
+  "pipeline_stage": "emitters"
 }
 
 Ada dependencies:
@@ -1197,7 +1197,7 @@ Python: pass
   "outputs": [{"name": "body_code", "type": "text", "source": "stdout"}],
   "options": ["--help", "--version", "--describe", "--target"],
   "complexity": "O(n) where n is number of steps",
-  "pipeline_stage": "code_gen"
+  "pipeline_stage": "emitters"
 }
 
 Ada dependencies:
@@ -1251,7 +1251,7 @@ Header comment format:
   "outputs": [{"name": "commented_code", "type": "text", "source": "stdout"}],
   "options": ["--help", "--version", "--describe", "--metadata"],
   "complexity": "O(n) where n is code size",
-  "pipeline_stage": "code_gen"
+  "pipeline_stage": "emitters"
 }
 
 Ada dependencies:
@@ -1301,7 +1301,7 @@ Behavior:
   "outputs": [{"name": "formatted_code", "type": "text", "source": "stdout"}],
   "options": ["--help", "--version", "--describe", "--target"],
   "complexity": "O(n) where n is code size",
-  "pipeline_stage": "code_gen"
+  "pipeline_stage": "emitters"
 }
 
 Ada dependencies:

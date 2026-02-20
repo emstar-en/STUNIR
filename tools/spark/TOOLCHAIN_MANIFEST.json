@@ -31,7 +31,8 @@
       "count": 8,
       "tools": [
         "type_normalize",
-        "type_map",
+        "emitters": {
+          "description": "Code generation for target languages",
         "type_map_target",
         "type_resolver",
         "type_lookup",
@@ -79,9 +80,9 @@
         "ir_check_types"
       ]
     },
-    "codegen": {
+    "emitters": {
       "description": "Code generation for target languages",
-      "count": 11,
+      "count": 12,
       "tools": [
         "sig_gen_cpp",
         "sig_gen_rust",
@@ -166,7 +167,7 @@
       },
       {
         "phase": 3,
-        "name": "Code Generation",
+        "name": "Emitters",
         "tools": ["sig_gen_cpp", "sig_gen_rust", "sig_gen_python"]
       },
       {
@@ -226,7 +227,7 @@
       "src/functions/": "4 function analysis tools",
       "src/spec/": "6 spec pipeline tools",
       "src/ir/": "12 IR pipeline tools",
-      "src/codegen/": "11 code generation tools",
+        "src/emitters/": "11 code generation tools",
       "src/validation/": "4 schema validation tools",
       "src/files/": "5 file operations tools",
       "src/verification/": "3 verification tools",

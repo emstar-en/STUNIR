@@ -34,19 +34,19 @@ procedure Sig_Gen_CPP is
 
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""sig_gen_cpp""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Generate C++ function signatures from STUNIR IR""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""ir_json""," & ASCII.LF &
-     "    ""type"": ""json""," & ASCII.LF &
-     "    ""source"": [""stdin""]," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"sig_gen_cpp\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Generate C++ function signatures from STUNIR IR\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"ir_json\"," & ASCII.LF &
+     "    \"type\": \"json\"," & ASCII.LF &
+     "    \"source\": [\"stdin\"]," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""cpp_header""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"cpp_header\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": \"stdout\"" & ASCII.LF &
      "  }]" & ASCII.LF &
      "}";
 

@@ -29,11 +29,11 @@ procedure Sig_Gen_Python is
    procedure Print_Describe is
    begin
       Put_Line ("{");
-      Put_Line ("  ""name"": ""sig_gen_python"",");
-      Put_Line ("  ""description"": ""Generate Python CFFI bindings"",");
-      Put_Line ("  ""version"": ""0.1.0-alpha"",");
-      Put_Line ("  ""inputs"": [{""name"": ""spec_or_ir"", ""type"": ""json"", ""source"": [""stdin"", ""file""]}],");
-      Put_Line ("  ""outputs"": [{""name"": ""bindings"", ""type"": ""text"", ""source"": ""stdout""}]");
+      Put_Line ("  \"name\": \"sig_gen_python\",");
+      Put_Line ("  \"description\": \"Generate Python CFFI bindings\",");
+      Put_Line ("  \"version\": \"0.1.0-alpha\",");
+      Put_Line ("  \"inputs\": [{\"name\": \"spec_or_ir\", \"type\": \"json\", \"source\": [\"stdin\", \"file\"]}],");
+      Put_Line ("  \"outputs\": [{\"name\": \"bindings\", \"type\": \"text\", \"source\": \"stdout\"}]");
       Put_Line ("}");
    end Print_Describe;
 
@@ -89,7 +89,7 @@ procedure Sig_Gen_Python is
          Append (Stub, "# Safe wrapper mode enabled" & ASCII.LF);
       end if;
       Append (Stub, "# TODO: Populate ffi.cdef() with signatures" & ASCII.LF);
-      Append (Stub, "ffi.cdef(" & """" & ")" & ASCII.LF);
+      Append (Stub, "ffi.cdef(" & "\"\"" & ")" & ASCII.LF);
       Append (Stub, "# TODO: Load library with ffi.dlopen" & ASCII.LF);
       return To_String (Stub);
    end Generate_Stub;

@@ -26,12 +26,12 @@ procedure Code_Gen_Func_Body is
    Version : constant String := "0.1.0-alpha";
 
    Describe_Output : constant String :=
-     "{""tool"":""code_gen_func_body"",""version"":""0.1.0-alpha""," &
-     """description"":""Generate function body stub from IR function JSON""," &
-     """inputs"":[{""type"":""json"",""source"":""stdin"",""required"":true}]," &
-     """outputs"":[{""type"":""code"",""source"":""stdout""}]," &
-     """options"":[""--target LANG""]," &
-     """targets"":[""c"",""cpp"",""rust"",""python"",""js"",""go""]}";
+     "{\"tool\":\"code_gen_func_body\",\"version\":\"0.1.0-alpha\"," &
+     "\"description\":\"Generate function body stub from IR function JSON\"," &
+     "\"inputs\":[{\"type\":\"json\",\"source\":\"stdin\",\"required\":true}]," &
+     "\"outputs\":[{\"type\":\"code\",\"source\":\"stdout\"}]," &
+     "\"options\":[\"--target LANG\"]," &
+     "\"targets\":[\"c\",\"cpp\",\"rust\",\"python\",\"js\",\"go\"]}";
 
    function Read_Stdin return String is
       Result : Unbounded_String := Null_Unbounded_String;
@@ -56,7 +56,7 @@ procedure Code_Gen_Func_Body is
    end Find;
 
    function Get_String (JSON : String; Key : String) return String is
-      Pat  : constant String := """" & Key & """";
+      Pat  : constant String := "\"" & Key & "\"";
       K    : constant Natural := Find (JSON, Pat);
       P, E : Natural;
    begin
@@ -90,18 +90,18 @@ procedure Code_Gen_Func_Body is
          else return "0"; end if;
       elsif Lang = "python" then
          if    IR_Type = "bool"              then return "False";
-         elsif IR_Type = "str"               then return """";
+         elsif IR_Type = "str"               then return "\"\"";
          elsif IR_Type = "void"              then return "";
          elsif IR_Type = "f32" or IR_Type = "f64" then return "0.0";
          else return "0"; end if;
       elsif Lang = "js" or Lang = "javascript" then
          if    IR_Type = "bool"              then return "false";
-         elsif IR_Type = "str"               then return """""";
+         elsif IR_Type = "str"               then return "\"\"";
          elsif IR_Type = "void"              then return "";
          else return "0"; end if;
       elsif Lang = "go" then
          if    IR_Type = "bool"              then return "false";
-         elsif IR_Type = "str"               then return """""";
+         elsif IR_Type = "str"               then return "\"\"";
          elsif IR_Type = "void"              then return "";
          elsif IR_Type = "f32" or IR_Type = "f64" then return "0.0";
          else return "0"; end if;

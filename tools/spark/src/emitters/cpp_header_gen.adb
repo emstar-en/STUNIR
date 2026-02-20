@@ -29,24 +29,24 @@ procedure Cpp_Header_Gen is
    --  Description output for --describe
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""cpp_header_gen""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Generate C++ header files from IR""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""ir_json""," & ASCII.LF &
-     "    ""type"": ""json""," & ASCII.LF &
-     "    ""source"": ""stdin""," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"cpp_header_gen\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Generate C++ header files from IR\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"ir_json\"," & ASCII.LF &
+     "    \"type\": \"json\"," & ASCII.LF &
+     "    \"source\": \"stdin\"," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""header_content""," & ASCII.LF &
-     "    ""type"": ""cpp""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"header_content\"," & ASCII.LF &
+     "    \"type\": \"cpp\"," & ASCII.LF &
+     "    \"source\": \"stdout\"" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""complexity"": ""O(n)""," & ASCII.LF &
-     "  ""options"": [" & ASCII.LF &
-     "    ""--help"", ""--version"", ""--describe""," & ASCII.LF &
-     "    ""--guard""" & ASCII.LF &
+     "  \"complexity\": \"O(n)\"," & ASCII.LF &
+     "  \"options\": [" & ASCII.LF &
+     "    \"--help\", \"--version\", \"--describe\"," & ASCII.LF &
+     "    \"--guard\"" & ASCII.LF &
      "  ]" & ASCII.LF &
      "}";
 

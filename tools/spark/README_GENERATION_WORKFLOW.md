@@ -154,9 +154,9 @@ These tools were generated as stubs and need full implementation:
 
 1. [ ] code_add_comments.adb
 2. [ ] code_format_target.adb
-3. [ ] code_gen_func_body.adb
-4. [ ] code_gen_func_sig.adb
-5. [ ] code_gen_preamble.adb
+3. [ ] emitters/code_gen_func_body.adb
+4. [ ] emitters/code_gen_func_sig.adb
+5. [ ] emitters/code_gen_preamble.adb
 6. [ ] code_write.adb
 7. [ ] func_parse_body.adb
 8. [ ] func_parse_sig.adb

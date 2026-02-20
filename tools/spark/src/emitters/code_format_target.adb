@@ -1,4 +1,4 @@
---  code_add_comments - Add comments to generated code
+--  code_format_target - Format code for target language
 --  Phase 1 Powertool for STUNIR
 
 pragma SPARK_Mode (Off);
@@ -10,7 +10,7 @@ with Ada.Exceptions;
 with GNAT.Strings;
 with GNAT.Command_Line;
 
-procedure Code_Add_Comments is
+procedure Code_Format_Target is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
@@ -20,7 +20,7 @@ procedure Code_Add_Comments is
    Exit_Error   : constant := 1;
 
    --  Configuration
-   Comment_Style : aliased GNAT.Strings.String_Access := new String'("");
+   Target_Lang   : aliased GNAT.Strings.String_Access := new String'("");
    Show_Version  : aliased Boolean := False;
    Show_Help     : aliased Boolean := False;
    Show_Describe : aliased Boolean := False;
@@ -29,34 +29,34 @@ procedure Code_Add_Comments is
 
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""code_add_comments""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Add comments to generated code""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""code""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": [""stdin""]," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"code_format_target\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Format code for target language\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"code\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": [\"stdin\"]," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""commented_code""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"formatted_code\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": \"stdout\"" & ASCII.LF &
      "  }]" & ASCII.LF &
      "}";
 
    procedure Print_Usage is
    begin
-      Put_Line ("code_add_comments - Add comments to generated code");
+      Put_Line ("code_format_target - Format code for target language");
       Put_Line ("Version: " & Version);
       Put_Line ("");
-      Put_Line ("Usage: code_add_comments [OPTIONS] --style STYLE < code.txt");
+      Put_Line ("Usage: code_format_target [OPTIONS] --target LANG < code.txt");
       Put_Line ("");
       Put_Line ("Options:");
       Put_Line ("  --help, -h        Show this help message");
       Put_Line ("  --version, -v     Show version information");
       Put_Line ("  --describe        Show tool description (JSON)");
-      Put_Line ("  --style STYLE     Comment style (cpp, rust, python)");
+      Put_Line ("  --target LANG     Target language (cpp, rust, python)");
    end Print_Usage;
 
    procedure Print_Error (Msg : String) is
@@ -77,18 +77,11 @@ procedure Code_Add_Comments is
       return To_String (Result);
    end Read_Stdin;
 
-   function Add_Comments (Code : String; Style : String) return String is
+   function Format_Code (Code : String; Lang : String) return String is
    begin
-      if Style = "cpp" then
-         return "// Auto-generated code" & ASCII.LF & Code;
-      elsif Style = "rust" then
-         return "// Auto-generated code" & ASCII.LF & Code;
-      elsif Style = "python" then
-         return "# Auto-generated code" & ASCII.LF & Code;
-      else
-         return Code;
-      end if;
-   end Add_Comments;
+      --  Basic formatting - just return as-is for now
+      return Code;
+   end Format_Code;
 
    Config : GNAT.Command_Line.Command_Line_Configuration;
 
@@ -96,7 +89,7 @@ begin
    GNAT.Command_Line.Define_Switch (Config, Show_Help'Access, "-h", "--help");
    GNAT.Command_Line.Define_Switch (Config, Show_Version'Access, "-v", "--version");
    GNAT.Command_Line.Define_Switch (Config, Show_Describe'Access, "", "--describe");
-   GNAT.Command_Line.Define_Switch (Config, Comment_Style'Access, "-s:", "--style=");
+   GNAT.Command_Line.Define_Switch (Config, Target_Lang'Access, "-t:", "--target=");
 
    begin
       GNAT.Command_Line.Getopt (Config);
@@ -125,8 +118,10 @@ begin
       return;
    end if;
 
-   if Comment_Style.all = "" then
-      Comment_Style.all := "cpp";
+   if Target_Lang.all = "" then
+      Print_Error ("Target language required (--target)");
+      Set_Exit_Status (Exit_Error);
+      return;
    end if;
 
    declare
@@ -138,7 +133,7 @@ begin
          return;
       end if;
 
-      Put (Add_Comments (Code, Comment_Style.all));
+      Put (Format_Code (Code, Target_Lang.all));
       Set_Exit_Status (Exit_Success);
    end;
 
@@ -146,4 +141,4 @@ exception
    when others =>
       Print_Error ("Unexpected error");
       Set_Exit_Status (Exit_Error);
-end Code_Add_Comments;
+end Code_Format_Target;

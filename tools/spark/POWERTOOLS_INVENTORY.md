@@ -105,7 +105,7 @@
 
 ---
 
-### 6. Code Generation (12 tools) - `src/codegen/`
+### 6. Emitters (12 tools) - `src/emitters/`
 
 | Tool | Purpose | Lines | Status |
 |------|---------|-------|--------|

@@ -43,23 +43,23 @@ procedure Sig_Gen_Rust is
    --  Description output
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""sig_gen_rust""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Generate Rust FFI signatures from STUNIR spec""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""spec_json""," & ASCII.LF &
-     "    ""type"": ""json""," & ASCII.LF &
-     "    ""source"": [""stdin"", ""file""]," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"sig_gen_rust\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Generate Rust FFI signatures from STUNIR spec\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"spec_json\"," & ASCII.LF &
+     "    \"type\": \"json\"," & ASCII.LF &
+     "    \"source\": [\"stdin\", \"file\"]," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""rust_code""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"rust_code\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": \"stdout\"" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""complexity"": ""O(n)""," & ASCII.LF &
-     "  ""options"": [" & ASCII.LF &
-     "    ""--help"", ""--version"", ""--describe"", ""--module"", ""--output"", ""--safe"", ""--verbose""" & ASCII.LF &
+     "  \"complexity\": \"O(n)\"," & ASCII.LF &
+     "  \"options\": [" & ASCII.LF &
+     "    \"--help\", \"--version\", \"--describe\", \"--module\", \"--output\", \"--safe\", \"--verbose\"" & ASCII.LF &
      "  ]" & ASCII.LF &
      "}";
 
@@ -350,7 +350,7 @@ procedure Sig_Gen_Rust is
                end if;
 
                if Unsafe_FFI then
-                  Append (Result, "pub unsafe extern ""C"" fn ");
+                  Append (Result, "pub unsafe extern \"C\" fn ");
                   Append (Result, STUNIR_Types.JSON_Strings.To_String (Current_Func));
                   Append (Result, "(" & To_String (Current_Params) & ")");
                   Append (Result, " -> " & STUNIR_Types.JSON_Strings.To_String (Current_Return));

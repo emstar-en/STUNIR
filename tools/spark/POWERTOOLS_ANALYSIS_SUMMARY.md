@@ -242,8 +242,8 @@ Utility                 → Used By
 json_path_parser        → json_extract, spec_extract_*, ir_extract_*
 json_path_eval          → json_extract, all extractors
 validation_reporter     → spec_validate_schema, ir_validate_schema
-type_map_cpp            → sig_gen_cpp, code_gen_func_sig
-cpp_signature_gen       → sig_gen_cpp, code_gen_func_sig
+type_map_cpp            → sig_gen_cpp, code_gen_func_sig (emitters)
+cpp_signature_gen       → sig_gen_cpp, code_gen_func_sig (emitters)
 schema_check_*          → spec_validate_schema (all validators)
 ir_check_*              → ir_validate_schema (all validators)
 ```

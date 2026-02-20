@@ -33,7 +33,7 @@ This document tracks the status of the STUNIR powertools refactoring effort to i
 | format_detect | ✅ FIXED | None | Spec files exist in src/ |
 | extraction_to_spec | ✅ FIXED | None | Fixed character literal escaping |
 
-## Phase 3 Powertools (Code Generation)
+## Phase 3 Powertools (Emitters)
 
 | Tool | Status | Issues | Notes |
 |------|--------|--------|-------|

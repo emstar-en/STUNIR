@@ -342,8 +342,8 @@
         ]
       },
       {
-        "id": "phase_3_codegen",
-        "name": "Code Generation",
+        "id": "phase_3_emitters",
+        "name": "Emitters",
         "description": "Tools for generating target language code",
         "phase": 3,
         "tools": [
@@ -641,7 +641,7 @@
         "expected_outputs": [
           "validation_report"
         ],
-        "ai_hints": "Ensure IR integrity before codegen"
+        "ai_hints": "Ensure IR integrity before emitters"
       },
       {
         "name": "sig_gen_python",

@@ -1,4 +1,4 @@
---  code_format_target - Format code for target language
+--  code_write - Write code to files
 --  Phase 1 Powertool for STUNIR
 
 pragma SPARK_Mode (Off);
@@ -10,7 +10,7 @@ with Ada.Exceptions;
 with GNAT.Strings;
 with GNAT.Command_Line;
 
-procedure Code_Format_Target is
+procedure Code_Write is
    use Ada.Command_Line;
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
@@ -20,7 +20,7 @@ procedure Code_Format_Target is
    Exit_Error   : constant := 1;
 
    --  Configuration
-   Target_Lang   : aliased GNAT.Strings.String_Access := new String'("");
+   Output_File   : aliased GNAT.Strings.String_Access := new String'("");
    Show_Version  : aliased Boolean := False;
    Show_Help     : aliased Boolean := False;
    Show_Describe : aliased Boolean := False;
@@ -29,34 +29,34 @@ procedure Code_Format_Target is
 
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""code_format_target""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Format code for target language""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""code""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": [""stdin""]," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"code_write\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Write code to files\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"code\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": [\"stdin\"]," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""formatted_code""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"file\"," & ASCII.LF &
+     "    \"type\": \"file\"," & ASCII.LF &
+     "    \"source\": \"filesystem\"" & ASCII.LF &
      "  }]" & ASCII.LF &
      "}";
 
    procedure Print_Usage is
    begin
-      Put_Line ("code_format_target - Format code for target language");
+      Put_Line ("code_write - Write code to files");
       Put_Line ("Version: " & Version);
       Put_Line ("");
-      Put_Line ("Usage: code_format_target [OPTIONS] --target LANG < code.txt");
+      Put_Line ("Usage: code_write [OPTIONS] --output FILE < code.txt");
       Put_Line ("");
       Put_Line ("Options:");
       Put_Line ("  --help, -h        Show this help message");
       Put_Line ("  --version, -v     Show version information");
       Put_Line ("  --describe        Show tool description (JSON)");
-      Put_Line ("  --target LANG     Target language (cpp, rust, python)");
+      Put_Line ("  --output FILE     Output file (required)");
    end Print_Usage;
 
    procedure Print_Error (Msg : String) is
@@ -77,19 +77,13 @@ procedure Code_Format_Target is
       return To_String (Result);
    end Read_Stdin;
 
-   function Format_Code (Code : String; Lang : String) return String is
-   begin
-      --  Basic formatting - just return as-is for now
-      return Code;
-   end Format_Code;
-
    Config : GNAT.Command_Line.Command_Line_Configuration;
 
 begin
    GNAT.Command_Line.Define_Switch (Config, Show_Help'Access, "-h", "--help");
    GNAT.Command_Line.Define_Switch (Config, Show_Version'Access, "-v", "--version");
    GNAT.Command_Line.Define_Switch (Config, Show_Describe'Access, "", "--describe");
-   GNAT.Command_Line.Define_Switch (Config, Target_Lang'Access, "-t:", "--target=");
+   GNAT.Command_Line.Define_Switch (Config, Output_File'Access, "-o:", "--output=");
 
    begin
       GNAT.Command_Line.Getopt (Config);
@@ -118,27 +112,34 @@ begin
       return;
    end if;
 
-   if Target_Lang.all = "" then
-      Print_Error ("Target language required (--target)");
+   if Output_File.all = "" then
+      Print_Error ("Output file required (--output)");
       Set_Exit_Status (Exit_Error);
       return;
    end if;
 
    declare
-      Code : constant String := Read_Stdin;
+      Content : constant String := Read_Stdin;
+      File    : File_Type;
    begin
-      if Code'Length = 0 then
+      if Content'Length = 0 then
          Print_Error ("Empty input");
          Set_Exit_Status (Exit_Error);
          return;
       end if;
 
-      Put (Format_Code (Code, Target_Lang.all));
+      Create (File, Out_File, Output_File.all);
+      Put (File, Content);
+      Close (File);
       Set_Exit_Status (Exit_Success);
+   exception
+      when others =>
+         Print_Error ("Cannot write file: " & Output_File.all);
+         Set_Exit_Status (Exit_Error);
    end;
 
 exception
    when others =>
       Print_Error ("Unexpected error");
       Set_Exit_Status (Exit_Error);
-end Code_Format_Target;
+end Code_Write;

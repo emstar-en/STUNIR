@@ -27,12 +27,12 @@ procedure Code_Gen_Preamble is
    Version : constant String := "0.1.0-alpha";
 
    Describe_Output : constant String :=
-     "{""tool"":""code_gen_preamble"",""version"":""0.1.0-alpha""," &
-     """description"":""Generate code preamble for target language""," &
-     """inputs"":[{""type"":""flag"",""name"":""--target"",""required"":true}]," &
-     """outputs"":[{""type"":""code"",""source"":""stdout""}]," &
-     """options"":[""--target LANG"",""--module NAME""]," &
-     """targets"":[""c"",""cpp"",""rust"",""python"",""js"",""go""]}";
+     "{\"tool\":\"code_gen_preamble\",\"version\":\"0.1.0-alpha\"," &
+     "\"description\":\"Generate code preamble for target language\"," &
+     "\"inputs\":[{\"type\":\"flag\",\"name\":\"--target\",\"required\":true}]," &
+     "\"outputs\":[{\"type\":\"code\",\"source\":\"stdout\"}]," &
+     "\"options\":[\"--target LANG\",\"--module NAME\"]," &
+     "\"targets\":[\"c\",\"cpp\",\"rust\",\"python\",\"js\",\"go\"]}";
 
    function Gen_Preamble (Lang : String; Module : String) return String is
       R : Unbounded_String;

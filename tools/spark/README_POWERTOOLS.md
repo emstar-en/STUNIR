@@ -8,10 +8,9 @@ The STUNIR toolchain follows the Unix philosophy: **small, focused, composable p
 
 ```
 src/
-├── codegen/        # Code generation utilities (12 tools)
+├── emitters/       # Code generation utilities (12 tools)
 ├── core/           # Pipeline orchestration (19 tools)
 ├── detection/      # Language and feature detection (5 tools)
-├── emitters/       # Language-specific code emitters (1 tool)
 ├── files/          # File I/O operations (4 tools)
 ├── functions/      # Function extraction and indexing (6 tools)
 ├── ir/             # IR manipulation and optimization (8 tools)

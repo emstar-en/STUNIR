@@ -340,9 +340,9 @@ Decompose into:
 | Tool | Responsibility | Uses Utilities |
 |------|----------------|----------------|
 | type_map_target | Map types to target language | type_map_cpp, type_map_rust, etc. |
-| code_gen_preamble | Generate language preamble | (standalone) |
-| code_gen_func_sig | Generate function signature | type_map_target, cpp_signature_gen |
-| code_gen_func_body | Generate function body | (standalone) |
+| code_gen_preamble | Generate language preamble | (standalone, emitters) |
+| code_gen_func_sig | Generate function signature | type_map_target, cpp_signature_gen (emitters) |
+| code_gen_func_body | Generate function body | (standalone, emitters) |
 | sig_gen_cpp | Generate C++ signatures | type_map_cpp, cpp_signature_gen, cpp_header_gen |
 | sig_gen_rust | Generate Rust signatures | (standalone) |
 | code_add_comments | Add metadata comments | (standalone) |

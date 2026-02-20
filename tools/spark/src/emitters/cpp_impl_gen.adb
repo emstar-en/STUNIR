@@ -29,24 +29,24 @@ procedure Cpp_Impl_Gen is
    --  Description output for --describe
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""cpp_impl_gen""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Generate C++ implementation files from IR""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""ir_json""," & ASCII.LF &
-     "    ""type"": ""json""," & ASCII.LF &
-     "    ""source"": ""stdin""," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"cpp_impl_gen\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Generate C++ implementation files from IR\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"ir_json\"," & ASCII.LF &
+     "    \"type\": \"json\"," & ASCII.LF &
+     "    \"source\": \"stdin\"," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""implementation_content""," & ASCII.LF &
-     "    ""type"": ""cpp""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"implementation_content\"," & ASCII.LF &
+     "    \"type\": \"cpp\"," & ASCII.LF &
+     "    \"source\": \"stdout\"" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""complexity"": ""O(n)""," & ASCII.LF &
-     "  ""options"": [" & ASCII.LF &
-     "    ""--help"", ""--version"", ""--describe""," & ASCII.LF &
-     "    ""--header""" & ASCII.LF &
+     "  \"complexity\": \"O(n)\"," & ASCII.LF &
+     "  \"options\": [" & ASCII.LF &
+     "    \"--help\", \"--version\", \"--describe\"," & ASCII.LF &
+     "    \"--header\"" & ASCII.LF &
      "  ]" & ASCII.LF &
      "}";
 
@@ -97,7 +97,7 @@ procedure Cpp_Impl_Gen is
    begin
       --  Add header include if specified
       if Header'Length > 0 then
-         Append (Result, "#include """ & Header & """" & ASCII.LF);
+         Append (Result, "#include \"" & Header & "\"" & ASCII.LF);
          Append (Result, ASCII.LF);
       end if;
 

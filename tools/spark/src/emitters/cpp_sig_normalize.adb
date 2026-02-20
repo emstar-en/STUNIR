@@ -28,23 +28,23 @@ procedure Cpp_Sig_Normalize is
    --  Description output for --describe
    Describe_Output : constant String :=
      "{" & ASCII.LF &
-     "  ""tool"": ""cpp_sig_normalize""," & ASCII.LF &
-     "  ""version"": ""0.1.0-alpha""," & ASCII.LF &
-     "  ""description"": ""Normalize C++ function signatures""," & ASCII.LF &
-     "  ""inputs"": [{" & ASCII.LF &
-     "    ""name"": ""cpp_signature""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": ""stdin""," & ASCII.LF &
-     "    ""required"": true" & ASCII.LF &
+     "  \"tool\": \"cpp_sig_normalize\"," & ASCII.LF &
+     "  \"version\": \"0.1.0-alpha\"," & ASCII.LF &
+     "  \"description\": \"Normalize C++ function signatures\"," & ASCII.LF &
+     "  \"inputs\": [{" & ASCII.LF &
+     "    \"name\": \"cpp_signature\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": \"stdin\"," & ASCII.LF &
+     "    \"required\": true" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""outputs"": [{" & ASCII.LF &
-     "    ""name"": ""normalized_signature""," & ASCII.LF &
-     "    ""type"": ""string""," & ASCII.LF &
-     "    ""source"": ""stdout""" & ASCII.LF &
+     "  \"outputs\": [{" & ASCII.LF &
+     "    \"name\": \"normalized_signature\"," & ASCII.LF &
+     "    \"type\": \"string\"," & ASCII.LF &
+     "    \"source\": \"stdout\"" & ASCII.LF &
      "  }]," & ASCII.LF &
-     "  ""complexity"": ""O(n)""," & ASCII.LF &
-     "  ""options"": [" & ASCII.LF &
-     "    ""--help"", ""--version"", ""--describe""" & ASCII.LF &
+     "  \"complexity\": \"O(n)\"," & ASCII.LF &
+     "  \"options\": [" & ASCII.LF &
+     "    \"--help\", \"--version\", \"--describe\"" & ASCII.LF &
      "  ]" & ASCII.LF &
      "}";
 

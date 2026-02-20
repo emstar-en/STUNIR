@@ -26,12 +26,12 @@ procedure Code_Gen_Func_Sig is
    Version : constant String := "0.1.0-alpha";
 
    Describe_Output : constant String :=
-     "{""tool"":""code_gen_func_sig"",""version"":""0.1.0-alpha""," &
-     """description"":""Generate function signature from IR function JSON""," &
-     """inputs"":[{""type"":""json"",""source"":""stdin"",""required"":true}]," &
-     """outputs"":[{""type"":""code"",""source"":""stdout""}]," &
-     """options"":[""--target LANG""]," &
-     """targets"":[""c"",""cpp"",""rust"",""python"",""js"",""go""]}";
+     "{\"tool\":\"code_gen_func_sig\",\"version\":\"0.1.0-alpha\"," &
+     "\"description\":\"Generate function signature from IR function JSON\"," &
+     "\"inputs\":[{\"type\":\"json\",\"source\":\"stdin\",\"required\":true}]," &
+     "\"outputs\":[{\"type\":\"code\",\"source\":\"stdout\"}]," &
+     "\"options\":[\"--target LANG\"]," &
+     "\"targets\":[\"c\",\"cpp\",\"rust\",\"python\",\"js\",\"go\"]}";
 
    function Read_Stdin return String is
       Result : Unbounded_String := Null_Unbounded_String;
@@ -56,7 +56,7 @@ procedure Code_Gen_Func_Sig is
    end Find;
 
    function Get_String (JSON : String; Key : String) return String is
-      Pat  : constant String := """" & Key & """";
+      Pat  : constant String := "\"" & Key & "\"";
       K    : constant Natural := Find (JSON, Pat);
       P, E : Natural;
    begin
@@ -74,7 +74,7 @@ procedure Code_Gen_Func_Sig is
    end Get_String;
 
    function Get_Block (JSON : String; Key : String) return String is
-      Pat   : constant String := """" & Key & """";
+      Pat   : constant String := "\"" & Key & "\"";
       K     : constant Natural := Find (JSON, Pat);
       P, E  : Natural;
       Depth : Integer := 0;
@@ -91,7 +91,7 @@ procedure Code_Gen_Func_Sig is
       E := P;
       while E <= JSON'Last loop
          if InStr then
-            if JSON (E) = '"' and then (E = JSON'First or else JSON (E - 1) /= '\') then
+            if JSON (E) = '"' and then (E = JSON'First or else JSON (E - 1) /= '\\') then
                InStr := False; end if;
          else
             if    JSON (E) = '"'                   then InStr := True;
@@ -118,7 +118,7 @@ procedure Code_Gen_Func_Sig is
       Pos := Pos + 1;
       while Pos <= Arr'Last loop
          if InStr then
-            if Arr (Pos) = '"' and then (Pos = Arr'First or else Arr (Pos - 1) /= '\') then
+            if Arr (Pos) = '"' and then (Pos = Arr'First or else Arr (Pos - 1) /= '\\') then
                InStr := False; end if;
          else
             case Arr (Pos) is
@@ -148,7 +148,7 @@ procedure Code_Gen_Func_Sig is
       Pos := Pos + 1;
       while Pos <= Arr'Last loop
          if InStr then
-            if Arr (Pos) = '"' and then (Pos = Arr'First or else Arr (Pos - 1) /= '\') then
+            if Arr (Pos) = '"' and then (Pos = Arr'First or else Arr (Pos - 1) /= '\\') then
                InStr := False; end if;
          else
             case Arr (Pos) is

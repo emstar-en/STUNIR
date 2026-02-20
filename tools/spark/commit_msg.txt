@@ -22,7 +22,7 @@ Key Changes:
 
 Architecture:
 Orthogonal structure across 12 directories: core, json, types, functions, 
-spec, ir, codegen, validation, files, verification, utils, detection
+spec, ir, emitters, validation, files, verification, utils, detection
 
 Documentation Added:
 - docs/ULTIMATE_VICTORY_2025-02-18.md

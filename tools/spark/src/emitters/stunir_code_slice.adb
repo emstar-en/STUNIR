@@ -87,12 +87,12 @@ package body STUNIR_Code_Slice is
    begin
       Initialize (Builder);
       Append_Line (Builder, "{");
-      Append_Line (Builder, "  ""kind"": ""stunir.code_slice.v1"",");
-      Append_Line (Builder, "  ""file_path"": """ & Path_Strings.To_String (Slice.File_Path) & """,");
-      Append_Line (Builder, "  ""file_hash"": """ & Hash_Strings.To_String (Slice.File_Hash) & """,");
-      Append_Line (Builder, "  ""language"": """ & Lang_Strings.To_String (Slice.Language) & """,");
-      Append_Line (Builder, "  ""region_count"": " & Natural'Image (Slice.Region_Count) & ",");
-      Append_Line (Builder, "  ""regions"": [");
+      Append_Line (Builder, "  \"kind\": \"stunir.code_slice.v1\",");
+      Append_Line (Builder, "  \"file_path\": \"" & Path_Strings.To_String (Slice.File_Path) & "\",");
+      Append_Line (Builder, "  \"file_hash\": \"" & Hash_Strings.To_String (Slice.File_Hash) & "\",");
+      Append_Line (Builder, "  \"language\": \"" & Lang_Strings.To_String (Slice.Language) & "\",");
+      Append_Line (Builder, "  \"region_count\": " & Natural'Image (Slice.Region_Count) & ",");
+      Append_Line (Builder, "  \"regions\": [");
 
       for I in 1 .. Slice.Region_Count loop
          if I > 1 then
@@ -101,10 +101,10 @@ package body STUNIR_Code_Slice is
             Append_Line (Builder, "    {");
          end if;
 
-         Append_Line (Builder, "      ""start_line"": " & Natural'Image (Slice.Regions (I).Start_Line) & ",");
-         Append_Line (Builder, "      ""end_line"": " & Natural'Image (Slice.Regions (I).End_Line) & ",");
-         Append_Line (Builder, "      ""region_type"": """ & Region_Type_To_String (Slice.Regions (I).Region_Kind) & """,");
-         Append_Line (Builder, "      ""content_hash"": """ & Hash_Strings.To_String (Slice.Regions (I).Content_Hash) & """");
+         Append_Line (Builder, "      \"start_line\": " & Natural'Image (Slice.Regions (I).Start_Line) & ",");
+         Append_Line (Builder, "      \"end_line\": " & Natural'Image (Slice.Regions (I).End_Line) & ",");
+         Append_Line (Builder, "      \"region_type\": \"" & Region_Type_To_String (Slice.Regions (I).Region_Kind) & "\",");
+         Append_Line (Builder, "      \"content_hash\": \"" & Hash_Strings.To_String (Slice.Regions (I).Content_Hash) & "\"");
          Append_Line (Builder, "    }");
       end loop;
 
