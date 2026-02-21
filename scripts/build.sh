@@ -45,14 +45,23 @@ ARCH="$(detect_arch)"
 PRECOMPILED_DIR="precompiled/${PLATFORM}-${ARCH}/spark/bin"
 
 # Tool paths - prefer precompiled, fall back to built
-if [ -x "$PRECOMPILED_DIR/stunir_spec_to_ir_main" ] && [ "$USE_PRECOMPILED" != "0" ]; then
-    SPARK_SPEC_TO_IR="$PRECOMPILED_DIR/stunir_spec_to_ir_main"
-    SPARK_IR_TO_CODE="$PRECOMPILED_DIR/stunir_ir_to_code_main"
+# NOTE: Old tool names (stunir_spec_to_ir_main, stunir_ir_to_code_main) are deprecated.
+# Use ir_converter_main and code_emitter_main instead.
+if [ -x "$PRECOMPILED_DIR/ir_converter_main" ] && [ "$USE_PRECOMPILED" != "0" ]; then
+    SPARK_IR_CONVERTER="$PRECOMPILED_DIR/ir_converter_main"
+    SPARK_CODE_EMITTER="$PRECOMPILED_DIR/code_emitter_main"
+    SPARK_PIPELINE_DRIVER="$PRECOMPILED_DIR/pipeline_driver_main"
     USING_PRECOMPILED=1
 else
-    SPARK_SPEC_TO_IR="tools/spark/bin/stunir_spec_to_ir_main"
-    SPARK_IR_TO_CODE="tools/spark/bin/stunir_ir_to_code_main"
+    SPARK_IR_CONVERTER="tools/spark/bin/ir_converter_main"
+    SPARK_CODE_EMITTER="tools/spark/bin/code_emitter_main"
+    SPARK_PIPELINE_DRIVER="tools/spark/bin/pipeline_driver_main"
     USING_PRECOMPILED=0
+fi
+# Fallback to old names if new ones don't exist
+if [ ! -x "$SPARK_IR_CONVERTER" ] && [ -x "$PRECOMPILED_DIR/stunir_spec_to_ir_main" ]; then
+    SPARK_IR_CONVERTER="$PRECOMPILED_DIR/stunir_spec_to_ir_main"
+    SPARK_CODE_EMITTER="$PRECOMPILED_DIR/stunir_ir_to_code_main"
 fi
 NATIVE_BIN="tools/native/rust/stunir-native/target/release/stunir-native"
 
@@ -85,7 +94,7 @@ detect_runtime() {
 
     # Auto-detection priority: Precompiled SPARK -> Built SPARK -> Native -> Python -> Shell
     # SPARK (Ada) is the PRIMARY and PREFERRED runtime
-    if [ -x "$SPARK_SPEC_TO_IR" ] && [ -x "$SPARK_IR_TO_CODE" ]; then
+    if [ -x "$SPARK_IR_CONVERTER" ] && [ -x "$SPARK_CODE_EMITTER" ]; then
         if [ "$USING_PRECOMPILED" = "1" ]; then
             echo "[STUNIR] Using precompiled SPARK binaries (no GNAT compiler needed)" >&2
         fi
@@ -103,7 +112,7 @@ detect_runtime() {
 
 # --- Build SPARK tools if needed ---
 build_spark_tools() {
-    if [ ! -x "$SPARK_SPEC_TO_IR" ] || [ ! -x "$SPARK_IR_TO_CODE" ]; then
+    if [ ! -x "$SPARK_IR_CONVERTER" ] || [ ! -x "$SPARK_CODE_EMITTER" ]; then
         log "Building Ada SPARK tools..."
         if command -v gprbuild >/dev/null 2>&1; then
             (cd tools/spark && gprbuild -P stunir_tools.gpr) || {
@@ -138,8 +147,8 @@ chmod +x scripts/lib/*.sh 2>/dev/null || true
 case "$RUNTIME" in
     spark)
         # PRIMARY: Ada SPARK implementation
-        if [ ! -x "$SPARK_SPEC_TO_IR" ]; then
-            error "SPARK binary not found at $SPARK_SPEC_TO_IR"
+        if [ ! -x "$SPARK_IR_CONVERTER" ]; then
+            error "SPARK binary not found at $SPARK_IR_CONVERTER"
             error "Please run: cd tools/spark && gprbuild -P stunir_tools.gpr"
             exit 1
         fi
@@ -147,11 +156,11 @@ case "$RUNTIME" in
         log "Using Ada SPARK Core (PRIMARY implementation)"
         
         # 1. Spec -> IR (SPARK)
-        "$SPARK_SPEC_TO_IR" --spec-root "$SPEC_ROOT" --out "$OUT_IR" --lockfile "$LOCK_FILE"
+        "$SPARK_IR_CONVERTER" --spec-root "$SPEC_ROOT" --out "$OUT_IR" --lockfile "$LOCK_FILE"
         
         # 2. IR -> Code (SPARK)
-        if [ -x "$SPARK_IR_TO_CODE" ]; then
-            "$SPARK_IR_TO_CODE" --input "$OUT_IR" --output "$OUT_PY" --target python
+        if [ -x "$SPARK_CODE_EMITTER" ]; then
+            "$SPARK_CODE_EMITTER" --input "$OUT_IR" --output "$OUT_PY" --target python
         fi
         
         # 3. Generate IR Manifest
