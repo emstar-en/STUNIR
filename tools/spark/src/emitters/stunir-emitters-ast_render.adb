@@ -60,7 +60,7 @@ package body STUNIR.Emitters.AST_Render is
             when Kind_Float_Literal =>
                Append (Output, "0.0", Ok);
             when Kind_String_Literal =>
-               Append (Output, "\"\"", Ok);
+               Append (Output, """""", Ok);
             when Kind_Bool_Literal =>
                Append (Output, "false", Ok);
             when Kind_Var_Ref =>

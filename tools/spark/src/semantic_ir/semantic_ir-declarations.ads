@@ -10,8 +10,10 @@ with Semantic_IR.Nodes; use Semantic_IR.Nodes;
 package Semantic_IR.Declarations with
    SPARK_Mode => On
 is
-   -- Declaration types
-   type Declaration_Node (Kind : IR_Node_Kind) is new IR_Node (Kind) with record
+   --  Declaration node: wraps an IR_Node with declaration-specific fields.
+   --  IR_Node is a discriminated record (not tagged), so we use composition.
+   type Declaration_Node (Kind : IR_Node_Kind) is record
+      Base       : IR_Node (Kind);
       Decl_Name  : IR_Name;
       Visibility : Visibility_Kind := Vis_Public;
    end record;
@@ -65,7 +67,7 @@ is
    
    function Is_Valid_Declaration (Decl : Declaration_Node) return Boolean
       with Post => (if Is_Valid_Declaration'Result then
-                       Is_Valid_Node_ID (Decl.Node_ID) and then
+                       Is_Valid_Node_ID (Decl.Base.ID) and then
                        Name_Strings.Length (Decl.Decl_Name) > 0);
    
 end Semantic_IR.Declarations;

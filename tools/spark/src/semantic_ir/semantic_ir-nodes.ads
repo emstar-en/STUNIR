@@ -36,6 +36,7 @@ is
    type Source_Location is record
       Line   : Natural := 0;    --  Line number (1-based, 0 = unknown)
       Column : Natural := 0;    --  Column number (1-based, 0 = unknown)
+      Length : Natural := 0;    --  Token length (0 = unknown)
       File   : IR_Path;         --  Source file path
    end record;
 
@@ -46,9 +47,9 @@ is
    --  Base AST node type with discriminant for variant-specific data.
    --  Each node has a unique ID, source location, and content hash.
    type IR_Node (Kind : IR_Node_Kind) is record
-      Node_ID  : Node_ID;       --  Unique identifier for this node
+      ID       : Node_ID;         --  Unique identifier for this node (renamed from Node_ID to avoid shadowing)
       Location : Source_Location; --  Source location for debugging
-      Hash     : IR_Hash;       --  Content hash for verification
+      Hash     : IR_Hash;         --  Content hash for verification
 
       --  Variant-specific fields based on node kind
       case Kind is

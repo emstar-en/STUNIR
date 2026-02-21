@@ -4,10 +4,11 @@
 
 with STUNIR.Emitters;    use STUNIR.Emitters;
 with STUNIR.Emitters.Node_Table;
+with STUNIR.Emitters.CodeGen;    use STUNIR.Emitters.CodeGen;
 with Semantic_IR.Modules;
 with Semantic_IR.Declarations;
+with Semantic_IR.Nodes;
 with Semantic_IR.Types;
-with STUNIR.Emitters.CodeGen;
 
 package STUNIR.Emitters.Lisp is
    pragma SPARK_Mode (On);
@@ -52,36 +53,36 @@ package STUNIR.Emitters.Lisp is
       Config : Lisp_Config := Default_Config;
    end record;
 
-   -- Override abstract methods from Base_Emitter
-   overriding procedure Emit_Module
-     (Self   : in out Lisp_Emitter;
-      Module : in     Semantic_IR.Modules.IR_Module;
-      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
-      Success:    out Boolean)
+   --  Concrete emitter procedures (not overriding — base has no abstract procs)
+   procedure Emit_Module
+     (Self    : in out Lisp_Emitter;
+      Module  : in     Semantic_IR.Modules.IR_Module;
+      Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output  :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
+      Success :    out Boolean)
    with
-     Pre'Class  => Is_Valid_Module (Module),
-     Post'Class => (if Success then Code_Buffers.Length (Output) > 0);
+     Pre  => Semantic_IR.Modules.Is_Valid_Module (Module),
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) > 0);
 
-   overriding procedure Emit_Type
-     (Self   : in out Lisp_Emitter;
-      T      : in     Semantic_IR.Declarations.Type_Declaration;
-      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
-      Success:    out Boolean)
+   procedure Emit_Type
+     (Self    : in out Lisp_Emitter;
+      T       : in     Semantic_IR.Declarations.Type_Declaration;
+      Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output  :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
+      Success :    out Boolean)
    with
-     Pre'Class  => T.Field_Cnt > 0,
-     Post'Class => (if Success then Code_Buffers.Length (Output) >= 0);
+     Pre  => Semantic_IR.Nodes.Is_Valid_Node_ID (T.Base.Base.ID),
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
 
-   overriding procedure Emit_Function
-     (Self   : in out Lisp_Emitter;
-      Func   : in     Semantic_IR.Declarations.Function_Declaration;
-      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
-      Success:    out Boolean)
+   procedure Emit_Function
+     (Self    : in out Lisp_Emitter;
+      Func    : in     Semantic_IR.Declarations.Function_Declaration;
+      Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
+      Output  :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
+      Success :    out Boolean)
    with
-     Pre'Class  => Func.Arg_Cnt >= 0,
-     Post'Class => (if Success then Code_Buffers.Length (Output) >= 0);
+     Pre  => Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Base.Base.ID),
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
 
    -- Dialect-specific helpers
    function Get_Comment_Prefix (Dialect : Lisp_Dialect) return String
@@ -106,13 +107,13 @@ package STUNIR.Emitters.Lisp is
      (Buffer  : in out IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Post => (if Success then Code_Buffers.Length (Buffer) > Code_Buffers.Length (Buffer'Old));
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer) > STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer'Old));
 
    procedure Emit_List_End
      (Buffer  : in out IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Post => (if Success then Code_Buffers.Length (Buffer) > Code_Buffers.Length (Buffer'Old));
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer) > STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer'Old));
 
    procedure Emit_Atom
      (Buffer  : in out IR_Code_Buffer;
@@ -120,18 +121,18 @@ package STUNIR.Emitters.Lisp is
       Success :    out Boolean)
    with
      Pre => Atom'Length > 0 and Atom'Length <= 128,
-     Post => (if Success then Code_Buffers.Length (Buffer) >= Code_Buffers.Length (Buffer'Old));
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer) >= STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer'Old));
 
    procedure Emit_Space
      (Buffer  : in out IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Post => (if Success then Code_Buffers.Length (Buffer) = Code_Buffers.Length (Buffer'Old) + 1);
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer) = STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer'Old) + 1);
 
    procedure Emit_Newline
      (Buffer  : in out IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Post => (if Success then Code_Buffers.Length (Buffer) = Code_Buffers.Length (Buffer'Old) + 1);
+     Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer) = STUNIR.Emitters.CodeGen.Code_Buffers.Length (Buffer'Old) + 1);
 
 end STUNIR.Emitters.Lisp;

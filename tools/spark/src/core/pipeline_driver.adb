@@ -6,20 +6,15 @@
 
 pragma SPARK_Mode (On);
 
-with STUNIR_Types;
-use STUNIR_Types;
-
+--  STUNIR_Types is already use-visible via pipeline_driver.ads (use STUNIR_Types)
 with Spec_Assembler;
 with IR_Converter;
 with Code_Emitter;
 
 with Ada.Text_IO;
-with Ada.Strings.Fixed;
+pragma Unreferenced (Ada.Text_IO);  --  Available for future diagnostic output
 
 package body Pipeline_Driver is
-
-   use Ada.Strings;
-   use Ada.Strings.Fixed;
 
    procedure Run_Phase_1_Spec_Assembly
      (Config : in     Pipeline_Config;

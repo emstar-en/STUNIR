@@ -76,7 +76,7 @@ package body Semantic_IR.Validation is
       
       -- Validate node ID
       declare
-         ID_Result : constant Validation_Result := Validate_Node_ID (M.Base.Node_ID);
+         ID_Result : constant Validation_Result := Validate_Node_ID (M.Base.ID);
       begin
          if ID_Result.Status /= Valid then
             return ID_Result;

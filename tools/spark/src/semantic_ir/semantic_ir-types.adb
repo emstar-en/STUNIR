@@ -202,7 +202,7 @@ package body Semantic_IR.Types is
       elsif I = "never" then
          return Inline_Never;
       elsif I = "hint" then
-         return Inline_Hint;
+         return Inline_Hint_Suggest;
       else
          return Inline_None;
       end if;

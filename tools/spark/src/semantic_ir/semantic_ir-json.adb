@@ -18,7 +18,6 @@ with STUNIR.Emitters.Node_Table;
 
 package body Semantic_IR.JSON is
 
-   use STUNIR_Types;
    use STUNIR_JSON_Parser;
    use Semantic_IR.Types;
    use Semantic_IR.Nodes;
@@ -27,6 +26,7 @@ package body Semantic_IR.JSON is
    use Semantic_IR.Statements;
    use Semantic_IR.Expressions;
    use STUNIR.Emitters.Node_Table;
+   use type Name_Strings.Bounded_String;
 
    function To_Name (S : String) return IR_Name is
    begin
@@ -53,11 +53,11 @@ package body Semantic_IR.JSON is
    function To_Path (S : String) return IR_Path is
    begin
       if S'Length = 0 then
-         return Path_Strings.Null_Bounded_String;
-      elsif S'Length > Max_Path_Length then
-         return Path_Strings.To_Bounded_String (S (S'First .. S'First + Max_Path_Length - 1));
+         return Semantic_IR.Types.Path_Strings.Null_Bounded_String;
+      elsif S'Length > Semantic_IR.Types.Max_Path_Length then
+         return Semantic_IR.Types.Path_Strings.To_Bounded_String (S (S'First .. S'First + Semantic_IR.Types.Max_Path_Length - 1));
       else
-         return Path_Strings.To_Bounded_String (S);
+         return Semantic_IR.Types.Path_Strings.To_Bounded_String (S);
       end if;
    end To_Path;
 
@@ -116,12 +116,12 @@ package body Semantic_IR.JSON is
 
    procedure Parse_Source_Location
      (State  : in out Parser_State;
-      Loc    :    out Source_Location;
+      Loc    :    out Semantic_IR.Nodes.Source_Location;
       Status :    out Status_Code)
    is
       Member_Name : Identifier_String;
    begin
-      Loc := (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0);
+      Loc := (File => Semantic_IR.Types.Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0);
       if State.Current_Token /= Token_Object_Start then
          Status := Error_Parse;
          return;
@@ -222,7 +222,7 @@ package body Semantic_IR.JSON is
       Int_Str     : String := "";
       Str_Str     : String := "";
       Bool_Str    : String := "";
-      Location    : Source_Location := (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0);
+      Location    : Semantic_IR.Nodes.Source_Location := (File => Semantic_IR.Types.Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0);
       Expr_Type   : Type_Reference := (Kind => TK_Primitive, Prim_Type => Type_Void);
       Left_ID     : Node_ID := Name_Strings.Null_Bounded_String;
       Right_ID    : Node_ID := Name_Strings.Null_Bounded_String;
@@ -230,8 +230,7 @@ package body Semantic_IR.JSON is
       Then_ID     : Node_ID := Name_Strings.Null_Bounded_String;
       Else_ID     : Node_ID := Name_Strings.Null_Bounded_String;
       Op_Bin      : Binary_Operator := Op_Add;
-      Op_Un       : Unary_Operator := Op_Not;
-      Success     : Boolean;
+      Added       : Boolean;
    begin
       Expr_ID := Name_Strings.Null_Bounded_String;
 
@@ -275,7 +274,6 @@ package body Semantic_IR.JSON is
                   Op_Str : constant String := JSON_Strings.To_String (State.Token_Value);
                begin
                   Op_Bin := Parse_Binary_Operator (Op_Str);
-                  Op_Un := Parse_Unary_Operator (Op_Str);
                end;
             elsif Key = "type" and then State.Current_Token = Token_Object_Start then
                Parse_Type_Reference (State, Expr_Type, Status);
@@ -304,34 +302,80 @@ package body Semantic_IR.JSON is
       Expr_ID := To_Node_ID (NodeId_Str);
       declare
          Kind : constant IR_Node_Kind := Parse_Node_Kind (Kind_Str);
-         Expr_Node : Expression_Node :=
-           (Kind      => Kind,
-            Node_ID   => Expr_ID,
-            Location  => Location,
-            Hash      => To_Hash (Hash_Str),
-            Expr_Type => Expr_Type);
       begin
          case Kind is
             when Kind_Binary_Expr =>
-               Add_Expression (Nodes,
-                 (Kind => Kind_Binary_Expr,
-                  Bin  => (Base => Expr_Node, Operator => Op_Bin, Left_ID => Left_ID, Right_ID => Right_ID)),
-                 Success);
+               declare
+                  Expr_Node : constant Expression_Node (Kind_Binary_Expr) :=
+                    (Kind      => Kind_Binary_Expr,
+                     Base      => (Kind     => Kind_Binary_Expr,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str)),
+                     Expr_Type => Expr_Type);
+               begin
+                  Add_Expression (Nodes,
+                    (Kind => Kind_Binary_Expr,
+                     Bin  => (Base => Expr_Node, Operator => Op_Bin, Left_ID => Left_ID, Right_ID => Right_ID)),
+                    Added);
+               end;
             when Kind_Ternary_Expr =>
-               Add_Expression (Nodes,
-                 (Kind => Kind_Ternary_Expr,
-                  Ter  => (Base => Expr_Node, Condition_ID => Cond_ID, Then_ID => Then_ID, Else_ID => Else_ID)),
-                 Success);
+               declare
+                  Expr_Node : constant Expression_Node (Kind_Ternary_Expr) :=
+                    (Kind      => Kind_Ternary_Expr,
+                     Base      => (Kind     => Kind_Ternary_Expr,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str)),
+                     Expr_Type => Expr_Type);
+               begin
+                  Add_Expression (Nodes,
+                    (Kind => Kind_Ternary_Expr,
+                     Ter  => (Base => Expr_Node, Condition_ID => Cond_ID, Then_ID => Then_ID, Else_ID => Else_ID)),
+                    Added);
+               end;
             when Kind_Var_Ref =>
-               Expr_Node.Var_Name := To_Name (Name_Str);
-               Expr_Node.Var_Binding := To_Node_ID (Bind_Str);
-               Add_Expression_Node (Nodes, Expr_Node, Success);
+               declare
+                  Expr_Node : Expression_Node (Kind_Var_Ref) :=
+                    (Kind      => Kind_Var_Ref,
+                     Base      => (Kind     => Kind_Var_Ref,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str),
+                                  Var_Name => Name_Strings.Null_Bounded_String,
+                                  Var_Binding => Name_Strings.Null_Bounded_String),
+                     Expr_Type => Expr_Type);
+               begin
+                  Expr_Node.Base.Var_Name := To_Name (Name_Str);
+                  Expr_Node.Base.Var_Binding := To_Node_ID (Bind_Str);
+                  Add_Expression_Node (Nodes, Expr_Node, Added);
+               end;
             when Kind_Integer_Literal =>
-               Expr_Node.Int_Value := Long_Long_Integer (To_Int (Int_Str, 0));
-               Expr_Node.Int_Radix := 10;
-               Add_Expression_Node (Nodes, Expr_Node, Success);
+               declare
+                  Expr_Node : Expression_Node (Kind_Integer_Literal) :=
+                    (Kind      => Kind_Integer_Literal,
+                     Base      => (Kind     => Kind_Integer_Literal,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str),
+                                  Int_Value => 0,
+                                  Int_Radix => 10),
+                     Expr_Type => Expr_Type);
+               begin
+                  Expr_Node.Base.Int_Value := Long_Long_Integer (To_Int (Int_Str, 0));
+                  Expr_Node.Base.Int_Radix := 10;
+                  Add_Expression_Node (Nodes, Expr_Node, Added);
+               end;
             when Kind_Float_Literal =>
                declare
+                  Expr_Node : Expression_Node (Kind_Float_Literal) :=
+                    (Kind      => Kind_Float_Literal,
+                     Base      => (Kind     => Kind_Float_Literal,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str),
+                                  Float_Value => 0.0),
+                     Expr_Type => Expr_Type);
                   Float_Val : Long_Float := 0.0;
                begin
                   if Str_Str'Length > 0 then
@@ -342,17 +386,51 @@ package body Semantic_IR.JSON is
                            Float_Val := 0.0;
                      end;
                   end if;
-                  Expr_Node.Float_Value := Float_Val;
+                  Expr_Node.Base.Float_Value := Float_Val;
+                  Add_Expression_Node (Nodes, Expr_Node, Added);
                end;
-               Add_Expression_Node (Nodes, Expr_Node, Success);
             when Kind_String_Literal =>
-               Expr_Node.Str_Value := To_Name (Str_Str);
-               Add_Expression_Node (Nodes, Expr_Node, Success);
+               declare
+                  Expr_Node : Expression_Node (Kind_String_Literal) :=
+                    (Kind      => Kind_String_Literal,
+                     Base      => (Kind     => Kind_String_Literal,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str),
+                                  Str_Value => Name_Strings.Null_Bounded_String),
+                     Expr_Type => Expr_Type);
+               begin
+                  Expr_Node.Base.Str_Value := To_Name (Str_Str);
+                  Add_Expression_Node (Nodes, Expr_Node, Added);
+               end;
             when Kind_Bool_Literal =>
-               Expr_Node.Bool_Value := (Bool_Str = "true");
-               Add_Expression_Node (Nodes, Expr_Node, Success);
+               declare
+                  Expr_Node : Expression_Node (Kind_Bool_Literal) :=
+                    (Kind      => Kind_Bool_Literal,
+                     Base      => (Kind     => Kind_Bool_Literal,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str),
+                                  Bool_Value => False),
+                     Expr_Type => Expr_Type);
+               begin
+                  Expr_Node.Base.Bool_Value := (Bool_Str = "true");
+                  Add_Expression_Node (Nodes, Expr_Node, Added);
+               end;
             when others =>
-               Add_Expression_Node (Nodes, Expr_Node, Success);
+               declare
+                  Expr_Node : constant Expression_Node (Kind_Var_Ref) :=
+                    (Kind      => Kind_Var_Ref,
+                     Base      => (Kind     => Kind_Var_Ref,
+                                  ID       => Expr_ID,
+                                  Location => Location,
+                                  Hash     => To_Hash (Hash_Str),
+                                  Var_Name => Name_Strings.Null_Bounded_String,
+                                  Var_Binding => Name_Strings.Null_Bounded_String),
+                     Expr_Type => Expr_Type);
+               begin
+                  Add_Expression_Node (Nodes, Expr_Node, Added);
+               end;
          end case;
       end;
 
@@ -371,9 +449,9 @@ package body Semantic_IR.JSON is
       Kind_Str    : String := "";
       NodeId_Str  : String := "";
       Hash_Str    : String := "";
-      Location    : Source_Location := (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0);
+      Location    : Semantic_IR.Nodes.Source_Location := (File => Semantic_IR.Types.Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0);
       Value_ID    : Node_ID := Name_Strings.Null_Bounded_String;
-      Success     : Boolean;
+         Added       : Boolean;
    begin
       Stmt_ID := Name_Strings.Null_Bounded_String;
       if State.Current_Token /= Token_Object_Start then
@@ -411,18 +489,34 @@ package body Semantic_IR.JSON is
       Stmt_ID := To_Node_ID (NodeId_Str);
       declare
          Kind : constant IR_Node_Kind := Parse_Node_Kind (Kind_Str);
-         Stmt_Node : Statement_Node :=
-           (Kind     => Kind,
-            Node_ID  => Stmt_ID,
-            Location => Location,
-            Hash     => To_Hash (Hash_Str));
       begin
          if Kind = Kind_Return_Stmt then
-            Add_Statement (Nodes,
-              (Kind => Kind_Return_Stmt, Ret => (Base => Stmt_Node, Value_ID => Value_ID)),
-              Success);
+            declare
+               Stmt_Node : constant Statement_Node (Kind_Return_Stmt) :=
+                 (Kind     => Kind_Return_Stmt,
+                  Base     => (Kind     => Kind_Return_Stmt,
+                               ID       => Stmt_ID,
+                               Location => Location,
+                               Hash     => To_Hash (Hash_Str)));
+            begin
+               Add_Statement (Nodes,
+                 (Kind => Kind_Return_Stmt, Ret => (Base => Stmt_Node, Value_ID => Value_ID)),
+                 Added);
+            end;
          else
-            Add_Statement (Nodes, (Kind => Kind, Base => Stmt_Node), Success);
+            declare
+               Stmt_Node : constant Statement_Node (Kind_Expr_Stmt) :=
+                 (Kind     => Kind_Expr_Stmt,
+                  Base     => (Kind     => Kind_Expr_Stmt,
+                               ID       => Stmt_ID,
+                               Location => Location,
+                               Hash     => To_Hash (Hash_Str)));
+            begin
+               Add_Statement (Nodes,
+                 (Kind => Kind_Expr_Stmt,
+                  Expr => (Base => Stmt_Node, Expr_ID => Name_Strings.Null_Bounded_String)),
+                 Added);
+            end;
          end if;
       end;
 
@@ -431,152 +525,6 @@ package body Semantic_IR.JSON is
       end if;
    end Parse_Statement;
 
-   procedure Parse_Function_Decl
-     (State  : in out Parser_State;
-      Nodes  : in out Node_Table;
-      Decl   :    out Function_Declaration;
-      Status :    out Status_Code)
-   is
-      Member_Name : Identifier_String;
-      Name_Str    : String := "";
-      NodeId_Str  : String := "";
-      Hash_Str    : String := "";
-      Vis_Str     : String := "";
-      Vis_Str     : String := "";
-      Inline_Str  : String := "";
-      Return_T    : Type_Reference := (Kind => TK_Primitive, Prim_Type => Type_Void);
-      Params      : Parameter_List := (others => Name_Strings.Null_Bounded_String);
-      Param_Count : Natural := 0;
-      Body_ID     : Node_ID := Name_Strings.Null_Bounded_String;
-   begin
-      Decl := (Base => (Kind => Kind_Function_Decl,
-                        Node_ID => Name_Strings.Null_Bounded_String,
-                        Location => (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
-                        Hash => Hash_Strings.Null_Bounded_String,
-                        Decl_Name => Name_Strings.Null_Bounded_String,
-                        Visibility => Vis_Public),
-               Return_Type => (Kind => TK_Primitive, Prim_Type => Type_Void),
-               Param_Count => 0,
-               Parameters  => (others => Name_Strings.Null_Bounded_String),
-               Body_ID     => Name_Strings.Null_Bounded_String,
-               Inline      => Inline_None,
-               Is_Pure     => False,
-               Stack_Usage => 0,
-               Priority    => 0,
-               Interrupt_Vec => 0,
-               Entry_Point => False);
-
-      if State.Current_Token /= Token_Object_Start then
-         Status := Error_Parse;
-         return;
-      end if;
-
-      Next (State, Status);
-      while Status = Success and then State.Current_Token /= Token_Object_End loop
-         Read_Member (State, Member_Name, Status);
-         exit when Status /= Success;
-         declare
-            Key : constant String := Identifier_Strings.To_String (Member_Name);
-         begin
-            if Key = "name" and then State.Current_Token = Token_String then
-               Name_Str := JSON_Strings.To_String (State.Token_Value);
-            elsif Key = "node_id" and then State.Current_Token = Token_String then
-               NodeId_Str := JSON_Strings.To_String (State.Token_Value);
-            elsif Key = "hash" and then State.Current_Token = Token_String then
-               Hash_Str := JSON_Strings.To_String (State.Token_Value);
-            elsif Key = "visibility" and then State.Current_Token = Token_String then
-               Vis_Str := JSON_Strings.To_String (State.Token_Value);
-            elsif Key = "visibility" and then State.Current_Token = Token_String then
-               Vis_Str := JSON_Strings.To_String (State.Token_Value);
-            elsif Key = "inline" and then State.Current_Token = Token_String then
-               Inline_Str := JSON_Strings.To_String (State.Token_Value);
-            elsif Key = "function_type" and then State.Current_Token = Token_Object_Start then
-               declare
-                  Member_Key : Identifier_String;
-               begin
-                  Next (State, Status);
-                  while Status = Success and then State.Current_Token /= Token_Object_End loop
-                     Read_Member (State, Member_Key, Status);
-                     exit when Status /= Success;
-                     if Identifier_Strings.To_String (Member_Key) = "return_type" then
-                        Parse_Type_Reference (State, Return_T, Status);
-                     elsif Identifier_Strings.To_String (Member_Key) = "parameters" and then State.Current_Token = Token_Array_Start then
-                        Next (State, Status);
-                        while Status = Success and then State.Current_Token /= Token_Array_End loop
-                           declare
-                              P_Name : String := "";
-                              P_Key  : Identifier_String;
-                           begin
-                              if State.Current_Token = Token_Object_Start then
-                                 Next (State, Status);
-                                 while Status = Success and then State.Current_Token /= Token_Object_End loop
-                                    Read_Member (State, P_Key, Status);
-                                    exit when Status /= Success;
-                                    if Identifier_Strings.To_String (P_Key) = "name" and then State.Current_Token = Token_String then
-                                       P_Name := JSON_Strings.To_String (State.Token_Value);
-                                    else
-                                       Skip (State, Status);
-                                    end if;
-                                    if State.Current_Token = Token_Comma then
-                                       Next (State, Status);
-                                    end if;
-                                 end loop;
-                                 if State.Current_Token = Token_Object_End then
-                                    Next (State, Status);
-                                 end if;
-                              else
-                                 Skip (State, Status);
-                              end if;
-                              if Param_Count < Max_Parameters then
-                                 Param_Count := Param_Count + 1;
-                                 Params (Param_Count) := To_Node_ID (P_Name);
-                              end if;
-                              if State.Current_Token = Token_Comma then
-                                 Next (State, Status);
-                              end if;
-                           end;
-                        end loop;
-                        if State.Current_Token = Token_Array_End then
-                           Next (State, Status);
-                        end if;
-                     else
-                        Skip (State, Status);
-                     end if;
-                     if State.Current_Token = Token_Comma then
-                        Next (State, Status);
-                     end if;
-                  end loop;
-                  if State.Current_Token = Token_Object_End then
-                     Next (State, Status);
-                  end if;
-               end;
-            elsif Key = "body" then
-               Parse_Statement (State, Nodes, Body_ID, Status);
-            else
-               Skip (State, Status);
-            end if;
-         end;
-
-         if State.Current_Token = Token_Comma then
-            Next (State, Status);
-         end if;
-      end loop;
-
-      Decl.Base.Node_ID := To_Node_ID (NodeId_Str);
-      Decl.Base.Decl_Name := To_Name (Name_Str);
-      Decl.Base.Hash := To_Hash (Hash_Str);
-      Decl.Base.Visibility := Parse_Visibility (Vis_Str);
-      Decl.Base.Visibility := Parse_Visibility (Vis_Str);
-      Decl.Inline := Parse_Inline_Hint (Inline_Str);
-      Decl.Return_Type := Return_T;
-      Decl.Param_Count := Param_Count;
-      Decl.Parameters := Params;
-      Decl.Body_ID := Body_ID;
-
-      if State.Current_Token = Token_Object_End then
-         Next (State, Status);
-      end if;
-   end Parse_Function_Decl;
 
    procedure Parse_Declaration
      (State  : in out Parser_State;
@@ -588,9 +536,10 @@ package body Semantic_IR.JSON is
       Kind_Str    : String := "";
       Decl        : Function_Declaration :=
         (Base => (Kind => Kind_Function_Decl,
-                  Node_ID => Name_Strings.Null_Bounded_String,
-                  Location => (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
-                  Hash => Hash_Strings.Null_Bounded_String,
+                  Base => (Kind => Kind_Function_Decl,
+                           ID => Name_Strings.Null_Bounded_String,
+                           Location => (File => Semantic_IR.Types.Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
+                           Hash => Hash_Strings.Null_Bounded_String),
                   Decl_Name => Name_Strings.Null_Bounded_String,
                   Visibility => Vis_Public),
          Return_Type => (Kind => TK_Primitive, Prim_Type => Type_Void),
@@ -604,7 +553,7 @@ package body Semantic_IR.JSON is
          Interrupt_Vec => 0,
          Entry_Point => False);
       Decl_Record : Declaration_Record;
-      Success     : Boolean;
+      Added       : Boolean;
    begin
       Decl_ID := Name_Strings.Null_Bounded_String;
       if State.Current_Token /= Token_Object_Start then
@@ -624,9 +573,9 @@ package body Semantic_IR.JSON is
             elsif Key = "name" and then State.Current_Token = Token_String then
                Decl.Base.Decl_Name := To_Name (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "node_id" and then State.Current_Token = Token_String then
-               Decl.Base.Node_ID := To_Node_ID (JSON_Strings.To_String (State.Token_Value));
+               Decl.Base.Base.ID := To_Node_ID (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "hash" and then State.Current_Token = Token_String then
-               Decl.Base.Hash := To_Hash (JSON_Strings.To_String (State.Token_Value));
+               Decl.Base.Base.Hash := To_Hash (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "visibility" and then State.Current_Token = Token_String then
                Decl.Base.Visibility := Parse_Visibility (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "inline" and then State.Current_Token = Token_String then
@@ -669,7 +618,7 @@ package body Semantic_IR.JSON is
                                  Skip (State, Status);
                               end if;
 
-                              if Decl.Param_Count < Max_Parameters then
+                              if Decl.Param_Count < Semantic_IR.Declarations.Max_Parameters then
                                  Decl.Param_Count := Decl.Param_Count + 1;
                                  Decl.Parameters (Decl.Param_Count) := To_Node_ID (P_Name);
                               end if;
@@ -707,18 +656,19 @@ package body Semantic_IR.JSON is
 
       if Kind_Str = "function_decl" then
          Decl_Record := (Kind => Kind_Function_Decl, Func => Decl);
-         Add_Declaration (Nodes, Decl_Record, Success);
-         Decl_ID := Decl.Base.Node_ID;
+         Add_Declaration (Nodes, Decl_Record, Added);
+         Decl_ID := Decl.Base.Base.ID;
       elsif Kind_Str = "type_decl" then
          declare
-            T : Type_Declaration :=
-              (Base => (Kind => Kind_Type_Decl,
-                        Node_ID => Name_Strings.Null_Bounded_String,
-                        Location => (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
-                        Hash => Hash_Strings.Null_Bounded_String,
-                        Decl_Name => Name_Strings.Null_Bounded_String,
-                        Visibility => Vis_Public),
-               Type_Def => (Kind => TK_Primitive, Prim_Type => Type_Void));
+                  T : Type_Declaration :=
+                     (Base => (Kind => Kind_Type_Decl,
+                                    Base => (Kind => Kind_Type_Decl,
+                                                 ID => Name_Strings.Null_Bounded_String,
+                                                 Location => (File => Semantic_IR.Types.Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
+                                                 Hash => Hash_Strings.Null_Bounded_String),
+                                    Decl_Name => Name_Strings.Null_Bounded_String,
+                                    Visibility => Vis_Public),
+                      Type_Def => (Kind => TK_Primitive, Prim_Type => Type_Void));
             Added : Boolean;
          begin
             if State.Current_Token = Token_Object_Start then
@@ -729,9 +679,9 @@ package body Semantic_IR.JSON is
                   if Identifier_Strings.To_String (Member_Name) = "name" and then State.Current_Token = Token_String then
                      T.Base.Decl_Name := To_Name (JSON_Strings.To_String (State.Token_Value));
                   elsif Identifier_Strings.To_String (Member_Name) = "node_id" and then State.Current_Token = Token_String then
-                     T.Base.Node_ID := To_Node_ID (JSON_Strings.To_String (State.Token_Value));
+                     T.Base.Base.ID := To_Node_ID (JSON_Strings.To_String (State.Token_Value));
                   elsif Identifier_Strings.To_String (Member_Name) = "hash" and then State.Current_Token = Token_String then
-                     T.Base.Hash := To_Hash (JSON_Strings.To_String (State.Token_Value));
+                     T.Base.Base.Hash := To_Hash (JSON_Strings.To_String (State.Token_Value));
                   elsif Identifier_Strings.To_String (Member_Name) = "type_definition" and then State.Current_Token = Token_Object_Start then
                      Parse_Type_Reference (State, T.Type_Def, Status);
                   else
@@ -746,7 +696,7 @@ package body Semantic_IR.JSON is
                end if;
             end if;
             Add_Type_Declaration (Nodes, T, Added);
-            Decl_ID := T.Base.Node_ID;
+            Decl_ID := T.Base.Base.ID;
          end;
       else
          Status := Error_Not_Implemented;
@@ -839,9 +789,9 @@ package body Semantic_IR.JSON is
       Member_Name : Identifier_String;
    begin
       Module := (Base => (Kind => Kind_Module,
-                          Node_ID => Name_Strings.Null_Bounded_String,
-                          Location => (File => Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
-                          Hash => Hash_Strings.Null_Bounded_String),
+                 ID => Name_Strings.Null_Bounded_String,
+                 Location => (File => Semantic_IR.Types.Path_Strings.Null_Bounded_String, Line => 1, Column => 1, Length => 0),
+                 Hash => Hash_Strings.Null_Bounded_String),
                  Module_Name => Name_Strings.Null_Bounded_String,
                  Import_Count => 0,
                  Imports => (others => (Module_Name => Name_Strings.Null_Bounded_String, Symbol_Count => 0, Symbols => (others => Name_Strings.Null_Bounded_String), Import_All => False, Alias => Name_Strings.Null_Bounded_String)),
@@ -849,7 +799,7 @@ package body Semantic_IR.JSON is
                  Exports => (others => Name_Strings.Null_Bounded_String),
                  Decl_Count => 0,
                  Declarations => (others => Name_Strings.Null_Bounded_String),
-                 Metadata => (Target_Count => 0, Target_Categories => (others => Target_Native), Safety_Level => Level_None, Optimization_Level => 0));
+                 Metadata => (Target_Count => 0, Target_Categories => (others => Target_Native), Module_Safety => Level_None, Optimization_Level => 0));
 
       if State.Current_Token /= Token_Object_Start then
          Status := Error_Parse;
@@ -866,7 +816,7 @@ package body Semantic_IR.JSON is
             if Key = "name" and then State.Current_Token = Token_String then
                Module.Module_Name := To_Name (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "node_id" and then State.Current_Token = Token_String then
-               Module.Base.Node_ID := To_Node_ID (JSON_Strings.To_String (State.Token_Value));
+               Module.Base.ID := To_Node_ID (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "hash" and then State.Current_Token = Token_String then
                Module.Base.Hash := To_Hash (JSON_Strings.To_String (State.Token_Value));
             elsif Key = "location" and then State.Current_Token = Token_Object_Start then

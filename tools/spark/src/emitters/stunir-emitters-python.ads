@@ -21,21 +21,21 @@ package STUNIR.Emitters.Python is
       Config : Python_Config;
    end record;
 
-   overriding procedure Emit_Module
+   procedure Emit_Module
      (Self   : in out Python_Emitter;
       Module : in     Semantic_IR.Modules.IR_Module;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
-   overriding procedure Emit_Type
+   procedure Emit_Type
      (Self   : in out Python_Emitter;
       T      : in     Semantic_IR.Declarations.Type_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
-   overriding procedure Emit_Function
+   procedure Emit_Function
      (Self   : in out Python_Emitter;
       Func   : in     Semantic_IR.Declarations.Function_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;

@@ -766,7 +766,7 @@ package body STUNIR_JSON_Utils is
                         Module.Generic_Insts (Module.Generic_Inst_Cnt).Name :=
                           Name_Strings.To_Bounded_String (Inst_Name);
                         Module.Generic_Insts (Module.Generic_Inst_Cnt).Base_Type :=
-                          Name_Strings.To_Bounded_String (Base_Type_Str);
+                          Type_Strings.To_Bounded_String (Base_Type_Str);
 
                         -- Parse type arguments
                         if Type_Args_Pos > 0 then
@@ -1017,6 +1017,11 @@ package body STUNIR_JSON_Utils is
                       if Type_Strings.Length (Stmt.Cast_Type) > 0 then
                          Append_To_Buffer (Output, ",""cast_type"":""" & Type_Strings.To_String (Stmt.Cast_Type) & """");
                       end if;
+
+                   when Stmt_Other =>
+                      --  Unknown/other statement kind — emit as nop
+                      Append_To_Buffer (Output, """op"":""nop""");
+
                 end case;
                 
                 Append_To_Buffer (Output, "}");

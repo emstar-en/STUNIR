@@ -17,8 +17,10 @@ pragma SPARK_Mode (On);
 
 with Ada.Strings.Bounded;
 
+--  NOTE: pragma Pure removed — Ada.Strings.Bounded is not a pure unit.
+--  Preelaborate is used instead (allows bounded string instantiations).
 package Semantic_IR.Types with
-   Pure,
+   Preelaborate,
    SPARK_Mode => On
 is
    --  =========================================================================
@@ -105,36 +107,8 @@ is
       Kind_Struct_Init              --  Struct initialization
    );
 
-       --  Map JSON schema kind strings to internal enum values
-       function Parse_Node_Kind (Kind_Str : String) return IR_Node_Kind
-          with Global => null;
-
-       function Parse_Binary_Operator (Op_Str : String) return Binary_Operator
-          with Global => null;
-
-       function Parse_Unary_Operator (Op_Str : String) return Unary_Operator
-          with Global => null;
-
-       function Parse_Visibility (Vis_Str : String) return Visibility_Kind
-          with Global => null;
-
-       function Parse_Mutability (Mut_Str : String) return Mutability_Kind
-          with Global => null;
-
-       function Parse_Storage_Class (Storage_Str : String) return Storage_Class
-          with Global => null;
-
-       function Parse_Inline_Hint (Inline_Str : String) return Inline_Hint
-          with Global => null;
-
-       function Parse_Primitive_Type (Prim_Str : String) return IR_Primitive_Type
-          with Global => null;
-
-       function Parse_Target_Category (Cat_Str : String) return Target_Category
-          with Global => null;
-
-       function Parse_Safety_Level (Level_Str : String) return Safety_Level
-          with Global => null;
+   --  NOTE: Parse_* functions moved to end of package (after all type defs)
+   --  to avoid forward-reference errors.
 
    --  =========================================================================
    --  Operators
@@ -181,9 +155,9 @@ is
       Mut_Mutable, Mut_Immutable, Mut_Const
    );
    
-   -- Inline hint
+   -- Inline hint (Inline_Hint_Suggest renamed to avoid conflict with type name)
    type Inline_Hint is (
-      Inline_Always, Inline_Never, Inline_Hint, Inline_None
+      Inline_Always, Inline_Never, Inline_Hint_Suggest, Inline_None
    );
    
    -- Source location
@@ -231,14 +205,27 @@ is
       Level_DO178C_A
    );
    
-   -- Helper functions
+   --  Helper functions
    function Operator_Symbol (Op : Binary_Operator) return String
       with Post => Operator_Symbol'Result'Length > 0;
-   
+
    function Operator_Symbol (Op : Unary_Operator) return String
       with Post => Operator_Symbol'Result'Length > 0;
-   
+
    function Primitive_Type_Name (T : IR_Primitive_Type) return String
       with Post => Primitive_Type_Name'Result'Length > 0;
-      
+
+   --  Map JSON schema kind strings to internal enum values
+   --  (declared here, after all types, to avoid forward-reference errors)
+   function Parse_Node_Kind       (Kind_Str    : String) return IR_Node_Kind    with Global => null;
+   function Parse_Binary_Operator (Op_Str      : String) return Binary_Operator with Global => null;
+   function Parse_Unary_Operator  (Op_Str      : String) return Unary_Operator  with Global => null;
+   function Parse_Visibility      (Vis_Str     : String) return Visibility_Kind  with Global => null;
+   function Parse_Mutability      (Mut_Str     : String) return Mutability_Kind  with Global => null;
+   function Parse_Storage_Class   (Storage_Str : String) return Storage_Class   with Global => null;
+   function Parse_Inline_Hint     (Inline_Str  : String) return Inline_Hint     with Global => null;
+   function Parse_Primitive_Type  (Prim_Str    : String) return IR_Primitive_Type with Global => null;
+   function Parse_Target_Category (Cat_Str     : String) return Target_Category  with Global => null;
+   function Parse_Safety_Level    (Level_Str   : String) return Safety_Level     with Global => null;
+
 end Semantic_IR.Types;

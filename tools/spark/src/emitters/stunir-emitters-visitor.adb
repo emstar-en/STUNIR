@@ -5,7 +5,7 @@
 package body STUNIR.Emitters.Visitor is
    pragma SPARK_Mode (On);
 
-   function Null_Node_ID return Semantic_IR.Types.Node_ID is
+   function Null_Node_ID return Semantic_IR.Types.ID is
      (Semantic_IR.Types.Name_Strings.Null_Bounded_String);
 
    procedure Traverse_Module
@@ -28,7 +28,7 @@ package body STUNIR.Emitters.Visitor is
       -- Traverse declarations via node table resolution.
       for I in 1 .. Module.Decl_Count loop
          declare
-            Decl_ID : constant Semantic_IR.Types.Node_ID := Module.Declarations (I);
+            Decl_ID : constant Semantic_IR.Types.ID := Module.Declarations (I);
             Decl_Index : constant STUNIR.Emitters.Node_Table.Node_Index :=
               STUNIR.Emitters.Node_Table.Lookup (Nodes, Decl_ID);
          begin

@@ -2,8 +2,10 @@
 -- DO-178C Level A
 -- Phase 3b: Language Family Emitters
 
-with STUNIR.Emitters.CodeGen;
+
+with Semantic_IR.Types; use Semantic_IR.Types;
 with STUNIR.Emitters.AST_Render;
+with STUNIR.Emitters.CodeGen; use STUNIR.Emitters.CodeGen;
 
 package body STUNIR.Emitters.Lisp is
    pragma SPARK_Mode (On);

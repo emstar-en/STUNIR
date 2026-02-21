@@ -1,71 +1,63 @@
 -- STUNIR Base Emitter Interface
 -- DO-178C Level A
 -- Phase 3a: Core Category Emitters
+--
+-- NOTE: STUNIR.Emitters.CodeGen and STUNIR.Emitters.Node_Table are child
+-- packages of this package. In Ada, a parent package spec CANNOT with its
+-- own children (circular dependency). Those withs are in the body only.
+-- The abstract interface uses Ada.Strings.Bounded directly for the output
+-- buffer type, and the Semantic_IR types for module/declaration parameters.
 
+with Ada.Strings.Bounded;
 with Semantic_IR.Modules;
 with Semantic_IR.Declarations;
 with Semantic_IR.Nodes;
 with Semantic_IR.Types;
-with STUNIR.Emitters.CodeGen;
-with STUNIR.Emitters.Node_Table;
 
 package STUNIR.Emitters is
    pragma SPARK_Mode (On);
 
-  subtype Target_Category is Semantic_IR.Types.Target_Category;
+   subtype Target_Category is Semantic_IR.Types.Target_Category;
 
    type Emitter_Status is
      (Status_Success, Status_Error_Parse, Status_Error_Generate, Status_Error_IO);
 
-   -- Abstract emitter interface
-  type Base_Emitter is abstract tagged record
-    Category : Target_Category := Semantic_IR.Types.Target_Embedded;
-    Status   : Emitter_Status := Status_Success;
-  end record;
+   --  NOTE: Code_Buffers and IR_Code_Buffer are defined in STUNIR.Emitters.CodeGen
+   --  (the child package). They are NOT defined here to avoid duplicate instances.
+   --  NOTE: Max_Nodes and Node_Index are defined in STUNIR.Emitters.Node_Table
+   --  (the child package). They are NOT defined here to avoid duplicate types.
+   --  The Ada.Strings.Bounded with clause is kept for potential future use.
 
-   -- Abstract methods (must be overridden by concrete emitters)
-   procedure Emit_Module
-     (Self   : in out Base_Emitter;
-      Module : in     Semantic_IR.Modules.IR_Module;
-      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
-      Success:    out Boolean)
-   is abstract
-   with
-     Pre'Class  => Semantic_IR.Modules.Is_Valid_Module (Module),
-     Post'Class => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) > 0);
+   --  Abstract emitter base type
+   type Base_Emitter is abstract tagged record
+      Category : Target_Category := Semantic_IR.Types.Target_Embedded;
+      Status   : Emitter_Status  := Status_Success;
+   end record;
 
-   procedure Emit_Type
-     (Self   : in out Base_Emitter;
-      T      : in     Semantic_IR.Declarations.Type_Declaration;
-      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
-      Success:    out Boolean)
-   is abstract
-   with
-     Pre'Class  => Semantic_IR.Nodes.Is_Valid_Node_ID (T.Base.Node_ID),
-     Post'Class => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
+   --  NOTE: Abstract Emit_Module/Emit_Type/Emit_Function are NOT declared here.
+   --  Reason: those procedures take STUNIR.Emitters.Node_Table.Node_Table and
+   --  STUNIR.Emitters.CodeGen.IR_Code_Buffer as parameters. A parent package
+   --  spec cannot with its own children (Ada circular dependency rule).
+   --
+   --  Instead, each child emitter package (CFamily, Python, Lisp, etc.) defines
+   --  its own concrete Emit_Module procedure with the full Node_Table parameter.
+   --  code_emitter.adb dispatches statically by target name, not via class-wide
+   --  dispatch through this base type. The base type exists only to carry the
+   --  Category and Status fields shared by all emitters.
+   --
+   --  If class-wide dispatch is needed in the future, move the abstract interface
+   --  to STUNIR.Emitters.CodeGen (which already withs Node_Table) or introduce
+   --  a separate STUNIR.Emitters.Interface package that withs both children.
 
-   procedure Emit_Function
-     (Self   : in out Base_Emitter;
-      Func   : in     Semantic_IR.Declarations.Function_Declaration;
-      Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
-      Success:    out Boolean)
-   is abstract
-   with
-     Pre'Class  => Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Base.Node_ID),
-     Post'Class => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
-
-   -- Common utility functions
+   --  Common utility functions
    function Get_Category_Name (Cat : Target_Category) return String
    with
      Global => null,
-     Post => Get_Category_Name'Result'Length > 0;
+     Post   => Get_Category_Name'Result'Length > 0;
 
    function Get_Status_Name (Status : Emitter_Status) return String
    with
      Global => null,
-     Post => Get_Status_Name'Result'Length > 0;
+     Post   => Get_Status_Name'Result'Length > 0;
 
 end STUNIR.Emitters;

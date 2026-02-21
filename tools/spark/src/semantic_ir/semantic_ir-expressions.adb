@@ -8,9 +8,9 @@ package body Semantic_IR.Expressions is
 
    function Is_Valid_Expression (Expr : Expression_Node) return Boolean is
    begin
-      return Is_Valid_Node_ID (Expr.Node_ID) and then
+      return Is_Valid_Node_ID (Expr.Base.ID) and then
              Is_Expression_Kind (Expr.Kind) and then
-             Is_Valid_Hash (Expr.Hash);
+             Is_Valid_Hash (Expr.Base.Hash);
    end Is_Valid_Expression;
    
 end Semantic_IR.Expressions;
