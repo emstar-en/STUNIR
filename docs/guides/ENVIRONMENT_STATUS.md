@@ -179,7 +179,8 @@ From COMPREHENSIVE_GAP_ANALYSIS_v0.9.md:
 |------|---------|--------|
 | pyproject.toml | 0.8.9 | ✅ Canonical |
 | stunir/__init__.py | 1.0.0 | ❌ Incorrect claim |
-| src/main.rs (Rust core) | 0.5.0 | ⚠️ Outdated |
+| tools/rust/Cargo.toml | 0.8.9 | ✅ Correct |
+| (src/main.rs) | (archived) | 📁 docs/archive/native_legacy/rust_root/ |
 | CHANGELOG.md | 1.0.0 | ❌ Premature |
 
 **Recommendation:** Treat **0.8.9** as the current version. The project is NOT v0.9 or v1.0 complete despite documentation claims.

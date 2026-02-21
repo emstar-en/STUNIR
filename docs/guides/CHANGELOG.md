@@ -196,9 +196,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Version consistency across all components (now uniformly 0.8.9)
   - pyproject.toml: 0.8.9
-  - src/main.rs: 0.8.9
-  - stunir/__init__.py: 0.8.9
   - tools/rust/Cargo.toml: 0.8.9
+  - stunir/__init__.py: 0.8.9
+  - (Note: src/main.rs archived to docs/archive/native_legacy/rust_root/ on 2026-02-20)
 - Documentation accuracy in CHANGELOG.md
 - SPARK optimizer now includes basic implementations for all optimization passes
   - Dead code elimination (basic pattern-based)
