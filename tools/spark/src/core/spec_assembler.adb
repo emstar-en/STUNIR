@@ -6,14 +6,9 @@
 
 pragma SPARK_Mode (On);
 
-with STUNIR_Types;
-use STUNIR_Types;
-
+--  STUNIR_Types is already use-visible via spec_assembler.ads (use STUNIR_Types)
 with STUNIR_JSON_Parser;
 use STUNIR_JSON_Parser;
-
-with Ada.Strings.Bounded;
-pragma Unreferenced (Ada.Strings.Bounded);  --  Kept for future use
 
 package body Spec_Assembler is
 

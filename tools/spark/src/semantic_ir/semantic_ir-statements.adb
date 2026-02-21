@@ -8,9 +8,9 @@ package body Semantic_IR.Statements is
 
    function Is_Valid_Statement (Stmt : Statement_Node) return Boolean is
    begin
-      return Is_Valid_Node_ID (Stmt.Node_ID) and then
+      return Is_Valid_Node_ID (Stmt.Base.ID) and then
              Is_Statement_Kind (Stmt.Kind) and then
-             Is_Valid_Hash (Stmt.Hash);
+             Is_Valid_Hash (Stmt.Base.Hash);
    end Is_Valid_Statement;
    
 end Semantic_IR.Statements;

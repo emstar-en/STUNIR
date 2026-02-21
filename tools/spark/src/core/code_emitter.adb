@@ -6,10 +6,10 @@
 
 pragma SPARK_Mode (On);
 
-with STUNIR_JSON_Parser;
-use STUNIR_JSON_Parser;
 with Semantic_IR.JSON;
 with Semantic_IR.Modules;
+with Semantic_IR.Types;
+pragma Unreferenced (Semantic_IR.Types);  --  Needed transitively by Semantic_IR.JSON
 with STUNIR.Emitters.Node_Table;
 with STUNIR.Emitters.CodeGen;
 with STUNIR.Emitters.Lisp;
@@ -19,16 +19,10 @@ with STUNIR.Emitters.Prolog_Family;
 with STUNIR.Emitters.Futhark_Family;
 with STUNIR.Emitters.Lean4_Family;
 
-with Ada.Strings.Fixed;
-with Ada.Characters.Handling;
 with Ada.Text_IO;
 use Ada.Text_IO;
 
 package body Code_Emitter is
-
-   use Ada.Strings;
-   use Ada.Strings.Fixed;
-   use Ada.Characters.Handling;
 
    --  =======================================================================
    --  Internal Helper Functions
@@ -51,23 +45,7 @@ package body Code_Emitter is
       Status := Success;
    end Append_To_Code;
 
-   function To_Lower_Case (S : String) return String is
-      Result : String (S'Range);
-   begin
-      for I in S'Range loop
-         Result (I) := To_Lower (S (I));
-      end loop;
-      return Result;
-   end To_Lower_Case;
-
-   function To_Upper_Case (S : String) return String is
-      Result : String (S'Range);
-   begin
-      for I in S'Range loop
-         Result (I) := To_Upper (S (I));
-      end loop;
-      return Result;
-   end To_Upper_Case;
+   --  NOTE: To_Lower_Case / To_Upper_Case helpers removed (unused)
 
    --  =======================================================================
    --  Type Mapping Implementation
@@ -316,6 +294,14 @@ package body Code_Emitter is
             else
                Mapped := IR_Type;
             end if;
+
+         --  AST-emitter targets: type mapping is handled by the emitter layer
+         --  (STUNIR.Emitters.CFamily, Python, Lisp, Prolog, Futhark, Lean4).
+         --  Return the IR type unchanged; the emitter will map it.
+         when Target_Clojure | Target_ClojureScript | Target_Prolog |
+              Target_Futhark | Target_Lean4 =>
+            Mapped := IR_Type;
+
       end case;
    end Map_Type_To_Target;
 
@@ -630,7 +616,6 @@ package body Code_Emitter is
       Temp_Status : Status_Code;
    begin
       Header := Code_Strings.Null_Bounded_String;
-      Status := Success;
 
       case Target is
          when Target_CPP =>
@@ -661,7 +646,7 @@ package body Code_Emitter is
             Append_To_Code (Header, "// DO NOT EDIT MANUALLY" & ASCII.LF & ASCII.LF, Temp_Status);
       end case;
 
-      Status := Success;
+      Status := Temp_Status;
    end Generate_Header;
 
    procedure Generate_Footer
@@ -672,7 +657,6 @@ package body Code_Emitter is
       Temp_Status : Status_Code;
    begin
       Footer := Code_Strings.Null_Bounded_String;
-      Status := Success;
 
       case Target is
          when Target_Go =>
@@ -684,7 +668,7 @@ package body Code_Emitter is
             null;  --  No footer needed
       end case;
 
-      Status := Success;
+      Status := Temp_Status;
    end Generate_Footer;
 
    procedure Generate_All_Code
@@ -824,10 +808,11 @@ package body Code_Emitter is
       Module : Semantic_IR.Modules.IR_Module;
       Nodes  : STUNIR.Emitters.Node_Table.Node_Table;
    begin
-      IR := (Schema_Version => Identifier_Strings.Null_Bounded_String,
-             IR_Version     => Identifier_Strings.Null_Bounded_String,
-             Module_Name    => Identifier_Strings.Null_Bounded_String,
-             Functions      => (Count => 0, Functions => (others => (Name => Identifier_Strings.Null_Bounded_String, Return_Type => Type_Name_Strings.Null_Bounded_String, Parameters => (Count => 0, Params => (others => (Name => Identifier_Strings.Null_Bounded_String, Param_Type => Type_Name_Strings.Null_Bounded_String))), Steps => (Count => 0, Steps => (others => (Step_Type => Step_Noop, Target => Identifier_Strings.Null_Bounded_String, Source => Identifier_Strings.Null_Bounded_String, Value => Identifier_Strings.Null_Bounded_String)))))));
+      --  Field-by-field init to avoid Dynamic_Predicate violation on IR_Function
+      IR.Schema_Version  := Identifier_Strings.Null_Bounded_String;
+      IR.IR_Version      := Identifier_Strings.Null_Bounded_String;
+      IR.Module_Name     := Identifier_Strings.Null_Bounded_String;
+      IR.Functions.Count := 0;
 
       Semantic_IR.JSON.Parse_IR_JSON (JSON_Content, Module, Nodes, Status);
       if Status /= Success then

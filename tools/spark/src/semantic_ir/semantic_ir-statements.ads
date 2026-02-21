@@ -10,8 +10,10 @@ with Semantic_IR.Nodes; use Semantic_IR.Nodes;
 package Semantic_IR.Statements with
    SPARK_Mode => On
 is
-   -- Statement types
-   type Statement_Node (Kind : IR_Node_Kind) is new IR_Node (Kind) with null record;
+   --  Statement node: composition (IR_Node is not tagged, cannot extend with record)
+   type Statement_Node (Kind : IR_Node_Kind) is record
+      Base : IR_Node (Kind);
+   end record;
    
    -- Block statement
    Max_Statements : constant := 128;
@@ -98,6 +100,6 @@ is
    
    function Is_Valid_Statement (Stmt : Statement_Node) return Boolean
       with Post => (if Is_Valid_Statement'Result then
-                       Is_Valid_Node_ID (Stmt.Node_ID));
+                       Is_Valid_Node_ID (Stmt.Base.ID));  --  .Base is IR_Node
    
 end Semantic_IR.Statements;

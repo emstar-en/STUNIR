@@ -9,7 +9,7 @@ package body Semantic_IR.Modules is
    function Is_Valid_Module (M : IR_Module) return Boolean is
       use Name_Strings;
    begin
-      return Is_Valid_Node_ID (M.Base.Node_ID) and then
+      return Is_Valid_Node_ID (M.Base.ID) and then
              Is_Valid_Hash (M.Base.Hash) and then
              Length (M.Module_Name) > 0 and then
              M.Import_Count <= Max_Imports and then

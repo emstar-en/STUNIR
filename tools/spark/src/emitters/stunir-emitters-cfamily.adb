@@ -1,7 +1,8 @@
 -- STUNIR C Family Emitter (SPARK Body)
 -- DO-178C Level A
 
-with STUNIR.Emitters.CodeGen;
+
+with Semantic_IR.Types; use Semantic_IR.Types;
 with STUNIR.Emitters.AST_Render;
 
 package body STUNIR.Emitters.CFamily is

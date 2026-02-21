@@ -1,5 +1,0 @@
-stunir-semantic_ir.ads:50:40: warning: condition can only be False if invalid values present [-gnatwc]
-stunir-semantic_ir.ads:143:14: warning: condition can only be False if invalid values present [-gnatwc]
-stunir-semantic_ir.ads:143:39: warning: condition can only be False if invalid values present [-gnatwc]
-stunir-semantic_ir.ads:164:15: warning: condition can only be False if invalid values present [-gnatwc]
-stunir-semantic_ir.ads:164:41: warning: condition can only be False if invalid values present [-gnatwc]

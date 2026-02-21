@@ -1,7 +1,8 @@
 -- STUNIR Futhark Emitter (SPARK Body)
 -- DO-178C Level A
 
-with STUNIR.Emitters.CodeGen;
+
+with Semantic_IR.Types; use Semantic_IR.Types;
 
 package body STUNIR.Emitters.Futhark_Family is
    pragma SPARK_Mode (On);

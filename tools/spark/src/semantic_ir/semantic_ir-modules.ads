@@ -30,8 +30,8 @@ is
    type Module_Metadata is record
       Target_Count       : Natural range 0 .. Max_Target_Categories := 0;
       Target_Categories  : Target_Category_List;
-      Safety_Level       : Safety_Level := Level_None;
-      Optimization_Level : Natural range 0 .. 3 := 0; -- O0..O3
+      Module_Safety      : Safety_Level := Level_None;  --  renamed: Safety_Level field shadowed type
+      Optimization_Level : Natural range 0 .. 3 := 0;  --  O0..O3
    end record;
    
    -- Module structure
@@ -59,7 +59,7 @@ is
    -- Module validation
    function Is_Valid_Module (M : IR_Module) return Boolean
       with Post => (if Is_Valid_Module'Result then
-                       Is_Valid_Node_ID (M.Base.Node_ID) and then
+                       Is_Valid_Node_ID (M.Base.ID) and then
                        Name_Strings.Length (M.Module_Name) > 0);
    
    -- Module operations

@@ -17,7 +17,7 @@ package body STUNIR.Emitters.Node_Table is
    function Lookup (Table : Node_Table; ID : Node_ID) return Node_Index is
    begin
       for I in 1 .. Table.Count loop
-         if Table.Entries (I).Used and then Table.Entries (I).ID = ID then
+         if Table.Entries (I).Used and then Name_Strings.To_String (Table.Entries (I).ID) = Name_Strings.To_String (ID) then
             return I;
          end if;
       end loop;
@@ -48,7 +48,7 @@ package body STUNIR.Emitters.Node_Table is
       if Table.Count < Max_Nodes then
          Table.Count := Table.Count + 1;
          Table.Entries (Table.Count) := (
-            ID    => Node.Node_ID,
+            ID    => Node.ID,
             Kind  => Node.Kind,
             Group => Group_Node,
             Data  => (Group => Group_Node, Node => Node),
@@ -68,8 +68,8 @@ package body STUNIR.Emitters.Node_Table is
       if Table.Count < Max_Nodes then
          Table.Count := Table.Count + 1;
          Table.Entries (Table.Count) := (
-            ID    => Decl.Base.Node_ID,
-            Kind  => Decl.Base.Kind,
+            ID    => Decl.Base.Base.ID,
+            Kind  => Decl.Base.Base.Kind,
             Group => Group_Declaration,
             Data  => (Group => Group_Declaration, Decl => Decl),
             Used  => True);
@@ -84,7 +84,7 @@ package body STUNIR.Emitters.Node_Table is
       Decl    : Function_Declaration;
       Success : out Boolean)
    is
-      Wrapped : Declaration_Record := (Kind => Kind_Function_Decl, Func => Decl);
+      Wrapped : constant Declaration_Record := (Kind => Kind_Function_Decl, Func => Decl);
    begin
       Add_Declaration (Table, Wrapped, Success);
    end Add_Function_Declaration;
@@ -94,7 +94,7 @@ package body STUNIR.Emitters.Node_Table is
       Decl    : Type_Declaration;
       Success : out Boolean)
    is
-      Wrapped : Declaration_Record := (Kind => Kind_Type_Decl, Typ => Decl);
+      Wrapped : constant Declaration_Record := (Kind => Kind_Type_Decl, Typ => Decl);
    begin
       Add_Declaration (Table, Wrapped, Success);
    end Add_Type_Declaration;
@@ -104,7 +104,7 @@ package body STUNIR.Emitters.Node_Table is
       Decl    : Const_Declaration;
       Success : out Boolean)
    is
-      Wrapped : Declaration_Record := (Kind => Kind_Const_Decl, Cst => Decl);
+      Wrapped : constant Declaration_Record := (Kind => Kind_Const_Decl, Cst => Decl);
    begin
       Add_Declaration (Table, Wrapped, Success);
    end Add_Const_Declaration;
@@ -114,7 +114,7 @@ package body STUNIR.Emitters.Node_Table is
       Decl    : Variable_Declaration;
       Success : out Boolean)
    is
-      Wrapped : Declaration_Record := (Kind => Kind_Var_Decl, Var => Decl);
+      Wrapped : constant Declaration_Record := (Kind => Kind_Var_Decl, Var => Decl);
    begin
       Add_Declaration (Table, Wrapped, Success);
    end Add_Variable_Declaration;
@@ -128,8 +128,8 @@ package body STUNIR.Emitters.Node_Table is
       if Table.Count < Max_Nodes then
          Table.Count := Table.Count + 1;
          Table.Entries (Table.Count) := (
-            ID    => Stmt.Base.Node_ID,
-            Kind  => Stmt.Base.Kind,
+            ID    => Stmt.Base.Base.ID,
+            Kind  => Stmt.Base.Base.Kind,
             Group => Group_Statement,
             Data  => (Group => Group_Statement, Stmt => Stmt),
             Used  => True);
@@ -148,8 +148,8 @@ package body STUNIR.Emitters.Node_Table is
       if Table.Count < Max_Nodes then
          Table.Count := Table.Count + 1;
          Table.Entries (Table.Count) := (
-            ID    => Expr.Base.Node_ID,
-            Kind  => Expr.Base.Kind,
+            ID    => Expr.Base.Base.ID,
+            Kind  => Expr.Base.Base.Kind,
             Group => Group_Expression,
             Data  => (Group => Group_Expression, Expr => Expr),
             Used  => True);
@@ -164,8 +164,46 @@ package body STUNIR.Emitters.Node_Table is
       Expr    : Expression_Node;
       Success : out Boolean)
    is
-      Wrapped : Expression_Record := (Kind => Expr.Kind, Base => Expr);
+      Wrapped : Expression_Record := (Kind => Kind_Integer_Literal,
+                       Base => (Kind => Kind_Integer_Literal,
+                             Base => (Kind     => Kind_Integer_Literal,
+                                ID       => Expr.Base.ID,
+                                Location => Expr.Base.Location,
+                                Hash     => Expr.Base.Hash,
+                                Int_Value => 0,
+                                Int_Radix => 10),
+                             Expr_Type => Expr.Expr_Type));
    begin
+      case Expr.Kind is
+         when Kind_Binary_Expr =>
+            Wrapped := (Kind => Kind_Binary_Expr, Bin => (Base => Expr, Operator => Op_Add, Left_ID => Name_Strings.Null_Bounded_String, Right_ID => Name_Strings.Null_Bounded_String));
+         when Kind_Unary_Expr =>
+            Wrapped := (Kind => Kind_Unary_Expr, Un => (Base => Expr, Operator => Op_Not, Operand_ID => Name_Strings.Null_Bounded_String));
+         when Kind_Function_Call =>
+            Wrapped := (Kind => Kind_Function_Call, Call => (Base => Expr, Function_Name => Name_Strings.Null_Bounded_String, Func_Binding => Name_Strings.Null_Bounded_String, Arg_Count => 0, Arguments => [others => Name_Strings.Null_Bounded_String]));
+         when Kind_Member_Expr =>
+            Wrapped := (Kind => Kind_Member_Expr, Mem => (Base => Expr, Object_ID => Name_Strings.Null_Bounded_String, Member_Name => Name_Strings.Null_Bounded_String, Is_Arrow => False));
+         when Kind_Array_Access =>
+            Wrapped := (Kind => Kind_Array_Access, Arr => (Base => Expr, Array_ID => Name_Strings.Null_Bounded_String, Index_ID => Name_Strings.Null_Bounded_String));
+         when Kind_Cast_Expr =>
+            Wrapped := (Kind => Kind_Cast_Expr, Cast => (Base => Expr, Operand_ID => Name_Strings.Null_Bounded_String, Target_Type => (Kind => TK_Primitive, Prim_Type => Type_Void)));
+         when Kind_Ternary_Expr =>
+            Wrapped := (Kind => Kind_Ternary_Expr, Ter => (Base => Expr, Condition_ID => Name_Strings.Null_Bounded_String, Then_ID => Name_Strings.Null_Bounded_String, Else_ID => Name_Strings.Null_Bounded_String));
+         when Kind_Array_Init =>
+            Wrapped := (Kind => Kind_Array_Init, Arr_Init => (Base => Expr, Elem_Count => 0, Elements => [others => Name_Strings.Null_Bounded_String]));
+         when Kind_Struct_Init =>
+            Wrapped := (Kind => Kind_Struct_Init, Struct_Init => (Base => Expr, Struct_Name => Name_Strings.Null_Bounded_String, Field_Count => 0, Fields => [others => (Field_Name => Name_Strings.Null_Bounded_String, Value_ID => Name_Strings.Null_Bounded_String)]));
+         when others =>
+            Wrapped := (Kind => Kind_Var_Ref,
+                        Base => (Kind => Kind_Var_Ref,
+                                 Base => (Kind     => Kind_Var_Ref,
+                                          ID       => Expr.Base.ID,
+                                          Location => Expr.Base.Location,
+                                          Hash     => Expr.Base.Hash,
+                                          Var_Name => Name_Strings.Null_Bounded_String,
+                                          Var_Binding => Name_Strings.Null_Bounded_String),
+                                 Expr_Type => Expr.Expr_Type));
+      end case;
       Add_Expression (Table, Wrapped, Success);
    end Add_Expression_Node;
 

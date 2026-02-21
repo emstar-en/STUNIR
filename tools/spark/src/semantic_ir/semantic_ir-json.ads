@@ -7,7 +7,6 @@
 pragma SPARK_Mode (On);
 
 with STUNIR_Types;
-with STUNIR_JSON_Parser;
 with Semantic_IR.Modules;
 with STUNIR.Emitters.Node_Table;
 

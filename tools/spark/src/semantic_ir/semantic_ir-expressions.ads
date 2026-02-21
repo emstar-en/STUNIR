@@ -10,8 +10,9 @@ with Semantic_IR.Nodes; use Semantic_IR.Nodes;
 package Semantic_IR.Expressions with
    SPARK_Mode => On
 is
-   -- Expression types
-   type Expression_Node (Kind : IR_Node_Kind) is new IR_Node (Kind) with record
+   --  Expression node: composition (IR_Node is not tagged, cannot extend with record)
+   type Expression_Node (Kind : IR_Node_Kind) is record
+      Base      : IR_Node (Kind);
       Expr_Type : Type_Reference;
    end record;
    
@@ -104,6 +105,6 @@ is
    
    function Is_Valid_Expression (Expr : Expression_Node) return Boolean
       with Post => (if Is_Valid_Expression'Result then
-                       Is_Valid_Node_ID (Expr.Node_ID));
+                       Is_Valid_Node_ID (Expr.Base.ID));  --  .Base is IR_Node
    
 end Semantic_IR.Expressions;

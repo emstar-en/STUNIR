@@ -22,21 +22,21 @@ package STUNIR.Emitters.CFamily is
       Config : C_Config;
    end record;
 
-   overriding procedure Emit_Module
+   procedure Emit_Module
      (Self   : in out C_Emitter;
       Module : in     Semantic_IR.Modules.IR_Module;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
-   overriding procedure Emit_Type
+   procedure Emit_Type
      (Self   : in out C_Emitter;
       T      : in     Semantic_IR.Declarations.Type_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
-   overriding procedure Emit_Function
+   procedure Emit_Function
      (Self   : in out C_Emitter;
       Func   : in     Semantic_IR.Declarations.Function_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
