@@ -10,33 +10,9 @@
 ```
 tools/python/
 ├── targets/            # Code emitters for various target languages
-│   ├── asm_ir/         # Assembly IR emitters
-│   ├── asp/            # Answer Set Programming emitters
-│   ├── assembly/       # x86, ARM assembly emitters
-│   ├── beam/           # BEAM VM (Erlang, Elixir) emitters
-│   ├── business/       # COBOL, BASIC emitters
-│   ├── bytecode/       # Bytecode emitters
-│   ├── c/              # C/C++ emitters
-│   ├── constraints/    # MiniZinc, CHR emitters
-│   ├── embedded/       # Embedded systems emitters
-│   ├── expert_systems/ # CLIPS, JESS emitters
-│   ├── fpga/           # FPGA emitters
-│   ├── functional/     # Haskell, F#, OCaml emitters
-│   ├── gpu/            # CUDA, OpenCL emitters
-│   ├── grammar/        # ANTLR, BNF emitters
-│   ├── json/           # JSON emitters
-│   ├── lexer/          # Lexer generators
-│   ├── lisp/           # Lisp family emitters
-│   ├── mobile/         # Mobile platform emitters
-│   ├── native/         # Native code emitters
-│   ├── oop/            # OOP language emitters
-│   ├── parser/         # Parser generators
-│   ├── planning/       # PDDL emitters
-│   ├── polyglot/       # Multi-language emitters
-│   ├── prolog/         # Prolog emitters
-│   ├── scientific/     # Fortran, Pascal emitters
-│   ├── systems/        # Systems language emitters
-│   └── wasm/           # WebAssembly emitters
+├── bootstrap/          # STUNIR bootstrap compiler, lexer, grammar
+├── spec/               # Spec utilities (validation, templates)
+├── ir_modules/         # IR modules (actor, asp, business, etc.)
 ├── manifests/          # IR manifest generation and verification
 ├── ir/                 # IR utilities
 ├── semantic/           # Semantic analysis
@@ -46,7 +22,7 @@ tools/python/
 ├── validators/         # Validation utilities
 ├── validation/         # Validation logic
 ├── parsers/            # Parsing utilities
-├── scripts/            # Pipeline scripts
+├── scripts/            # Pipeline scripts (including unified_analysis)
 ├── integration/        # Integration tests
 ├── integrations/       # Integration utilities
 ├── optimize/           # Optimization utilities
