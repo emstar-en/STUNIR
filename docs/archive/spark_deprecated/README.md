@@ -1,12 +1,13 @@
 # Archived: Deprecated SPARK Sources
 
 > **Archive Date:** 2026-02-20
-> **Original Location:** `tools/spark/src/deprecated/`
-> **Reason:** Superseded by SPARK core refactor (`tools/spark/src/core/`)
+> **Reason:** Superseded by SPARK core refactor (`tools/spark/src/core/`) or consolidated into language buckets
 
 ---
 
 ## What Was Archived
+
+### Original Deprecated Sources (from `tools/spark/src/deprecated/`)
 
 These files were the original monolithic implementations of the STUNIR SPARK tools.
 They have been replaced by the modular pipeline in `tools/spark/src/core/`.
@@ -28,6 +29,13 @@ They have been replaced by the modular pipeline in `tools/spark/src/core/`.
 - `stunir_spec_to_ir_v2.adb` — Intermediate refactor attempt
 - `stunir_json_utils.adb.backup` — Backup of JSON utilities
 - `*.backup` files — Various backups
+
+### Additional Archived SPARK Code (2026-02-20)
+
+| Directory | Original Location | Reason |
+|-----------|-------------------|--------|
+| `targets_spark/` | `tools/python/targets/spark/` | Outdated SPARK targets; use `tools/spark/` instead |
+| `python_core_spark/` | `tools/python/core/` | SPARK/Ada code in Python bucket; use `tools/spark/` instead |
 
 ---
 

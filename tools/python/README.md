@@ -9,9 +9,6 @@
 
 ```
 tools/python/
-├── manifests/          # IR manifest generation and verification
-│   ├── gen_ir_manifest.py
-│   └── verify_ir_manifest.py
 ├── targets/            # Code emitters for various target languages
 │   ├── asm_ir/         # Assembly IR emitters
 │   ├── asp/            # Answer Set Programming emitters
@@ -27,7 +24,6 @@ tools/python/
 │   ├── functional/     # Haskell, F#, OCaml emitters
 │   ├── gpu/            # CUDA, OpenCL emitters
 │   ├── grammar/        # ANTLR, BNF emitters
-│   ├── haskell/        # Haskell-specific emitters
 │   ├── json/           # JSON emitters
 │   ├── lexer/          # Lexer generators
 │   ├── lisp/           # Lisp family emitters
@@ -38,36 +34,46 @@ tools/python/
 │   ├── planning/       # PDDL emitters
 │   ├── polyglot/       # Multi-language emitters
 │   ├── prolog/         # Prolog emitters
-│   ├── rust/           # Rust emitters
 │   ├── scientific/     # Fortran, Pascal emitters
-│   ├── spark/          # SPARK Ada emitters
 │   ├── systems/        # Systems language emitters
 │   └── wasm/           # WebAssembly emitters
-├── core/               # Core utilities (moved from src/ada/core/)
-│   ├── build_system/
-│   ├── common/
-│   ├── compliance_package/
-│   ├── config_manager/
-│   ├── coverage_analyzer/
-│   ├── dependency_resolver/
-│   ├── do331_integration/
-│   ├── do332_integration/
-│   ├── do333_integration/
-│   ├── epoch_manager/
-│   ├── ir_transform/
-│   ├── ir_validator/
-│   ├── receipt_manager/
-│   ├── report_generator/
-│   ├── result_validator/
-│   ├── semantic_checker/
-│   ├── test_harness/
-│   ├── test_orchestrator/
-│   ├── toolchain_discovery/
-│   ├── tool_interface/
-│   └── type_system/
-├── stunir_factory.py   # Factory utilities
+├── manifests/          # IR manifest generation and verification
+├── ir/                 # IR utilities
+├── semantic/           # Semantic analysis
+├── semantic_ir/        # Semantic IR implementation
+├── emitters/           # Emitter utilities
+├── codegen/            # Code generation
+├── validators/         # Validation utilities
+├── validation/         # Validation logic
+├── parsers/            # Parsing utilities
+├── scripts/            # Pipeline scripts
+├── integration/        # Integration tests
+├── integrations/       # Integration utilities
+├── optimize/           # Optimization utilities
+├── security/           # Security utilities
+├── resilience/         # Resilience patterns
+├── retry/              # Retry logic
+├── ratelimit/          # Rate limiting
+├── telemetry/          # Telemetry utilities
+├── resources/          # Resource management
+├── memory/             # Memory utilities
+├── common/             # Common utilities
+├── config/             # Configuration
+├── platform/           # Platform utilities
+├── lib/                # Library utilities
+├── serializers/        # Serialization
+├── stunir_logging/     # Logging
+├── stunir_types/       # Type definitions
+├── receipt_emitter/    # Receipt emission
+├── manifest/           # Manifest utilities
+├── ir_emitter/         # IR emission
+├── canonicalizers/     # Canonicalization
+├── conformance/        # Conformance testing
+├── *.py                # Top-level Python utilities (49 files)
 └── stunir_minimal.py   # Minimal pipeline runner
 ```
+
+> **Note:** SPARK/Ada code previously in `targets/spark/` and `core/` has been archived to `docs/archive/spark_deprecated/`. Use `tools/spark/` for SPARK implementation.
 
 ---
 
