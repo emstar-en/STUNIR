@@ -85,15 +85,18 @@ Think of it as a **safety harness for AI code generation**:
 STUNIR provides **precompiled Ada SPARK binaries** for testing current functionality:
 
 ```bash
-# Spec to IR conversion
-precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main
+# Spec to IR conversion (use ir_converter_main)
+precompiled/linux-x86_64/spark/bin/ir_converter_main
 
-# IR to code emission
-precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main
+# IR to code emission (use code_emitter_main)
+precompiled/linux-x86_64/spark/bin/code_emitter_main
 
-# Embedded target emitter
-precompiled/linux-x86_64/spark/bin/embedded_emitter_main
+# Pipeline driver (orchestrates full pipeline)
+precompiled/linux-x86_64/spark/bin/pipeline_driver_main
 ```
+
+> **Note:** The old tool names (`stunir_spec_to_ir_main`, `stunir_ir_to_code_main`) are deprecated.
+> See `docs/archive/spark_deprecated/README.md` for the deprecation schedule.
 
 **Benefits of Precompiled Binaries:**
 - ✅ No GNAT compiler required
@@ -230,22 +233,25 @@ gnatprove -P stunir_tools.gpr --level=2
 
 ### Python Tools (Alternative Pipeline)
 
-Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a **fully functional alternative** to Ada SPARK:
+Python files (`tools/spec_to_ir.py`, `tools/ir_to_code.py`) provide a **reference implementation** for understanding the pipeline logic:
+
+**Status:**
+- ⚠️ **Secondary to SPARK** — Use SPARK tools for production
+- ⚠️ **Reference only** — For learning and prototyping
+- ⚠️ **No receipt generation** — Does not produce audit receipts
 
 **When to use Python:**
-- ✅ Rapid prototyping and development workflows
-- ✅ Easier to read, understand, and modify
+- ✅ Learning and understanding pipeline logic
+- ✅ Rapid prototyping (when receipts not required)
 - ✅ When GNAT/SPARK toolchain is unavailable
-- ✅ CI/CD pipelines where speed matters more than formal verification
-- ✅ Learning and experimentation
-- ✅ Production use cases where formal verification is not required
 
 **When to prefer Ada SPARK:**
+- All production use cases
 - Safety-critical applications requiring DO-178C compliance
-- Production systems requiring formal verification
-- Reproducible builds with maximum determinism
+- Systems requiring formal verification
+- Reproducible builds with audit receipts
 
-**Both pipelines produce identical IR output** - choose based on your verification and workflow needs.
+> **Important:** Python bridge scripts (`bridge_*`) have been archived. See `docs/archive/python_legacy/README.md`.
 
 ## What is STUNIR?
 **STUNIR = Deterministic Multi-Language Code Generation**
@@ -264,14 +270,17 @@ STUNIR is not meant to be a human-operated CLI product. Humans typically do **no
 
 If you want to understand "how STUNIR works", start with:
 * **`tools/spark/`** — Ada SPARK primary implementation (DO-178C Level A)
-  * `tools/spark/src/stunir_spec_to_ir.adb` — spec to IR conversion logic
-  * `tools/spark/src/stunir_ir_to_code.adb` — IR to code emission logic
+  * `tools/spark/ARCHITECTURE.md` — **Canonical architecture reference (SSoT)**
+  * `tools/spark/README.md` — **Canonical entry point**
+  * `tools/spark/src/core/` — Core pipeline tools (ir_converter, code_emitter, pipeline_driver)
   * `tools/spark/stunir_tools.gpr` — GNAT project file for building
 * **`precompiled/linux-x86_64/spark/bin/`** — Precompiled SPARK binaries (recommended)
 * **`scripts/build.sh`** — Polyglot build dispatcher (auto-detects and prioritizes SPARK)
 * **`scripts/verify.sh`** — Receipt verification (uses SPARK verifier when available)
 * **`docs/verification.md`** — Local vs DSSE verification model
-* **`tools/native/README.md`** — Native verification stages (Rust/Haskell; SPARK-compatible)
+
+> **Note:** The old monolithic sources (`stunir_spec_to_ir.adb`, `stunir_ir_to_code.adb`) have been
+> archived to `docs/archive/spark_deprecated/`. Use the modular tools in `tools/spark/src/core/`.
 
 ### Pack/Container Interchange Format
 
@@ -396,14 +405,14 @@ STUNIR also aims to make integrity verification possible in constrained environm
   * IR validation (standardization gate): `stunir-native validate ...`
   * Pack / receipt verification (Profile-3-style pack verifier): `stunir-native verify pack ...`
 * For pack verification, it aims to match the failure tags and behavior contract in `contracts/stunir_profile3_contract.json` (stable tag string + exit 1).
-### Profile 3: Shell-Native (Minimal)
-*   **Status:** Fully Implemented (Bootstrapping & Verification).
-*   **Runtime:** POSIX Shell (Bash) + Coreutils. No Python required.
-*   **Capabilities:**
-    *   Toolchain Discovery & Locking (`scripts/lib/manifest.sh`)
-    *   Receipt Generation (`scripts/lib/receipt.sh`)
-    *   JSON Generation (`scripts/lib/json.sh`)
-*   **Documentation:** See [docs/shell_native.md](docs/shell_native.md).
+### Profile 3: Shell-Native (Minimal) — DEPRECATED
+
+> **Warning:** The shell-native profile has been **deprecated** due to host contamination risks
+> and portability issues. See `docs/archive/ARCHIVE_POLICY.md` for details.
+
+*   **Status:** Archived. See `docs/archive/shell_legacy/`.
+*   **Reason:** Shell offloading invites environment-specific behavior and bypasses receipt generation.
+*   **Replacement:** Use SPARK tools (`tools/spark/`) or Profile 2 native verifiers.
 
 ## Ada SPARK Core (Formal Methods Implementation)
 
@@ -705,3 +714,29 @@ This README is part of the harness contract. When updating it:
 * do not silently delete naming/rationale/mechanics sections
 * prefer additive edits or explicit deprecations
 * if content is superseded, mark it as such rather than removing it
+
+---
+
+## Archive Policy (2026-02-20)
+
+STUNIR has been aligned to the SPARK pipeline as the single source of truth. The following
+have been archived:
+
+| Category | Archive Location | Reason |
+|----------|-----------------|--------|
+| Deprecated SPARK sources | `docs/archive/spark_deprecated/` | Superseded by `tools/spark/src/core/` |
+| Python bridge scripts | `docs/archive/python_legacy/` | Stopgaps for broken SPARK binaries |
+| Shell-centric pipelines | `docs/archive/shell_legacy/` | Host contamination/portability risks |
+| Generated outputs | `work_artifacts/archives/2026-02-20-spark-alignment/` | Disposable build artifacts |
+
+### Key Policy Changes
+
+1. **Shell Offloading Deprecated** — The "minimal toolchain with smart shell offloading" pattern
+   has been explicitly deprecated due to host contamination and portability risks.
+
+2. **Python Patch Fallback** — Python patches over incomplete implementations are allowed only
+   when refactoring/rebuilding SPARK tools is not feasible, and must emit receipts with provenance.
+   See `docs/archive/ARCHIVE_POLICY.md` for details.
+
+3. **SPARK-First** — All documentation and tooling now prioritizes the SPARK pipeline.
+   See `tools/spark/ARCHITECTURE.md` for the canonical architecture.

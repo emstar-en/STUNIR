@@ -82,7 +82,7 @@
 
 ### Language Emitters (Planned/Incomplete)
 
-Most emitters in `src/ada/targets/` report version `1.0.0` but are **not tested** in the current pipeline.
+Most emitters in `tools/python/targets/` report version `1.0.0` but are **not tested** in the current pipeline.
 
 ---
 

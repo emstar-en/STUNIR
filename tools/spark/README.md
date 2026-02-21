@@ -107,7 +107,6 @@ tools/spark/
     detection/   Phase 0    Format and language detection
     validation/  Phase X    Schema validation
     verification/ Phase X   Hashing, manifests, receipts
-    deprecated/  EXCLUDED   Legacy monoliths (see DEPRECATED.md)
  obj/             Build artifacts (.ali, .o)  never in src/
  bin/             Compiled executables
  docs/
@@ -115,6 +114,9 @@ tools/spark/
     STUNIR_TYPE_ARCHITECTURE.md        (superseded by ARCHITECTURE.md)
     archive/    Historical working notes (not authoritative)
  tests/           Test sources
+
+> **Note:** The `src/deprecated/` directory has been moved to `docs/archive/spark_deprecated/`.
+> See `docs/archive/spark_deprecated/README.md` for the deprecation schedule.
 ```
 
 **GOVERNANCE:** Do NOT create new subdirectories under `src/` without updating

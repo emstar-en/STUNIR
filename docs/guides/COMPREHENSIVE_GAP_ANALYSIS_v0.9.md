@@ -80,9 +80,11 @@ STUNIR-main/
 | File | Version | Component |
 |------|---------|-----------|
 | pyproject.toml | 0.8.9 | Python package metadata |
-| src/main.rs | 0.5.0 | Rust native core CLI |
+| tools/rust/Cargo.toml | 0.8.9 | Rust tools |
 | stunir/__init__.py | 1.0.0 | Python package |
 | CHANGELOG.md | 1.0.0 | Released 2026-01-31 |
+
+> **Note:** `src/main.rs` (Rust native core CLI) was archived to `docs/archive/native_legacy/rust_root/` on 2026-02-20.
 
 **Impact:** Users cannot determine actual version. Package managers may reject.
 
@@ -256,8 +258,9 @@ error: could not compile `windows-sys`
 
 **Reality:**
 - pyproject.toml: version = "0.8.9"
-- src/main.rs: version = "0.5.0"
+- tools/rust/Cargo.toml: version = "0.8.9"
 - stunir/__init__.py: __version__ = "1.0.0"
+- (src/main.rs archived to docs/archive/native_legacy/rust_root/ on 2026-02-20)
 
 **Impact:** Users confused about actual capabilities and version.
 
@@ -447,10 +450,10 @@ Version: 0.8.9
 | File | Current | Should Be |
 |------|---------|-----------|
 | pyproject.toml | 0.8.9 | 0.8.9 |
-| src/main.rs | 0.5.0 | 0.8.9 |
 | stunir/__init__.py | 1.0.0 | 0.8.9 |
-| tools/rust/Cargo.toml | Check | 0.8.9 |
+| tools/rust/Cargo.toml | 0.8.9 | 0.8.9 |
 | CHANGELOG.md | 1.0.0 released | Move to unreleased |
+| (src/main.rs) | (archived) | docs/archive/native_legacy/rust_root/ |
 
 ### Files with Placeholder Code
 

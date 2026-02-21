@@ -10,10 +10,15 @@ precompiled/
 └── linux-x86_64/
     └── spark/
         └── bin/
-            ├── stunir_spec_to_ir_main    # Spec → IR converter
-            ├── stunir_ir_to_code_main    # IR → Code emitter
+            ├── ir_converter_main         # Spec → IR converter (PRIMARY)
+            ├── code_emitter_main         # IR → Code emitter (PRIMARY)
+            ├── pipeline_driver_main      # Full pipeline orchestrator
             └── embedded_emitter_main     # Embedded target emitter
 ```
+
+> **Note:** The old tool names (`stunir_spec_to_ir_main`, `stunir_ir_to_code_main`) are deprecated.
+> They may still exist for backward compatibility but should not be used for new work.
+> See `docs/archive/spark_deprecated/README.md` for the deprecation schedule.
 
 ## Supported Platforms
 
@@ -62,16 +67,20 @@ export STUNIR_USE_PRECOMPILED=1
 ### Manual Usage
 
 ```bash
-# Spec to IR
-./precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main \
+# Spec to IR (use ir_converter_main)
+./precompiled/linux-x86_64/spark/bin/ir_converter_main \
     --spec-root spec/ \
     --out asm/spec_ir.json
 
-# IR to Code
-./precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main \
+# IR to Code (use code_emitter_main)
+./precompiled/linux-x86_64/spark/bin/code_emitter_main \
     --input asm/spec_ir.json \
     --output asm/output.py \
     --target python
+
+# Full pipeline (use pipeline_driver_main)
+./precompiled/linux-x86_64/spark/bin/pipeline_driver_main \
+    --config pipeline.json
 ```
 
 ## Building from Source
@@ -95,9 +104,17 @@ gprbuild -P stunir_emitters.gpr
 
 | Binary | Source | Description |
 |--------|--------|-------------|
-| `stunir_spec_to_ir_main` | `tools/spark/` | Converts spec JSON to IR manifest |
-| `stunir_ir_to_code_main` | `tools/spark/` | Generates code from IR |
+| `ir_converter_main` | `tools/spark/src/core/` | Converts spec JSON to IR manifest (PRIMARY) |
+| `code_emitter_main` | `tools/spark/src/core/` | Generates code from IR (PRIMARY) |
+| `pipeline_driver_main` | `tools/spark/src/core/` | Orchestrates full pipeline execution |
 | `embedded_emitter_main` | `targets/spark/` | Embedded C code emitter |
+
+**Deprecated binaries (do not use for new work):**
+
+| Binary | Replacement |
+|--------|-------------|
+| `stunir_spec_to_ir_main` | `ir_converter_main` |
+| `stunir_ir_to_code_main` | `code_emitter_main` |
 
 ## Version Information
 
