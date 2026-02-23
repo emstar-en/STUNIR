@@ -1,14 +1,13 @@
 # STUNIR Quick Start Guide
 
-## Version 0.8.9
+> **⚠️ PRE-ALPHA (v0.1.0-alpha)** — SPARK-only pipeline functional. See [VERSION_STATUS.md](../../VERSION_STATUS.md) for limitations.
 
 Get started with STUNIR in 5 minutes.
 
 ## Prerequisites
 
-- **Ada SPARK Tools** (primary): `gprbuild`, `gnat` (optional, precompiled binaries available)
-- **Python 3.8+** (alternative): For reference implementation
-- **Rust** (optional): For native components
+- **Ada SPARK Tools** (required): `gprbuild`, `gnat` via Alire or GNAT Community
+- **Python 3.8+** (not recommended): Experimental only, not canonical
 
 ## Installation
 
@@ -117,6 +116,17 @@ pub fn hello(name: &str) -> String {
 ```
 
 ## Next Steps
+
+### ⚠️ Determinism & Schema Rules
+
+STUNIR enforces strict determinism for reproducible builds. **IR JSON must comply with:**
+
+| Rule | Requirement | Reference |
+|------|-------------|-----------|
+| **No Floats** | Use integers only | `tools/spark/schema/stunir_ir_v1.dcbor.json` |
+| **Sorted Keys** | JSON keys lexicographically sorted | `contracts/stunir_profile3_contract.json` |
+| **NFC Strings** | Unicode NFC normalized | dCBOR spec |
+| **No Duplicates** | Duplicate keys forbidden | Canonical JSON |
 
 ### Optimize Your IR
 

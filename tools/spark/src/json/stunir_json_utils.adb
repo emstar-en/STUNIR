@@ -984,7 +984,7 @@ package body STUNIR_JSON_Utils is
                       end if;
                    
                    when Stmt_Nop =>
-                      Append_To_Buffer (Output, """op"":""noop""");
+                      Append_To_Buffer (Output, """op"":""nop""");
 
                    when Stmt_Generic_Call =>
                       -- v0.8.9: Generic function call

@@ -1,5 +1,8 @@
 # STUNIR - MADE BY AI FOR AI
 
+> **⚠️ PRE-ALPHA (v0.1.0-alpha)** — Experimental prototype. SPARK-only pipeline functional. Not production-ready.
+> See [VERSION_STATUS.md](./VERSION_STATUS.md) for current capabilities and limitations.
+
 ##  Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
@@ -77,7 +80,7 @@ Think of it as a **safety harness for AI code generation**:
 | Priority | Implementation | Status | Development Focus |
 |----------|---------------|--------|-------------------|
 | **1. PRIMARY** | **Ada SPARK** | 🔨 **Partially functional** (active development) | **Being developed NOW** |
-| 2. Alternative | Python | 🔨 **Incomplete** (future development) | Development planned after SPARK |
+| 2. Alternative | Python | ⚠️ **Not canonical** (experimental only) | Not actively maintained |
 | 3. Native | Rust/Haskell | ⏳ Planned | Future |
 
 ### Precompiled SPARK Binaries (Recommended for ALPHA Testing)

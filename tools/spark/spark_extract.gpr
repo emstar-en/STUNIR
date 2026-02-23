@@ -1,0 +1,46 @@
+project Spark_Extract is
+   for Source_Dirs use (
+      "src",
+      "src/spec",
+      "src/types"
+   );
+
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+
+   for Main use (
+      "spark_extract_main.adb"
+   );
+
+   package Compiler is
+      for Default_Switches ("Ada") use (
+         "-gnat2022",
+         "-gnatwa",
+         "-gnatVa",
+         "-gnatf",
+         "-gnato",
+         "-fstack-check",
+         "-g"
+      );
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use (
+         "-E",
+         "-d32m"
+      );
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("Ada") use (
+         "-g"
+      );
+   end Linker;
+
+   package Builder is
+      for Default_Switches ("Ada") use (
+         "-s",
+         "-j0"
+      );
+   end Builder;
+end Spark_Extract;

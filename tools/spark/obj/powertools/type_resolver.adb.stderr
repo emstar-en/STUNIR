@@ -1,5 +1,0 @@
-type_resolver.adb:9:17: warning: no entities of "Ada.Strings.Unbounded" are referenced [-gnatwu]
-type_resolver.adb:11:10: warning: unit "GNAT.OS_Lib" is not referenced [-gnatwu]
-type_resolver.adb:18:04: warning: use clause for package "Unbounded" has no effect [-gnatwu]
-type_resolver.adb:25:04: warning: "Type_Name" is not modified, could be declared constant [-gnatwk]
-type_resolver.adb:122:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

@@ -1,0 +1,15 @@
+﻿{
+    "functions":  [
+
+                  ],
+    "types":  [
+
+              ],
+    "source":  "self_refinement",
+    "schema_version":  "stunir_spec_v1",
+    "generated_at":  "2026-02-22T22:43:23Z",
+    "modules":  [
+
+                ],
+    "spec_version":  "1.0.0"
+}

@@ -1,3 +1,0 @@
-func_dedup.adb:27:04: warning: named number "Exit_Validation_Error" is not referenced [-gnatwu]
-func_dedup.adb:180:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 22 [-gnatwr]
-func_dedup.adb:353:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

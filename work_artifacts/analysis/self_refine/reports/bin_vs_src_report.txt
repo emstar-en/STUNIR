@@ -1,0 +1,68 @@
+STUNIR bin vs src (Main list) check
+Timestamp: 2026-02-22T00:00:00Z
+GPR: c:\Users\MSTAR\AppData\Roaming\AbacusAI\Agent Workspaces\STUNIR\tools\spark\stunir_tools.gpr
+Bin: c:\Users\MSTAR\AppData\Roaming\AbacusAI\Agent Workspaces\STUNIR\tools\spark\bin
+
+Expected binaries: 27
+Actual binaries:   81
+Missing:           0
+Extra:             54
+
+Missing (expected but not present):
+  - None
+
+Extra (present but not expected):
+  - code_add_comments
+  - code_format_target
+  - code_gen_func_body
+  - code_gen_func_sig
+  - code_gen_preamble
+  - code_write
+  - cpp_header_gen
+  - cpp_impl_gen
+  - cpp_sig_normalize
+  - file_find
+  - file_hash
+  - file_writer
+  - func_parse_body
+  - func_parse_sig
+  - func_to_ir
+  - ir_add_metadata
+  - ir_check_functions
+  - ir_check_required
+  - ir_check_types
+  - ir_extract_funcs
+  - ir_extract_module
+  - ir_gen_functions
+  - ir_merge_funcs
+  - json_formatter
+  - json_merge_arrays
+  - json_merge_objects
+  - json_path_eval
+  - json_path_parser
+  - json_validator
+  - json_value_format
+  - manifest_generate
+  - module_to_ir
+  - schema_check_format
+  - schema_check_required
+  - schema_check_types
+  - sig_gen_cpp
+  - sig_gen_python
+  - sig_gen_rust
+  - spec_extract_funcs
+  - spec_extract_module
+  - spec_extract_types
+  - spec_to_python
+  - spec_validate
+  - spec_validate_schema
+  - stunir_ir_to_code_main
+  - stunir_spec_to_ir_main
+  - type_dependency
+  - type_expand
+  - type_lookup
+  - type_map_cpp
+  - type_map_target
+  - type_resolve
+  - type_resolver
+  - validation_reporter

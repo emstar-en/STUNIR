@@ -1,1 +1,1 @@
-{"schema":"stunir_ir_v1","ir_version":"v1","module_name":"test_module","docstring":"","types":[],"functions":[{"name":"main","args":[],"return_type":"void","steps":[]}]}
+{"schema":"stunir_ir_v1","ir_version":"v1","module_name":"test_module","docstring":"","types":[],"functions":[{"name":"main","args":[{"name":"a","type":"int"}],"return_type":"int","steps":[{"op":"assign","target":"b","value":"a"},{"op":"call","target":"c","value":"add(b, 1)"},{"op":"return","value":"c"}]}]}

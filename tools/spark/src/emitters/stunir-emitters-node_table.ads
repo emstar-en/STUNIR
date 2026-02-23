@@ -4,16 +4,16 @@
 
 pragma SPARK_Mode (On);
 
-with Semantic_IR.Types; use Semantic_IR.Types;
-with Semantic_IR.Nodes; use Semantic_IR.Nodes;
-with Semantic_IR.Declarations; use Semantic_IR.Declarations;
-with Semantic_IR.Statements; use Semantic_IR.Statements;
-with Semantic_IR.Expressions; use Semantic_IR.Expressions;
+with IR.Types; use IR.Types;
+with IR.Nodes; use IR.Nodes;
+with IR.Declarations; use IR.Declarations;
+with IR.Statements; use IR.Statements;
+with IR.Expressions; use IR.Expressions;
 
 package STUNIR.Emitters.Node_Table is
 
    -- Maximum nodes stored for emission
-   Max_Nodes : constant := 2048;
+   Max_Nodes : constant := 8;
    subtype Node_Index is Natural range 0 .. Max_Nodes;
 
    type Node_Kind_Group is (Group_Node, Group_Declaration, Group_Statement, Group_Expression);

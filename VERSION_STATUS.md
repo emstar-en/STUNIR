@@ -1,7 +1,9 @@
 # STUNIR Version Status
 
-**Last Updated**: February 17, 2026  
+**Last Updated**: February 23, 2026  
 **Overall Project Status**: `0.1.0-alpha` (ALPHA Prototype)
+
+> **✨ NEW (2026-02-23)**: Stub alignment now preserves module structure (imports/exports/types/constants/dependencies) in generated code.
 
 ## Overall Project Version
 
@@ -23,29 +25,38 @@
 
 ### Ada SPARK Pipeline (Primary Implementation)
 
-**Status**: ✅ Functional - Basic Spec→IR→Code pipeline working
+**Status**: ✅ Functional - IR→Code pipeline working with control flow
 
 | Component | Version | File | Status | Capabilities |
 |-----------|---------|------|--------|--------------|
-| **IR to Code Emitter** | `0.1.0-alpha` | `tools/spark/src/stunir_ir_to_code.ads` | ✅ Functional | IR→Code for C/Rust/Python (function stubs) |
-| **Spec to IR Converter** | No version constant | `tools/spark/src/stunir_spec_to_ir.ads` | ✅ Functional | Spec→IR conversion, manifest generation |
+| **IR Validator** | `0.1.0-alpha` | `tools/spark/src/ir/ir_validate_schema.adb` | ✅ Functional | Schema validation for IR JSON |
+| **IR Parser** | `0.1.0-alpha` | `tools/spark/src/ir/ir_parse.adb` | ✅ Functional | Parses IR with nested control flow |
+| **Code Emitter** | `0.1.0-alpha` | `tools/spark/src/emitters/emit_target.adb` | ✅ Functional | IR→Code for C/Clojure/Futhark/Lean4 |
+| **Pipeline Driver** | `0.1.0-alpha` | `tools/spark/src/core/pipeline_driver.adb` | ✅ Functional | Orchestrates SPARK-only pipeline |
+| **SPARK Extractor** | `2026-02-23a` | `tools/spark/src/spec/spark_extract.adb` | ✅ Functional | Ada/SPARK signature extraction |
 | **Toolchain** | `0.1.0-alpha` | `local_toolchain.lock.json` | ✅ Locked | Deterministic tool versioning |
 
 **Tested Capabilities**:
-- ✅ Spec JSON → IR JSON conversion
-- ✅ IR JSON → Code generation (C, Rust, Python)
-- ✅ Function stub generation
-- ❌ Full function implementation (not implemented)
+- ✅ IR JSON validation
+- ✅ IR JSON → Code generation (C, Clojure, Futhark, Lean4)
+- ✅ Function body generation with control flow (if/else, while, for)
+- ✅ Nested control flow (if inside function, while inside function)
+- ✅ SPARK/Ada signature extraction (single-line signatures)
+- ✅ **Module structure preservation** (imports, exports, types, constants, dependencies)
+- ✅ **Multi-target type emission** (C, Rust, Ada, Clojure, Prolog, Futhark, Lean4)
+- ❌ Deeply nested control flow (if inside while) - limited support
 - ❌ Code → Spec reverse pipeline (not implemented)
+
+**SPARK Extractor Known Limitations**:
+- ❌ Multiline signatures not supported (signatures must be on single line)
+- ⚠️ Body files (.adb) may have empty return types (spec lookup not implemented)
+- ⚠️ Tested on curated test corpus only (11 files, 46 functions extracted)
 
 ### Python Pipeline (Alternative Implementation)
 
-**Status**: ⚠️ Untested - Alternative to Ada SPARK
+**Status**: ⚠️ Not used - SPARK pipeline is canonical
 
-| Component | Version | Status | Notes |
-|-----------|---------|--------|-------|
-| Python bridge scripts | TBD | ⚠️ Untested | Alternative when SPARK unavailable |
-| Python emitters | Various | ⚠️ Mixed | Many emitter versions at 1.0.0 or 2.0.0 |
+**Note**: Python scripts exist in `tools/python/` but are not part of the SPARK pipeline.
 
 ### Utility Libraries
 

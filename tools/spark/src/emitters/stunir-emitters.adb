@@ -8,30 +8,30 @@ package body STUNIR.Emitters is
    function Get_Category_Name (Cat : Target_Category) return String is
    begin
       case Cat is
-         when Semantic_IR.Types.Target_Embedded        => return "Embedded";
-         when Semantic_IR.Types.Target_Realtime        => return "Realtime";
-         when Semantic_IR.Types.Target_Safety_Critical => return "SafetyCritical";
-         when Semantic_IR.Types.Target_GPU             => return "GPU";
-         when Semantic_IR.Types.Target_WASM            => return "WASM";
-         when Semantic_IR.Types.Target_Native          => return "Native";
-         when Semantic_IR.Types.Target_JIT             => return "JIT";
-         when Semantic_IR.Types.Target_Interpreter     => return "Interpreter";
-         when Semantic_IR.Types.Target_Functional      => return "Functional";
-         when Semantic_IR.Types.Target_Logic           => return "Logic";
-         when Semantic_IR.Types.Target_Constraint      => return "Constraint";
-         when Semantic_IR.Types.Target_Dataflow        => return "Dataflow";
-         when Semantic_IR.Types.Target_Reactive        => return "Reactive";
-         when Semantic_IR.Types.Target_Quantum         => return "Quantum";
-         when Semantic_IR.Types.Target_Neuromorphic    => return "Neuromorphic";
-         when Semantic_IR.Types.Target_Biocomputing    => return "Biocomputing";
-         when Semantic_IR.Types.Target_Molecular       => return "Molecular";
-         when Semantic_IR.Types.Target_Optical         => return "Optical";
-         when Semantic_IR.Types.Target_Reversible      => return "Reversible";
-         when Semantic_IR.Types.Target_Analog          => return "Analog";
-         when Semantic_IR.Types.Target_Stochastic      => return "Stochastic";
-         when Semantic_IR.Types.Target_Fuzzy           => return "Fuzzy";
-         when Semantic_IR.Types.Target_Approximate     => return "Approximate";
-         when Semantic_IR.Types.Target_Probabilistic   => return "Probabilistic";
+         when IR.Types.Target_Embedded        => return "Embedded";
+         when IR.Types.Target_Realtime        => return "Realtime";
+         when IR.Types.Target_Safety_Critical => return "SafetyCritical";
+         when IR.Types.Target_GPU             => return "GPU";
+         when IR.Types.Target_WASM            => return "WASM";
+         when IR.Types.Target_Native          => return "Native";
+         when IR.Types.Target_JIT             => return "JIT";
+         when IR.Types.Target_Interpreter     => return "Interpreter";
+         when IR.Types.Target_Functional      => return "Functional";
+         when IR.Types.Target_Logic           => return "Logic";
+         when IR.Types.Target_Constraint      => return "Constraint";
+         when IR.Types.Target_Dataflow        => return "Dataflow";
+         when IR.Types.Target_Reactive        => return "Reactive";
+         when IR.Types.Target_Quantum         => return "Quantum";
+         when IR.Types.Target_Neuromorphic    => return "Neuromorphic";
+         when IR.Types.Target_Biocomputing    => return "Biocomputing";
+         when IR.Types.Target_Molecular       => return "Molecular";
+         when IR.Types.Target_Optical         => return "Optical";
+         when IR.Types.Target_Reversible      => return "Reversible";
+         when IR.Types.Target_Analog          => return "Analog";
+         when IR.Types.Target_Stochastic      => return "Stochastic";
+         when IR.Types.Target_Fuzzy           => return "Fuzzy";
+         when IR.Types.Target_Approximate     => return "Approximate";
+         when IR.Types.Target_Probabilistic   => return "Probabilistic";
       end case;
    end Get_Category_Name;
 

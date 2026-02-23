@@ -1,0 +1,19 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "1.0",
+  "module_name": "pipeline_test",
+  "functions": [
+    {
+      "name": "",
+      "return_type": "",
+      "args": [],
+      "steps": []
+    },
+    {
+      "name": "",
+      "return_type": "",
+      "args": [],
+      "steps": []
+    }
+  ]
+}

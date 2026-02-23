@@ -1,0 +1,22 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "test_module",
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "int",
+      "args": [
+        {"name": "a", "type": "int"},
+        {"name": "b", "type": "int"}
+      ]
+    },
+    {
+      "name": "multiply",
+      "return_type": "int",
+      "args": [
+        {"name": "x", "type": "int"},
+        {"name": "y", "type": "int"}
+      ]
+    }
+  ]
+}

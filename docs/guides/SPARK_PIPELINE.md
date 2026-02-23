@@ -1,18 +1,27 @@
 # SPARK Pipeline Documentation
 
-**Status:** ✅ Production-Ready (Reference Implementation)  
-**Completeness:** 100% (24/24 categories complete)  
-**Purpose:** DO-178C Level A certified implementation for safety-critical systems
+> **⚠️ PRE-ALPHA (v0.1.0-alpha)** — Experimental prototype. See [VERSION_STATUS.md](../../VERSION_STATUS.md) for current capabilities and limitations.
+
+**Status:** 🔨 Partially Functional (Active Development)  
+**Completeness:** IR→Code pipeline working; other phases in development  
+**Purpose:** Deterministic code generation with formal verification support
 
 ---
 
 ## Overview
 
-The SPARK pipeline is the **reference implementation** of STUNIR designed for:
-- **DO-178C Compliance**: Supports Level A certification
-- **Formal Verification**: Proven absence of runtime errors
-- **Deterministic Behavior**: No undefined behavior
-- **Safety-Critical**: Suitable for avionics, medical devices, nuclear
+The SPARK pipeline is the **canonical implementation** of STUNIR designed for:
+- **Deterministic Behavior**: Reproducible, hash-stable output
+- **Formal Verification**: SPARK mode enables proofs (tools under development)
+- **Safety-Critical**: Targeting avionics, medical devices, nuclear (not yet certified)
+
+### Known Limitations
+
+- ❌ Multiline signatures not supported in SPARK extractor
+- ⚠️ Body files (.adb) may have empty return types
+- ❌ Deeply nested control flow has limited support
+- ❌ Code→Spec reverse pipeline not implemented
+- ⚠️ Stub-only code generation (full bodies not implemented)
 
 ---
 
@@ -124,43 +133,46 @@ Summary logged in gnatprove.out
 
 ### Why Trust the SPARK Pipeline?
 
-1. **DO-178C Compliance**: Meets Level A requirements
-2. **Formal Verification**: Runtime errors proven impossible
-3. **Deterministic**: No undefined behavior
-4. **Tool Qualification**: GNAT Pro is qualified for DO-178C
-5. **Industry Heritage**: Decades of use in critical systems
+1. **Deterministic**: Reproducible, hash-stable output
+2. **Formal Verification**: SPARK mode enables proofs (in progress)
+3. **No Undefined Behavior**: SPARK subset eliminates UB
+4. **Industry Heritage**: SPARK has decades of use in critical systems
 
-### Proof Obligations
+### Proof Obligations (Target)
 
-- ✅ No buffer overflows
-- ✅ No integer overflow/underflow
-- ✅ No divide by zero
-- ✅ No null pointer dereference
-- ✅ All variables initialized
-- ✅ All bounds checked
+- 🎯 No buffer overflows
+- 🎯 No integer overflow/underflow
+- 🎯 No divide by zero
+- 🎯 No null pointer dereference
+- 🎯 All variables initialized
+- 🎯 All bounds checked
+
+> **Note**: Full SPARK proofs are in progress. Not all proof obligations are currently proven.
 
 ---
 
 ## Confluence Status
 
 - ✅ Reference implementation (defines confluence)
-- ✅ All 24 categories complete
-- ✅ 100% of test vectors pass
-- ✅ All runtime errors proven impossible
+- 🔨 IR→Code pipeline functional
+- 🔨 SPARK proofs in progress (level=2)
+- ⚠️ Pre-alpha: not all features complete
 
 ---
 
-## Certification
+## Certification (Future Goal)
 
-### DO-178C Process
+> **Note**: DO-178C certification is a **future goal**, not current status. The SPARK pipeline is pre-alpha.
+
+### Target DO-178C Process
 
 1. **Requirements**: Defined in STUNIR specs
 2. **Design**: Ada SPARK implementation
 3. **Implementation**: Source code with contracts
 4. **Verification**: SPARK proofs + testing
-5. **Tool Qualification**: GNAT Pro certified
+5. **Tool Qualification**: GNAT Pro (industry standard)
 
-### Artifacts
+### Future Artifacts
 
 - Source code with SPARK annotations
 - Proof reports (gnatprove.out)
@@ -171,7 +183,7 @@ Summary logged in gnatprove.out
 
 ## Future Work
 
-1. Qualify remaining emitter categories for DO-178C
+1. Complete SPARK proofs (level=2 → level=3)
 2. Add runtime monitoring hooks
 3. Optimize for code size (embedded targets)
 4. Generate certification artifacts automatically

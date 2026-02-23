@@ -3,8 +3,8 @@
 
 with STUNIR.Emitters;
 with STUNIR.Emitters.Node_Table;
-with Semantic_IR.Modules;
-with Semantic_IR.Declarations;
+with IR.Modules;
+with IR.Declarations;
 with STUNIR.Emitters.CodeGen;
 
 package STUNIR.Emitters.Lean4_Family is
@@ -21,21 +21,21 @@ package STUNIR.Emitters.Lean4_Family is
 
    procedure Emit_Module
      (Self   : in out Lean4_Emitter;
-      Module : in     Semantic_IR.Modules.IR_Module;
+      Module : in     IR.Modules.IR_Module;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
    procedure Emit_Type
      (Self   : in out Lean4_Emitter;
-      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      T      : in     IR.Declarations.Type_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
    procedure Emit_Function
      (Self   : in out Lean4_Emitter;
-      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Func   : in     IR.Declarations.Function_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);

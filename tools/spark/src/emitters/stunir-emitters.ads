@@ -6,18 +6,18 @@
 -- packages of this package. In Ada, a parent package spec CANNOT with its
 -- own children (circular dependency). Those withs are in the body only.
 -- The abstract interface uses Ada.Strings.Bounded directly for the output
--- buffer type, and the Semantic_IR types for module/declaration parameters.
+-- buffer type, and the IR types for module/declaration parameters.
 
 with Ada.Strings.Bounded;
-with Semantic_IR.Modules;
-with Semantic_IR.Declarations;
-with Semantic_IR.Nodes;
-with Semantic_IR.Types;
+with IR.Modules;
+with IR.Declarations;
+with IR.Nodes;
+with IR.Types;
 
 package STUNIR.Emitters is
    pragma SPARK_Mode (On);
 
-   subtype Target_Category is Semantic_IR.Types.Target_Category;
+   subtype Target_Category is IR.Types.Target_Category;
 
    type Emitter_Status is
      (Status_Success, Status_Error_Parse, Status_Error_Generate, Status_Error_IO);
@@ -30,7 +30,7 @@ package STUNIR.Emitters is
 
    --  Abstract emitter base type
    type Base_Emitter is abstract tagged record
-      Category : Target_Category := Semantic_IR.Types.Target_Embedded;
+      Category : Target_Category := IR.Types.Target_Embedded;
       Status   : Emitter_Status  := Status_Success;
    end record;
 

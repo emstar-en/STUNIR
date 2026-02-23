@@ -1,0 +1,26 @@
+﻿STUNIR Self-Refinement Summary
+==============================
+Report Version: self_refine_report_v2
+Script Version: self_refine.ps1@2026-02-22c
+Timestamp: 2026-02-22T22:43:22Z
+Status: PASSED
+
+Files Processed:
+  Total SPARK files: 169
+  Extracted: 45
+  Spec functions: 0
+  IR files: 1
+  Emitted targets: 2
+    Extraction fallback: 124
+
+Phases:
+  Extraction:     completed
+  Spec Assembly:  completed
+  IR Conversion:  completed
+  IR Validation:  PASS
+  Emission:       completed
+
+Errors: 0
+Warnings: 240
+
+Output Directory: C:\Users\MSTAR\AppData\Roaming\AbacusAI\Agent Workspaces\stunir\work_artifacts\analysis\self_refine

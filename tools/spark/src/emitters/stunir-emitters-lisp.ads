@@ -1,14 +1,21 @@
 -- STUNIR Lisp Family Emitter (SPARK Specification)
 -- DO-178C Level A
 -- Phase 3b: Language Family Emitters
+--
+-- DEPRECATED: This typed Semantic IR emitter is deprecated.
+-- The canonical emitter path is now the Micro IR emitter in emit_target.adb.
+-- All Lisp family targets (Common Lisp, Scheme, Racket, Emacs Lisp, Guile, Hy,
+-- Janet, Clojure, ClojureScript) are now supported via the unified pipeline.
+-- See: src/emitters/emit_target.adb and src/emitters/emit_target_main.adb
+-- Scheduled removal: 2026-06-01
 
 with STUNIR.Emitters;    use STUNIR.Emitters;
 with STUNIR.Emitters.Node_Table;
 with STUNIR.Emitters.CodeGen;    use STUNIR.Emitters.CodeGen;
-with Semantic_IR.Modules;
-with Semantic_IR.Declarations;
-with Semantic_IR.Nodes;
-with Semantic_IR.Types;
+with IR.Modules;
+with IR.Declarations;
+with IR.Nodes;
+with IR.Types;
 
 package STUNIR.Emitters.Lisp is
    pragma SPARK_Mode (On);
@@ -56,32 +63,32 @@ package STUNIR.Emitters.Lisp is
    --  Concrete emitter procedures (not overriding — base has no abstract procs)
    procedure Emit_Module
      (Self    : in out Lisp_Emitter;
-      Module  : in     Semantic_IR.Modules.IR_Module;
+      Module  : in     IR.Modules.IR_Module;
       Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output  :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Pre  => Semantic_IR.Modules.Is_Valid_Module (Module),
+     Pre  => IR.Modules.Is_Valid_Module (Module),
      Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) > 0);
 
    procedure Emit_Type
      (Self    : in out Lisp_Emitter;
-      T       : in     Semantic_IR.Declarations.Type_Declaration;
+      T       : in     IR.Declarations.Type_Declaration;
       Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output  :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Pre  => Semantic_IR.Nodes.Is_Valid_Node_ID (T.Base.Base.ID),
+     Pre  => IR.Nodes.Is_Valid_Node_ID (T.Base.Base.ID),
      Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
 
    procedure Emit_Function
      (Self    : in out Lisp_Emitter;
-      Func    : in     Semantic_IR.Declarations.Function_Declaration;
+      Func    : in     IR.Declarations.Function_Declaration;
       Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output  :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success :    out Boolean)
    with
-     Pre  => Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Base.Base.ID),
+     Pre  => IR.Nodes.Is_Valid_Node_ID (Func.Base.Base.ID),
      Post => (if Success then STUNIR.Emitters.CodeGen.Code_Buffers.Length (Output) >= 0);
 
    -- Dialect-specific helpers
@@ -96,7 +103,7 @@ package STUNIR.Emitters.Lisp is
      Post => Get_Module_Syntax'Result'Length in 6 .. 20;
 
    function Map_Type_To_Lisp
-     (Prim_Type : Semantic_IR.Types.IR_Primitive_Type;
+     (Prim_Type : IR.Types.IR_Primitive_Type;
       Dialect   : Lisp_Dialect) return String
    with
      Global => null,

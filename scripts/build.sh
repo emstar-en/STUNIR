@@ -45,8 +45,8 @@ ARCH="$(detect_arch)"
 PRECOMPILED_DIR="precompiled/${PLATFORM}-${ARCH}/spark/bin"
 
 # Tool paths - prefer precompiled, fall back to built
-# NOTE: Old tool names (stunir_spec_to_ir_main, stunir_ir_to_code_main) are deprecated.
-# Use ir_converter_main and code_emitter_main instead.
+# Only use tools from stunir_tools.gpr Main list (updated binaries)
+# Deprecated tools (stunir_spec_to_ir_main, stunir_ir_to_code_main) are in bin/deprecated/
 if [ -x "$PRECOMPILED_DIR/ir_converter_main" ] && [ "$USE_PRECOMPILED" != "0" ]; then
     SPARK_IR_CONVERTER="$PRECOMPILED_DIR/ir_converter_main"
     SPARK_CODE_EMITTER="$PRECOMPILED_DIR/code_emitter_main"
@@ -58,10 +58,9 @@ else
     SPARK_PIPELINE_DRIVER="tools/spark/bin/pipeline_driver_main"
     USING_PRECOMPILED=0
 fi
-# Fallback to old names if new ones don't exist
-if [ ! -x "$SPARK_IR_CONVERTER" ] && [ -x "$PRECOMPILED_DIR/stunir_spec_to_ir_main" ]; then
-    SPARK_IR_CONVERTER="$PRECOMPILED_DIR/stunir_spec_to_ir_main"
-    SPARK_CODE_EMITTER="$PRECOMPILED_DIR/stunir_ir_to_code_main"
+# Check for deprecated tools and warn
+if [ -x "tools/spark/bin/stunir_spec_to_ir_main" ] || [ -x "tools/spark/bin/stunir_ir_to_code_main" ]; then
+    warn "Deprecated tools found in bin/. Run: cd tools/spark/bin && ./deprecate_extras.cmd"
 fi
 NATIVE_BIN="tools/native/rust/stunir-native/target/release/stunir-native"
 

@@ -1,0 +1,8 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "module",
+  "types": [],
+  "functions": [
+  ]
+}

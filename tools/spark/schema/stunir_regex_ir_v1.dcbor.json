@@ -15,7 +15,20 @@
       "alphabet": "Unless otherwise noted, the alphabet is the set of Unicode scalar values restricted to the ASCII subset (U+0000–U+007F). Patterns that accept non-ASCII input are explicitly annotated.",
       "anchoring": "A pattern marked 'anchored: true' matches the entire input string (implicit ^ and $). A pattern marked 'anchored: false' is a search pattern (matches any substring). Anchoring is a property of the use-site, not the pattern itself; this IR records the canonical intended anchoring.",
       "transformation_semantics": "Patterns used for substitution (re.sub) are annotated with 'mode: transform' and include a 'replacement' field. The replacement string is a formal object: '$0' refers to the full match, '$1'..'$N' to capture groups. Capture groups are numbered left-to-right by opening parenthesis.",
-      "hash_stability": "The canonical form of this IR document is produced by sorting all JSON object keys lexicographically and using no insignificant whitespace (dCBOR-style). The sha256 of the canonical bytes is the identity of this IR version."
+      "hash_stability": "The canonical form of this IR document is produced by sorting all JSON object keys lexicographically and using no insignificant whitespace (dCBOR-style). The sha256 of the canonical bytes is the identity of this IR version.",
+      "dcbor_profile": {
+        "family": "dcbor",
+        "canonical": true,
+        "definite_lengths_only": true,
+        "indefinite_lengths": "forbidden",
+        "map_key_order": "canonical",
+        "integer_encoding": "shortest",
+        "byte_string_encoding": "canonical",
+        "text_string_encoding": "utf-8",
+        "float_policy": "forbid_floats",
+        "string_normalization": "NFC",
+        "forbid_surrogates": true
+      }
     },
     "governance": "This file is the Single Source of Truth (SSoT) for all regular expressions in the STUNIR harness. When adding a new pattern: (1) add it here first, (2) reference it from the using source file with a REGEX_IR_REF comment, (3) update stunir_tools.gpr if a new source directory is involved. Do NOT embed undocumented regex strings in source files."
   },

@@ -1,0 +1,32 @@
+﻿{
+    "schema_version":  "stunir_spec_v1",
+    "modules":  [
+
+                ],
+    "types":  [
+
+              ],
+    "generated_at":  "2026-02-22T18:26:47Z",
+    "source":  "self_refinement",
+    "spec_version":  "1.0.0",
+    "functions":  [
+                      {
+                          "name":  "matching",
+                          "return_type":  "-- NOTE: This package implements GLOB pattern",
+                          "args":  [
+                                       {
+                                           "name":  "arg",
+                                           "type":  "*"
+                                       },
+                                       {
+                                           "name":  "arg",
+                                           "type":  "?"
+                                       },
+                                       {
+                                           "name":  "arg",
+                                           "type":  "[...]"
+                                       }
+                                   ]
+                      }
+                  ]
+}

@@ -1,2 +1,0 @@
-lang_detect.adb:97:13: warning: "Line_Str" is not modified, could be declared constant [-gnatwk]
-lang_detect.adb:159:16: warning: "Res" is not modified, could be declared constant [-gnatwk]

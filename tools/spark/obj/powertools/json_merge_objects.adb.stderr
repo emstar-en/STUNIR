@@ -1,2 +1,0 @@
-json_merge_objects.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
-json_merge_objects.adb:106:07: warning: variable "Line_Start" is not referenced [-gnatwu]

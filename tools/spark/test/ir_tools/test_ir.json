@@ -1,0 +1,90 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "test_module",
+  "types": [],
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "int",
+      "args": [
+        {"name": "a", "type": "int"},
+        {"name": "b", "type": "int"}
+      ],
+      "steps": [
+        {"op": "return", "value": "a + b"}
+      ]
+    },
+    {
+      "name": "factorial",
+      "return_type": "int",
+      "args": [
+        {"name": "n", "type": "int"}
+      ],
+      "steps": [
+        {"op": "assign", "target": "result", "value": "1"},
+        {"op": "assign", "target": "i", "value": "1"},
+        {
+          "op": "for",
+          "init": "i = 1",
+          "condition": "i <= n",
+          "increment": "i++",
+          "body_steps": [
+            {"op": "assign", "target": "result", "value": "result * i"}
+          ]
+        },
+        {"op": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "abs_value",
+      "return_type": "int",
+      "args": [
+        {"name": "x", "type": "int"}
+      ],
+      "steps": [
+        {
+          "op": "if",
+          "condition": "x < 0",
+          "then_steps": [
+            {"op": "return", "value": "-x"}
+          ],
+          "else_steps": [
+            {"op": "return", "value": "x"}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "count_down",
+      "return_type": "int",
+      "args": [
+        {"name": "n", "type": "int"}
+      ],
+      "steps": [
+        {"op": "assign", "target": "count", "value": "0"},
+        {
+          "op": "while",
+          "condition": "n > 0",
+          "body_steps": [
+            {"op": "assign", "target": "count", "value": "count + 1"},
+            {"op": "assign", "target": "n", "value": "n - 1"}
+          ]
+        },
+        {"op": "return", "value": "count"}
+      ]
+    },
+    {
+      "name": "compute",
+      "return_type": "int",
+      "args": [
+        {"name": "x", "type": "int"},
+        {"name": "y", "type": "int"}
+      ],
+      "steps": [
+        {"op": "assign", "target": "result", "value": "0"},
+        {"op": "return", "value": "result"}
+      ]
+    }
+  ]
+}

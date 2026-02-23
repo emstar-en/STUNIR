@@ -1,0 +1,3 @@
+spark_extract_main@2026-02-22a
+Input:  .\test_data\golden_test.ads
+Output: .\test_data\golden_test_extraction.json

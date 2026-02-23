@@ -5,11 +5,11 @@
 package body STUNIR.Emitters.Visitor is
    pragma SPARK_Mode (On);
 
-   function Null_Node_ID return Semantic_IR.Types.ID is
-     (Semantic_IR.Types.Name_Strings.Null_Bounded_String);
+   function Null_Node_ID return IR.Types.ID is
+     (IR.Types.Name_Strings.Null_Bounded_String);
 
    procedure Traverse_Module
-     (Module  : in     Semantic_IR.Modules.IR_Module;
+     (Module  : in     IR.Modules.IR_Module;
       Nodes   : in     STUNIR.Emitters.Node_Table.Node_Table;
       Context : in out Visitor_Context'Class;
       Result  :    out Visit_Result)
@@ -28,7 +28,7 @@ package body STUNIR.Emitters.Visitor is
       -- Traverse declarations via node table resolution.
       for I in 1 .. Module.Decl_Count loop
          declare
-            Decl_ID : constant Semantic_IR.Types.ID := Module.Declarations (I);
+            Decl_ID : constant IR.Types.ID := Module.Declarations (I);
             Decl_Index : constant STUNIR.Emitters.Node_Table.Node_Index :=
               STUNIR.Emitters.Node_Table.Lookup (Nodes, Decl_ID);
          begin
@@ -40,9 +40,9 @@ package body STUNIR.Emitters.Visitor is
                     STUNIR.Emitters.Node_Table.Get_Declaration (Nodes, Decl_Index);
                begin
                   case Decl_Node.Kind is
-                     when Semantic_IR.Types.Kind_Type_Decl =>
+                     when IR.Types.Kind_Type_Decl =>
                         declare
-                           T : Semantic_IR.Declarations.Type_Declaration := Decl_Node.Typ;
+                           T : IR.Declarations.Type_Declaration := Decl_Node.Typ;
                         begin
                            On_Type_Start (Context, T);
                            if Context.Result = Abort_Visit then
@@ -56,9 +56,9 @@ package body STUNIR.Emitters.Visitor is
                            end if;
                         end;
 
-                     when Semantic_IR.Types.Kind_Function_Decl =>
+                     when IR.Types.Kind_Function_Decl =>
                         declare
-                           F : Semantic_IR.Declarations.Function_Declaration := Decl_Node.Func;
+                           F : IR.Declarations.Function_Declaration := Decl_Node.Func;
                         begin
                            On_Function_Start (Context, F);
                            if Context.Result = Abort_Visit then
@@ -66,7 +66,7 @@ package body STUNIR.Emitters.Visitor is
                               return;
                            end if;
 
-                           if Semantic_IR.Nodes.Is_Valid_Node_ID (F.Body_ID) then
+                           if IR.Nodes.Is_Valid_Node_ID (F.Body_ID) then
                               declare
                                  Stmt_Index : constant STUNIR.Emitters.Node_Table.Node_Index :=
                                    STUNIR.Emitters.Node_Table.Lookup (Nodes, F.Body_ID);

@@ -1,13 +1,16 @@
 # `docs/archive/` — Historical Working Notes
 
+> **⚠️ ARCHIVED — NOT CANONICAL — DO NOT USE FOR CURRENT REFERENCE**
+>
 > **These files are ARCHIVED working notes.** They are preserved for historical
 > reference and diff archaeology only. They are **not authoritative** and may
 > contain outdated, contradictory, or superseded information.
 >
-> **Canonical documentation is in `tools/spark/`:**
-> - `README.md` — Entry point, build instructions, pipeline overview
-> - `ARCHITECTURE.md` — Authoritative architecture reference
-> - `CONTRIBUTING.md` — Governance rules, contribution checklist
+> **For current documentation, use:**
+> - `tools/spark/README.md` — Entry point, build instructions, pipeline overview
+> - `tools/spark/ARCHITECTURE.md` — Authoritative architecture reference
+> - `VERSION_STATUS.md` — Current project status and capabilities
+> - `STUNIR_QUICKSTART_PRODUCTION.md` — Quick start guide
 
 ## Archived Files
 

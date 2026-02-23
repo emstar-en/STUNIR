@@ -3,7 +3,7 @@
 -- Phase 3b: Language Family Emitters
 
 with Ada.Text_IO; use Ada.Text_IO;
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with IR.Modules; use IR.Modules;
 with STUNIR.Emitters.Prolog; use STUNIR.Emitters.Prolog;
 
 procedure Test_Prolog is

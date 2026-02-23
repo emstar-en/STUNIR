@@ -1,1 +1,0 @@
-receipt_generate.adb:70:36: warning: "Buffer" may be referenced before it has a value [enabled by default]

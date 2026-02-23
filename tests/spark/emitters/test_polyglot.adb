@@ -3,7 +3,7 @@
 -- Phase 3a: Core Category Emitters
 
 with Ada.Text_IO; use Ada.Text_IO;
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with IR.Modules; use IR.Modules;
 with STUNIR.Emitters; use STUNIR.Emitters;
 with STUNIR.Emitters.Polyglot; use STUNIR.Emitters.Polyglot;
 

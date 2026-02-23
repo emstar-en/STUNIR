@@ -1,1 +1,1 @@
-{"schema":"stunir_ir_v1","ir_version":"v1","module_name":"test_module","docstring":"","types":[],"functions":[{"name":"main","args":[],"return_type":"void","steps":[]}]}
+{"schema":"stunir_ir_v1","ir_version":"v1","module_name":"test_module","docstring":"","types":[],"functions":[{"name":"main","args":[],"return_type":"void","steps":[{"op":"call","value":"do_work()"},{"op":"return","value":""}]}]}

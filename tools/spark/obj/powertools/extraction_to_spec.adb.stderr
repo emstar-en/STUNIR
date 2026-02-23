@@ -1,6 +1,0 @@
-extraction_to_spec.adb:10:17: warning: unit "Ada.Strings.Fixed" is not referenced [-gnatwu]
-extraction_to_spec.adb:28:04: warning: named number "Exit_Validation_Error" is not referenced [-gnatwu]
-extraction_to_spec.adb:207:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 23 [-gnatwr]
-extraction_to_spec.adb:208:11: warning: "STUNIR_Types" is already use-visible through previous use_clause at line 24 [-gnatwr]
-extraction_to_spec.adb:214:07: warning: variable "Functions_Array" is not referenced [-gnatwu]
-extraction_to_spec.adb:407:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

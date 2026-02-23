@@ -1,0 +1,36 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "module",
+  "language": "spark",
+  "functions": [
+    {
+      "name": "Initialize",
+      "return_type": "void",
+      "args": []
+    }
+,
+    {
+      "name": "Get_Version",
+      "return_type": "String",
+      "args": []
+    }
+,
+    {
+      "name": "Set_Value",
+      "return_type": "void",
+      "args": [{"name": "Val", "type": "Integer"}]
+    }
+,
+    {
+      "name": "Add",
+      "return_type": "Integer",
+      "args": [{"name": "A", "type": "Integer"}, {"name": "B", "type": "Integer"}]
+    }
+,
+    {
+      "name": "Compute",
+      "return_type": "Float",
+      "args": [{"name": "X", "type": "Float"}, {"name": "Y", "type": "Float"}, {"name": "Mode", "type": "Integer"}]
+    }
+  ]
+}
