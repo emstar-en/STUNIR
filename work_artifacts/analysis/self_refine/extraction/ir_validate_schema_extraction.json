@@ -1,0 +1,5 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "module",
+  "language": "spark",
+  "functions": [

@@ -1,1 +1,0 @@
-spec_extract_module.adb:11:10: warning: unit "GNAT.OS_Lib" is not referenced [-gnatwu]

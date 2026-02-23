@@ -1,0 +1,14 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "module",
+  "types": [],
+  "functions": [
+    {
+      "name": "matching",
+      "return_type": "-- NOTE: This package implements GLOB pattern",
+      "args": [{"name": "arg", "type": "*"}, {"name": "arg", "type": "?"}, {"name": "arg", "type": "[...]"}],
+      "steps": [{"op": "assign", "value": "null", "target": "result"}, {"op": "return", "value": "result"}]
+    }
+  ]
+}

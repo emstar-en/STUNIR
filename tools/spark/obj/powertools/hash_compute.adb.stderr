@@ -1,1 +1,0 @@
-hash_compute.adb:54:14: warning: "Streams" is already use-visible through previous use_clause at line 14 [-gnatwr]

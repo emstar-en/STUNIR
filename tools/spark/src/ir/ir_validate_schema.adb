@@ -79,27 +79,83 @@ procedure IR_Validate_Schema is
       return Index (S, Pattern) > 0;
    end Contains;
 
+   --  Global for error tracking
+   Last_Validation_Errors : Unbounded_String := Null_Unbounded_String;
+
    function Is_Valid_IR (Content : String) return Boolean is
+      In_String : Boolean := False;
+      Has_IR_Version : Boolean := False;
+      Has_Module_Name : Boolean := False;
+      Has_Functions : Boolean := False;
+      Has_Types : Boolean := False;
+      Errors : Unbounded_String := Null_Unbounded_String;
    begin
-      --  Check for required fields
-      if not Contains (Content, """schema""") then
-         return False;
+      --  Reject floats (dCBOR profile forbids floats in IR JSON)
+      for I in Content'Range loop
+         if Content (I) = '"' then
+            In_String := not In_String;
+         elsif Content (I) = '.' and then not In_String then
+            --  Allow dots inside strings only
+            Append (Errors, """float_detected: position " & Integer'Image (I) & """,");
+         end if;
+      end loop;
+
+      --  Check required fields
+      Has_IR_Version := Contains (Content, """ir_version""");
+      Has_Module_Name := Contains (Content, """module_name""");
+      Has_Functions := Contains (Content, """functions""");
+      Has_Types := Contains (Content, """types""");
+
+      if not Has_IR_Version then
+         Append (Errors, """missing_field: ir_version"",");
       end if;
 
-      if not Contains (Content, """ir_version""") then
-         return False;
+      if not Has_Module_Name then
+         Append (Errors, """missing_field: module_name"",");
       end if;
 
-      if not Contains (Content, """module_name""") then
-         return False;
+      if not Has_Functions then
+         Append (Errors, """missing_field: functions"",");
       end if;
 
-      if not Contains (Content, """functions""") then
-         return False;
+      --  Validate step fields if present
+      --  Steps should have "op" field, not "step_type"
+      if Contains (Content, """step_type""") then
+         --  Legacy format - reject
+         Append (Errors, """legacy_field: step_type (use 'op' instead)"",");
       end if;
 
+      --  Validate that steps use "op" field
+      if Contains (Content, """steps""") then
+         if not Contains (Content, """op""") then
+            --  Steps array exists but no "op" field found
+            Append (Errors, """missing_field: op (required in steps)"",");
+         end if;
+      end if;
+
+      --  Store errors for reporting
+      if Length (Errors) > 0 then
+         Last_Validation_Errors := Errors;
+         return False;
+      end if;
+      
       return True;
    end Is_Valid_IR;
+
+   procedure Print_Validation_Result (Valid : Boolean) is
+   begin
+      if Valid then
+         Put_Line ("{""valid"": true, ""errors"": []}");
+      else
+         declare
+            ErrStr : constant String := To_String (Last_Validation_Errors);
+            --  Remove trailing comma
+            CleanErrors : String := ErrStr (ErrStr'First .. ErrStr'Last - 1);
+         begin
+            Put_Line ("{""valid"": false, ""errors"": [" & CleanErrors & "]}");
+         end;
+      end if;
+   end Print_Validation_Result;
 
 begin
    --  Parse arguments
@@ -146,10 +202,10 @@ begin
       end if;
 
       if Is_Valid_IR (Content) then
-         Put_Line ("true");
+         Print_Validation_Result (True);
          Set_Exit_Status (Exit_Success);
       else
-         Put_Line ("false");
+         Print_Validation_Result (False);
          Set_Exit_Status (Exit_Error);
       end if;
    end;

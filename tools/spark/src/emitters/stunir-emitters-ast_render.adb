@@ -7,18 +7,18 @@ pragma SPARK_Mode (On);
 
 with STUNIR.Emitters.CodeGen;
 with STUNIR.Emitters.Node_Table;
-with Semantic_IR.Types;
-with Semantic_IR.Nodes;
-with Semantic_IR.Expressions;
-with Semantic_IR.Statements;
+with IR.Types;
+with IR.Nodes;
+with IR.Expressions;
+with IR.Statements;
 
 package body STUNIR.Emitters.AST_Render is
 
    use STUNIR.Emitters.CodeGen;
-   use Semantic_IR.Types;
-   use Semantic_IR.Nodes;
-   use Semantic_IR.Expressions;
-   use Semantic_IR.Statements;
+   use IR.Types;
+   use IR.Nodes;
+   use IR.Expressions;
+   use IR.Statements;
 
    procedure Append
      (Buffer : in out IR_Code_Buffer;

@@ -1,4 +1,0 @@
-stunir_json_parser.adb:6:20: warning: no entities of "Ada.Characters.Handling" are referenced [-gnatwu]
-stunir_json_parser.adb:10:04: warning: use clause for package "Handling" has no effect [-gnatwu]
-stunir_json_parser.adb:11:08: warning: "STUNIR_Types" is already use-visible through previous use_clause at stunir_json_parser.ads:13 [-gnatwr]
-stunir_json_parser.adb:189:07: warning: "Pos" is not modified, could be declared constant [-gnatwk]

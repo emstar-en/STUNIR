@@ -1,0 +1,21 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "pipeline_test",
+  "functions": [
+    {
+      "name": "compute",
+      "return_type": "int",
+      "args": [
+        {"name": "x", "type": "int"},
+        {"name": "y", "type": "int"}
+      ]
+    },
+    {
+      "name": "process",
+      "return_type": "void",
+      "args": [
+        {"name": "data", "type": "string"}
+      ]
+    }
+  ]
+}

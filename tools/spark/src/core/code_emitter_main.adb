@@ -10,24 +10,32 @@ with Ada.Command_Line;
 with Ada.Text_IO;
 with STUNIR_Types;
 use STUNIR_Types;
-with Code_Emitter;
+with Emit_Target;
 
 procedure Code_Emitter_Main is
+   package ACL renames Ada.Command_Line;
+   use Ada.Text_IO;
 
    procedure Print_Usage is
    begin
-      Ada.Text_IO.Put_Line ("Usage: code_emitter -i <input> -o <output> -t <target>");
-      Ada.Text_IO.Put_Line ("  -i <input>    Input ir.json file path");
-      Ada.Text_IO.Put_Line ("  -o <output>   Output directory for generated code");
-      Ada.Text_IO.Put_Line ("  -t <target>   Target language (or 'all' for all targets)");
-      Ada.Text_IO.Put_Line ("  -h            Show this help message");
-      Ada.Text_IO.Put_Line ("");
-      Ada.Text_IO.Put_Line ("Supported targets:");
-      Ada.Text_IO.Put_Line ("  cpp, c, python, rust, go, java, javascript, typescript, ada, spark, clojure, cljs, prolog, futhark, lean4, all");
+      Put_Line ("Usage: code_emitter <input_ir.json> <target> <output_file>");
+      Put_Line ("  input_ir.json    Input ir.json file path");
+      Put_Line ("  target           Target language (python, cpp, c, rust, etc.)");
+      Put_Line ("  output_file      Output file path");
+      Put_Line ("  -h               Show this help message");
+      Put_Line ("");
+      Put_Line ("Supported targets:");
+      Put_Line ("  Mainstream: cpp, c, python, rust, go, java, javascript, csharp, swift,");
+      Put_Line ("              kotlin, spark, ada");
+      Put_Line ("  Lisp family: common-lisp, scheme, racket, emacs-lisp, guile, hy, janet,");
+      Put_Line ("               clojure, cljs");
+      Put_Line ("  Prolog family: swi-prolog, gnu-prolog, mercury, prolog (generic)");
+      Put_Line ("  Functional/Formal: futhark, lean4, haskell");
    end Print_Usage;
 
    function Parse_Target (Target_Str : String) return Target_Language is
    begin
+      --  Mainstream languages
       if Target_Str = "cpp" or Target_Str = "c++" then
          return Target_CPP;
       elsif Target_Str = "c" then
@@ -44,159 +52,94 @@ procedure Code_Emitter_Main is
          return Target_JavaScript;
       elsif Target_Str = "typescript" or Target_Str = "ts" then
          return Target_JavaScript;
-      elsif Target_Str = "ada" then
-         return Target_SPARK;
+      elsif Target_Str = "csharp" or Target_Str = "cs" or Target_Str = "c#" then
+         return Target_CSharp;
+      elsif Target_Str = "swift" then
+         return Target_Swift;
+      elsif Target_Str = "kotlin" or Target_Str = "kt" then
+         return Target_Kotlin;
       elsif Target_Str = "spark" then
          return Target_SPARK;
-      elsif Target_Str = "clojure" then
+      elsif Target_Str = "ada" then
+         return Target_Ada;
+      --  Lisp family
+      elsif Target_Str = "common-lisp" or Target_Str = "cl" or Target_Str = "lisp" then
+         return Target_Common_Lisp;
+      elsif Target_Str = "scheme" then
+         return Target_Scheme;
+      elsif Target_Str = "racket" then
+         return Target_Racket;
+      elsif Target_Str = "emacs-lisp" or Target_Str = "elisp" or Target_Str = "el" then
+         return Target_Emacs_Lisp;
+      elsif Target_Str = "guile" then
+         return Target_Guile;
+      elsif Target_Str = "hy" then
+         return Target_Hy;
+      elsif Target_Str = "janet" then
+         return Target_Janet;
+      elsif Target_Str = "clojure" or Target_Str = "clj" then
          return Target_Clojure;
       elsif Target_Str = "cljs" or Target_Str = "clojurescript" then
          return Target_ClojureScript;
+      --  Prolog family
+      elsif Target_Str = "swi-prolog" or Target_Str = "swi" then
+         return Target_SWI_Prolog;
+      elsif Target_Str = "gnu-prolog" or Target_Str = "gprolog" then
+         return Target_GNU_Prolog;
+      elsif Target_Str = "mercury" then
+         return Target_Mercury;
       elsif Target_Str = "prolog" then
-         return Target_Prolog;
+         return Target_Prolog;  --  Generic (deprecated)
+      --  Functional/Formal
       elsif Target_Str = "futhark" then
          return Target_Futhark;
-      elsif Target_Str = "lean4" then
+      elsif Target_Str = "lean4" or Target_Str = "lean" then
          return Target_Lean4;
       else
-         return Target_CPP;  --  Default
+         return Target_Python;  --  Default
       end if;
    end Parse_Target;
 
    Input_Path  : Path_String := Path_Strings.Null_Bounded_String;
-   Output_Dir  : Path_String := Path_Strings.Null_Bounded_String;
-   Target_Str  : Identifier_String := Identifier_Strings.Null_Bounded_String;
-   Target      : Target_Language := Target_CPP;
-   All_Targets : Boolean := False;
+   Output_Path : Path_String := Path_Strings.Null_Bounded_String;
+   Target      : Target_Language := Target_Python;
    Status      : Status_Code;
-   Arg_Index   : Positive := 1;
 
 begin
    --  Parse command-line arguments
-   while Arg_Index <= Ada.Command_Line.Argument_Count loop
-      declare
-         Arg : constant String := Ada.Command_Line.Argument (Arg_Index);
-      begin
-         if Arg = "-h" or Arg = "--help" then
-            Print_Usage;
-            Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Success);
-            return;
-         elsif Arg = "-i" then
-            if Arg_Index < Ada.Command_Line.Argument_Count then
-               Arg_Index := Arg_Index + 1;
-               declare
-                  Path_Str : constant String := Ada.Command_Line.Argument (Arg_Index);
-               begin
-                  if Path_Str'Length <= Max_Path_Length then
-                     Input_Path := Path_Strings.To_Bounded_String (Path_Str);
-                  else
-                     Ada.Text_IO.Put_Line ("Error: Input path too long");
-                     Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-                     return;
-                  end if;
-               end;
-            else
-               Ada.Text_IO.Put_Line ("Error: -i requires an argument");
-               Print_Usage;
-               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-               return;
-            end if;
-         elsif Arg = "-o" then
-            if Arg_Index < Ada.Command_Line.Argument_Count then
-               Arg_Index := Arg_Index + 1;
-               declare
-                  Path_Str : constant String := Ada.Command_Line.Argument (Arg_Index);
-               begin
-                  if Path_Str'Length <= Max_Path_Length then
-                     Output_Dir := Path_Strings.To_Bounded_String (Path_Str);
-                  else
-                     Ada.Text_IO.Put_Line ("Error: Output directory too long");
-                     Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-                     return;
-                  end if;
-               end;
-            else
-               Ada.Text_IO.Put_Line ("Error: -o requires an argument");
-               Print_Usage;
-               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-               return;
-            end if;
-         elsif Arg = "-t" then
-            if Arg_Index < Ada.Command_Line.Argument_Count then
-               Arg_Index := Arg_Index + 1;
-               declare
-                  T_Str : constant String := Ada.Command_Line.Argument (Arg_Index);
-               begin
-                  if T_Str = "all" then
-                     All_Targets := True;
-                  else
-                     if T_Str'Length <= Max_Identifier_Length then
-                        Target_Str := Identifier_Strings.To_Bounded_String (T_Str);
-                        Target := Parse_Target (T_Str);
-                     else
-                        Ada.Text_IO.Put_Line ("Error: Target name too long");
-                        Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-                        return;
-                     end if;
-                  end if;
-               end;
-            else
-               Ada.Text_IO.Put_Line ("Error: -t requires an argument");
-               Print_Usage;
-               Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-               return;
-            end if;
-         else
-            Ada.Text_IO.Put_Line ("Error: Unknown option: " & Arg);
-            Print_Usage;
-            Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-            return;
-         end if;
-         Arg_Index := Arg_Index + 1;
-      end;
-   end loop;
-
-   --  Validate required arguments
-   if Path_Strings.Length (Input_Path) = 0 then
-      Ada.Text_IO.Put_Line ("Error: Input path required (-i)");
+   if ACL.Argument_Count < 3 then
       Print_Usage;
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      ACL.Set_Exit_Status (ACL.Failure);
       return;
    end if;
 
-   if Path_Strings.Length (Output_Dir) = 0 then
-      Ada.Text_IO.Put_Line ("Error: Output directory required (-o)");
-      Print_Usage;
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-      return;
-   end if;
+   declare
+      Arg : constant String := ACL.Argument (1);
+   begin
+      if Arg = "-h" or Arg = "--help" then
+         Print_Usage;
+         ACL.Set_Exit_Status (ACL.Success);
+         return;
+      end if;
+   end;
 
-   if not All_Targets and Identifier_Strings.Length (Target_Str) = 0 then
-      Ada.Text_IO.Put_Line ("Error: Target language required (-t) or use 'all'");
-      Print_Usage;
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
-      return;
-   end if;
+   Input_Path := Path_Strings.To_Bounded_String (ACL.Argument (1));
+   Target := Parse_Target (ACL.Argument (2));
+   Output_Path := Path_Strings.To_Bounded_String (ACL.Argument (3));
 
    --  Process the IR file
-   Ada.Text_IO.Put_Line ("Generating target code...");
-   Ada.Text_IO.Put_Line ("  Input:  " & Path_Strings.To_String (Input_Path));
-   Ada.Text_IO.Put_Line ("  Output: " & Path_Strings.To_String (Output_Dir));
+   Put_Line ("Generating target code...");
+   Put_Line ("  Input:  " & Path_Strings.To_String (Input_Path));
+   Put_Line ("  Output: " & Path_Strings.To_String (Output_Path));
 
-   if All_Targets then
-      Ada.Text_IO.Put_Line ("  Target: all languages");
-      Code_Emitter.Process_IR_File_All_Targets (Input_Path, Output_Dir, Status);
-   else
-      Ada.Text_IO.Put_Line ("  Target: " & Identifier_Strings.To_String (Target_Str));
-      Code_Emitter.Process_IR_File (Input_Path, Output_Dir, Target, Status);
-   end if;
+   Emit_Target.Emit_Target_File (Input_Path, Target, Output_Path, Status);
 
-   if Status = Success then
-      Ada.Text_IO.Put_Line ("Code generation successful.");
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Success);
+   if Status = STUNIR_Types.Success then
+      Put_Line ("Code generation successful.");
+      ACL.Set_Exit_Status (ACL.Success);
    else
-      Ada.Text_IO.Put_Line ("Error: Code generation failed with status " & Status_Code'Image (Status));
-      Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+      Put_Line ("Error: Code generation failed with status " & Status_Code'Image (Status));
+      ACL.Set_Exit_Status (ACL.Failure);
    end if;
 
 end Code_Emitter_Main;

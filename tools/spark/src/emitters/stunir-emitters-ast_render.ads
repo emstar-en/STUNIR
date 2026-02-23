@@ -7,23 +7,23 @@ pragma SPARK_Mode (On);
 
 with STUNIR.Emitters.CodeGen;
 with STUNIR.Emitters.Node_Table;
-with Semantic_IR.Types;
-with Semantic_IR.Nodes;
-with Semantic_IR.Statements;
-with Semantic_IR.Expressions;
+with IR.Types;
+with IR.Nodes;
+with IR.Statements;
+with IR.Expressions;
 
 package STUNIR.Emitters.AST_Render is
    pragma SPARK_Mode (On);
 
    procedure Render_Expression
      (Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Expr_ID: in     Semantic_IR.Types.Node_ID;
+      Expr_ID: in     IR.Types.Node_ID;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
    procedure Render_Statement
      (Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
-      Stmt_ID: in     Semantic_IR.Types.Node_ID;
+      Stmt_ID: in     IR.Types.Node_ID;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 

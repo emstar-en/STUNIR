@@ -7,14 +7,25 @@
 pragma SPARK_Mode (On);
 
 --  STUNIR_Types is already use-visible via pipeline_driver.ads (use STUNIR_Types)
-with Spec_Assembler;
-with IR_Converter;
-with Code_Emitter;
+with Assemble_Spec;
+with Spec_To_IR;
+with Emit_Target;
 
 with Ada.Text_IO;
-pragma Unreferenced (Ada.Text_IO);  --  Available for future diagnostic output
 
 package body Pipeline_Driver is
+
+   --  Helper function to build file paths
+   function Build_Path (Dir : Path_String; File_Name : String) return Path_String is
+      Dir_Str : constant String := Path_Strings.To_String (Dir);
+      Full    : constant String := Dir_Str & "/" & File_Name;
+   begin
+      if Full'Length <= Max_Path_Length then
+         return Path_Strings.To_Bounded_String (Full);
+      else
+         return Path_Strings.Null_Bounded_String;
+      end if;
+   end Build_Path;
 
    procedure Run_Phase_1_Spec_Assembly
      (Config : in     Pipeline_Config;
@@ -22,6 +33,7 @@ package body Pipeline_Driver is
       Status :    out Status_Code)
    is
       Spec_Status : Status_Code;
+      Spec_Path   : Path_String;
    begin
       Result := Phase_Result'(
          Success       => False,
@@ -36,11 +48,19 @@ package body Pipeline_Driver is
          return;
       end if;
 
-      --  Call Spec_Assembler to process extraction file
-      Spec_Assembler.Process_Extraction_File
+      --  Build spec.json output path
+      Spec_Path := Build_Path (Config.Output_Dir, "spec.json");
+      if Path_Strings.Length (Spec_Path) = 0 then
+         Result.Success := False;
+         Result.Message := Error_Strings.To_Bounded_String ("Path too long");
+         Status := Error_Too_Large;
+         return;
+      end if;
+
+      --  Call Assemble_Spec to process extraction file
+      Assemble_Spec.Assemble_Spec_File
         (Input_Path  => Config.Input_Path,
-         Output_Path => Config.Output_Dir,
-         Module_Name => Config.Module_Name,
+         Output_Path => Spec_Path,
          Status      => Spec_Status);
 
       if Spec_Status = Success then
@@ -76,15 +96,21 @@ package body Pipeline_Driver is
          return;
       end if;
 
-      --  Construct paths
-      Spec_Path := Config.Output_Dir;
-      IR_Path := Config.Output_Dir;
+      --  Construct input/output paths
+      Spec_Path := Build_Path (Config.Output_Dir, "spec.json");
+      IR_Path   := Build_Path (Config.Output_Dir, "ir.json");
+      
+      if Path_Strings.Length (Spec_Path) = 0 or else Path_Strings.Length (IR_Path) = 0 then
+         Result.Success := False;
+         Result.Message := Error_Strings.To_Bounded_String ("Path too long");
+         Status := Error_Too_Large;
+         return;
+      end if;
 
-      --  Call IR_Converter to process spec file
-      IR_Converter.Process_Spec_File
+      --  Call Spec_To_IR to process spec file
+      Spec_To_IR.Convert_Spec_File
         (Input_Path  => Spec_Path,
          Output_Path => IR_Path,
-         Module_Name => Config.Module_Name,
          Status      => IR_Status);
 
       if IR_Status = Success then
@@ -105,6 +131,32 @@ package body Pipeline_Driver is
    is
       Emit_Status : Status_Code;
       IR_Path     : Path_String;
+      Output_Path : Path_String;
+      
+      --  Helper to emit for a single target
+      procedure Emit_Single_Target (Target : Target_Language; Success : out Boolean) is
+         Target_Ext : constant String := Emit_Target.Get_Target_Extension (Target);
+         Target_File : constant String := "output" & Target_Ext;
+      begin
+         Success := False;
+         
+         Output_Path := Build_Path (Config.Output_Dir, Target_File);
+         if Path_Strings.Length (Output_Path) = 0 then
+            return;
+         end if;
+         
+         Emit_Target.Emit_Target_File
+           (Input_Path  => IR_Path,
+            Target      => Target,
+            Output_Path => Output_Path,
+            Status      => Emit_Status);
+         
+         Success := Is_Success (Emit_Status);
+      end Emit_Single_Target;
+      
+      --  Track emission success
+      All_Success : Boolean := True;
+      Target_OK   : Boolean;
    begin
       Result := Phase_Result'(
          Success       => False,
@@ -120,31 +172,79 @@ package body Pipeline_Driver is
       end if;
 
       --  Construct IR path
-      IR_Path := Config.Output_Dir;
-
-      --  Call Code_Emitter to generate target code
-      if Config.Generate_All then
-         Code_Emitter.Process_IR_File_All_Targets
-           (Input_Path  => IR_Path,
-            Output_Dir  => Config.Output_Dir,
-            Status      => Emit_Status);
-      else
-         Code_Emitter.Process_IR_File
-           (Input_Path  => IR_Path,
-            Output_Dir  => Config.Output_Dir,
-            Target      => Config.Targets,
-            Status      => Emit_Status);
+      IR_Path := Build_Path (Config.Output_Dir, "ir.json");
+      if Path_Strings.Length (IR_Path) = 0 then
+         Result.Success := False;
+         Result.Message := Error_Strings.To_Bounded_String ("Path too long");
+         Status := Error_Too_Large;
+         return;
       end if;
 
-      if Emit_Status = Success then
+      --  Emit code for target(s)
+      if Config.Generate_All then
+         --  Emit for all target languages
+         Emit_Single_Target (Target_CPP, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_C, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Python, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Rust, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Go, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_JavaScript, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Java, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_CSharp, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Swift, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Kotlin, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_SPARK, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Clojure, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_ClojureScript, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Prolog, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Futhark, Target_OK);
+         All_Success := All_Success and Target_OK;
+         
+         Emit_Single_Target (Target_Lean4, Target_OK);
+         All_Success := All_Success and Target_OK;
+      else
+         --  Emit for single target
+         Emit_Single_Target (Config.Targets, Target_OK);
+         All_Success := Target_OK;
+      end if;
+
+      if All_Success then
          Result.Success := True;
          Result.Functions_Out := 1;  --  Placeholder
+         Status := Success;
       else
          Result.Success := False;
          Result.Message := Error_Strings.To_Bounded_String ("Code emission failed");
+         Status := Error_Emission_Failed;
       end if;
-
-      Status := Emit_Status;
    end Run_Phase_3_Code_Emission;
 
    procedure Run_Full_Pipeline

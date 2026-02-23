@@ -1,0 +1,12 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "module",
+  "language": "c",
+  "functions": [
+    {
+      "name": "matching",
+      "return_type": "-- NOTE: This package implements GLOB pattern",
+      "args": [{"name": "arg", "type": "*"}, {"name": "arg", "type": "?"}, {"name": "arg", "type": "[...]"}]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+﻿{
+  "schema": "stunir_ir_v1",
+  "ir_version": "1.0.0",
+  "module_name": "test_module",
+  "imports": [
+    {"name": "stdio", "from": ""},
+    {"name": "math_utils", "from": "utils"}
+  ],
+  "exports": [
+    {"name": "calculate", "type": "function"},
+    {"name": "Result", "type": "type"}
+  ],
+  "types": [
+    {
+      "name": "Result",
+      "kind": "struct",
+      "fields": [
+        {"name": "value", "type": "i32"},
+        {"name": "status", "type": "i32"}
+      ]
+    },
+    {
+      "name": "Handle",
+      "kind": "alias",
+      "base_type": "i64"
+    }
+  ],
+  "constants": [
+    {"name": "MAX_SIZE", "type": "i32", "value": "1024"},
+    {"name": "VERSION", "type": "string", "value": "\"1.0.0\""}
+  ],
+  "dependencies": [
+    {"name": "libc", "version": "2.31"},
+    {"name": "openssl", "version": "1.1.1"}
+  ],
+  "functions": [
+    {
+      "name": "calculate",
+      "return_type": "i32",
+      "args": [
+        {"name": "a", "type": "i32"},
+        {"name": "b", "type": "i32"}
+      ],
+      "steps": [
+        {"op": "return", "value": "a"}
+      ]
+    }
+  ]
+}

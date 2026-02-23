@@ -3,7 +3,7 @@
 -- Phase 3b: Language Family Emitters
 
 
-with Semantic_IR.Types; use Semantic_IR.Types;
+with IR.Types; use IR.Types;
 with STUNIR.Emitters.AST_Render;
 with STUNIR.Emitters.CodeGen; use STUNIR.Emitters.CodeGen;
 
@@ -57,25 +57,25 @@ package body STUNIR.Emitters.Lisp is
    -- Map_Type_To_Lisp
    ----------------------------------------------------------------------------
    function Map_Type_To_Lisp
-     (Prim_Type : Semantic_IR.Types.IR_Primitive_Type;
+     (Prim_Type : IR.Types.IR_Primitive_Type;
       Dialect   : Lisp_Dialect) return String
    is
       pragma Unreferenced (Dialect);
    begin
       case Prim_Type is
-         when Semantic_IR.Types.Type_String =>
+         when IR.Types.Type_String =>
             return "string";
-         when Semantic_IR.Types.Type_I8 | Semantic_IR.Types.Type_I16 | Semantic_IR.Types.Type_I32 | Semantic_IR.Types.Type_I64 =>
+         when IR.Types.Type_I8 | IR.Types.Type_I16 | IR.Types.Type_I32 | IR.Types.Type_I64 =>
             return "integer";
-         when Semantic_IR.Types.Type_U8 | Semantic_IR.Types.Type_U16 | Semantic_IR.Types.Type_U32 | Semantic_IR.Types.Type_U64 =>
+         when IR.Types.Type_U8 | IR.Types.Type_U16 | IR.Types.Type_U32 | IR.Types.Type_U64 =>
             return "integer";
-         when Semantic_IR.Types.Type_F32 | Semantic_IR.Types.Type_F64 =>
+         when IR.Types.Type_F32 | IR.Types.Type_F64 =>
             return "float";
-         when Semantic_IR.Types.Type_Bool =>
+         when IR.Types.Type_Bool =>
             return "boolean";
-         when Semantic_IR.Types.Type_Void =>
+         when IR.Types.Type_Void =>
             return "nil";
-         when Semantic_IR.Types.Type_Char =>
+         when IR.Types.Type_Char =>
             return "char";
       end case;
    end Map_Type_To_Lisp;
@@ -149,14 +149,14 @@ package body STUNIR.Emitters.Lisp is
    ----------------------------------------------------------------------------
    procedure Emit_Module
      (Self   : in out Lisp_Emitter;
-      Module : in     Semantic_IR.Modules.IR_Module;
+      Module : in     IR.Modules.IR_Module;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is
       Temp_Success : Boolean;
       Comment_Prefix : constant String := Get_Comment_Prefix (Self.Config.Dialect);
-      Module_Name : constant String := Semantic_IR.Types.Name_Strings.To_String (Module.Module_Name);
+      Module_Name : constant String := IR.Types.Name_Strings.To_String (Module.Module_Name);
    begin
       Output := Code_Buffers.Null_Bounded_String;
       Success := False;
@@ -200,11 +200,11 @@ package body STUNIR.Emitters.Lisp is
                   Decl : constant STUNIR.Emitters.Node_Table.Declaration_Record :=
                     STUNIR.Emitters.Node_Table.Get_Declaration (Nodes, Decl_Index);
                begin
-                  if Decl.Kind = Semantic_IR.Types.Kind_Function_Decl then
+                  if Decl.Kind = IR.Types.Kind_Function_Decl then
                      declare
                         Func_Output : IR_Code_Buffer;
                         Func_Success : Boolean;
-                        F : constant Semantic_IR.Declarations.Function_Declaration := Decl.Func;
+                        F : constant IR.Declarations.Function_Declaration := Decl.Func;
                      begin
                         Emit_Function (Self, F, Nodes, Func_Output, Func_Success);
                         if Func_Success then
@@ -227,7 +227,7 @@ package body STUNIR.Emitters.Lisp is
    ----------------------------------------------------------------------------
    procedure Emit_Type
      (Self   : in out Lisp_Emitter;
-      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      T      : in     IR.Declarations.Type_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
@@ -243,13 +243,13 @@ package body STUNIR.Emitters.Lisp is
    ----------------------------------------------------------------------------
    procedure Emit_Function
      (Self   : in out Lisp_Emitter;
-      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Func   : in     IR.Declarations.Function_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is
       Temp_Success : Boolean;
-      Func_Name : constant String := Semantic_IR.Types.Name_Strings.To_String (Func.Base.Decl_Name);
+      Func_Name : constant String := IR.Types.Name_Strings.To_String (Func.Base.Decl_Name);
    begin
       Output := Code_Buffers.Null_Bounded_String;
       Success := False;
@@ -271,7 +271,7 @@ package body STUNIR.Emitters.Lisp is
             Emit_Newline (Output, Temp_Success);
             if not Temp_Success then return; end if;
 
-            if Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Body_ID) then
+            if IR.Nodes.Is_Valid_Node_ID (Func.Body_ID) then
                declare
                   Stmt_Out : IR_Code_Buffer;
                   Stmt_Ok  : Boolean;

@@ -1,2 +1,0 @@
-manifest_generate.adb:4:17: warning: unit "Ada.Strings.Unbounded" is not referenced [-gnatwu]
-manifest_generate.adb:12:04: warning: use clause for type "Ada.Streams.Stream_Element_Offset" has no effect [-gnatwu]

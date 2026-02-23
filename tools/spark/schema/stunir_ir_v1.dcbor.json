@@ -1,0 +1,57 @@
+{
+  "schema": "stunir.ir.dcbor.v1",
+  "id": "stunir.ir.v1",
+  "title": "STUNIR IR v1 dCBOR Canonicalization Spec (SPARK SSoT)",
+  "scope": {
+    "byte_exact_applies_to": ["ir_dcbor_bytes"],
+    "explicitly_not_byte_exact": ["emitted_outputs", "logs", "receipts"]
+  },
+  "encoding": {
+    "family": "dcbor",
+    "canonical": true,
+    "definite_lengths_only": true,
+    "indefinite_lengths": "forbidden",
+    "map_key_order": "canonical",
+    "integer_encoding": "shortest",
+    "byte_string_encoding": "canonical",
+    "text_string_encoding": "utf-8"
+  },
+  "string_normalization": {
+    "unicode": "NFC",
+    "encoding": "utf-8",
+    "forbid_surrogates": true
+  },
+  "float_policy": {
+    "mode": "forbid_floats",
+    "rationale": "Avoid cross-encoder divergence; IR is structural and should not contain floats."
+  },
+  "json_profile": {
+    "allowed_types": ["null", "boolean", "integer", "string", "array", "object"],
+    "forbid": ["float", "duplicate_keys"],
+    "object_keys": "string_only",
+    "array_order": "preserve"
+  },
+  "canonical_ir_content": {
+    "type": "ir_object_model",
+    "layout_independent": true,
+    "forbid_environment_dependent_fields": true,
+    "required_root_fields": ["ir_version", "module_name", "types", "functions"],
+    "field_order": "lexicographic"
+  },
+  "hashes": {
+    "cir_sha256": "sha256(dcbor_canonical_encode(canonical_ir_object_model))",
+    "ir_dcbor_sha256": "sha256(ir_dcbor_bytes)"
+  },
+  "conformance": {
+    "reject_non_canonical": true,
+    "reject_indefinite": true,
+    "reject_floats": true,
+    "reject_duplicate_keys": true,
+    "reject_non_nfc_strings": true
+  },
+  "versioning": {
+    "format_version": 1,
+    "backwards_compat_policy": "Newer readers may support older formats; older readers may reject newer.",
+    "evolution": "Bump id/version only when canonical encoding rules or IR model change impacts bytes."
+  }
+}

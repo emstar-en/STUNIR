@@ -1,272 +1,226 @@
 {
-  "version": "0.1.0-alpha",
-  "schema_version": "1.0",
-  "date": "2025-02-17",
-  "release_tier": "alpha",
+  "version": "1.0.0",
+  "schema_version": "1.1",
+  "date": "2026-02-22",
+  "release_tier": "stable",
   "status": "production_ready",
-  "total_tools": 66,
-  "duplicates_removed": 7,
+  "total_tools": 27,
+  "deprecated_tools": 54,
   "spark_compliance": "100%",
   
-  "principle": "Each tool performs one distinct, orthogonal function. No functional overlap.",
+  "principle": "Each tool performs one distinct, orthogonal function. Only tools in stunir_tools.gpr Main list are surfaced.",
+  
+  "updated_tools": {
+    "description": "Canonical tool list from stunir_tools.gpr Main entries",
+    "count": 27,
+    "tools": [
+      "file_indexer",
+      "hash_compute",
+      "lang_detect",
+      "format_detect",
+      "toolchain_verify",
+      "source_extract_main",
+      "spec_assembler_main",
+      "stunir_spec_assemble_main",
+      "extraction_to_spec",
+      "assemble_spec_main",
+      "func_dedup",
+      "type_normalize",
+      "ir_converter_main",
+      "ir_canonicalize_dcbor",
+      "ir_validate_schema",
+      "ir_validate",
+      "type_map",
+      "spec_to_ir_main",
+      "code_emitter_main",
+      "pipeline_driver_main",
+      "emit_target_main",
+      "stunir_code_index_main",
+      "stunir_receipt_link_main",
+      "json_validate",
+      "json_extract",
+      "json_merge",
+      "receipt_generate"
+    ]
+  },
   
   "categories": {
-    "json": {
-      "description": "JSON parsing, validation, and manipulation",
-      "count": 9,
+    "phase0_bootstrap": {
+      "description": "Bootstrap / Filesystem tools",
+      "count": 6,
       "tools": [
+        "file_indexer",
+        "hash_compute",
+        "lang_detect",
+        "format_detect",
+        "toolchain_verify",
+        "source_extract_main"
+      ]
+    },
+    "phase1_spec": {
+      "description": "Spec Assembly pipeline",
+      "count": 6,
+      "tools": [
+        "spec_assembler_main",
+        "stunir_spec_assemble_main",
+        "extraction_to_spec",
+        "assemble_spec_main",
+        "func_dedup",
+        "type_normalize"
+      ]
+    },
+    "phase2_ir": {
+      "description": "IR Conversion pipeline",
+      "count": 6,
+      "tools": [
+        "ir_converter_main",
+        "ir_canonicalize_dcbor",
+        "ir_validate_schema",
+        "ir_validate",
+        "type_map",
+        "spec_to_ir_main"
+      ]
+    },
+    "phase3_emit": {
+      "description": "Code Emission pipeline",
+      "count": 3,
+      "tools": [
+        "code_emitter_main",
+        "pipeline_driver_main",
+        "emit_target_main"
+      ]
+    },
+    "cross_cutting": {
+      "description": "Cross-cutting utilities",
+      "count": 6,
+      "tools": [
+        "stunir_code_index_main",
+        "stunir_receipt_link_main",
         "json_validate",
         "json_extract",
         "json_merge",
-        "json_formatter",
-        "json_path_parser",
-        "json_value_format",
-        "json_merge_objects",
-        "json_merge_arrays",
-        "json_path_eval"
-      ]
-    },
-    "types": {
-      "description": "Type system operations: normalization, mapping, resolution",
-      "count": 8,
-      "tools": [
-        "type_normalize",
-        "emitters": {
-          "description": "Code generation for target languages",
-        "type_map_target",
-        "type_resolver",
-        "type_lookup",
-        "type_expand",
-        "type_dependency"
-      ]
-    },
-    "functions": {
-      "description": "Function analysis and IR conversion",
-      "count": 4,
-      "tools": [
-        "func_dedup",
-        "func_parse_body",
-        "func_parse_sig",
-        "func_to_ir"
-      ]
-    },
-    "spec": {
-      "description": "Specification pipeline: extraction, validation, transformation",
-      "count": 6,
-      "tools": [
-        "format_detect",
-        "lang_detect",
-        "extraction_to_spec",
-        "spec_validate_schema",
-        "spec_extract_module",
-        "spec_extract_funcs",
-        "spec_extract_types"
-      ]
-    },
-    "ir": {
-      "description": "Intermediate Representation pipeline",
-      "count": 12,
-      "tools": [
-        "ir_add_metadata",
-        "ir_extract_funcs",
-        "ir_extract_module",
-        "ir_gen_functions",
-        "ir_merge_funcs",
-        "ir_validate",
-        "ir_validate_schema",
-        "module_to_ir",
-        "ir_check_required",
-        "ir_check_functions",
-        "ir_check_types"
-      ]
-    },
-    "emitters": {
-      "description": "Code generation for target languages",
-      "count": 12,
-      "tools": [
-        "sig_gen_cpp",
-        "sig_gen_rust",
-        "sig_gen_python",
-        "cpp_header_gen",
-        "cpp_impl_gen",
-        "cpp_sig_normalize",
-        "code_add_comments",
-        "code_format_target",
-        "code_gen_func_body",
-        "code_gen_func_sig",
-        "code_gen_preamble",
-        "code_write"
-      ]
-    },
-    "validation": {
-      "description": "Schema validation and reporting",
-      "count": 4,
-      "tools": [
-        "schema_check_required",
-        "schema_check_types",
-        "schema_check_format",
-        "validation_reporter"
-      ]
-    },
-    "files": {
-      "description": "File operations and indexing",
-      "count": 5,
-      "tools": [
-        "file_indexer",
-        "file_find",
-        "file_reader",
-        "file_writer"
-      ]
-    },
-    "verification": {
-      "description": "Hashing, receipts, and attestation",
-      "count": 3,
-      "tools": [
-        "hash_compute",
-        "receipt_generate",
-        "toolchain_verify"
-      ]
-    },
-    "utils": {
-      "description": "CLI and general utilities",
-      "count": 5,
-      "tools": [
-        "cli_parser",
-        "command_utils",
-        "path_normalize",
-        "manifest_generate"
-      ]
-    },
-    "core": {
-      "description": "Core libraries and parsers",
-      "count": 1,
-      "tools": [
-        "stunir_json_parser"
+        "receipt_generate"
       ]
     }
   },
   
   "core_workflow": {
-    "name": "C to Multi-Language Bindings",
-    "description": "Extract C functions and generate bindings for multiple languages",
+    "name": "STUNIR Pipeline",
+    "description": "Complete pipeline from source extraction to code emission",
     "phases": [
       {
         "phase": 0,
-        "name": "Data Preparation",
-        "tools": ["file_indexer", "hash_compute", "lang_detect"]
+        "name": "Bootstrap",
+        "tools": ["file_indexer", "hash_compute", "lang_detect", "format_detect", "source_extract_main"]
       },
       {
         "phase": 1,
-        "name": "Extraction to Spec",
-        "tools": ["format_detect", "extraction_to_spec", "spec_validate_schema", "func_dedup"]
+        "name": "Spec Assembly",
+        "tools": ["spec_assembler_main", "extraction_to_spec", "func_dedup", "type_normalize"]
       },
       {
         "phase": 2,
-        "name": "Type Processing",
-        "tools": ["type_normalize", "type_map", "type_resolver"]
+        "name": "IR Conversion",
+        "tools": ["ir_converter_main", "ir_validate_schema", "type_map", "spec_to_ir_main"]
       },
       {
         "phase": 3,
-        "name": "Emitters",
-        "tools": ["sig_gen_cpp", "sig_gen_rust", "sig_gen_python"]
+        "name": "Code Emission",
+        "tools": ["code_emitter_main", "emit_target_main", "pipeline_driver_main"]
       },
       {
         "phase": 4,
         "name": "Verification",
-        "tools": ["receipt_generate", "toolchain_verify"]
+        "tools": ["receipt_generate", "toolchain_verify", "stunir_receipt_link_main"]
       }
     ]
   },
   
-  "removed_duplicates": {
-    "count": 7,
+  "deprecated_tools": {
+    "description": "Tools to be moved to bin/deprecated/ - not in GPR Main list",
+    "count": 54,
+    "location": "tools/spark/bin/deprecated/",
     "tools": [
-      {
-        "name": "json_validator",
-        "reason": "Duplicates json_validate",
-        "replaced_by": "json_validate"
-      },
-      {
-        "name": "json_read",
-        "reason": "Duplicates json_validate",
-        "replaced_by": "json_validate"
-      },
-      {
-        "name": "json_write",
-        "reason": "Empty file (3 blank lines)",
-        "replaced_by": "N/A - no implementation"
-      },
-      {
-        "name": "file_hash",
-        "reason": "Duplicates hash_compute",
-        "replaced_by": "hash_compute"
-      },
-      {
-        "name": "type_map_cpp",
-        "reason": "Duplicates type_map --lang=cpp",
-        "replaced_by": "type_map"
-      },
-      {
-        "name": "type_resolve",
-        "reason": "Duplicates type_resolver",
-        "replaced_by": "type_resolver"
-      },
-      {
-        "name": "spec_validate",
-        "reason": "Stub version, duplicates spec_validate_schema",
-        "replaced_by": "spec_validate_schema"
-      }
-    ]
-  },
-  
-  "directory_structure": {
-    "proposed": {
-      "src/core/": ["stunir_json_parser", "stunir_types", "stunir_string_utils"],
-      "src/json/": "9 JSON tools",
-      "src/types/": "8 type system tools",
-      "src/functions/": "4 function analysis tools",
-      "src/spec/": "6 spec pipeline tools",
-      "src/ir/": "12 IR pipeline tools",
-        "src/emitters/": "11 code generation tools",
-      "src/validation/": "4 schema validation tools",
-      "src/files/": "5 file operations tools",
-      "src/verification/": "3 verification tools",
-      "src/utils/": "5 utility tools"
-    }
+      "code_add_comments",
+      "code_format_target",
+      "code_gen_func_body",
+      "code_gen_func_sig",
+      "code_gen_preamble",
+      "code_write",
+      "cpp_header_gen",
+      "cpp_impl_gen",
+      "cpp_sig_normalize",
+      "file_find",
+      "file_hash",
+      "file_writer",
+      "func_parse_body",
+      "func_parse_sig",
+      "func_to_ir",
+      "ir_add_metadata",
+      "ir_check_functions",
+      "ir_check_required",
+      "ir_check_types",
+      "ir_extract_funcs",
+      "ir_extract_module",
+      "ir_gen_functions",
+      "ir_merge_funcs",
+      "json_formatter",
+      "json_merge_arrays",
+      "json_merge_objects",
+      "json_path_eval",
+      "json_path_parser",
+      "json_validator",
+      "json_value_format",
+      "manifest_generate",
+      "module_to_ir",
+      "schema_check_format",
+      "schema_check_required",
+      "schema_check_types",
+      "sig_gen_cpp",
+      "sig_gen_python",
+      "sig_gen_rust",
+      "spec_extract_funcs",
+      "spec_extract_module",
+      "spec_extract_types",
+      "spec_to_python",
+      "spec_validate",
+      "spec_validate_schema",
+      "stunir_ir_to_code_main",
+      "stunir_spec_to_ir_main",
+      "type_dependency",
+      "type_expand",
+      "type_lookup",
+      "type_map_cpp",
+      "type_map_target",
+      "type_resolve",
+      "type_resolver",
+      "validation_reporter"
+    ],
+    "reason": "Not in stunir_tools.gpr Main list. Use updated tools instead.",
+    "removal_date": "2026-06-01"
   },
   
   "build_system": {
-    "project_file": "powertools.gpr",
-    "tools_in_build_before": 47,
-    "tools_to_add": 19,
-    "tools_in_build_after": 66,
-    "missing_tools_to_add": [
-      "cli_parser", "command_utils", "path_normalize",
-      "code_add_comments", "code_format_target", "code_gen_func_body", 
-      "code_gen_func_sig", "code_gen_preamble", "code_write",
-      "func_parse_body", "func_parse_sig", "func_to_ir",
-      "ir_add_metadata", "ir_extract_funcs", "ir_extract_module", 
-      "ir_merge_funcs", "module_to_ir",
-      "file_find", "file_reader",
-      "spec_extract_funcs", "spec_extract_types",
-      "manifest_generate"
-    ]
+    "project_file": "stunir_tools.gpr",
+    "exec_dir": "bin",
+    "object_dir": "obj",
+    "build_command": "gprbuild -P stunir_tools.gpr",
+    "clean_command": "gprclean -P stunir_tools.gpr",
+    "prove_command": "gnatprove -P stunir_tools.gpr --level=2"
   },
   
   "quality_metrics": {
     "spark_compliance": "100%",
     "compilation_errors": 0,
-    "tools_with_duplicates": 0,
-    "orthogonality": "100%",
-    "test_coverage": "TBD",
-    "documentation_coverage": "TBD"
+    "tools_in_main_list": 27,
+    "deprecated_tools": 54,
+    "orthogonality": "100%"
   },
   
   "notes": {
-    "principle": "Unix philosophy: Do one thing well",
-    "composition": "Tools designed to pipe together",
-    "contracts": "Clear stdin/stdout/file I/O contracts",
-    "exit_codes": "Standardized across toolchain",
+    "principle": "Only tools in stunir_tools.gpr Main list are surfaced",
+    "deprecation_policy": "Extras moved to bin/deprecated/ for transition period",
+    "removal_schedule": "Deprecated tools removed 2026-06-01",
     "ai_friendly": "All tools support --describe for introspection"
   }
 }

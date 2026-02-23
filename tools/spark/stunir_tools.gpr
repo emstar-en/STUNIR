@@ -136,10 +136,13 @@
 --
 --  src/ir/             Phase:2   Prefix:IR_*             SPARK:Mixed
 --    IR pipeline: generation, validation, merging, optimization.
---    Units: IR_Add_Metadata, IR_Check_Functions, IR_Check_Required,
+--    Units: IR (root), IR.Types, IR.Nodes, IR.Modules, IR.Declarations,
+--           IR.Expressions, IR.Statements, IR.Validation, IR.JSON,
+--           IR_Add_Metadata, IR_Check_Functions, IR_Check_Required,
 --           IR_Check_Types, IR_Extract_Funcs, IR_Extract_Module,
 --           IR_Gen_Functions, IR_Merge_Funcs, IR_Validate,
---           IR_Validate_Schema, STUNIR_Optimizer
+--           IR_Validate_Schema, STUNIR_Optimizer, IR_Parse
+--    This is the canonical IR implementation with typed AST support.
 --
 --  src/utils/          Phase:X   Prefix:(various)        SPARK:Mixed
 --    String, path, CLI, and toolchain utilities.
@@ -189,15 +192,16 @@
 --    spec_assembler_main.adb       Phase:1  extraction JSON → spec JSON
 --    stunir_spec_assemble_main.adb Phase:1  AI extraction → spec JSON (alt)
 --    extraction_to_spec.adb        Phase:1  extraction JSON → spec JSON
---    spec_validate.adb             Phase:1  spec JSON → validation result
 --    func_dedup.adb                Phase:1  functions JSON → deduped JSON
 --    type_normalize.adb            Phase:1  types JSON → normalized JSON
---
+--    DEPRECATED: spec_validate.adb → use spec_validate_schema.adb
+
 --  PHASE 2 — IR Conversion
 --    ir_converter_main.adb  Phase:2  spec JSON → IR JSON
+--    ir_canonicalize_dcbor.adb Phase:2  IR JSON → canonical IR JSON (dCBOR profile)
 --    ir_validate.adb        Phase:2  IR JSON → validation result
 --    type_map.adb           Phase:2  type → target type mapping
---    type_resolve.adb       Phase:2  type refs → resolved types
+--    DEPRECATED: type_resolve.adb → use type_resolver.adb
 --
 --  PHASE 3 — Code Emission
 --    code_emitter_main.adb    Phase:3  IR JSON → target language code
@@ -226,12 +230,11 @@ project STUNIR_Tools is
    for Source_Dirs use (
       "src",            --  Root (no units; required for gprbuild traversal)
       "src/core",       --  Phase 1-4: Pipeline orchestrators + root package
-      "src/emitters",   --  Phase 3:   STUNIR.Emitters.* code generation backends
-      "src/semantic_ir", --  Phase 2:  Semantic_IR.* typed AST hierarchy
+        "src/emitters",   --  Phase 3:   STUNIR.Emitters.* code generation backends
       "src/types",      --  Phase X:   STUNIR_Types master type definitions
       "src/json",       --  Phase X:   JSON parsing and manipulation utilities
       "src/spec",       --  Phase 1:   Spec assembly and validation pipeline
-      "src/ir",         --  Phase 2:   IR generation, validation, optimization
+      "src/ir",         --  Phase 2:   IR generation, validation, optimization (IR.* packages)
       "src/utils",      --  Phase X:   String, path, CLI, toolchain utilities
       "src/files",      --  Phase 0:   Filesystem find/hash/index/read/write
       "src/functions",  --  Phase 1:   Function dedup, parsing, IR conversion
@@ -239,6 +242,8 @@ project STUNIR_Tools is
       "src/validation", --  Phase X:   Schema validation (see REGEX_IR_REF above)
       "src/verification" --  Phase X:  Hashing, manifests, receipts
       --  NOTE: src/deprecated/ is intentionally ABSENT. See RULE 3 above.
+      --  NOTE: src/micro/ removed - emit_target_main.adb moved to src/emitters/
+      --  NOTE: src/semantic_ir/ removed - IR.* packages now in src/ir/
    );
 
    for Object_Dir use "obj";  --  All .ali and .o files go here. Never in src/.
@@ -256,24 +261,33 @@ project STUNIR_Tools is
       "lang_detect.adb",
       "format_detect.adb",
       "toolchain_verify.adb",
+      "source_extract_main.adb",
 
       --  Phase 1 — Spec Assembly
       "spec_assembler_main.adb",
       "stunir_spec_assemble_main.adb",
       "extraction_to_spec.adb",
-      "spec_validate.adb",
+      "assemble_spec_main.adb",
+      --  NOTE: spec_validate.adb moved to src/deprecated/ (stub, use spec_validate_schema.adb)
       "func_dedup.adb",
       "type_normalize.adb",
 
+      --  Phase 0 — SPARK Extraction
+      "spark_extract_main.adb",
+
       --  Phase 2 — IR Conversion
       "ir_converter_main.adb",
+      "ir_canonicalize_dcbor.adb",
+      "ir_validate_schema.adb",
       "ir_validate.adb",
       "type_map.adb",
-      "type_resolve.adb",
+      "spec_to_ir_main.adb",
+      --  NOTE: type_resolve.adb moved to src/deprecated/ (use type_resolver.adb instead)
 
       --  Phase 3 — Code Emission
       "code_emitter_main.adb",
       "pipeline_driver_main.adb",
+      "emit_target_main.adb",
 
       --  Cross-cutting
       "stunir_code_index_main.adb",

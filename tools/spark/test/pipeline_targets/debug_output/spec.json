@@ -1,0 +1,16 @@
+{
+  "schema": "stunir_spec_v1",
+  "module_name": "pipeline_test",
+  "functions": [
+    {
+      "name": "compute",
+      "return_type": "int",
+      "args": []
+    },
+    {
+      "name": "process",
+      "return_type": "void",
+      "args": []
+    }
+  ]
+}

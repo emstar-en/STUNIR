@@ -3,7 +3,7 @@
 -- Phase 3c: Testing all 17 remaining category emitters
 
 with Ada.Text_IO; use Ada.Text_IO;
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with IR.Modules; use IR.Modules;
 with STUNIR.Emitters;
 with STUNIR.Emitters.Business;
 with STUNIR.Emitters.FPGA;

@@ -1,1 +1,0 @@
-schema_check_required.adb:53:56: warning: array aggregate using () is an obsolescent syntax, use [] instead [-gnatwj]

@@ -37,6 +37,15 @@ package body STUNIR_JSON_Parser is
       Current_Pos : Positive := State.Position;
       Input_Str   : constant String := JSON_Strings.To_String (State.Input);
    begin
+      --  Skip UTF-8 BOM if present (EF BB BF = 239 187 191)
+      if Current_Pos <= Input_Str'Length - 2
+         and then Character'Pos (Input_Str (Current_Pos)) = 239
+         and then Character'Pos (Input_Str (Current_Pos + 1)) = 187
+         and then Character'Pos (Input_Str (Current_Pos + 2)) = 191
+      then
+         Current_Pos := Current_Pos + 3;
+      end if;
+
       while Current_Pos <= Input_Str'Length
          and then Is_Whitespace (Input_Str (Current_Pos))
       loop
@@ -281,15 +290,28 @@ package body STUNIR_JSON_Parser is
       Input  : in  JSON_String;
       Status : out Status_Code)
    is
+      Input_Str   : constant String := JSON_Strings.To_String (Input);
+      Start_Pos   : Positive := 1;
    begin
       if JSON_Strings.Length (Input) = 0 then
          Status := Error_Invalid_Input;
          return;
       end if;
 
+      --  Skip UTF-8 BOM if present (EF BB BF = 239 187 191)
+      if Input_Str'Length >= 3
+         and then Character'Pos (Input_Str (Input_Str'First)) = 239
+         and then Character'Pos (Input_Str (Input_Str'First + 1)) = 187
+         and then Character'Pos (Input_Str (Input_Str'First + 2)) = 191
+      then
+         Start_Pos := Input_Str'First + 3;
+      else
+         Start_Pos := Input_Str'First;
+      end if;
+
       State := Parser_State'(
          Input         => Input,
-         Position      => 1,
+         Position      => Start_Pos,
          Line          => 1,
          Column        => 1,
          Nesting       => (others => Nest_Object),
@@ -522,6 +544,12 @@ package body STUNIR_JSON_Parser is
                Member_Value := State.Token_Value;
                Status := Success;
             end;
+
+         when Token_Object_Start | Token_Array_Start =>
+            --  Allow caller to parse complex values (array/object) directly.
+            --  The caller should check Current_Token and handle accordingly.
+            Member_Value := JSON_Strings.Null_Bounded_String;
+            Status := Success;
 
          when others =>
             Status := Error_Parse;

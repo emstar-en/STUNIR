@@ -3,12 +3,14 @@
 
 with Ada.Text_IO;
 with Ada.Assertions;
-with STUNIR.Semantic_IR;
+with IR.Types;
+with IR.Modules;
 with STUNIR_Optimizer;
 
 procedure Test_Optimizer is
    use Ada.Text_IO;
-   use STUNIR.Semantic_IR;
+   use IR.Types;
+   use IR.Modules;
    use STUNIR_Optimizer;
 
    Test_Count : Natural := 0;

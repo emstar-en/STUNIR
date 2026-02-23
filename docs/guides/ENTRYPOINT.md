@@ -1,17 +1,19 @@
 ### STUNIR Pack Entry Point (v0)
 
-## Implementation Languages: Ada SPARK (Default) and Python (Alternative)
+> **⚠️ PRE-ALPHA (v0.1.0-alpha)** — See [VERSION_STATUS.md](../../VERSION_STATUS.md) for current capabilities.
 
-**All STUNIR tools default to Ada SPARK implementations.** Python files are fully functional alternatives suitable for many use cases.
+## Implementation Languages: Ada SPARK (Canonical)
 
-| Tool | Ada SPARK (Default) | Python (Alternative) |
+**Ada SPARK is the canonical implementation.** Python files exist but are **not actively maintained** and should be considered experimental.
+
+| Tool | Ada SPARK (Canonical) | Python (Experimental) |
 |------|---------------------|---------------------|
-| Spec to IR | `tools/spark/bin/stunir_spec_to_ir_main` | `tools/spec_to_ir.py` |
-| IR to Code | `tools/spark/bin/stunir_ir_to_code_main` | `tools/ir_to_code.py` |
+| Spec to IR | `tools/spark/bin/stunir_spec_to_ir_main` | `tools/spec_to_ir.py` ⚠️ |
+| IR to Code | `tools/spark/bin/stunir_ir_to_code_main` | `tools/ir_to_code.py` ⚠️ |
 
 **When to use each:**
-- **Ada SPARK**: Safety-critical systems, formal verification, reproducible builds, DO-178C compliance
-- **Python**: Rapid prototyping, development workflows, ease of modification, when SPARK toolchain is unavailable
+- **Ada SPARK (REQUIRED)**: Safety-critical systems, formal verification, reproducible builds, determinism guarantees
+- **Python (NOT RECOMMENDED)**: Experimental only, not canonical, may not match SPARK output
 
 ---
 

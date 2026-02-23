@@ -3,9 +3,9 @@
 
 with STUNIR.Emitters;
 with STUNIR.Emitters.Node_Table;
-with Semantic_IR.Modules;
-with Semantic_IR.Declarations;
-with Semantic_IR.Nodes;
+with IR.Modules;
+with IR.Declarations;
+with IR.Nodes;
 with STUNIR.Emitters.CodeGen;
 
 package STUNIR.Emitters.Python is
@@ -23,21 +23,21 @@ package STUNIR.Emitters.Python is
 
    procedure Emit_Module
      (Self   : in out Python_Emitter;
-      Module : in     Semantic_IR.Modules.IR_Module;
+      Module : in     IR.Modules.IR_Module;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
    procedure Emit_Type
      (Self   : in out Python_Emitter;
-      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      T      : in     IR.Declarations.Type_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);
 
    procedure Emit_Function
      (Self   : in out Python_Emitter;
-      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Func   : in     IR.Declarations.Function_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean);

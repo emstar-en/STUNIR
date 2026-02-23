@@ -4,7 +4,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Bounded;
-with STUNIR.Semantic_IR; use STUNIR.Semantic_IR;
+with IR.Modules; use IR.Modules;
 with STUNIR.Emitters; use STUNIR.Emitters;
 with STUNIR.Emitters.Embedded; use STUNIR.Emitters.Embedded;
 

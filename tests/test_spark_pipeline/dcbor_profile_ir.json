@@ -1,0 +1,18 @@
+{
+  "ir_version": "v1",
+  "module_name": "dcbor_profile_test",
+  "types": [],
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "int",
+      "parameters": [
+        {"name": "a", "type": "int"},
+        {"name": "b", "type": "int"}
+      ],
+      "steps": [
+        {"op": "return", "value": "0"}
+      ]
+    }
+  ]
+}

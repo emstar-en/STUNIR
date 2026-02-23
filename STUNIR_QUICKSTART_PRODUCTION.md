@@ -2,9 +2,9 @@
 
 ## ⚠️ ALPHA PROTOTYPE - Experimental Pipeline
 
-**Status**: ALPHA Prototype - spec-to-code pipeline functional on Windows
-**Last Verified**: February 16, 2026
-**Build Tools**: Ada SPARK via Alire toolchain
+**Status**: ALPHA Prototype - SPARK-only pipeline functional on Windows
+**Last Verified**: February 22, 2026
+**Build Tools**: Ada SPARK via GNAT/gprbuild
 **Stability**: Experimental - For testing and development only
 
 ---
@@ -12,11 +12,13 @@
 ## Pipeline Overview
 
 ```
-Spec JSON → IR JSON → Multi-Language Code (C, Rust, Python, Go, etc.)
-    ↓           ↓              ↓
-  Schema    Semantic IR    Function Stubs
- Validated   Canonical    Type-Checked
+IR JSON → Multi-Language Code (C, Rust, Clojure, Futhark, Lean4, etc.)
+    ↓              ↓
+  Schema      Function Bodies
+ Validated    Control Flow
 ```
+
+**Note**: The SPARK pipeline is the canonical implementation. All tools are Ada SPARK binaries.
 
 ---
 
@@ -26,8 +28,6 @@ Spec JSON → IR JSON → Multi-Language Code (C, Rust, Python, Go, etc.)
 - Location: `C:\Users\MSTAR\AppData\Local\alire\cache\toolchains\`
 - GNAT: v15.2.1
 - gprbuild: v25.0.1
-
-✅ **Python 3** (Optional - for alternative bridge scripts)
 
 ---
 
@@ -109,6 +109,39 @@ copy my_project_spec.json my_project_specs\
 - **C#** (`csharp`)
 - **WebAssembly** (`wasm`)
 - **Assembly** (`x86`, `arm`)
+
+---
+
+## ⚠️ Determinism & Schema Rules
+
+STUNIR enforces strict determinism for reproducible builds. **IR JSON must comply with:**
+
+| Rule | Requirement | Why |
+|------|-------------|-----|
+| **No Floats** | Use integers only | Avoid cross-encoder divergence |
+| **Sorted Keys** | JSON object keys must be lexicographically sorted | Canonical encoding |
+| **NFC Strings** | All strings must be Unicode NFC normalized | Byte-exact hashing |
+| **No Duplicates** | Duplicate keys forbidden | Deterministic parsing |
+
+**Reference**: `tools/spark/schema/stunir_ir_v1.dcbor.json` and `contracts/stunir_profile3_contract.json`
+
+**Example - Valid IR:**
+```json
+{
+  "functions": [{"name": "add", "return_type": "i32"}],
+  "module_name": "my_module",
+  "types": []
+}
+```
+
+**Example - INVALID (unsorted keys):**
+```json
+{
+  "module_name": "my_module",   // ❌ keys not sorted
+  "functions": [],
+  "types": []
+}
+```
 
 ---
 

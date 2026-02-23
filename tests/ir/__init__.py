@@ -1,1 +1,1 @@
-# Tests for STUNIR IR modules
+"""Tests for Semantic IR parser."""

@@ -1,3 +1,0 @@
-sig_gen_rust.adb:28:04: warning: named number "Exit_Validation_Error" is not referenced [-gnatwu]
-sig_gen_rust.adb:207:11: warning: "STUNIR_JSON_Parser" is already use-visible through previous use_clause at line 23 [-gnatwr]
-sig_gen_rust.adb:433:07: warning: "Arg" is not modified, could be declared constant [-gnatwk]

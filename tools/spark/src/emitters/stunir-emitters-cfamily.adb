@@ -2,7 +2,7 @@
 -- DO-178C Level A
 
 
-with Semantic_IR.Types; use Semantic_IR.Types;
+with IR.Types; use IR.Types;
 with STUNIR.Emitters.AST_Render;
 
 package body STUNIR.Emitters.CFamily is
@@ -10,7 +10,7 @@ package body STUNIR.Emitters.CFamily is
 
    procedure Emit_Module
      (Self   : in out C_Emitter;
-      Module : in     Semantic_IR.Modules.IR_Module;
+      Module : in     IR.Modules.IR_Module;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
@@ -32,11 +32,11 @@ package body STUNIR.Emitters.CFamily is
                   Decl : constant STUNIR.Emitters.Node_Table.Declaration_Record :=
                     STUNIR.Emitters.Node_Table.Get_Declaration (Nodes, Decl_Index);
                begin
-                  if Decl.Kind = Semantic_IR.Types.Kind_Function_Decl then
+                  if Decl.Kind = IR.Types.Kind_Function_Decl then
                      declare
                         Func_Out : STUNIR.Emitters.CodeGen.IR_Code_Buffer;
                         Func_Ok  : Boolean;
-                        F : constant Semantic_IR.Declarations.Function_Declaration := Decl.Func;
+                        F : constant IR.Declarations.Function_Declaration := Decl.Func;
                      begin
                         Emit_Function (Self, F, Nodes, Func_Out, Func_Ok);
                         if Func_Ok then
@@ -56,7 +56,7 @@ package body STUNIR.Emitters.CFamily is
 
    procedure Emit_Type
      (Self   : in out C_Emitter;
-      T      : in     Semantic_IR.Declarations.Type_Declaration;
+      T      : in     IR.Declarations.Type_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
@@ -69,21 +69,21 @@ package body STUNIR.Emitters.CFamily is
 
    procedure Emit_Function
      (Self   : in out C_Emitter;
-      Func   : in     Semantic_IR.Declarations.Function_Declaration;
+      Func   : in     IR.Declarations.Function_Declaration;
       Nodes  : in     STUNIR.Emitters.Node_Table.Node_Table;
       Output :    out STUNIR.Emitters.CodeGen.IR_Code_Buffer;
       Success:    out Boolean)
    is
       Gen : STUNIR.Emitters.CodeGen.Code_Generator;
       Ok  : Boolean;
-      Name_Str : constant String := Semantic_IR.Types.Name_Strings.To_String (Func.Base.Decl_Name);
+      Name_Str : constant String := IR.Types.Name_Strings.To_String (Func.Base.Decl_Name);
    begin
       STUNIR.Emitters.CodeGen.Initialize (Gen, 2);
       STUNIR.Emitters.CodeGen.Append_Line (Gen, "void " & Name_Str & "(void)", Ok);
       STUNIR.Emitters.CodeGen.Append_Line (Gen, "{", Ok);
       STUNIR.Emitters.CodeGen.Increase_Indent (Gen);
 
-      if Semantic_IR.Nodes.Is_Valid_Node_ID (Func.Body_ID) then
+      if IR.Nodes.Is_Valid_Node_ID (Func.Body_ID) then
          declare
             Stmt_Out : STUNIR.Emitters.CodeGen.IR_Code_Buffer;
             Stmt_Ok  : Boolean;
