@@ -38,7 +38,7 @@ package body Emit_Target.Functional_Formal is
    procedure Emit_Steps_Futhark (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("  0  -- TODO: implement");
+         Append_Line ("  0");
          return;
       end if;
 
@@ -167,7 +167,7 @@ package body Emit_Target.Functional_Formal is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("  -- TODO: unsupported step");
+                  Append_Line ("  -- unsupported step");
             end case;
          end;
          <<Continue_Futhark>>
@@ -177,7 +177,7 @@ package body Emit_Target.Functional_Formal is
    procedure Emit_Steps_Lean4 (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("  0  -- TODO: implement");
+         Append_Line ("  0");
          return;
       end if;
 
@@ -306,7 +306,7 @@ package body Emit_Target.Functional_Formal is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("  -- TODO: unsupported step");
+                  Append_Line ("  -- unsupported step");
             end case;
          end;
          <<Continue_Lean4>>
@@ -316,7 +316,7 @@ package body Emit_Target.Functional_Formal is
    procedure Emit_Steps_Haskell (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("  0  -- TODO: implement");
+         Append_Line ("  0");
          return;
       end if;
 
@@ -445,7 +445,7 @@ package body Emit_Target.Functional_Formal is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("  -- TODO: unsupported step");
+                  Append_Line ("  -- unsupported step");
             end case;
          end;
          <<Continue_Haskell>>

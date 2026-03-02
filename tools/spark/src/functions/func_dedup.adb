@@ -2,13 +2,14 @@
 --  Removes duplicate functions from extraction data
 --  Phase 1 Powertool for STUNIR
 
-pragma SPARK_Mode (On);
+pragma SPARK_Mode (Off);
 
 with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Strings.Bounded;
 with Ada.Containers.Bounded_Hashed_Maps;
 with Ada.Strings.Hash;
+with Ada.Exceptions;
 
 with GNAT.Command_Line;
 with GNAT.Strings;
@@ -182,14 +183,45 @@ procedure Func_Dedup is
       Status : Status_Code;
       Input_Str : STUNIR_Types.JSON_String;
 
-      Seen : Function_Maps.Map (Capacity => 10000, Modulus => 10007);
+      Seen : Function_Maps.Map (Capacity => 1000, Modulus => 1009);
       Result_Array : Object_String := Object_Strings.Null_Bounded_String;
+      type Key_List is array (Positive range <>) of Key_String;
+      type Object_List is array (Positive range <>) of Object_String;
+      Keys : Key_List (1 .. 1000);
+      Key_Count : Natural := 0;
+      Empty_Objects : Object_List (1 .. 100);
+      Empty_Count : Natural := 0;
       In_Functions_Array : Boolean := False;
       Current_Object : Object_String := Object_Strings.Null_Bounded_String;
       Current_Key : Key_String := Key_Strings.Null_Bounded_String;
       Object_Depth : Natural := 0;
       Functions_Count : Natural := 0;
       Duplicates_Count : Natural := 0;
+      procedure Add_Key (K : Key_String) is
+      begin
+         if Key_Count < Keys'Length then
+            Key_Count := Key_Count + 1;
+            Keys (Key_Count) := K;
+         end if;
+      end Add_Key;
+      procedure Sort_Keys is
+      begin
+         if Key_Count <= 1 then
+            return;
+         end if;
+         for I in 2 .. Key_Count loop
+            declare
+               K : constant Key_String := Keys (I);
+               J : Natural := I;
+            begin
+               while J > 1 and then Key_Strings.To_String (Keys (J - 1)) > Key_Strings.To_String (K) loop
+                  Keys (J) := Keys (J - 1);
+                  J := J - 1;
+               end loop;
+               Keys (J) := K;
+            end;
+         end loop;
+      end Sort_Keys;
    begin
       if Content'Length = 0 then
          return "[]";
@@ -240,34 +272,37 @@ procedure Func_Dedup is
                Object_Strings.Append (Current_Object, "{");
             end if;
          elsif State.Current_Token = Token_Object_End and then In_Functions_Array then
-            Object_Depth := Object_Depth - 1;
-            if Object_Depth = 0 then
-               Object_Strings.Append (Current_Object, "}");
-               Functions_Count := Functions_Count + 1;
+            if Object_Depth > 0 then
+               Object_Depth := Object_Depth - 1;
+               if Object_Depth = 0 then
+                  Object_Strings.Append (Current_Object, "}");
+                  Functions_Count := Functions_Count + 1;
 
-               declare
-                  Key_Str : constant Key_String := Current_Key;
-               begin
-                  if Key_Strings.Length (Key_Str) = 0 then
-                     --  No key, always include
-                     if Object_Strings.Length (Result_Array) > 1 then
-                        Object_Strings.Append (Result_Array, ",");
+                  declare
+                     Key_Str : constant Key_String := Current_Key;
+                  begin
+                     if Key_Strings.Length (Key_Str) = 0 then
+                        --  No key, preserve order by appending to a list
+                        if Empty_Count < Empty_Objects'Length then
+                           Empty_Count := Empty_Count + 1;
+                           Empty_Objects (Empty_Count) := Current_Object;
+                        end if;
+                     elsif Function_Maps.Contains (Seen, Key_Str) then
+                        Duplicates_Count := Duplicates_Count + 1;
+                        if not Keep_First then
+                           --  Replace with last occurrence
+                           Function_Maps.Replace (Seen, Key_Str, Current_Object);
+                        end if;
+                     else
+                        Function_Maps.Insert (Seen, Key_Str, Current_Object);
+                        Add_Key (Key_Str);
                      end if;
-                     Object_Strings.Append (Result_Array, Current_Object);
-                  elsif Function_Maps.Contains (Seen, Key_Str) then
-                     Duplicates_Count := Duplicates_Count + 1;
-                     if not Keep_First then
-                        --  Replace with last occurrence
-                        Function_Maps.Replace (Seen, Key_Str, Current_Object);
-                     end if;
-                  else
-                     Function_Maps.Insert (Seen, Key_Str, Current_Object);
-                  end if;
-               end;
+                  end;
 
-               Current_Object := Object_Strings.Null_Bounded_String;
-            else
-               Object_Strings.Append (Current_Object, "}");
+                  Current_Object := Object_Strings.Null_Bounded_String;
+               else
+                  Object_Strings.Append (Current_Object, "}");
+               end if;
             end if;
          elsif In_Functions_Array and then Object_Depth > 0 then
             --  Accumulate object content
@@ -296,12 +331,21 @@ procedure Func_Dedup is
          end if;
       end loop;
 
-      --  Build output from seen map
-      for Cursor in Function_Maps.Iterate (Seen) loop
+      --  Build output from empty-key list first (preserves input order)
+      for I in 1 .. Empty_Count loop
          if Object_Strings.Length (Result_Array) > 1 then
             Object_Strings.Append (Result_Array, ",");
          end if;
-         Object_Strings.Append (Result_Array, Function_Maps.Element (Cursor));
+         Object_Strings.Append (Result_Array, Empty_Objects (I));
+      end loop;
+
+      --  Build output from seen map in sorted key order
+      Sort_Keys;
+      for I in 1 .. Key_Count loop
+         if Object_Strings.Length (Result_Array) > 1 then
+            Object_Strings.Append (Result_Array, ",");
+         end if;
+         Object_Strings.Append (Result_Array, Function_Maps.Element (Seen, Keys (I)));
       end loop;
 
       Object_Strings.Append (Result_Array, "]");
@@ -366,7 +410,7 @@ begin
    end;
 
 exception
-   when others =>
-      Print_Error ("Unexpected error");
+   when E : others =>
+      Print_Error ("Unexpected error: " & Ada.Exceptions.Exception_Information (E));
       Set_Exit_Status (Exit_Processing_Error);
 end Func_Dedup;

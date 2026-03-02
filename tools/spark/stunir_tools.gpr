@@ -274,6 +274,8 @@ project STUNIR_Tools is
 
       --  Phase 0 — SPARK Extraction
       "spark_extract_main.adb",
+      "rust_extract_main.adb",
+      "python_extract_main.adb",
 
       --  Phase 2 — IR Conversion
       "ir_converter_main.adb",
@@ -282,6 +284,7 @@ project STUNIR_Tools is
       "ir_validate.adb",
       "type_map.adb",
       "spec_to_ir_main.adb",
+      "module_to_ir.adb",
       --  NOTE: type_resolve.adb moved to src/deprecated/ (use type_resolver.adb instead)
 
       --  Phase 3 — Code Emission

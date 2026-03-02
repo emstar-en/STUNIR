@@ -38,9 +38,8 @@ package body Emit_Target.Lisp_Family is
    procedure Emit_Steps_Clojure (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("  ;; TODO: implement");
-         Append_Line ("  nil");
-         return;
+          Append_Line ("  nil");
+          return;
       end if;
 
       for J in Step_Index range 1 .. Func.Steps.Count loop
@@ -54,6 +53,11 @@ package body Emit_Target.Lisp_Family is
             Tgt  : constant String := To_String (Step.Target);
             Cond : constant String := To_String (Step.Condition);
             Args : constant String := To_String (Step.Args);
+            Idx  : constant String := To_String (Step.Index);
+            Key  : constant String := To_String (Step.Key);
+            Field : constant String := To_String (Step.Field);
+            Type_Args : constant String := To_String (Step.Type_Args);
+            Field_Kw : constant String := (if Field'Length > 0 then ":" & Field else ":field");
          begin
             case Step.Step_Type is
                when Step_Assign =>
@@ -215,7 +219,7 @@ package body Emit_Target.Lisp_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("  ;; TODO: unsupported step");
+                    Append_Line ("  ;; unsupported step");
             end case;
          end;
          <<Continue_Clojure>>
@@ -225,7 +229,7 @@ package body Emit_Target.Lisp_Family is
    procedure Emit_Steps_Common_Lisp (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("  0)  ; TODO: implement");
+         Append_Line ("  0)  ; no steps");
          return;
       end if;
 
@@ -400,7 +404,7 @@ package body Emit_Target.Lisp_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("  ;; TODO: unsupported step");
+                  Append_Line ("  ;; unsupported step");
             end case;
          end;
          <<Continue_Common_Lisp>>
@@ -410,7 +414,7 @@ package body Emit_Target.Lisp_Family is
    procedure Emit_Steps_Scheme (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("  0)  ; TODO: implement");
+         Append_Line ("  0)  ; no steps");
          return;
       end if;
 
@@ -588,7 +592,7 @@ package body Emit_Target.Lisp_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("  ; TODO: unsupported step");
+                  Append_Line ("  ; unsupported step");
             end case;
          end;
          <<Continue_Scheme>>

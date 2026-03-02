@@ -86,8 +86,8 @@ package body Spark_Extract is
       Put_Line (Output, "    {");
       Put_Line (Output, "      ""name"": """ & Name & """,");
       Put_Line (Output, "      ""return_type"": """ & Ret & """,");
-      Put_Line (Output, "      ""args"": [" & To_String (Args) & "]");
-      Put_Line (Output, "    }");
+      Put_Line (Output, "      ""parameters"": [" & To_String (Args) & "]");
+      Put (Output, "    }");
    end Emit_Function;
 
    procedure Parse_Params
@@ -153,6 +153,141 @@ package body Spark_Extract is
       return Index (L, "procedure ") > 0 or else Index (L, "function ") > 0;
    end Looks_Like_Subprogram;
 
+   function Signature_End_Pos (L : String) return Natural is
+      In_String : Boolean := False;
+      Depth : Integer := 0;
+   begin
+      for I in L'Range loop
+         if L (I) = '"' then
+            In_String := not In_String;
+         elsif not In_String then
+            if L (I) = '(' then
+               Depth := Depth + 1;
+            elsif L (I) = ')' then
+               if Depth > 0 then
+                  Depth := Depth - 1;
+               end if;
+            elsif Depth = 0 then
+               if L (I) = ';' then
+                  return I;
+               end if;
+               if L (I) = 'i'
+                 and then I > L'First
+                 and then L (I - 1) = ' '
+                 and then I < L'Last
+                 and then L (I + 1) = 's'
+               then
+                  if I + 1 = L'Last or else L (I + 2) = ' ' then
+                     return I - 1;
+                  end if;
+               end if;
+            end if;
+         end if;
+      end loop;
+      return 0;
+   end Signature_End_Pos;
+
+   function Has_Signature_End (L : String) return Boolean is
+   begin
+      return Signature_End_Pos (L) > 0;
+   end Has_Signature_End;
+
+   function Extract_Return_Type_From_Spec
+     (Body_Path : String;
+      Subprogram_Name : String) return String
+   is
+      Spec_Path : String := Body_Path;
+      Name_Lower : constant String := Subprogram_Name;
+      Spec_File  : File_Type;
+      Line       : String (1 .. 4096);
+      Last       : Natural;
+   begin
+      if Spec_Path'Length >= 4 and then Spec_Path (Spec_Path'Last - 3 .. Spec_Path'Last) = ".adb" then
+         Spec_Path := Spec_Path (Spec_Path'First .. Spec_Path'Last - 1) & "s";
+      else
+         return "";
+      end if;
+
+      if not Ada.Directories.Exists (Spec_Path) then
+         return "";
+      end if;
+
+      begin
+         Open (Spec_File, In_File, Spec_Path);
+      exception
+         when others =>
+            return "";
+      end;
+
+      declare
+         Sig_Buffer : Unbounded_String := Null_Unbounded_String;
+         In_Signature : Boolean := False;
+      begin
+         while not End_Of_File (Spec_File) loop
+            Get_Line (Spec_File, Line, Last);
+            if Last = 0 then
+               goto Next_Spec_Line;
+            end if;
+            declare
+               L : constant String := Trim_Spaces (Line (1 .. Last));
+            begin
+               if L'Length = 0 then
+                  goto Next_Spec_Line;
+               end if;
+
+               if not In_Signature then
+                  if Index (L, "function ") > 0 then
+                     Sig_Buffer := To_Unbounded_String (L);
+                     In_Signature := True;
+                  else
+                     goto Next_Spec_Line;
+                  end if;
+               else
+                  Append (Sig_Buffer, " " & L);
+               end if;
+
+               if In_Signature and then Has_Signature_End (To_String (Sig_Buffer)) then
+                  declare
+                     Sig_Line : constant String := To_String (Sig_Buffer);
+                     Func_Pos : constant Natural := Index (Sig_Line, "function ");
+                     Ret_Pos  : constant Natural := Index (Sig_Line, " return ");
+                     Semi_Pos : Natural := 0;
+                  begin
+                     Semi_Pos := Signature_End_Pos (Sig_Line);
+
+                     if Func_Pos > 0 and then Ret_Pos > Func_Pos and then Semi_Pos > Ret_Pos then
+                        declare
+                           Name_Start : constant Natural := Func_Pos + 9;
+                           Open_Paren : constant Natural := Index (Sig_Line, "(");
+                           Name_End   : Natural := Ret_Pos - 1;
+                           Name_Text  : String := "";
+                        begin
+                           if Open_Paren > 0 and then Open_Paren > Name_Start then
+                              Name_End := Open_Paren - 1;
+                           end if;
+                           if Name_End >= Name_Start then
+                              Name_Text := Trim_Spaces (Sig_Line (Name_Start .. Name_End));
+                              if Name_Text = Name_Lower then
+                                 Close (Spec_File);
+                                 return Trim_Spaces (Sig_Line (Ret_Pos + 8 .. Semi_Pos - 1));
+                              end if;
+                           end if;
+                        end;
+                     end if;
+                  end;
+
+                  Sig_Buffer := Null_Unbounded_String;
+                  In_Signature := False;
+               end if;
+            end;
+            <<Next_Spec_Line>> null;
+         end loop;
+      end;
+
+      Close (Spec_File);
+      return "";
+   end Extract_Return_Type_From_Spec;
+
    procedure Extract_File
      (Input_Path  : in     Path_String;
       Output_Path : in     Path_String;
@@ -206,134 +341,153 @@ package body Spark_Extract is
       end;
 
       Put_Line (Output, "{");
-      Put_Line (Output, "  ""schema"": ""stunir_extract_v1"",");
+      Put_Line (Output, "  ""schema_version"": ""extraction.v2"",");
       Put_Line (Output, "  ""module_name"": """ & Identifier_Strings.To_String (Module_Name) & """,");
       Put_Line (Output, "  ""language"": """ & Identifier_Strings.To_String (Language) & """,");
       Put_Line (Output, "  ""functions"": [");
 
-      while not End_Of_File (Input) loop
-         Get_Line (Input, Line, Last);
-         Line_Number := Line_Number + 1;
-         if Last > 0 then
-            Debug_Line := To_Unbounded_String (Line (1 .. Last));
-         else
-            Debug_Line := To_Unbounded_String ("");
-         end if;
-         if Last = 0 then
-            goto Continue_Loop;
-         end if;
-         declare
-            L : constant String := Trim_Spaces (Line (1 .. Last));
-         begin
-            if L'Length = 0 then
+      declare
+         Sig_Buffer : Unbounded_String := Null_Unbounded_String;
+         In_Signature : Boolean := False;
+      begin
+         while not End_Of_File (Input) loop
+            Get_Line (Input, Line, Last);
+            Line_Number := Line_Number + 1;
+            if Last > 0 then
+               Debug_Line := To_Unbounded_String (Line (1 .. Last));
+            else
+               Debug_Line := To_Unbounded_String ("");
+            end if;
+            if Last = 0 then
                goto Continue_Loop;
             end if;
-            if L (1) = '-' then
-               goto Continue_Loop;
-            end if;
-            if not Looks_Like_Subprogram (L) then
-               goto Continue_Loop;
-            end if;
-
             declare
-               Is_Function : constant Boolean := Index (L, "function ") > 0;
-               Is_Procedure : constant Boolean := Index (L, "procedure ") > 0;
-               Ret_Type : Unbounded_String := To_Unbounded_String ("void");
-               Name : Unbounded_String := Null_Unbounded_String;
-               Params : Unbounded_String := Null_Unbounded_String;
-               Open_Paren : Natural := Index (L, "(");
-               Close_Paren : Natural := Index (L, ")");
-               Has_Params : Boolean := Open_Paren > 0 and then Close_Paren > Open_Paren;
-               Semi_Pos : Natural := 0;  --  Will be computed based on function/procedure
-               Skip_This : Boolean := False;
+               L : constant String := Trim_Spaces (Line (1 .. Last));
             begin
-               --  Must have semicolon to be a complete declaration
-               --  Find the last semicolon in the line (handles multi-param cases)
-               for I in reverse L'Range loop
-                  if L (I) = ';' then
-                     Semi_Pos := I;
-                     exit;
-                  end if;
-               end loop;
-
-               if Semi_Pos = 0 then
-                  Skip_This := True;
+               if L'Length = 0 then
+                  goto Continue_Loop;
+               end if;
+               if L (1) = '-' then
+                  goto Continue_Loop;
                end if;
 
-               if not Skip_This and then Is_Function then
+               if not In_Signature then
+                  if Looks_Like_Subprogram (L) then
+                     Sig_Buffer := To_Unbounded_String (L);
+                     In_Signature := True;
+                  else
+                     goto Continue_Loop;
+                  end if;
+               else
+                  Append (Sig_Buffer, " " & L);
+               end if;
+
+               if In_Signature and then Has_Signature_End (To_String (Sig_Buffer)) then
                   declare
-                     Func_Pos : constant Natural := Index (L, "function ") + 9;
-                     Ret_Pos : constant Natural := Index (L, " return ");
+                     Sig_Line : constant String := To_String (Sig_Buffer);
+                     Is_Function : constant Boolean := Index (Sig_Line, "function ") > 0;
+                     Is_Procedure : constant Boolean := Index (Sig_Line, "procedure ") > 0;
+                     Ret_Type : Unbounded_String := Null_Unbounded_String;
+                     Name : Unbounded_String := Null_Unbounded_String;
+                     Params : Unbounded_String := Null_Unbounded_String;
+                     Open_Paren : Natural := Index (Sig_Line, "(");
+                     Close_Paren : Natural := Index (Sig_Line, ")");
+                     Has_Params : Boolean := Open_Paren > 0 and then Close_Paren > Open_Paren;
+                     Semi_Pos : Natural := 0;
+                     Skip_This : Boolean := False;
                   begin
-                     if Ret_Pos = 0 or else Ret_Pos <= Func_Pos then
+                     Semi_Pos := Signature_End_Pos (Sig_Line);
+
+                     if Semi_Pos = 0 then
                         Skip_This := True;
-                     elsif Ret_Pos + 8 > L'Last then
-                        Skip_This := True;
-                     else
-                        --  Extract name: between "function " and either "(" or " return"
-                        if Has_Params then
-                           if Open_Paren <= Func_Pos then
+                     end if;
+
+                     if not Skip_This and then Is_Function then
+                        declare
+                           Func_Pos : constant Natural := Index (Sig_Line, "function ") + 9;
+                           Ret_Pos : constant Natural := Index (Sig_Line, " return ");
+                        begin
+                           if Ret_Pos = 0 or else Ret_Pos <= Func_Pos then
+                              Skip_This := True;
+                           elsif Ret_Pos + 8 > Sig_Line'Last then
                               Skip_This := True;
                            else
-                              Name := To_Unbounded_String (Trim_Spaces (L (Func_Pos .. Open_Paren - 1)));
+                              if Has_Params then
+                                 if Open_Paren <= Func_Pos then
+                                    Skip_This := True;
+                                 else
+                                    Name := To_Unbounded_String (Trim_Spaces (Sig_Line (Func_Pos .. Open_Paren - 1)));
+                                 end if;
+                              else
+                                 Name := To_Unbounded_String (Trim_Spaces (Sig_Line (Func_Pos .. Ret_Pos - 1)));
+                              end if;
+                              if not Skip_This then
+                                 Ret_Type := To_Unbounded_String (Trim_Spaces (Sig_Line (Ret_Pos + 8 .. Semi_Pos - 1)));
+                              end if;
                            end if;
-                        else
-                           --  No params: name is between "function " and " return"
-                           Name := To_Unbounded_String (Trim_Spaces (L (Func_Pos .. Ret_Pos - 1)));
-                        end if;
-                        if not Skip_This then
-                           Ret_Type := To_Unbounded_String (Trim_Spaces (L (Ret_Pos + 8 .. Semi_Pos - 1)));
-                        end if;
-                     end if;
-                  end;
-               elsif not Skip_This and then Is_Procedure then
-                  declare
-                     Proc_Pos : constant Natural := Index (L, "procedure ") + 10;
-                  begin
-                     if Has_Params then
-                        if Open_Paren <= Proc_Pos then
-                           Skip_This := True;
-                        else
-                           Name := To_Unbounded_String (Trim_Spaces (L (Proc_Pos .. Open_Paren - 1)));
-                        end if;
+                        end;
+                     elsif not Skip_This and then Is_Procedure then
+                        declare
+                           Proc_Pos : constant Natural := Index (Sig_Line, "procedure ") + 10;
+                        begin
+                           if Has_Params then
+                              if Open_Paren <= Proc_Pos then
+                                 Skip_This := True;
+                              else
+                                 Name := To_Unbounded_string (Trim_Spaces (Sig_Line (Proc_Pos .. Open_Paren - 1)));
+                              end if;
+                           else
+                              Name := To_Unbounded_String (Trim_Spaces (Sig_Line (Proc_Pos .. Semi_Pos - 1)));
+                           end if;
+                        end;
                      else
-                        --  No params: name is between "procedure " and ";"
-                        Name := To_Unbounded_String (Trim_Spaces (L (Proc_Pos .. Semi_Pos - 1)));
+                        Skip_This := True;
                      end if;
+                     if not Skip_This and then Is_Procedure then
+                        Ret_Type := To_Unbounded_String ("void");
+                     end if;
+
+                     if not Skip_This then
+                        if Has_Params and then Close_Paren > Open_Paren + 1 then
+                           Params := To_Unbounded_String (Sig_Line (Open_Paren + 1 .. Close_Paren - 1));
+                        else
+                           Params := Null_Unbounded_String;
+                        end if;
+
+                        if Length (Name) = 0 then
+                           Skip_This := True;
+                        end if;
+                     end if;
+
+                     if not Skip_This then
+                        if Is_Function and then (Length (Ret_Type) = 0 or else To_String (Ret_Type) = "void") and then Input_Path_Str'Length > 0 then
+                           declare
+                              Lookup : constant String := Extract_Return_Type_From_Spec (Input_Path_Str, To_String (Name));
+                           begin
+                              if Lookup'Length > 0 then
+                                 Ret_Type := To_Unbounded_String (Lookup);
+                              end if;
+                           end;
+                        end if;
+                        declare
+                           Args_JSON : Unbounded_String;
+                        begin
+                           Parse_Params (To_String (Params), Args_JSON);
+                           Emit_Function (Output, To_String (Name), To_String (Ret_Type), Args_JSON, First_Function);
+                        end;
+                     end if;
+                  exception
+                     when E : others =>
+                        Put_Line (Standard_Error, "DEBUG: Exception in parsing: " & Ada.Exceptions.Exception_Information (E));
                   end;
-               else
-                  if not Skip_This then
-                     Skip_This := True;
-                  end if;
-               end if;
 
-               if not Skip_This then
-                  if Has_Params and then Close_Paren > Open_Paren + 1 then
-                     Params := To_Unbounded_String (L (Open_Paren + 1 .. Close_Paren - 1));
-                  else
-                     Params := Null_Unbounded_String;
-                  end if;
-
-                  if Length (Name) = 0 then
-                     Skip_This := True;
-                  end if;
+                  Sig_Buffer := Null_Unbounded_String;
+                  In_Signature := False;
                end if;
-
-               if not Skip_This then
-                  declare
-                     Args_JSON : Unbounded_String;
-                  begin
-                     Parse_Params (To_String (Params), Args_JSON);
-                     Emit_Function (Output, To_String (Name), To_String (Ret_Type), Args_JSON, First_Function);
-                  end;
-               end if;
-            exception
-               when E : others =>
-                  Put_Line (Standard_Error, "DEBUG: Exception in parsing: " & Ada.Exceptions.Exception_Information (E));
             end;
-         end;
-         <<Continue_Loop>> null;
-      end loop;
+            <<Continue_Loop>> null;
+         end loop;
+      end;
 
       Put_Line (Output, "  ]");
       Put_Line (Output, "}");
