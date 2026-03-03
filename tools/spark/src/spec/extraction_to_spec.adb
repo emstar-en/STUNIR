@@ -303,6 +303,7 @@ procedure Extraction_To_Spec is
                               Append (Result, "[");
                               declare
                                  Depth : Natural := 1;
+                                 Need_Comma : Boolean := False;
                               begin
                                  loop
                                     Next_Token (State, Status);
@@ -310,28 +311,86 @@ procedure Extraction_To_Spec is
                                     case State.Current_Token is
                                        when Token_Array_Start =>
                                           Depth := Depth + 1;
+                                          if Need_Comma then
+                                             Append (Result, ",");
+                                          end if;
                                           Append (Result, "[");
+                                          Need_Comma := False;
                                        when Token_Array_End =>
                                           Depth := Depth - 1;
                                           if Depth > 0 then
                                              Append (Result, "]");
+                                             Need_Comma := True;
                                           end if;
+                                       when Token_Object_Start =>
+                                          if Need_Comma then
+                                             Append (Result, ",");
+                                          end if;
+                                          Append (Result, "{");
+                                          Need_Comma := False;
+                                          declare
+                                             Obj_Depth : Natural := 1;
+                                             Obj_Need_Comma : Boolean := False;
+                                          begin
+                                             while Obj_Depth > 0 loop
+                                                Next_Token (State, Status);
+                                                exit when Status /= STUNIR_Types.Success;
+                                                case State.Current_Token is
+                                                   when Token_Object_Start =>
+                                                      Obj_Depth := Obj_Depth + 1;
+                                                      if Obj_Need_Comma then
+                                                         Append (Result, ",");
+                                                      end if;
+                                                      Append (Result, "{");
+                                                      Obj_Need_Comma := False;
+                                                   when Token_Object_End =>
+                                                      Obj_Depth := Obj_Depth - 1;
+                                                      if Obj_Depth > 0 then
+                                                         Append (Result, "}");
+                                                         Obj_Need_Comma := True;
+                                                      end if;
+                                                   when Token_String =>
+                                                      if Obj_Need_Comma then
+                                                         Append (Result, ",");
+                                                      end if;
+                                                      Append (Result, """" & Escape_Json_String (JSON_Strings.To_String (State.Token_Value)) & """");
+                                                      Obj_Need_Comma := True;
+                                                   when Token_Colon =>
+                                                      Append (Result, ":");
+                                                      Obj_Need_Comma := False;
+                                                   when Token_Number | Token_True | Token_False | Token_Null =>
+                                                      Append (Result, JSON_Strings.To_String (State.Token_Value));
+                                                      Obj_Need_Comma := True;
+                                                   when Token_Comma =>
+                                                      Obj_Need_Comma := True;
+                                                   when others =>
+                                                      null;
+                                                end case;
+                                             end loop;
+                                          end;
+                                          Append (Result, "}");
+                                          Need_Comma := True;
                                        when Token_String =>
+                                          if Need_Comma then
+                                             Append (Result, ",");
+                                          end if;
                                           declare
                                              Array_String : constant String := JSON_Strings.To_String (State.Token_Value);
                                           begin
                                              Append (Result, """" & Escape_Json_String (Array_String) & """");
                                           end;
+                                          Need_Comma := True;
+                                       when Token_Number | Token_True | Token_False | Token_Null =>
+                                          if Need_Comma then
+                                             Append (Result, ",");
+                                          end if;
+                                          Append (Result, JSON_Strings.To_String (State.Token_Value));
+                                          Need_Comma := True;
+                                       when Token_Comma =>
+                                          Need_Comma := True;
                                        when others =>
-                                          declare
-                                             Array_Value : constant String := JSON_Strings.To_String (State.Token_Value);
-                                          begin
-                                             Append (Result, Array_Value);
-                                          end;
+                                          null;
                                     end case;
-                                    if Depth > 0 then
-                                       Append (Result, ",");
-                                    end if;
                                  end loop;
                               end;
                               Append (Result, "]");

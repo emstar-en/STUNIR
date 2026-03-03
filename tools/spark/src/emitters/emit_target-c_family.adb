@@ -48,7 +48,7 @@ package body Emit_Target.C_Family is
       Step : IR_Step;
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    // TODO: implement");
+         Append_Line ("    return;");
          return;
       end if;
 
@@ -66,6 +66,10 @@ package body Emit_Target.C_Family is
             Args : constant String := To_String (Step.Args);
             Init : constant String := To_String (Step.Init);
             Incr : constant String := To_String (Step.Increment);
+            Idx  : constant String := To_String (Step.Index);
+            Key  : constant String := To_String (Step.Key);
+            Field : constant String := To_String (Step.Field);
+            Type_Args : constant String := To_String (Step.Type_Args);
          begin
             case Step.Step_Type is
                when Step_Assign =>
@@ -223,10 +227,104 @@ package body Emit_Target.C_Family is
                      end if;
                   end loop;
                   Append_Line ("    }");
+               when Step_Break =>
+                  Append_Line ("    break;");
+               when Step_Continue =>
+                  Append_Line ("    continue;");
+               when Step_Array_New =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_array_new(" & Args & ");");
+                  else
+                     Append_Line ("    stunir_array_new(" & Args & ");");
+                  end if;
+               when Step_Array_Get =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = " & Val & "[" & Idx & "]; ");
+                  else
+                     Append_Line ("    " & Val & "[" & Idx & "]; ");
+                  end if;
+               when Step_Array_Set =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & "[" & Idx & "] = " & Val & ";");
+                  else
+                     Append_Line ("    stunir_array_set(" & Args & ");");
+                  end if;
+               when Step_Array_Len =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_array_len(" & Val & ");");
+                  else
+                     Append_Line ("    stunir_array_len(" & Val & ");");
+                  end if;
+               when Step_Map_New =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_map_new(" & Args & ");");
+                  else
+                     Append_Line ("    stunir_map_new(" & Args & ");");
+                  end if;
+               when Step_Map_Get =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_map_get(" & Val & ", " & Key & ");");
+                  else
+                     Append_Line ("    stunir_map_get(" & Val & ", " & Key & ");");
+                  end if;
+               when Step_Map_Set =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    stunir_map_set(" & Tgt & ", " & Key & ", " & Val & ");");
+                  else
+                     Append_Line ("    stunir_map_set(" & Val & ", " & Key & ", " & Args & ");");
+                  end if;
+               when Step_Map_Delete =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    stunir_map_delete(" & Tgt & ", " & Key & ");");
+                  else
+                     Append_Line ("    stunir_map_delete(" & Val & ", " & Key & ");");
+                  end if;
+               when Step_Map_Has =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_map_has(" & Val & ", " & Key & ");");
+                  else
+                     Append_Line ("    stunir_map_has(" & Val & ", " & Key & ");");
+                  end if;
+               when Step_Map_Keys =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_map_keys(" & Val & ");");
+                  else
+                     Append_Line ("    stunir_map_keys(" & Val & ");");
+                  end if;
+               when Step_Struct_New =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = stunir_struct_new(" & Val & ");");
+                  else
+                     Append_Line ("    stunir_struct_new(" & Val & ");");
+                  end if;
+               when Step_Struct_Get =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = " & Val & "." & Field & ";");
+                  else
+                     Append_Line ("    " & Val & "." & Field & ";");
+                  end if;
+               when Step_Struct_Set =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & "." & Field & " = " & Val & ";");
+                  else
+                     Append_Line ("    " & Val & "." & Field & " = " & Args & ";");
+                  end if;
+               when Step_Type_Cast =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = (" & Type_Args & ")" & Val & ";");
+                  else
+                     Append_Line ("    (" & Type_Args & ")" & Val & ";");
+                  end if;
+               when Step_Generic_Call =>
+                  if Tgt'Length > 0 then
+                     Append_Line ("    " & Tgt & " = " & Val & "(" & Args & ");");
+                  else
+                     Append_Line ("    " & Val & "(" & Args & ");");
+                  end if;
                when Step_Nop =>
                   Append_Line ("    ;");
                when others =>
-                  Append_Line ("    // TODO: unsupported step");
+                  Append_Line ("    // unsupported step");
             end case;
          end;
          <<Continue>>

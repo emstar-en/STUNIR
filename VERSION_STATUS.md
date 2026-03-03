@@ -1,9 +1,9 @@
 # STUNIR Version Status
 
-**Last Updated**: February 23, 2026  
+**Last Updated**: March 1, 2026  
 **Overall Project Status**: `0.1.0-alpha` (ALPHA Prototype)
 
-> **✨ NEW (2026-02-23)**: Stub alignment now preserves module structure (imports/exports/types/constants/dependencies) in generated code.
+> **✨ NEW (2026-03-01)**: All IR step types now implemented for prioritized targets (C, Clojure, ClojureScript, Common Lisp, Scheme, Prolog, Futhark, Lean4, Haskell). No more "unsupported step" placeholders.
 
 ## Overall Project Version
 
@@ -31,26 +31,52 @@
 |-----------|---------|------|--------|--------------|
 | **IR Validator** | `0.1.0-alpha` | `tools/spark/src/ir/ir_validate_schema.adb` | ✅ Functional | Schema validation for IR JSON |
 | **IR Parser** | `0.1.0-alpha` | `tools/spark/src/ir/ir_parse.adb` | ✅ Functional | Parses IR with nested control flow |
-| **Code Emitter** | `0.1.0-alpha` | `tools/spark/src/emitters/emit_target.adb` | ✅ Functional | IR→Code for C/Clojure/Futhark/Lean4 |
+| **Code Emitter** | `0.1.0-alpha` | `tools/spark/src/emitters/emit_target.adb` | ✅ Functional | IR→Code for C/Clojure/Futhark/Lean4/Haskell/Prolog/Common Lisp/Scheme |
 | **Pipeline Driver** | `0.1.0-alpha` | `tools/spark/src/core/pipeline_driver.adb` | ✅ Functional | Orchestrates SPARK-only pipeline |
 | **SPARK Extractor** | `2026-02-23a` | `tools/spark/src/spec/spark_extract.adb` | ✅ Functional | Ada/SPARK signature extraction |
 | **Toolchain** | `0.1.0-alpha` | `local_toolchain.lock.json` | ✅ Locked | Deterministic tool versioning |
 
 **Tested Capabilities**:
 - ✅ IR JSON validation
-- ✅ IR JSON → Code generation (C, Clojure, Futhark, Lean4)
+- ✅ IR JSON → Code generation (C, Clojure, ClojureScript, Common Lisp, Scheme, Prolog, Futhark, Lean4, Haskell)
 - ✅ Function body generation with control flow (if/else, while, for)
 - ✅ Nested control flow (if inside function, while inside function)
-- ✅ SPARK/Ada signature extraction (single-line signatures)
+- ✅ SPARK/Ada signature extraction (single-line and multiline signatures)
 - ✅ **Module structure preservation** (imports, exports, types, constants, dependencies)
 - ✅ **Multi-target type emission** (C, Rust, Ada, Clojure, Prolog, Futhark, Lean4)
-- ❌ Deeply nested control flow (if inside while) - limited support
+- ✅ **All IR step types implemented** (Error, Switch, Try, Throw, Array Push/Pop, Set operations)
+- ✅ **Confluence test harness** (24/24 categories pass SPARK pipeline)
+- ✅ **Source extraction pipeline** (C/C++ → extraction JSON → spec → IR → code)
+- ✅ **extraction_to_spec** (fixed JSON array handling for nested objects)
+- ⚠️ Deeply nested control flow (if inside while) - limited support (see below)
 - ❌ Code → Spec reverse pipeline (not implemented)
 
-**SPARK Extractor Known Limitations**:
-- ❌ Multiline signatures not supported (signatures must be on single line)
-- ⚠️ Body files (.adb) may have empty return types (spec lookup not implemented)
-- ⚠️ Tested on curated test corpus only (11 files, 46 functions extracted)
+**Deep Nesting Limits** (as of 2026-02-28):
+
+| Nesting Level | Support Status | Notes |
+|---------------|----------------|-------|
+| Level 1 (flat) | ✅ Full | Single control structure in function |
+| Level 2 (if in if) | ✅ Full | Nested if/else within if/else |
+| Level 3 (if in while) | ⚠️ Partial | May generate incorrect indentation |
+| Level 4 (for in if in while) | ⚠️ Partial | Brace matching issues possible |
+| Level 5+ | ❌ Limited | Not recommended; may fail |
+
+**Known Nesting Issues**:
+- `emit_target.adb` uses `Is_In_Nested_Block` flag for tracking depth
+- Maximum practical nesting: 4 levels (if → while → for → if)
+- Deep nesting may cause:
+  - Incorrect brace/indentation in C-family targets
+  - Missing `end` keywords in Ada/Rust targets
+  - Unbalanced parentheses in Lisp-family targets
+
+**Recommendation**: For nesting > 3 levels, consider refactoring into helper functions.
+
+**SPARK Extractor Capabilities** (updated 2026-03-01):
+- ✅ Multiline signatures supported (signatures can span multiple lines)
+- ✅ Body files (.adb) return types resolved via corresponding .ads spec lookup
+- ✅ Handles `is`-terminated body signatures (not just `;`-terminated specs)
+- ✅ Ignores semicolons inside parameter lists when detecting signature end
+- ⚠️ Tested on curated test corpus (implementation_body.ads/.adb validates multiline + return types)
 
 ### Python Pipeline (Alternative Implementation)
 

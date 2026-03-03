@@ -9,6 +9,7 @@ pragma SPARK_Mode (Off);
 with Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
+with Ada.Exceptions;
 with STUNIR_Types;
 
 package body Source_Extract is
@@ -61,8 +62,8 @@ package body Source_Extract is
       Put_Line (Output, "    {");
       Put_Line (Output, "      ""name"": """ & Name & """,");
       Put_Line (Output, "      ""return_type"": """ & Ret & """,");
-      Put_Line (Output, "      ""args"": [" & To_String (Args) & "]");
-      Put_Line (Output, "    }");
+      Put_Line (Output, "      ""parameters"": [" & To_String (Args) & "]");
+      Put (Output, "    }");
    end Emit_Function;
 
    procedure Parse_Params
@@ -88,19 +89,21 @@ package body Source_Extract is
             declare
                Part : constant String := Trim_Spaces (P (Start .. I - 1));
                Name : constant String := Extract_Name (Part);
-               Type_Str : String := Part;
+               Type_Str : Unbounded_String := Null_Unbounded_String;
             begin
-               if Name'Length > 0 then
-                  Type_Str := Trim_Spaces (Part (Part'First .. Part'Last - Name'Length));
+               if Name'Length > 0 and then Name'Length < Part'Length then
+                  Type_Str := To_Unbounded_String (Trim_Spaces (Part (Part'First .. Part'Last - Name'Length)));
+               elsif Name'Length = 0 then
+                  Type_Str := To_Unbounded_String (Part);
                end if;
                if not First then
                   Append (Args_JSON, ", ");
                end if;
                First := False;
                if Name'Length = 0 then
-                  Append (Args_JSON, "{""name"": ""arg"", ""type"": """ & Type_Str & """}");
+                  Append (Args_JSON, "{""name"": ""arg"", ""type"": """ & To_String (Type_Str) & """}");
                else
-                  Append (Args_JSON, "{""name"": """ & Name & """, ""type"": """ & Type_Str & """}");
+                  Append (Args_JSON, "{""name"": """ & Name & """, ""type"": """ & To_String (Type_Str) & """}");
                end if;
             end;
             Start := I + 1;
@@ -111,18 +114,20 @@ package body Source_Extract is
          declare
             Part : constant String := Trim_Spaces (P (Start .. P'Last));
             Name : constant String := Extract_Name (Part);
-            Type_Str : String := Part;
+            Type_Str : Unbounded_String := Null_Unbounded_String;
          begin
-            if Name'Length > 0 then
-               Type_Str := Trim_Spaces (Part (Part'First .. Part'Last - Name'Length));
+            if Name'Length > 0 and then Name'Length < Part'Length then
+               Type_Str := To_Unbounded_String (Trim_Spaces (Part (Part'First .. Part'Last - Name'Length)));
+            elsif Name'Length = 0 then
+               Type_Str := To_Unbounded_String (Part);
             end if;
             if not First then
                Append (Args_JSON, ", ");
             end if;
             if Name'Length = 0 then
-               Append (Args_JSON, "{""name"": ""arg"", ""type"": """ & Type_Str & """}");
+               Append (Args_JSON, "{""name"": ""arg"", ""type"": """ & To_String (Type_Str) & """}");
             else
-               Append (Args_JSON, "{""name"": """ & Name & """, ""type"": """ & Type_Str & """}");
+               Append (Args_JSON, "{""name"": """ & Name & """, ""type"": """ & To_String (Type_Str) & """}");
             end if;
          end;
       end if;
@@ -146,7 +151,7 @@ package body Source_Extract is
       Create (Output, Out_File, Path_Strings.To_String (Output_Path));
 
       Put_Line (Output, "{");
-      Put_Line (Output, "  ""schema"": ""stunir_extract_v1"",");
+      Put_Line (Output, "  ""schema_version"": ""extraction.v2"",");
       Put_Line (Output, "  ""module_name"": """ & Identifier_Strings.To_String (Module_Name) & """,");
       Put_Line (Output, "  ""language"": """ & Identifier_Strings.To_String (Language) & """,");
       Put_Line (Output, "  ""functions"": [");
@@ -213,8 +218,9 @@ package body Source_Extract is
       Close (Input);
       Close (Output);
    exception
-      when others =>
+      when E : others =>
          Status := Error_File_IO;
+         Put_Line (Standard_Error, "Exception in Extract_File: " & Ada.Exceptions.Exception_Information (E));
          if Is_Open (Input) then
             Close (Input);
          end if;

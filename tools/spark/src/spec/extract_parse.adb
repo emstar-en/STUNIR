@@ -101,8 +101,8 @@ package body Extract_Parse is
                                           Type_Name_Strings.To_Bounded_String (
                                              JSON_Strings.To_String (Token_String_Value (Parser)));
                                        Next_Token (Parser, Temp_Status);
-                                    elsif Key = "args" and then Current_Token (Parser) = Token_Array_Start then
-                                       --  Parse args array
+                                    elsif (Key = "args" or Key = "parameters") and then Current_Token (Parser) = Token_Array_Start then
+                                       --  Parse args/parameters array (support both for backward compatibility)
                                        Extract.Functions.Functions (Extract.Functions.Count).Parameters.Count := 0;
                                        Next_Token (Parser, Temp_Status);
                                        while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop

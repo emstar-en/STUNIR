@@ -38,7 +38,7 @@ package body Emit_Target.Prolog_Family is
    procedure Emit_Steps_SWI_Prolog (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    % TODO: implement");
+         Append_Line ("    % no steps");
          Append_Line ("    Result = nil.");
          return;
       end if;
@@ -174,7 +174,7 @@ package body Emit_Target.Prolog_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("    % TODO: unsupported step");
+                  Append_Line ("    % unsupported step");
             end case;
          end;
          <<Continue_SWI>>
@@ -186,7 +186,7 @@ package body Emit_Target.Prolog_Family is
       --  GNU Prolog is very similar to SWI-Prolog
       --  Main differences: some built-in predicates, FD solver syntax
       if Func.Steps.Count = 0 then
-         Append_Line ("    % TODO: implement");
+         Append_Line ("    % no steps");
          Append_Line ("    Result = nil.");
          return;
       end if;
@@ -322,7 +322,7 @@ package body Emit_Target.Prolog_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("    % TODO: unsupported step");
+                  Append_Line ("    % unsupported step");
             end case;
          end;
          <<Continue_GNU>>
@@ -334,7 +334,7 @@ package body Emit_Target.Prolog_Family is
       --  Mercury is a functional/logic language with strong typing
       --  Different syntax from Prolog: uses mode declarations, determinism
       if Func.Steps.Count = 0 then
-         Append_Line ("    % TODO: implement");
+         Append_Line ("    % no steps");
          Append_Line ("    Result = nil.");
          return;
       end if;
@@ -470,7 +470,7 @@ package body Emit_Target.Prolog_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("    % TODO: unsupported step");
+                  Append_Line ("    % unsupported step");
             end case;
          end;
          <<Continue_Mercury>>

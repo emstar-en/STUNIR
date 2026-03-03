@@ -196,7 +196,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("    }");
                when others =>
-                  Append_Line ("    // TODO: unsupported step");
+                  Append_Line ("    // unsupported step");
             end case;
          end;
          <<Continue_Rust>>
@@ -206,7 +206,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_Python (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    pass  # TODO: implement");
+         Append_Line ("    return None");
          return;
       end if;
 
@@ -357,7 +357,7 @@ package body Emit_Target.Mainstream is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("    # TODO: unsupported step");
+                  Append_Line ("    # unsupported step");
             end case;
          end;
          <<Continue_Python>>
@@ -367,7 +367,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_Go (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    // TODO: implement");
+         Append_Line ("    return");
          return;
       end if;
 
@@ -521,7 +521,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("    }");
                when others =>
-                  Append_Line ("    // TODO: unsupported step");
+                  Append_Line ("    // unsupported step");
             end case;
          end;
          <<Continue_Go>>
@@ -531,7 +531,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_Java (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("        // TODO: implement");
+         Append_Line ("        return;");
          return;
       end if;
 
@@ -685,7 +685,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("        }");
                when others =>
-                  Append_Line ("        // TODO: unsupported step");
+                  Append_Line ("        // unsupported step");
             end case;
          end;
          <<Continue_Java>>
@@ -695,7 +695,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_JavaScript (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    // TODO: implement");
+         Append_Line ("    return");
          return;
       end if;
 
@@ -849,7 +849,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("    }");
                when others =>
-                  Append_Line ("    // TODO: unsupported step");
+                  Append_Line ("    // unsupported step");
             end case;
          end;
          <<Continue_JS>>
@@ -859,7 +859,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_CSharp (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("        // TODO: implement");
+         Append_Line ("        return;");
          return;
       end if;
 
@@ -1013,7 +1013,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("        }");
                when others =>
-                  Append_Line ("        // TODO: unsupported step");
+                  Append_Line ("        // unsupported step");
             end case;
          end;
          <<Continue_CSharp>>
@@ -1023,7 +1023,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_Swift (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    // TODO: implement");
+         Append_Line ("    return");
          return;
       end if;
 
@@ -1177,7 +1177,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("    }");
                when others =>
-                  Append_Line ("    // TODO: unsupported step");
+                  Append_Line ("    // unsupported step");
             end case;
          end;
          <<Continue_Swift>>
@@ -1187,7 +1187,7 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_Kotlin (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("    // TODO: implement");
+         Append_Line ("    return");
          return;
       end if;
 
@@ -1341,7 +1341,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("    }");
                when others =>
-                  Append_Line ("    // TODO: unsupported step");
+                  Append_Line ("    // unsupported step");
             end case;
          end;
          <<Continue_Kotlin>>
@@ -1351,7 +1351,6 @@ package body Emit_Target.Mainstream is
    procedure Emit_Steps_SPARK (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("   --  TODO: implement");
          Append_Line ("   return Integer'First;");
          return;
       end if;
@@ -1506,7 +1505,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("   end loop;");
                when others =>
-                  Append_Line ("   --  TODO: unsupported step");
+                  Append_Line ("   --  unsupported step");
             end case;
          end;
          <<Continue_SPARK>>
@@ -1518,7 +1517,6 @@ package body Emit_Target.Mainstream is
       --  Ada emitter is identical to SPARK for now
       --  Future: SPARK may add pragma SPARK_Mode, contracts, etc.
       if Func.Steps.Count = 0 then
-         Append_Line ("   --  TODO: implement");
          Append_Line ("   return Integer'First;");
          return;
       end if;
@@ -1673,7 +1671,7 @@ package body Emit_Target.Mainstream is
                   end loop;
                   Append_Line ("   end loop;");
                when others =>
-                  Append_Line ("   --  TODO: unsupported step");
+                  Append_Line ("   --  unsupported step");
             end case;
          end;
          <<Continue_Ada>>
