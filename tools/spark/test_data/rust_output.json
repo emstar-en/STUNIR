@@ -1,0 +1,24 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "test_module",
+  "language": "rust",
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "i32",
+      "args": [{"name": "a", "type": "i32"}, {"name": "b", "type": "i32"}]
+    }
+,
+    {
+      "name": "multiply",
+      "return_type": "f64",
+      "args": [{"name": "x", "type": "f64"}, {"name": "y", "type": "f64"}]
+    }
+,
+    {
+      "name": "main",
+      "return_type": "void",
+      "args": []
+    }
+  ]
+}

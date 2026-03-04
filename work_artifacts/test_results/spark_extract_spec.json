@@ -1,0 +1,16 @@
+{
+  "schema_version": "extraction.v2",
+  "module_name": "implementation_body",
+  "language": "spark",
+  "functions": [
+    {
+      "name": "Public_Proc",
+      "return_type": "void",
+      "parameters": [{"name": "Value", "type": "Integer"}, {"name": "Result", "type": "Integer"}]
+    },
+    {
+      "name": "Public_Func",
+      "return_type": "Float",
+      "parameters": [{"name": "A", "type": "Float"}, {"name": "B", "type": "Float"}]
+    }  ]
+}

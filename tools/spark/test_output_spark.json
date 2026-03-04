@@ -1,0 +1,31 @@
+{
+  "schema_version": "extraction.v2",
+  "module_name": "test_spark",
+  "language": "spark",
+  "functions": [
+    {
+      "name": "Initialize",
+      "return_type": "void",
+      "parameters": []
+    },
+    {
+      "name": "Get_Version",
+      "return_type": "String",
+      "parameters": []
+    },
+    {
+      "name": "Set_Value",
+      "return_type": "void",
+      "parameters": [{"name": "Val", "type": "Integer"}]
+    },
+    {
+      "name": "Add",
+      "return_type": "Integer",
+      "parameters": [{"name": "A", "type": "Integer"}, {"name": "B", "type": "Integer"}]
+    },
+    {
+      "name": "Compute",
+      "return_type": "Float",
+      "parameters": [{"name": "X", "type": "Float"}, {"name": "Y", "type": "Float"}, {"name": "Mode", "type": "Integer"}]
+    }  ]
+}

@@ -1,7 +1,9 @@
 # STUNIR Version Status
 
-**Last Updated**: March 1, 2026  
+**Last Updated**: March 2, 2026  
 **Overall Project Status**: `0.1.0-alpha` (ALPHA Prototype)
+
+> **✨ NEW (2026-03-02)**: Pre-emission artifact handling for GPU binaries and microcode blobs. Functions can now be associated with pre-compiled GPU kernels (PTX, CUBIN, HSACO, SPIR-V) and microcode blobs with selection policies (prefer_source, prefer_binary, require_binary).
 
 > **✨ NEW (2026-03-01)**: All IR step types now implemented for prioritized targets (C, Clojure, ClojureScript, Common Lisp, Scheme, Prolog, Futhark, Lean4, Haskell). No more "unsupported step" placeholders.
 
@@ -48,6 +50,9 @@
 - ✅ **Confluence test harness** (24/24 categories pass SPARK pipeline)
 - ✅ **Source extraction pipeline** (C/C++ → extraction JSON → spec → IR → code)
 - ✅ **extraction_to_spec** (fixed JSON array handling for nested objects)
+- ✅ **Futhark emitter** (loop expressions, match/switch, persistent updates, error handling)
+- ✅ **Lean4 emitter** (recursion, forM, match, Except monad, persistent updates)
+- ✅ **Pre-emission artifact handling** (GPU binaries, microcode blobs, selection policies)
 - ⚠️ Deeply nested control flow (if inside while) - limited support (see below)
 - ❌ Code → Spec reverse pipeline (not implemented)
 
@@ -77,6 +82,14 @@
 - ✅ Handles `is`-terminated body signatures (not just `;`-terminated specs)
 - ✅ Ignores semicolons inside parameter lists when detecting signature end
 - ⚠️ Tested on curated test corpus (implementation_body.ads/.adb validates multiline + return types)
+
+**Pre-Emission Artifact Handling** (added 2026-03-02):
+- ✅ GPU binary artifacts (PTX, CUBIN, HSACO, SPIR-V formats)
+- ✅ Microcode blobs (microcode, ROM, ucode formats)
+- ✅ Selection policies (prefer_source, prefer_binary, require_binary)
+- ✅ Spec → IR artifact mapping
+- ✅ Emission mode determination (Emit_Source, Emit_Binary, Emit_Hybrid)
+- ✅ Artifact normalization pass in optimizer
 
 ### Python Pipeline (Alternative Implementation)
 

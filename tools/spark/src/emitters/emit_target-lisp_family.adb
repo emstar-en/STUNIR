@@ -218,6 +218,159 @@ package body Emit_Target.Lisp_Family is
                         end;
                      end if;
                   end loop;
+               when Step_Error =>
+                  if Val'Length > 0 then
+                     Append_Line ("  (throw (Exception. " & Val & "))");
+                  else
+                     Append_Line ("  (throw (Exception. \"runtime error\"))");
+                  end if;
+               when Step_Break =>
+                  Append_Line ("  (break)");
+               when Step_Continue =>
+                  Append_Line ("  (continue)");
+               when Step_Switch =>
+                  Append_Line ("  (case " & Val);
+                  for C in Case_Index range 1 .. Step.Case_Count loop
+                     if Step.Case_Starts (C) <= Func.Steps.Count then
+                        Append_Line ("    " & Step.Case_Values (C) & " (do");
+                        for B in Step_Index range Step.Case_Starts (C) .. Step.Case_Starts (C) + Step.Case_Counts (C) - 1 loop
+                           if B <= Func.Steps.Count then
+                              declare
+                                 Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                 B_Val : constant String := To_String (Body_Step.Value);
+                                 B_Tgt : constant String := To_String (Body_Step.Target);
+                              begin
+                                 case Body_Step.Step_Type is
+                                    when Step_Assign =>
+                                       if B_Tgt'Length > 0 then
+                                          Append_Line ("      (set! " & B_Tgt & " " & B_Val & ")");
+                                       end if;
+                                    when Step_Return =>
+                                       Append_Line ("      " & B_Val);
+                                    when others =>
+                                       Append_Line ("      nil");
+                                 end case;
+                              end;
+                           end if;
+                        end loop;
+                        Append_Line ("    )");
+                     end if;
+                  end loop;
+                  if Step.Default_Count > 0 then
+                     Append_Line ("    :default (do");
+                     for B in Step_Index range Step.Default_Start .. Step.Default_Start + Step.Default_Count - 1 loop
+                        if B <= Func.Steps.Count then
+                           declare
+                              Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                              B_Val : constant String := To_String (Body_Step.Value);
+                           begin
+                              case Body_Step.Step_Type is
+                                 when Step_Return =>
+                                    Append_Line ("      " & B_Val);
+                                 when others =>
+                                    Append_Line ("      nil");
+                              end case;
+                           end;
+                        end if;
+                     end loop;
+                     Append_Line ("    )");
+                  end if;
+                  Append_Line ("  )");
+               when Step_Try =>
+                  Append_Line ("  (try");
+                  for B in Step_Index range Step.Try_Start .. Step.Try_Start + Step.Try_Count - 1 loop
+                     if B <= Func.Steps.Count then
+                        declare
+                           Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                           B_Val : constant String := To_String (Body_Step.Value);
+                           B_Tgt : constant String := To_String (Body_Step.Target);
+                        begin
+                           case Body_Step.Step_Type is
+                              when Step_Assign =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    (set! " & B_Tgt & " " & B_Val & ")");
+                                 end if;
+                              when Step_Return =>
+                                 Append_Line ("    " & B_Val);
+                              when others =>
+                                 Append_Line ("    nil");
+                           end case;
+                        end;
+                     end if;
+                  end loop;
+                  for C in Step_Index range 1 .. Step.Catch_Count loop
+                     if Step.Catch_Blocks (C).Exception_Type'Length > 0 then
+                        Append_Line ("  (catch " & Step.Catch_Blocks (C).Exception_Type & " e");
+                        for B in Step_Index range Step.Catch_Blocks (C).Handler_Start .. Step.Catch_Blocks (C).Handler_Start + Step.Catch_Blocks (C).Handler_Count - 1 loop
+                           if B <= Func.Steps.Count then
+                              declare
+                                 Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                 B_Val : constant String := To_String (Body_Step.Value);
+                              begin
+                                 case Body_Step.Step_Type is
+                                    when Step_Return =>
+                                       Append_Line ("    " & B_Val);
+                                    when others =>
+                                       Append_Line ("    nil");
+                                 end case;
+                              end;
+                           end if;
+                        end loop;
+                        Append_Line ("  )");
+                     end if;
+                  end loop;
+                  if Step.Finally_Count > 0 then
+                     Append_Line ("  (finally");
+                     for B in Step_Index range Step.Finally_Start .. Step.Finally_Start + Step.Finally_Count - 1 loop
+                        if B <= Func.Steps.Count then
+                           Append_Line ("    nil");
+                        end if;
+                     end loop;
+                     Append_Line ("  )");
+                  end if;
+                  Append_Line ("  )");
+               when Step_Throw =>
+                  Append_Line ("  (throw (Exception. " & Val & "))");
+               when Step_Array_New =>
+                  Append_Line ("  (set! " & Tgt & " (into-array []))");
+               when Step_Array_Get =>
+                  Append_Line ("  (set! " & Tgt & " (aget " & Val & " " & Idx & "))");
+               when Step_Array_Set =>
+                  Append_Line ("  (aset " & Tgt & " " & Idx & " " & Val & ")");
+               when Step_Array_Push =>
+                  Append_Line ("  (set! " & Tgt & " (conj " & Tgt & " " & Val & "))");
+               when Step_Array_Pop =>
+                  Append_Line ("  (set! " & Tgt & " (pop " & Val & "))");
+               when Step_Array_Len =>
+                  Append_Line ("  (set! " & Tgt & " (count " & Val & "))");
+               when Step_Map_New =>
+                  Append_Line ("  (set! " & Tgt & " {})");
+               when Step_Map_Get =>
+                  Append_Line ("  (set! " & Tgt & " (get " & Val & " " & Key & "))");
+               when Step_Map_Set =>
+                  Append_Line ("  (set! " & Tgt & " (assoc " & Tgt & " " & Key & " " & Val & "))");
+               when Step_Map_Delete =>
+                  Append_Line ("  (set! " & Tgt & " (dissoc " & Val & " " & Key & "))");
+               when Step_Map_Has =>
+                  Append_Line ("  (set! " & Tgt & " (contains? " & Val & " " & Key & "))");
+               when Step_Set_New =>
+                  Append_Line ("  (set! " & Tgt & " #{})");
+               when Step_Set_Add =>
+                  Append_Line ("  (set! " & Tgt & " (conj " & Tgt & " " & Val & "))");
+               when Step_Set_Remove =>
+                  Append_Line ("  (set! " & Tgt & " (disj " & Tgt & " " & Val & "))");
+               when Step_Set_Has =>
+                  Append_Line ("  (set! " & Tgt & " (contains? " & Args & " " & Val & "))");
+               when Step_Struct_New =>
+                  Append_Line ("  (set! " & Tgt & " (->" & Val & "))");
+               when Step_Struct_Get =>
+                  Append_Line ("  (set! " & Tgt & " (:" & Field & " " & Val & "))");
+               when Step_Struct_Set =>
+                  Append_Line ("  (set! " & Tgt & " (assoc " & Tgt & " :" & Field & " " & Val & "))");
+               when Step_Generic_Call =>
+                  Append_Line ("  (set! " & Tgt & " (" & Val & " " & Type_Args & " " & Args & "))");
+               when Step_Type_Cast =>
+                  Append_Line ("  (set! " & Tgt & " (" & Args & " " & Val & "))");
                when others =>
                     Append_Line ("  ;; unsupported step");
             end case;
@@ -403,6 +556,152 @@ package body Emit_Target.Lisp_Family is
                         end;
                      end if;
                   end loop;
+               when Step_Error =>
+                  if Val'Length > 0 then
+                     Append_Line ("  (error " & Val & ")");
+                  else
+                     Append_Line ("  (error \"runtime error\")");
+                  end if;
+               when Step_Break =>
+                  Append_Line ("  (break)");
+               when Step_Continue =>
+                  Append_Line ("  (continue)");
+               when Step_Switch =>
+                  Append_Line ("  (case " & Val);
+                  for C in Case_Index range 1 .. Step.Case_Count loop
+                     if Step.Case_Starts (C) <= Func.Steps.Count then
+                        Append_Line ("    ((" & Step.Case_Values (C) & ")");
+                        for B in Step_Index range Step.Case_Starts (C) .. Step.Case_Starts (C) + Step.Case_Counts (C) - 1 loop
+                           if B <= Func.Steps.Count then
+                              declare
+                                 Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                 B_Val : constant String := To_String (Body_Step.Value);
+                                 B_Tgt : constant String := To_String (Body_Step.Target);
+                              begin
+                                 case Body_Step.Step_Type is
+                                    when Step_Assign =>
+                                       if B_Tgt'Length > 0 then
+                                          Append_Line ("      (setf " & B_Tgt & " " & B_Val & ")");
+                                       end if;
+                                    when Step_Return =>
+                                       Append_Line ("      " & B_Val);
+                                    when others =>
+                                       Append_Line ("      nil");
+                                 end case;
+                              end;
+                           end if;
+                        end loop;
+                        Append_Line ("    )");
+                     end if;
+                  end loop;
+                  if Step.Default_Count > 0 then
+                     Append_Line ("    (t");
+                     for B in Step_Index range Step.Default_Start .. Step.Default_Start + Step.Default_Count - 1 loop
+                        if B <= Func.Steps.Count then
+                           declare
+                              Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                              B_Val : constant String := To_String (Body_Step.Value);
+                           begin
+                              case Body_Step.Step_Type is
+                                 when Step_Return =>
+                                    Append_Line ("      " & B_Val);
+                                 when others =>
+                                    Append_Line ("      nil");
+                              end case;
+                           end;
+                        end if;
+                     end loop;
+                     Append_Line ("    )");
+                  end if;
+                  Append_Line ("  )");
+               when Step_Try =>
+                  Append_Line ("  (handler-case");
+                  Append_Line ("    (progn");
+                  for B in Step_Index range Step.Try_Start .. Step.Try_Start + Step.Try_Count - 1 loop
+                     if B <= Func.Steps.Count then
+                        declare
+                           Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                           B_Val : constant String := To_String (Body_Step.Value);
+                           B_Tgt : constant String := To_String (Body_Step.Target);
+                        begin
+                           case Body_Step.Step_Type is
+                              when Step_Assign =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("      (setf " & B_Tgt & " " & B_Val & ")");
+                                 end if;
+                              when Step_Return =>
+                                 Append_Line ("      " & B_Val);
+                              when others =>
+                                 Append_Line ("      nil");
+                           end case;
+                        end;
+                     end if;
+                  end loop;
+                  Append_Line ("    )");
+                  for C in Step_Index range 1 .. Step.Catch_Count loop
+                     if Step.Catch_Blocks (C).Exception_Type'Length > 0 then
+                        Append_Line ("    (" & Step.Catch_Blocks (C).Exception_Type & " (e)");
+                        for B in Step_Index range Step.Catch_Blocks (C).Handler_Start .. Step.Catch_Blocks (C).Handler_Start + Step.Catch_Blocks (C).Handler_Count - 1 loop
+                           if B <= Func.Steps.Count then
+                              declare
+                                 Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                 B_Val : constant String := To_String (Body_Step.Value);
+                              begin
+                                 case Body_Step.Step_Type is
+                                    when Step_Return =>
+                                       Append_Line ("      " & B_Val);
+                                    when others =>
+                                       Append_Line ("      nil");
+                                 end case;
+                              end;
+                           end if;
+                        end loop;
+                        Append_Line ("    )");
+                     end if;
+                  end loop;
+                  Append_Line ("  )");
+               when Step_Throw =>
+                  Append_Line ("  (error " & Val & ")");
+               when Step_Array_New =>
+                  Append_Line ("  (setf " & Tgt & " (make-array " & Val & "))");
+               when Step_Array_Get =>
+                  Append_Line ("  (setf " & Tgt & " (aref " & Val & " " & Idx & "))");
+               when Step_Array_Set =>
+                  Append_Line ("  (setf (aref " & Tgt & " " & Idx & ") " & Val & ")");
+               when Step_Array_Push =>
+                  Append_Line ("  (vector-push-extend " & Val & " " & Tgt & ")");
+               when Step_Array_Pop =>
+                  Append_Line ("  (setf " & Tgt & " (vector-pop " & Val & "))");
+               when Step_Array_Len =>
+                  Append_Line ("  (setf " & Tgt & " (length " & Val & "))");
+               when Step_Map_New =>
+                  Append_Line ("  (setf " & Tgt & " (make-hash-table))");
+               when Step_Map_Get =>
+                  Append_Line ("  (setf " & Tgt & " (gethash " & Key & " " & Val & "))");
+               when Step_Map_Set =>
+                  Append_Line ("  (setf (gethash " & Key & " " & Tgt & ") " & Val & ")");
+               when Step_Map_Delete =>
+                  Append_Line ("  (remhash " & Key & " " & Val & ")");
+               when Step_Map_Has =>
+                  Append_Line ("  (setf " & Tgt & " (nth-value 1 (gethash " & Key & " " & Val & ")))");
+               when Step_Set_New =>
+                  Append_Line ("  (setf " & Tgt & " (make-hash-table :test 'equal))");
+               when Step_Set_Add =>
+                  Append_Line ("  (setf (gethash " & Val & " " & Tgt & ") t)");
+               when Step_Set_Remove =>
+                  Append_Line ("  (remhash " & Val & " " & Tgt & ")");
+               when Step_Set_Has =>
+                  Append_Line ("  (setf " & Tgt & " (nth-value 1 (gethash " & Val & " " & Args & ")))");
+               when Step_Struct_New =>
+                  Append_Line ("  (setf " & Tgt & " (make-" & Val & "))");
+               when Step_Struct_Get =>
+                  Append_Line ("  (setf " & Tgt & " (" & Val & "-" & Field & "))");
+               when Step_Struct_Set =>
+                  Append_Line ("  (setf (" & Tgt & "-" & Field & ") " & Val & ")");
+               when Step_Generic_Call =>
+                  Append_Line ("  (setf " & Tgt & " (" & Val & " " & Type_Args & " " & Args & "))");
+               when Step_Type_Cast =>
+                  Append_Line ("  (setf " & Tgt & " (coerce " & Val & " '" & Args & "))");
                when others =>
                   Append_Line ("  ;; unsupported step");
             end case;
@@ -591,6 +890,153 @@ package body Emit_Target.Lisp_Family is
                         end;
                      end if;
                   end loop;
+               when Step_Error =>
+                  if Val'Length > 0 then
+                     Append_Line ("  (error " & Val & ")");
+                  else
+                     Append_Line ("  (error \"runtime error\")");
+                  end if;
+               when Step_Break =>
+                  Append_Line ("  (break)");
+               when Step_Continue =>
+                  Append_Line ("  (continue)");
+               when Step_Switch =>
+                  Append_Line ("  (case " & Val);
+                  for C in Case_Index range 1 .. Step.Case_Count loop
+                     if Step.Case_Starts (C) <= Func.Steps.Count then
+                        Append_Line ("    ((" & Step.Case_Values (C) & ")");
+                        for B in Step_Index range Step.Case_Starts (C) .. Step.Case_Starts (C) + Step.Case_Counts (C) - 1 loop
+                           if B <= Func.Steps.Count then
+                              declare
+                                 Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                 B_Val : constant String := To_String (Body_Step.Value);
+                                 B_Tgt : constant String := To_String (Body_Step.Target);
+                              begin
+                                 case Body_Step.Step_Type is
+                                    when Step_Assign =>
+                                       if B_Tgt'Length > 0 then
+                                          Append_Line ("      (set! " & B_Tgt & " " & B_Val & ")");
+                                       end if;
+                                    when Step_Return =>
+                                       Append_Line ("      " & B_Val);
+                                    when others =>
+                                       Append_Line ("      #f");
+                                 end case;
+                              end;
+                           end if;
+                        end loop;
+                        Append_Line ("    )");
+                     end if;
+                  end loop;
+                  if Step.Default_Count > 0 then
+                     Append_Line ("    (t");
+                     for B in Step_Index range Step.Default_Start .. Step.Default_Start + Step.Default_Count - 1 loop
+                        if B <= Func.Steps.Count then
+                           declare
+                              Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                              B_Val : constant String := To_String (Body_Step.Value);
+                           begin
+                              case Body_Step.Step_Type is
+                                 when Step_Return =>
+                                    Append_Line ("      " & B_Val);
+                                 when others =>
+                                    Append_Line ("      #f");
+                              end case;
+                           end;
+                        end if;
+                     end loop;
+                     Append_Line ("    )");
+                  end if;
+                  Append_Line ("  )");
+               when Step_Try =>
+                  Append_Line ("  (handler-case");
+                  Append_Line ("    (progn");
+                  for B in Step_Index range Step.Try_Start .. Step.Try_Start + Step.Try_Count - 1 loop
+                     if B <= Func.Steps.Count then
+                        declare
+                           Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                           B_Val : constant String := To_String (Body_Step.Value);
+                           B_Tgt : constant String := To_String (Body_Step.Target);
+                        begin
+                           case Body_Step.Step_Type is
+                              when Step_Assign =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("      (set! " & B_Tgt & " " & B_Val & ")");
+                                 end if;
+                              when Step_Return =>
+                                 Append_Line ("      " & B_Val);
+                              when others =>
+                                 Append_Line ("      #f");
+                           end case;
+                        end;
+                     end if;
+                  end loop;
+                  Append_Line ("    )");
+                  for C in Step_Index range 1 .. Step.Catch_Count loop
+                     if Step.Catch_Blocks (C).Exception_Type'Length > 0 then
+                        Append_Line ("    (" & Step.Catch_Blocks (C).Exception_Type & " (err)");
+                        Append_Line ("      (progn");
+                        for B in Step_Index range Step.Catch_Blocks (C).Handler_Start .. Step.Catch_Blocks (C).Handler_Start + Step.Catch_Blocks (C).Handler_Count - 1 loop
+                           if B <= Func.Steps.Count then
+                              declare
+                                 Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                 B_Val : constant String := To_String (Body_Step.Value);
+                              begin
+                                 case Body_Step.Step_Type is
+                                    when Step_Return =>
+                                       Append_Line ("        " & B_Val);
+                                    when others =>
+                                       Append_Line ("        #f");
+                                 end case;
+                              end;
+                           end if;
+                        end loop;
+                        Append_Line ("      ))");
+                     end if;
+                  end loop;
+                  Append_Line ("  )");
+               when Step_Throw =>
+                  Append_Line ("  (error " & Val & ")");
+               when Step_Array_New =>
+                  Append_Line ("  (set! " & Tgt & " (make-array " & Val & "))");
+               when Step_Array_Get =>
+                  Append_Line ("  (set! " & Tgt & " (aref " & Val & " " & Idx & "))");
+               when Step_Array_Set =>
+                  Append_Line ("  (setf (aref " & Tgt & " " & Idx & ") " & Val & ")");
+               when Step_Array_Push =>
+                  Append_Line ("  (vector-push-extend " & Val & " " & Tgt & ")");
+               when Step_Array_Pop =>
+                  Append_Line ("  (set! " & Tgt & " (vector-pop " & Val & "))");
+               when Step_Array_Len =>
+                  Append_Line ("  (set! " & Tgt & " (length " & Val & "))");
+               when Step_Map_New =>
+                  Append_Line ("  (set! " & Tgt & " (make-hash-table))");
+               when Step_Map_Get =>
+                  Append_Line ("  (set! " & Tgt & " (gethash " & Key & " " & Val & "))");
+               when Step_Map_Set =>
+                  Append_Line ("  (setf (gethash " & Key & " " & Tgt & ") " & Val & ")");
+               when Step_Map_Delete =>
+                  Append_Line ("  (remhash " & Key & " " & Val & ")");
+               when Step_Map_Has =>
+                  Append_Line ("  (set! " & Tgt & " (nth-value 1 (gethash " & Key & " " & Val & ")))");
+               when Step_Set_New =>
+                  Append_Line ("  (set! " & Tgt & " (make-hash-table :test 'equal))");
+               when Step_Set_Add =>
+                  Append_Line ("  (setf (gethash " & Val & " " & Tgt & ") t)");
+               when Step_Set_Remove =>
+                  Append_Line ("  (remhash " & Val & " " & Tgt & ")");
+               when Step_Set_Has =>
+                  Append_Line ("  (set! " & Tgt & " (nth-value 1 (gethash " & Val & " " & Args & ")))");
+               when Step_Struct_New =>
+                  Append_Line ("  (set! " & Tgt & " (make-" & Val & "))");
+               when Step_Struct_Get =>
+                  Append_Line ("  (set! " & Tgt & " (" & Val & "-" & Field & "))");
+               when Step_Struct_Set =>
+                  Append_Line ("  (setf (" & Tgt & "-" & Field & ") " & Val & ")");
+               when Step_Generic_Call =>
+                  Append_Line ("  (set! " & Tgt & " (" & Val & " " & Type_Args & " " & Args & "))");
+               when Step_Type_Cast =>
+                  Append_Line ("  (set! " & Tgt & " (coerce " & Val & " '" & Args & "))");
                when others =>
                   Append_Line ("  ; unsupported step");
             end case;

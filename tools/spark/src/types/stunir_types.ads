@@ -429,6 +429,77 @@ package STUNIR_Types is
    end record;
 
    --  ========================================================================
+   --  GPU Binary Artifact Types (Pre-Emission)
+   --  ========================================================================
+
+   Max_GPU_Binaries    : constant := 8;
+   Max_Microcode_Blobs : constant := 4;
+   Max_Entry_Points    : constant := 8;
+
+   type GPU_Binary_Format is (
+      Format_PTX,
+      Format_CUBIN,
+      Format_HSACO,
+      Format_SPIRV
+   );
+
+   type Microcode_Format is (
+      Format_Microcode,
+      Format_ROM,
+      Format_UCode
+   );
+
+   type Selection_Policy is (
+      Prefer_Source,
+      Prefer_Binary,
+      Require_Binary
+   );
+
+   type Entry_Point_Index is range 0 .. Max_Entry_Points;
+   type GPU_Binary_Index is range 0 .. Max_GPU_Binaries;
+   type Microcode_Blob_Index is range 0 .. Max_Microcode_Blobs;
+
+   type Entry_Point_Array is array (Entry_Point_Index range <>) of Identifier_String;
+
+   type GPU_Binary_Artifact is record
+      Format           : GPU_Binary_Format;
+      Digest           : Identifier_String;  --  sha256:hex
+      Target_Arch      : Identifier_String;  --  e.g., sm_90, gfx1100
+      Entry_Points     : Entry_Point_Array (1 .. Max_Entry_Points);
+      Entry_Count      : Entry_Point_Index;
+      Blob_Path        : Path_String;
+      Kernel_Name      : Identifier_String;  --  Associated IR function
+      Policy           : Selection_Policy;
+   end record;
+
+   type GPU_Binary_Array is array (GPU_Binary_Index range <>) of GPU_Binary_Artifact;
+
+   type GPU_Binary_Collection is record
+      Binaries : GPU_Binary_Array (1 .. Max_GPU_Binaries);
+      Count    : GPU_Binary_Index;
+   end record;
+
+   type Microcode_Blob is record
+      Format       : Microcode_Format;
+      Digest       : Identifier_String;  --  sha256:hex
+      Target_Device : Identifier_String;
+      Blob_Path    : Path_String;
+      Load_Address : Identifier_String;  --  Hex address
+   end record;
+
+   type Microcode_Blob_Array is array (Microcode_Blob_Index range <>) of Microcode_Blob;
+
+   type Microcode_Blob_Collection is record
+      Blobs : Microcode_Blob_Array (1 .. Max_Microcode_Blobs);
+      Count : Microcode_Blob_Index;
+   end record;
+
+   type Artifacts is record
+      GPU_Binaries    : GPU_Binary_Collection;
+      Microcode_Blobs : Microcode_Blob_Collection;
+   end record;
+
+   --  ========================================================================
    --  IR Data Types (Top-level IR structure)
    --  ========================================================================
 
@@ -442,6 +513,7 @@ package STUNIR_Types is
       Constants      : Constant_Collection;
       Dependencies   : Dependency_Collection;
       Functions      : IR_Function_Collection;
+      Precompiled    : Artifacts;  --  Pre-compiled GPU binaries, microcode blobs
    end record;
 
    --  ========================================================================

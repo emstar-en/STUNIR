@@ -95,6 +95,8 @@ procedure Code_Emitter_Main is
          return Target_Futhark;
       elsif Target_Str = "lean4" or Target_Str = "lean" then
          return Target_Lean4;
+      elsif Target_Str = "haskell" or Target_Str = "hs" then
+         return Target_Haskell;
       else
          return Target_Python;  --  Default
       end if;

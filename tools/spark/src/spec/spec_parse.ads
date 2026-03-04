@@ -22,6 +22,7 @@ package Spec_Parse is
       Constants      : Constant_Collection;
       Dependencies   : Dependency_Collection;
       Functions      : Function_Collection;
+      Precompiled    : Artifacts;  --  Pre-compiled GPU binaries, microcode blobs
    end record;
 
    --  Parse spec JSON file into Spec_Data structure

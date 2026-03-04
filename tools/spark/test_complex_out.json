@@ -1,0 +1,22 @@
+{
+  "schema_version": "extraction.v2",
+  "module_name": "test_module",
+  "language": "rust",
+  "functions": [
+    {
+      "name": "generic_func",
+      "return_type": "T",
+      "parameters": [{"name": "item", "type": "T"}]
+    },
+    {
+      "name": "multiline",
+      "return_type": "i32",
+      "parameters": [{"name": "a", "type": "i32"}, {"name": "b", "type": "i32"}, {"name": "c", "type": "i32"}]
+    },
+    {
+      "name": "with_generics",
+      "return_type": "bool",
+      "parameters": [{"name": "map", "type": "HashMap<String, Vec<i32>>"}]
+    }
+  ]
+}

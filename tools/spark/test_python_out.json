@@ -1,0 +1,32 @@
+{
+  "schema_version": "extraction.v2",
+  "module_name": "test_module",
+  "language": "python",
+  "functions": [
+    {
+      "name": "simple_func",
+      "return_type": "any",
+      "parameters": [{"name": "a", "type": "any"}, {"name": "b", "type": "any"}]
+    },
+    {
+      "name": "with_type_hints",
+      "return_type": "any",
+      "parameters": [{"name": "name", "type": "str"}, {"name": "age", "type": "int"}]
+    },
+    {
+      "name": "with_defaults",
+      "return_type": "any",
+      "parameters": [{"name": "x", "type": "int"}, {"name": "y", "type": "str"}]
+    },
+    {
+      "name": "multiline_params",
+      "return_type": "any",
+      "parameters": [{"name": "first", "type": "str"}, {"name": "second", "type": "int"}, {"name": "third", "type": "List[str]"}]
+    },
+    {
+      "name": "decorated",
+      "return_type": "any",
+      "parameters": [{"name": "a", "type": "int"}]
+    }
+  ]
+}

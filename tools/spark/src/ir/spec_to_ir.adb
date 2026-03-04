@@ -128,6 +128,33 @@ package body Spec_To_IR is
          IR.Functions.Functions (I).Parameters.Count := 0;
          IR.Functions.Functions (I).Steps.Count := 0;
       end loop;
+      
+      --  Copy artifacts (GPU binaries and microcode blobs)
+      IR.Precompiled.GPU_Binaries.Count := Spec.Precompiled.GPU_Binaries.Count;
+      for I in GPU_Binary_Index range 1 .. Spec.Precompiled.GPU_Binaries.Count loop
+         IR.Precompiled.GPU_Binaries.Binaries (I) := Spec.Precompiled.GPU_Binaries.Binaries (I);
+      end loop;
+      for I in GPU_Binary_Index range Spec.Precompiled.GPU_Binaries.Count + 1 .. Max_GPU_Binaries loop
+         IR.Precompiled.GPU_Binaries.Binaries (I).Format := Format_PTX;
+         IR.Precompiled.GPU_Binaries.Binaries (I).Digest := Identifier_Strings.Null_Bounded_String;
+         IR.Precompiled.GPU_Binaries.Binaries (I).Target_Arch := Identifier_Strings.Null_Bounded_String;
+         IR.Precompiled.GPU_Binaries.Binaries (I).Entry_Count := 0;
+         IR.Precompiled.GPU_Binaries.Binaries (I).Blob_Path := Path_Strings.Null_Bounded_String;
+         IR.Precompiled.GPU_Binaries.Binaries (I).Kernel_Name := Identifier_Strings.Null_Bounded_String;
+         IR.Precompiled.GPU_Binaries.Binaries (I).Policy := Prefer_Source;
+      end loop;
+      
+      IR.Precompiled.Microcode_Blobs.Count := Spec.Precompiled.Microcode_Blobs.Count;
+      for I in Microcode_Blob_Index range 1 .. Spec.Precompiled.Microcode_Blobs.Count loop
+         IR.Precompiled.Microcode_Blobs.Blobs (I) := Spec.Precompiled.Microcode_Blobs.Blobs (I);
+      end loop;
+      for I in Microcode_Blob_Index range Spec.Precompiled.Microcode_Blobs.Count + 1 .. Max_Microcode_Blobs loop
+         IR.Precompiled.Microcode_Blobs.Blobs (I).Format := Format_Microcode;
+         IR.Precompiled.Microcode_Blobs.Blobs (I).Digest := Identifier_Strings.Null_Bounded_String;
+         IR.Precompiled.Microcode_Blobs.Blobs (I).Target_Device := Identifier_Strings.Null_Bounded_String;
+         IR.Precompiled.Microcode_Blobs.Blobs (I).Blob_Path := Path_Strings.Null_Bounded_String;
+         IR.Precompiled.Microcode_Blobs.Blobs (I).Load_Address := Identifier_Strings.Null_Bounded_String;
+      end loop;
    end Convert_Spec_To_IR;
 
    procedure Convert_Spec_File
@@ -227,7 +254,71 @@ package body Spec_To_IR is
          end if;
       end loop;
       
-      Put_Line (Output, "  ]");
+      Put_Line (Output, "  ],");
+      
+      --  Emit artifacts section
+      Put_Line (Output, "  ""artifacts"": {");
+      
+      --  GPU binaries
+      Put (Output, "    ""gpu_binaries"": [");
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         Put (Output, "{");
+         Put (Output, """format"": """);
+         case IR.Precompiled.GPU_Binaries.Binaries (I).Format is
+            when Format_PTX => Put (Output, "ptx");
+            when Format_CUBIN => Put (Output, "cubin");
+            when Format_HSACO => Put (Output, "hsaco");
+            when Format_SPIRV => Put (Output, "spirv");
+         end case;
+         Put (Output, """, ");
+         Put (Output, """digest"": """ & 
+            Identifier_Strings.To_String (IR.Precompiled.GPU_Binaries.Binaries (I).Digest) & """, ");
+         Put (Output, """target_arch"": """ & 
+            Identifier_Strings.To_String (IR.Precompiled.GPU_Binaries.Binaries (I).Target_Arch) & """, ");
+         Put (Output, """blob_path"": """ & 
+            Path_Strings.To_String (IR.Precompiled.GPU_Binaries.Binaries (I).Blob_Path) & """, ");
+         Put (Output, """kernel_name"": """ & 
+            Identifier_Strings.To_String (IR.Precompiled.GPU_Binaries.Binaries (I).Kernel_Name) & """, ");
+         Put (Output, """policy"": """);
+         case IR.Precompiled.GPU_Binaries.Binaries (I).Policy is
+            when Prefer_Source => Put (Output, "prefer_source");
+            when Prefer_Binary => Put (Output, "prefer_binary");
+            when Require_Binary => Put (Output, "require_binary");
+         end case;
+         Put (Output, """}");
+         if I < IR.Precompiled.GPU_Binaries.Count then
+            Put (Output, ", ");
+         end if;
+      end loop;
+      Put_Line (Output, "],");
+      
+      --  Microcode blobs
+      Put (Output, "    ""microcode_blobs"": [");
+      for I in Microcode_Blob_Index range 1 .. IR.Precompiled.Microcode_Blobs.Count loop
+         Put (Output, "{");
+         Put (Output, """format"": """);
+         case IR.Precompiled.Microcode_Blobs.Blobs (I).Format is
+            when Format_Microcode => Put (Output, "microcode");
+            when Format_ROM => Put (Output, "rom");
+            when Format_UCode => Put (Output, "ucode");
+         end case;
+         Put (Output, """, ");
+         Put (Output, """digest"": """ & 
+            Identifier_Strings.To_String (IR.Precompiled.Microcode_Blobs.Blobs (I).Digest) & """, ");
+         Put (Output, """target_device"": """ & 
+            Identifier_Strings.To_String (IR.Precompiled.Microcode_Blobs.Blobs (I).Target_Device) & """, ");
+         Put (Output, """blob_path"": """ & 
+            Path_Strings.To_String (IR.Precompiled.Microcode_Blobs.Blobs (I).Blob_Path) & """, ");
+         Put (Output, """load_address"": """ & 
+            Identifier_Strings.To_String (IR.Precompiled.Microcode_Blobs.Blobs (I).Load_Address) & """");
+         Put (Output, "}");
+         if I < IR.Precompiled.Microcode_Blobs.Count then
+            Put (Output, ", ");
+         end if;
+      end loop;
+      Put_Line (Output, "]");
+      
+      Put_Line (Output, "  }");
       Put_Line (Output, "}");
       Close (Output);
       

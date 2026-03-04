@@ -1,0 +1,11 @@
+{
+  "schema_version": "extraction.v2",
+  "module_name": "test_c",
+  "language": "c",
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "int",
+      "parameters": [{"name": "a", "type": "int"}, {"name": "b", "type": "int"}]
+    }  ]
+}

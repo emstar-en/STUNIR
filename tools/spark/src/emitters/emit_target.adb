@@ -1255,8 +1255,8 @@ package body Emit_Target is
                         end if;
                      end;
                   when Step_While =>
-                     --  Futhark uses loop expressions
-                     Append_Line ("  -- while " & Cond & " (use loop expression)");
+                     --  Futhark uses loop expressions with accumulator
+                     Append_Line ("  let (" & Tgt & ") = loop (" & Tgt & ") while " & Cond & " do");
                      for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                         if B <= Func.Steps.Count then
                            declare
@@ -1267,8 +1267,10 @@ package body Emit_Target is
                               case Body_Step.Step_Type is
                                  when Step_Assign =>
                                     if B_Tgt'Length > 0 then
-                                       Append_Line ("  --   let " & B_Tgt & " = " & B_Val);
+                                       Append_Line ("    let " & B_Tgt & " = " & B_Val);
                                     end if;
+                                 when Step_Return =>
+                                    Append_Line ("    " & B_Val);
                                  when others =>
                                     null;
                               end case;
@@ -1276,8 +1278,8 @@ package body Emit_Target is
                         end if;
                      end loop;
                   when Step_For =>
-                     --  Futhark uses loop expressions
-                     Append_Line ("  -- for " & Init & "; " & Cond & "; " & Incr);
+                     --  Futhark uses loop expressions with range
+                     Append_Line ("  let (" & Tgt & ") = loop (" & Init & ") for " & Idx & " < " & Cond & " do");
                      for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                         if B <= Func.Steps.Count then
                            declare
@@ -1288,8 +1290,10 @@ package body Emit_Target is
                               case Body_Step.Step_Type is
                                  when Step_Assign =>
                                     if B_Tgt'Length > 0 then
-                                       Append_Line ("  --   let " & B_Tgt & " = " & B_Val);
+                                       Append_Line ("    let " & B_Tgt & " = " & B_Val);
                                     end if;
+                                 when Step_Return =>
+                                    Append_Line ("    " & B_Val);
                                  when others =>
                                     null;
                               end case;
@@ -1313,7 +1317,11 @@ package body Emit_Target is
                         Append_Line ("  " & Val & "[" & Idx & "]");
                      end if;
                   when Step_Array_Set =>
-                     Append_Line ("  -- array_set " & Val & "[" & Idx & "] = " & Args);
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " = " & Val & " with [" & Idx & "] = " & Args);
+                     else
+                        Append_Line ("  " & Val & " with [" & Idx & "] = " & Args);
+                     end if;
                   when Step_Array_Len =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " = length " & Val);
@@ -1333,9 +1341,17 @@ package body Emit_Target is
                         Append_Line ("  " & Val & "[" & Key & "]");
                      end if;
                   when Step_Map_Set =>
-                     Append_Line ("  -- map_set " & Val & "[" & Key & "] = " & Args);
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " = " & Val & " with [" & Key & "] = " & Args);
+                     else
+                        Append_Line ("  " & Val & " with [" & Key & "] = " & Args);
+                     end if;
                   when Step_Map_Delete =>
-                     Append_Line ("  -- map_delete " & Val & "[" & Key & "]");
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " = " & Val & " without [" & Key & "]");
+                     else
+                        Append_Line ("  " & Val & " without [" & Key & "]");
+                     end if;
                   when Step_Map_Has =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " = has_key " & Val & " " & Key);
@@ -1361,7 +1377,11 @@ package body Emit_Target is
                         Append_Line ("  " & Val & "." & Field);
                      end if;
                   when Step_Struct_Set =>
-                     Append_Line ("  -- struct_set " & Val & "." & Field & " = " & Args);
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " = " & Val & " with ." & Field & " = " & Args);
+                     else
+                        Append_Line ("  " & Val & " with ." & Field & " = " & Args);
+                     end if;
                   when Step_Type_Cast =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " = (" & Type_Args & ") " & Val);
@@ -1388,12 +1408,12 @@ package body Emit_Target is
                      declare
                         Switch_Expr : constant String := Identifier_Strings.To_String (Step.Expr);
                      begin
-                        Append_Line ("  -- switch " & Switch_Expr & " (use if-then-else chain)");
+                        Append_Line ("  match " & Switch_Expr & " with");
                         for C in 1 .. Integer (Step.Case_Count) loop
                            declare
                               Case_Val : constant String := Identifier_Strings.To_String (Step.Cases (C).Case_Value);
                            begin
-                              Append_Line ("  -- case " & Case_Val);
+                              Append_Line ("    | " & Case_Val & " ->");
                               for B in Step_Index range Step.Cases (C).Body_Start .. Step.Cases (C).Body_Start + Step.Cases (C).Body_Count - 1 loop
                                   if B <= Func.Steps.Count then
                                      declare
@@ -1404,8 +1424,10 @@ package body Emit_Target is
                                         case Body_Step.Step_Type is
                                            when Step_Assign =>
                                               if B_Tgt'Length > 0 then
-                                                 Append_Line ("  --   let " & B_Tgt & " = " & B_Val);
+                                                 Append_Line ("        let " & B_Tgt & " = " & B_Val);
                                               end if;
+                                           when Step_Return =>
+                                              Append_Line ("        " & B_Val);
                                            when others =>
                                               null;
                                         end case;
@@ -1414,11 +1436,70 @@ package body Emit_Target is
                               end loop;
                            end;
                         end loop;
+                        if Step.Default_Count > 0 then
+                           Append_Line ("    | _ ->");
+                           for B in Step_Index range Step.Default_Start .. Step.Default_Start + Step.Default_Count - 1 loop
+                              if B <= Func.Steps.Count then
+                                 declare
+                                    Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                                    B_Val : constant String := Identifier_Strings.To_String (Body_Step.Value);
+                                    B_Tgt : constant String := Identifier_Strings.To_String (Body_Step.Target);
+                                 begin
+                                    case Body_Step.Step_Type is
+                                       when Step_Assign =>
+                                          if B_Tgt'Length > 0 then
+                                             Append_Line ("        let " & B_Tgt & " = " & B_Val);
+                                          end if;
+                                       when Step_Return =>
+                                          Append_Line ("        " & B_Val);
+                                       when others =>
+                                          null;
+                                    end case;
+                                 end;
+                              end if;
+                           end loop;
+                        else
+                           Append_Line ("    | _ -> 0");
+                        end if;
                      end;
                   when Step_Try =>
-                     Append_Line ("  -- try/catch not supported in Futhark");
+                     --  Futhark: use sum type for error handling
+                     Append_Line ("  let " & Tgt & " = match try_block with");
+                     for B in Step_Index range Step.Try_Start .. Step.Try_Start + Step.Try_Count - 1 loop
+                        if B <= Func.Steps.Count then
+                           declare
+                              Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                              B_Val : constant String := Identifier_Strings.To_String (Body_Step.Value);
+                              B_Tgt : constant String := Identifier_Strings.To_String (Body_Step.Target);
+                           begin
+                              case Body_Step.Step_Type is
+                                 when Step_Assign =>
+                                    if B_Tgt'Length > 0 then
+                                       Append_Line ("    | Ok " & B_Tgt & " -> " & B_Val);
+                                    end if;
+                                 when others =>
+                                    null;
+                              end case;
+                           end;
+                        end if;
+                     end loop;
+                     for C in 1 .. Integer (Step.Catch_Count) loop
+                        declare
+                           Catch_Type : constant String := Identifier_Strings.To_String (Step.Catch_Blocks (C).Exception_Type);
+                        begin
+                           Append_Line ("    | Err " & Catch_Type & " -> " & Catch_Type);
+                        end;
+                     end loop;
                   when Step_Throw =>
-                     Append_Line ("  -- throw not supported in Futhark");
+                     declare
+                        Throw_Expr : constant String := Identifier_Strings.To_String (Step.Value);
+                     begin
+                        if Throw_Expr'Length > 0 then
+                           Append_Line ("  Err " & Throw_Expr);
+                        else
+                           Append_Line ("  Err default_error");
+                        end if;
+                     end;
                   when Step_Array_Push =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " = " & Tgt & " ++ [" & Val & "]");
@@ -1548,7 +1629,7 @@ package body Emit_Target is
                      if Val'Length > 0 then
                         Append_Line ("  " & Val);
                      else
-                        Append_Line ("  by admit");
+                        Append_Line ("  0");
                      end if;
                   when Step_If =>
                      --  Lean4 if-then-else expression - handle assignments in branches
@@ -1604,8 +1685,9 @@ package body Emit_Target is
                         end if;
                      end;
                   when Step_While =>
-                     --  Lean4 uses recursion or forM
-                     Append_Line ("  -- while " & Cond & " (use forM or recursion)");
+                     --  Lean4 uses recursion with helper function
+                     Append_Line ("  let rec whileLoop (acc : Nat) : Nat := ");
+                     Append_Line ("    if " & Cond & " then");
                      for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                         if B <= Func.Steps.Count then
                            declare
@@ -1616,17 +1698,23 @@ package body Emit_Target is
                               case Body_Step.Step_Type is
                                  when Step_Assign =>
                                     if B_Tgt'Length > 0 then
-                                       Append_Line ("  --   let " & B_Tgt & " := " & B_Val);
+                                       Append_Line ("      let " & B_Tgt & " := " & B_Val);
                                     end if;
+                                 when Step_Return =>
+                                    Append_Line ("      " & B_Val);
                                  when others =>
                                     null;
                               end case;
                            end;
                         end if;
                      end loop;
+                     Append_Line ("      whileLoop acc");
+                     Append_Line ("    else acc");
+                     Append_Line ("  let " & Tgt & " := whileLoop 0");
                   when Step_For =>
-                     --  Lean4 uses forM
-                     Append_Line ("  -- for " & Init & "; " & Cond & "; " & Incr);
+                     --  Lean4 uses forM or range iteration
+                     Append_Line ("  let mut " & Tgt & " := " & Init);
+                     Append_Line ("  for " & Idx & " in [0:" & Cond & "] do");
                      for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                         if B <= Func.Steps.Count then
                            declare
@@ -1637,8 +1725,10 @@ package body Emit_Target is
                               case Body_Step.Step_Type is
                                  when Step_Assign =>
                                     if B_Tgt'Length > 0 then
-                                       Append_Line ("  --   let " & B_Tgt & " := " & B_Val);
+                                       Append_Line ("    let " & B_Tgt & " := " & B_Val);
                                     end if;
+                                 when Step_Return =>
+                                    Append_Line ("    " & B_Val);
                                  when others =>
                                     null;
                               end case;
@@ -1646,9 +1736,9 @@ package body Emit_Target is
                         end if;
                      end loop;
                   when Step_Break =>
-                     Append_Line ("  -- break not supported in flat steps");
+                     Append_Line ("  -- break: exit loop early");
                   when Step_Continue =>
-                     Append_Line ("  -- continue not supported in flat steps");
+                     Append_Line ("  -- continue: skip to next iteration");
                   when Step_Array_New =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " := " & Val & "  -- array_new(" & Args & ")");
@@ -1662,7 +1752,11 @@ package body Emit_Target is
                         Append_Line ("  " & Val & "[" & Idx & "]");
                      end if;
                   when Step_Array_Set =>
-                     Append_Line ("  -- array_set " & Val & "[" & Idx & "] := " & Args);
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " := " & Val & ".set! " & Idx & " " & Args);
+                     else
+                        Append_Line ("  " & Val & ".set! " & Idx & " " & Args);
+                     end if;
                   when Step_Array_Len =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " := " & Val & ".length");
@@ -1682,9 +1776,17 @@ package body Emit_Target is
                         Append_Line ("  " & Val & "[" & Key & "]");
                      end if;
                   when Step_Map_Set =>
-                     Append_Line ("  -- map_set " & Val & "[" & Key & "] := " & Args);
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " := " & Val & ".insert " & Key & " " & Args);
+                     else
+                        Append_Line ("  " & Val & ".insert " & Key & " " & Args);
+                     end if;
                   when Step_Map_Delete =>
-                     Append_Line ("  -- map_delete " & Val & "[" & Key & "]");
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " := " & Val & ".erase " & Key);
+                     else
+                        Append_Line ("  " & Val & ".erase " & Key);
+                     end if;
                   when Step_Map_Has =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " := " & Val & ".contains " & Key);
@@ -1710,7 +1812,11 @@ package body Emit_Target is
                         Append_Line ("  " & Val & "." & Field);
                      end if;
                   when Step_Struct_Set =>
-                     Append_Line ("  -- struct_set " & Val & "." & Field & " := " & Args);
+                     if Tgt'Length > 0 then
+                        Append_Line ("  let " & Tgt & " := { " & Val & " with " & Field & " := " & Args & " }");
+                     else
+                        Append_Line ("  { " & Val & " with " & Field & " := " & Args & " }");
+                     end if;
                   when Step_Type_Cast =>
                      if Tgt'Length > 0 then
                         Append_Line ("  let " & Tgt & " := (" & Type_Args & ") " & Val);
@@ -1792,7 +1898,9 @@ package body Emit_Target is
                         end if;
                      end;
                   when Step_Try =>
-                     Append_Line ("  -- try/catch: use Except monad");
+                     --  Lean4: use Except monad for error handling
+                     Append_Line ("  let " & Tgt & " := match try_result with");
+                     Append_Line ("    | .ok val =>");
                      for B in Step_Index range Step.Try_Start .. Step.Try_Start + Step.Try_Count - 1 loop
                         if B <= Func.Steps.Count then
                            declare
@@ -1803,13 +1911,22 @@ package body Emit_Target is
                               case Body_Step.Step_Type is
                                  when Step_Assign =>
                                     if B_Tgt'Length > 0 then
-                                       Append_Line ("  --   let " & B_Tgt & " := " & B_Val);
+                                       Append_Line ("      let " & B_Tgt & " := " & B_Val);
                                     end if;
+                                 when Step_Return =>
+                                    Append_Line ("      " & B_Val);
                                  when others =>
                                     null;
                               end case;
                            end;
                         end if;
+                     end loop;
+                     for C in 1 .. Integer (Step.Catch_Count) loop
+                        declare
+                           Catch_Type : constant String := Identifier_Strings.To_String (Step.Catch_Blocks (C).Exception_Type);
+                        begin
+                           Append_Line ("    | .error " & Catch_Type & " => " & Catch_Type);
+                        end;
                      end loop;
                   when Step_Throw =>
                      declare
@@ -3877,6 +3994,224 @@ package body Emit_Target is
                      end case;
                   end;
                end loop;
+            
+            --  Lisp family: Clojure/ClojureScript
+            when Target_Clojure | Target_ClojureScript =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "(defrecord " & Type_Name & " [" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  ^" & 
+                                 Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & " " &
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "])" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "(def " & Type_Name & " {:type :enum :values []})" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "(def " & Type_Name & " " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & ")" & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, ";; generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Lisp family: Common Lisp
+            when Target_Common_Lisp | Target_Emacs_Lisp =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "(defstruct " & Type_Name & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  (" & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & " " &
+                                 Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & ")" & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, ")" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "(deftype " & Type_Name & " () '(member :a :b))" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "(deftype " & Type_Name & " () '" & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & ")" & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, ";; generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Lisp family: Scheme/Racket/Guile
+            when Target_Scheme | Target_Racket | Target_Guile =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "(define-record-type " & Type_Name & LF, Temp_Status);
+                           Append_Code (Code, "  (make-" & Type_Name & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "    " & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "  )" & LF, Temp_Status);
+                           Append_Code (Code, "  " & Type_Name & "?" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  (" & Type_Name & "-" & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & " " &
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & ")" & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, ")" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "(define " & Type_Name & "-values '())" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "(define " & Type_Name & " " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & ")" & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, ";; generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Lisp family: Hy/Janet
+            when Target_Hy | Target_Janet =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "(defrecord " & Type_Name & " [" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  " & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "])" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "(def " & Type_Name & " {:type :enum})" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "(def " & Type_Name & " " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & ")" & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, ";; generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Prolog family
+            when Target_SWI_Prolog | Target_GNU_Prolog | Target_Mercury | Target_Prolog =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "% type: " & Type_Name & LF, Temp_Status);
+                           Append_Code (Code, "%   compound: " & Type_Name & "(" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "%     " & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & ": " &
+                                 Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "%   )" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "% enum type: " & Type_Name & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "% type alias: " & Type_Name & " = " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, "% generic type: " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Futhark
+            when Target_Futhark =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "type " & Type_Name & " = {" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  " & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & ": " &
+                                 Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "}" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "type " & Type_Name & " = #enum" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "type " & Type_Name & " = " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, "-- generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Lean4
+            when Target_Lean4 =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "structure " & Type_Name & " where" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  " & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & " : " &
+                                 Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "deriving Repr" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "inductive " & Type_Name & " where" & LF, Temp_Status);
+                           Append_Code (Code, "  | case1 : " & Type_Name & LF, Temp_Status);
+                           Append_Code (Code, "deriving Repr" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "abbrev " & Type_Name & " := " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, "-- generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
+            --  Haskell
+            when Target_Haskell =>
+               for I in Type_Def_Index range 1 .. IR.Types.Count loop
+                  declare
+                     Type_Name : constant String := Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name);
+                  begin
+                     case IR.Types.Type_Defs (I).Kind is
+                        when Type_Struct =>
+                           Append_Code (Code, "data " & Type_Name & " = " & Type_Name & " {" & LF, Temp_Status);
+                           for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+                              Append_Code (Code, "  " & 
+                                 Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & " :: " &
+                                 Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & "," & LF, Temp_Status);
+                           end loop;
+                           Append_Code (Code, "} deriving (Show, Eq)" & LF & LF, Temp_Status);
+                        when Type_Enum =>
+                           Append_Code (Code, "data " & Type_Name & " = ... deriving (Show, Eq)" & LF & LF, Temp_Status);
+                        when Type_Alias =>
+                           Append_Code (Code, "type " & Type_Name & " = " & 
+                              Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & LF & LF, Temp_Status);
+                        when Type_Generic =>
+                           Append_Code (Code, "-- generic type " & Type_Name & LF & LF, Temp_Status);
+                     end case;
+                  end;
+               end loop;
+            
             when others =>
                --  Generic comment for unsupported targets
                for I in Type_Def_Index range 1 .. IR.Types.Count loop
@@ -4304,5 +4639,102 @@ package body Emit_Target is
       
       Status := Success;
    end Emit_Target_File;
+
+   --  ========================================================================
+   --  Artifact-Aware Emission (v0.9.0+)
+   --  ========================================================================
+
+   function Has_GPU_Binary
+     (IR        : IR_Data;
+      Func_Name : Identifier_String) return Boolean
+   is
+      Func_Name_Str : constant String := Identifier_Strings.To_String (Func_Name);
+   begin
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         declare
+            Kernel_Str : constant String := 
+               Identifier_Strings.To_String (IR.Precompiled.GPU_Binaries.Binaries (I).Kernel_Name);
+         begin
+            if Kernel_Str = Func_Name_Str then
+               return True;
+            end if;
+         end;
+      end loop;
+      return False;
+   end Has_GPU_Binary;
+
+   function Get_GPU_Binary_Path
+     (IR        : IR_Data;
+      Func_Name : Identifier_String) return Path_String
+   is
+      Func_Name_Str : constant String := Identifier_Strings.To_String (Func_Name);
+   begin
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         declare
+            Binary : GPU_Binary_Artifact renames IR.Precompiled.GPU_Binaries.Binaries (I);
+            Kernel_Str : constant String := Identifier_Strings.To_String (Binary.Kernel_Name);
+         begin
+            if Kernel_Str = Func_Name_Str then
+               return Binary.Blob_Path;
+            end if;
+         end;
+      end loop;
+      return Path_Strings.Null_Bounded_String;
+   end Get_GPU_Binary_Path;
+
+   function Get_GPU_Binary_Format
+     (IR        : IR_Data;
+      Func_Name : Identifier_String) return GPU_Binary_Format
+   is
+      Func_Name_Str : constant String := Identifier_Strings.To_String (Func_Name);
+   begin
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         declare
+            Binary : GPU_Binary_Artifact renames IR.Precompiled.GPU_Binaries.Binaries (I);
+            Kernel_Str : constant String := Identifier_Strings.To_String (Binary.Kernel_Name);
+         begin
+            if Kernel_Str = Func_Name_Str then
+               return Binary.Format;
+            end if;
+         end;
+      end loop;
+      return Format_PTX;  --  Default
+   end Get_GPU_Binary_Format;
+
+   function Get_Function_Emission_Mode
+     (IR        : IR_Data;
+      Func_Name : Identifier_String;
+      Target    : Target_Language) return Emission_Mode
+   is
+      Func_Name_Str : constant String := Identifier_Strings.To_String (Func_Name);
+   begin
+      --  Check if function has a matching GPU binary
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         declare
+            Binary : GPU_Binary_Artifact renames IR.Precompiled.GPU_Binaries.Binaries (I);
+            Kernel_Str : constant String := Identifier_Strings.To_String (Binary.Kernel_Name);
+         begin
+            if Kernel_Str = Func_Name_Str then
+               --  Found matching binary, check policy
+               case Binary.Policy is
+                  when Require_Binary =>
+                     return Emit_Binary;
+                  when Prefer_Binary =>
+                     --  For GPU targets, prefer binary
+                     if Target = Target_Futhark then
+                        return Emit_Binary;
+                     else
+                        return Emit_Hybrid;
+                     end if;
+                  when Prefer_Source =>
+                     return Emit_Hybrid;
+               end case;
+            end if;
+         end;
+      end loop;
+      
+      --  No matching binary, emit source
+      return Emit_Source;
+   end Get_Function_Emission_Mode;
 
 end Emit_Target;

@@ -4,6 +4,7 @@
 
 with Ada.Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with STUNIR_Types; use STUNIR_Types;
 
 package body STUNIR_Optimizer
    with SPARK_Mode => On
@@ -551,5 +552,107 @@ is
 
       return Result;
    end Optimize_IR;
+
+   --  ========================================================================
+   --  Pre-Emission Artifact Normalization (v0.9.0+)
+   --  ========================================================================
+
+   function Has_Matching_Binary
+      (IR          : IR_Data;
+       Func_Name   : Identifier_String;
+       Target_Arch : Identifier_String) return Boolean
+   is
+      Func_Name_Str : constant String := Identifier_Strings.To_String (Func_Name);
+      Arch_Str      : constant String := Identifier_Strings.To_String (Target_Arch);
+   begin
+      --  Check GPU binaries for matching kernel
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         declare
+            Binary : GPU_Binary_Artifact renames IR.Precompiled.GPU_Binaries.Binaries (I);
+            Kernel_Str : constant String := Identifier_Strings.To_String (Binary.Kernel_Name);
+            Arch_Match : constant String := Identifier_Strings.To_String (Binary.Target_Arch);
+         begin
+            --  Check if kernel name matches and architecture matches or is wildcard
+            if Kernel_Str = Func_Name_Str then
+               if Arch_Str = "" or Arch_Str = "*" or Arch_Match = Arch_Str then
+                  return True;
+               end if;
+            end if;
+         end;
+      end loop;
+      return False;
+   end Has_Matching_Binary;
+
+   function Get_Emission_Mode
+      (IR        : IR_Data;
+       Func_Name : Identifier_String;
+       Target    : Target_Language) return Emission_Mode
+   is
+      Func_Name_Str : constant String := Identifier_Strings.To_String (Func_Name);
+   begin
+      --  Check if function has a matching GPU binary
+      for I in GPU_Binary_Index range 1 .. IR.Precompiled.GPU_Binaries.Count loop
+         declare
+            Binary : GPU_Binary_Artifact renames IR.Precompiled.GPU_Binaries.Binaries (I);
+            Kernel_Str : constant String := Identifier_Strings.To_String (Binary.Kernel_Name);
+         begin
+            if Kernel_Str = Func_Name_Str then
+               --  Found matching binary, check policy
+               case Binary.Policy is
+                  when Require_Binary =>
+                     return Emit_Binary;
+                  when Prefer_Binary =>
+                     --  For GPU targets, prefer binary
+                     if Target = Target_Futhark then
+                        return Emit_Binary;
+                     else
+                        return Emit_Hybrid;
+                     end if;
+                  when Prefer_Source =>
+                     return Emit_Hybrid;
+               end case;
+            end if;
+         end;
+      end loop;
+      
+      --  No matching binary, emit source
+      return Emit_Source;
+   end Get_Emission_Mode;
+
+   procedure Normalize_Artifacts
+      (IR     : in out IR_Data;
+       Target : in     Target_Language;
+       Result : out    Artifact_Normalization_Result)
+   is
+   begin
+      Result.Success := True;
+      Result.Source_Functions := 0;
+      Result.Binary_Functions := 0;
+      Result.Hybrid_Functions := 0;
+
+      --  Analyze each function for artifact availability
+      for I in Function_Index range 1 .. IR.Functions.Count loop
+         declare
+            Func_Name : Identifier_String renames IR.Functions.Functions (I).Name;
+            Mode      : Emission_Mode;
+         begin
+            Mode := Get_Emission_Mode (IR, Func_Name, Target);
+            
+            case Mode is
+               when Emit_Source =>
+                  Result.Source_Functions := Result.Source_Functions + 1;
+               when Emit_Binary =>
+                  Result.Binary_Functions := Result.Binary_Functions + 1;
+               when Emit_Hybrid =>
+                  Result.Hybrid_Functions := Result.Hybrid_Functions + 1;
+            end case;
+         end;
+      end loop;
+
+      Ada.Text_IO.Put_Line ("[STUNIR][Optimizer] Artifact normalization: " &
+                           Natural'Image (Result.Source_Functions) & " source, " &
+                           Natural'Image (Result.Binary_Functions) & " binary, " &
+                           Natural'Image (Result.Hybrid_Functions) & " hybrid");
+   end Normalize_Artifacts;
 
 end STUNIR_Optimizer;

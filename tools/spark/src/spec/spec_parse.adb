@@ -64,6 +64,27 @@ package body Spec_Parse is
          Spec.Functions.Functions (I).Return_Type := Type_Name_Strings.Null_Bounded_String;
          Spec.Functions.Functions (I).Parameters.Count := 0;
       end loop;
+      
+      --  Initialize artifacts
+      Spec.Precompiled.GPU_Binaries.Count := 0;
+      for I in GPU_Binary_Index range 1 .. Max_GPU_Binaries loop
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Format := Format_PTX;
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Digest := Identifier_Strings.Null_Bounded_String;
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Target_Arch := Identifier_Strings.Null_Bounded_String;
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Entry_Count := 0;
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Blob_Path := Path_Strings.Null_Bounded_String;
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Kernel_Name := Identifier_Strings.Null_Bounded_String;
+         Spec.Precompiled.GPU_Binaries.Binaries (I).Policy := Prefer_Source;
+      end loop;
+      
+      Spec.Precompiled.Microcode_Blobs.Count := 0;
+      for I in Microcode_Blob_Index range 1 .. Max_Microcode_Blobs loop
+         Spec.Precompiled.Microcode_Blobs.Blobs (I).Format := Format_Microcode;
+         Spec.Precompiled.Microcode_Blobs.Blobs (I).Digest := Identifier_Strings.Null_Bounded_String;
+         Spec.Precompiled.Microcode_Blobs.Blobs (I).Target_Device := Identifier_Strings.Null_Bounded_String;
+         Spec.Precompiled.Microcode_Blobs.Blobs (I).Blob_Path := Path_Strings.Null_Bounded_String;
+         Spec.Precompiled.Microcode_Blobs.Blobs (I).Load_Address := Identifier_Strings.Null_Bounded_String;
+      end loop;
    end Init_Spec_Data;
 
    procedure Parse_Spec_String
@@ -527,6 +548,207 @@ package body Spec_Parse is
                      end if;
                   end loop;
                   if Current_Token (Parser) = Token_Array_End then
+                     Next_Token (Parser, Temp_Status);
+                  end if;
+               elsif Name_Str = "artifacts" and then Current_Token (Parser) = Token_Object_Start then
+                  --  Parse artifacts object
+                  Next_Token (Parser, Temp_Status);
+                  while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                     if Current_Token (Parser) = Token_String then
+                        declare
+                           Art_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                        begin
+                           Next_Token (Parser, Temp_Status);
+                           if Current_Token (Parser) /= Token_Colon then
+                              Status := Error_Parse;
+                              return;
+                           end if;
+                           Next_Token (Parser, Temp_Status);
+                           
+                           if Art_Key = "gpu_binaries" and then Current_Token (Parser) = Token_Array_Start then
+                              --  Parse GPU binaries array
+                              Spec.Precompiled.GPU_Binaries.Count := 0;
+                              Next_Token (Parser, Temp_Status);
+                              while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                 if Current_Token (Parser) = Token_Object_Start then
+                                    if Spec.Precompiled.GPU_Binaries.Count < Max_GPU_Binaries then
+                                       Spec.Precompiled.GPU_Binaries.Count := Spec.Precompiled.GPU_Binaries.Count + 1;
+                                       declare
+                                          Bin_Idx : constant GPU_Binary_Index := Spec.Precompiled.GPU_Binaries.Count;
+                                       begin
+                                          Next_Token (Parser, Temp_Status);
+                                          while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                             if Current_Token (Parser) = Token_String then
+                                                declare
+                                                   Bin_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                begin
+                                                   Next_Token (Parser, Temp_Status);
+                                                   if Current_Token (Parser) /= Token_Colon then
+                                                      Status := Error_Parse;
+                                                      return;
+                                                   end if;
+                                                   Next_Token (Parser, Temp_Status);
+                                                   
+                                                   if Bin_Key = "format" and then Current_Token (Parser) = Token_String then
+                                                      declare
+                                                         Fmt : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                      begin
+                                                         if Fmt = "ptx" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Format := Format_PTX;
+                                                         elsif Fmt = "cubin" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Format := Format_CUBIN;
+                                                         elsif Fmt = "hsaco" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Format := Format_HSACO;
+                                                         elsif Fmt = "spirv" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Format := Format_SPIRV;
+                                                         end if;
+                                                      end;
+                                                   elsif Bin_Key = "digest" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Digest :=
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Bin_Key = "target_arch" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Target_Arch :=
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Bin_Key = "blob_path" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Blob_Path :=
+                                                         Path_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Bin_Key = "kernel_name" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Kernel_Name :=
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Bin_Key = "policy" and then Current_Token (Parser) = Token_String then
+                                                      declare
+                                                         Pol : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                      begin
+                                                         if Pol = "prefer_source" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Policy := Prefer_Source;
+                                                         elsif Pol = "prefer_binary" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Policy := Prefer_Binary;
+                                                         elsif Pol = "require_binary" then
+                                                            Spec.Precompiled.GPU_Binaries.Binaries (Bin_Idx).Policy := Require_Binary;
+                                                         end if;
+                                                      end;
+                                                   end if;
+                                                   Next_Token (Parser, Temp_Status);
+                                                end;
+                                             else
+                                                Next_Token (Parser, Temp_Status);
+                                             end if;
+                                             if Current_Token (Parser) = Token_Comma then
+                                                Next_Token (Parser, Temp_Status);
+                                             end if;
+                                          end loop;
+                                          if Current_Token (Parser) = Token_Object_End then
+                                             Next_Token (Parser, Temp_Status);
+                                          end if;
+                                       end;
+                                    else
+                                       Skip_Value (Parser, Temp_Status);
+                                    end if;
+                                 else
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                                 if Current_Token (Parser) = Token_Comma then
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                              end loop;
+                              if Current_Token (Parser) = Token_Array_End then
+                                 Next_Token (Parser, Temp_Status);
+                              end if;
+                           elsif Art_Key = "microcode_blobs" and then Current_Token (Parser) = Token_Array_Start then
+                              --  Parse microcode blobs array
+                              Spec.Precompiled.Microcode_Blobs.Count := 0;
+                              Next_Token (Parser, Temp_Status);
+                              while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                 if Current_Token (Parser) = Token_Object_Start then
+                                    if Spec.Precompiled.Microcode_Blobs.Count < Max_Microcode_Blobs then
+                                       Spec.Precompiled.Microcode_Blobs.Count := Spec.Precompiled.Microcode_Blobs.Count + 1;
+                                       declare
+                                          Mc_Idx : constant Microcode_Blob_Index := Spec.Precompiled.Microcode_Blobs.Count;
+                                       begin
+                                          Next_Token (Parser, Temp_Status);
+                                          while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                             if Current_Token (Parser) = Token_String then
+                                                declare
+                                                   Mc_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                begin
+                                                   Next_Token (Parser, Temp_Status);
+                                                   if Current_Token (Parser) /= Token_Colon then
+                                                      Status := Error_Parse;
+                                                      return;
+                                                   end if;
+                                                   Next_Token (Parser, Temp_Status);
+                                                   
+                                                   if Mc_Key = "format" and then Current_Token (Parser) = Token_String then
+                                                      declare
+                                                         Fmt : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                      begin
+                                                         if Fmt = "microcode" then
+                                                            Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Format := Format_Microcode;
+                                                         elsif Fmt = "rom" then
+                                                            Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Format := Format_ROM;
+                                                         elsif Fmt = "ucode" then
+                                                            Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Format := Format_UCode;
+                                                         end if;
+                                                      end;
+                                                   elsif Mc_Key = "digest" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Digest :=
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Mc_Key = "target_device" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Target_Device :=
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Mc_Key = "blob_path" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Blob_Path :=
+                                                         Path_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   elsif Mc_Key = "load_address" and then Current_Token (Parser) = Token_String then
+                                                      Spec.Precompiled.Microcode_Blobs.Blobs (Mc_Idx).Load_Address :=
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   end if;
+                                                   Next_Token (Parser, Temp_Status);
+                                                end;
+                                             else
+                                                Next_Token (Parser, Temp_Status);
+                                             end if;
+                                             if Current_Token (Parser) = Token_Comma then
+                                                Next_Token (Parser, Temp_Status);
+                                             end if;
+                                          end loop;
+                                          if Current_Token (Parser) = Token_Object_End then
+                                             Next_Token (Parser, Temp_Status);
+                                          end if;
+                                       end;
+                                    else
+                                       Skip_Value (Parser, Temp_Status);
+                                    end if;
+                                 else
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                                 if Current_Token (Parser) = Token_Comma then
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                              end loop;
+                              if Current_Token (Parser) = Token_Array_End then
+                                 Next_Token (Parser, Temp_Status);
+                              end if;
+                           else
+                              Skip_Value (Parser, Temp_Status);
+                           end if;
+                        end;
+                     else
+                        Next_Token (Parser, Temp_Status);
+                     end if;
+                     if Current_Token (Parser) = Token_Comma then
+                        Next_Token (Parser, Temp_Status);
+                     end if;
+                  end loop;
+                  if Current_Token (Parser) = Token_Object_End then
                      Next_Token (Parser, Temp_Status);
                   end if;
                else

@@ -1,0 +1,26 @@
+{
+  "schema_version": "extraction.v2",
+  "module_name": "implementation_body",
+  "language": "spark",
+  "functions": [
+    {
+      "name": "Local_Helper",
+      "return_type": "void",
+      "parameters": [{"name": "X", "type": "Integer"}]
+    },
+    {
+      "name": "Public_Proc",
+      "return_type": "void",
+      "parameters": [{"name": "Value", "type": "Integer"}, {"name": "Result", "type": "Integer"}]
+    },
+    {
+      "name": "Public_Func",
+      "return_type": "Float",
+      "parameters": [{"name": "A", "type": "Float"}, {"name": "B", "type": "Float"}]
+    },
+    {
+      "name": "Complex_Func",
+      "return_type": "Boolean",
+      "parameters": [{"name": "Input", "type": "String"}, {"name": "Len", "type": "Integer"}]
+    }  ]
+}

@@ -112,7 +112,7 @@
           "description": "Constant-folded value if applicable"
         }
       }
-    }
+
   },
   "properties": {
     "ir_version": {
@@ -516,6 +516,100 @@
                   "$ref": "#/definitions/optimization_hint",
                   "description": "Step-level optimization hints (v0.8.9+)"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "description": "Pre-compiled binary artifacts (GPU binaries, microcode blobs) for pre-emission handling",
+      "additionalProperties": false,
+      "properties": {
+        "gpu_binaries": {
+          "type": "array",
+          "description": "GPU binary artifacts (PTX, CUBIN, HSACO, SPIR-V)",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["format", "digest"],
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": ["ptx", "cubin", "hsaco", "spirv"],
+                "description": "Binary format type"
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$",
+                "description": "SHA-256 digest of the binary blob"
+              },
+              "target_arch": {
+                "type": "string",
+                "description": "Target architecture (e.g., sm_90, gfx1100)"
+              },
+              "entry_points": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Kernel entry point names"
+              },
+              "blob_path": {
+                "type": "string",
+                "description": "Optional path hint for materialization"
+              },
+              "kernel_name": {
+                "type": "string",
+                "description": "Associated IR function/kernel name"
+              },
+              "selection_policy": {
+                "type": "string",
+                "enum": ["prefer_source", "prefer_binary", "require_binary"],
+                "default": "prefer_binary",
+                "description": "Selection policy for this artifact"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Format-specific metadata"
+              }
+            }
+          }
+        },
+        "microcode_blobs": {
+          "type": "array",
+          "description": "Microcode ROM/ucode binary artifacts",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["format", "digest"],
+            "properties": {
+              "format": {
+                "type": "string",
+                "enum": ["microcode", "rom", "ucode"],
+                "description": "Microcode format type"
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$",
+                "description": "SHA-256 digest of the microcode blob"
+              },
+              "target_device": {
+                "type": "string",
+                "description": "Target device identifier"
+              },
+              "blob_path": {
+                "type": "string",
+                "description": "Optional path hint for materialization"
+              },
+              "load_address": {
+                "type": "string",
+                "description": "Load address for the microcode"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Device-specific metadata"
               }
             }
           }

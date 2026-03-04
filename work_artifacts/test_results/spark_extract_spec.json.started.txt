@@ -1,0 +1,3 @@
+spark_extract_main@2026-02-23a
+Input:  tools/spark/test_data/implementation_body.ads
+Output: work_artifacts/test_results/spark_extract_spec.json

@@ -1,0 +1,24 @@
+{
+  "schema": "stunir_extract_v1",
+  "module_name": "test_module",
+  "language": "python",
+  "functions": [
+    {
+      "name": "add",
+      "return_type": "any",
+      "args": [{"name": "a", "type": "any"}, {"name": "b", "type": "any"}]
+    }
+,
+    {
+      "name": "greet",
+      "return_type": "any",
+      "args": [{"name": "name", "type": "any"}]
+    }
+,
+    {
+      "name": "calculate",
+      "return_type": "any",
+      "args": [{"name": "x", "type": "any"}, {"name": "y", "type": "any"}, {"name": "z", "type": "any"}]
+    }
+  ]
+}

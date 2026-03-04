@@ -128,4 +128,48 @@ is
        Constant_Count : Natural) return IR_Code_Buffer
       with Pre => Constant_Count <= Max_Constants;
 
+   --  ========================================================================
+   --  Pre-Emission Artifact Normalization (v0.9.0+)
+   --  ========================================================================
+
+   --  Artifact emission mode for functions
+   type Emission_Mode is (
+      Emit_Source,     --  Generate source code
+      Emit_Binary,     --  Embed pre-compiled binary
+      Emit_Hybrid      --  Source with binary fallback
+   );
+
+   --  Artifact normalization result
+   type Artifact_Normalization_Result is record
+      Success           : Boolean;
+      Source_Functions  : Natural;  --  Functions to emit as source
+      Binary_Functions  : Natural;  --  Functions with pre-compiled binaries
+      Hybrid_Functions  : Natural;  --  Functions with hybrid mode
+   end record;
+
+   --  Normalize artifacts for emission
+   --  Determines emission mode for each function based on:
+   --  - Available GPU binaries
+   --  - Selection policy
+   --  - Target architecture match
+   procedure Normalize_Artifacts
+      (IR        : in out IR_Data;
+       Target    : in     Target_Language;
+       Result    : out    Artifact_Normalization_Result)
+      with Global => null;
+
+   --  Check if a function has a matching GPU binary
+   function Has_Matching_Binary
+      (IR         : IR_Data;
+       Func_Name  : Identifier_String;
+       Target_Arch : Identifier_String) return Boolean
+      with Global => null;
+
+   --  Get emission mode for a function
+   function Get_Emission_Mode
+      (IR         : IR_Data;
+       Func_Name  : Identifier_String;
+       Target     : Target_Language) return Emission_Mode
+      with Global => null;
+
 end STUNIR_Optimizer;

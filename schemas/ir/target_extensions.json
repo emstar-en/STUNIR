@@ -25,6 +25,41 @@
         "naked_function": {"type": "boolean"}
       }
     },
+    "GPUBinaryArtifact": {
+      "type": "object",
+      "description": "Pre-compiled GPU binary artifact (PTX, CUBIN, HSACO, SPIR-V, or microcode)",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["ptx", "cubin", "hsaco", "spirv", "microcode"],
+          "description": "Binary format type"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 digest of the binary blob (sha256:hex)"
+        },
+        "target_arch": {
+          "type": "string",
+          "description": "Target architecture (e.g., sm_90, gfx1100, spirv64)"
+        },
+        "entry_points": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Kernel entry point names in the binary"
+        },
+        "blob_path": {
+          "type": "string",
+          "description": "Optional path hint for materialization"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Format-specific metadata (e.g., PTX version, compute capability)",
+          "additionalProperties": true
+        }
+      },
+      "required": ["format", "digest"]
+    },
     "GPUExtensions": {
       "type": "object",
       "properties": {
@@ -51,7 +86,18 @@
         "warp_size": {"type": "integer"},
         "max_registers": {"type": "integer"},
         "vectorize": {"type": "boolean"},
-        "unroll_factor": {"type": "integer", "minimum": 0}
+        "unroll_factor": {"type": "integer", "minimum": 0},
+        "binaries": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/GPUBinaryArtifact"},
+          "description": "Pre-compiled binary artifacts for this kernel"
+        },
+        "selection_policy": {
+          "type": "string",
+          "enum": ["prefer_source", "prefer_binary", "require_binary"],
+          "default": "prefer_binary",
+          "description": "Policy for choosing source vs binary artifact"
+        }
       }
     },
     "WASMExtensions": {
