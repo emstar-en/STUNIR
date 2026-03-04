@@ -11,6 +11,7 @@ with IR_Parse;
 with Ada.Characters.Latin_1;
 with Ada.Text_IO;
 with Emit_Target.Mainstream;
+with Type_Map_Runtime;
 
 package body Emit_Target is
 
@@ -4288,7 +4289,8 @@ package body Emit_Target is
          declare
             Func : constant IR_Function := IR.Functions.Functions (I);
             Func_Name : constant String := Identifier_Strings.To_String (Func.Name);
-            Ret_Type  : constant String := Type_Name_Strings.To_String (Func.Return_Type);
+            Ret_Type  : constant String := Type_Map_Runtime.Map_Type
+               (Type_Name_Strings.To_String (Func.Return_Type), Target);
          begin
             case Target is
                when Target_Python =>
@@ -4300,7 +4302,7 @@ package body Emit_Target is
                      end if;
                   end loop;
                   Append_Code (Code, "):" & LF, Temp_Status);
-                  if Ret_Type'Length = 0 or else Ret_Type = "void" then
+                  if Ret_Type'Length = 0 or else Ret_Type = "void" or else Ret_Type = "None" then
                      Append_Code (Code, "    return" & LF & LF, Temp_Status);
                   else
                      Append_Code (Code, "    return 0" & LF & LF, Temp_Status);
@@ -4309,7 +4311,8 @@ package body Emit_Target is
                when Target_C | Target_CPP =>
                   Append_Code (Code, Ret_Type & " " & Func_Name & "(", Temp_Status);
                   for J in Parameter_Index range 1 .. Func.Parameters.Count loop
-                     Append_Code (Code, Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type) & " " &
+                     Append_Code (Code, Type_Map_Runtime.Map_Type
+                        (Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Target) & " " &
                                   Identifier_Strings.To_String (Func.Parameters.Params (J).Name), Temp_Status);
                      if J < Func.Parameters.Count then
                         Append_Code (Code, ", ", Temp_Status);
@@ -4323,7 +4326,8 @@ package body Emit_Target is
                   Append_Code (Code, "fn " & Func_Name & "(", Temp_Status);
                   for J in Parameter_Index range 1 .. Func.Parameters.Count loop
                      Append_Code (Code, Identifier_Strings.To_String (Func.Parameters.Params (J).Name) & ": " &
-                                  Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Temp_Status);
+                                  Type_Map_Runtime.Map_Type
+                        (Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Target), Temp_Status);
                      if J < Func.Parameters.Count then
                         Append_Code (Code, ", ", Temp_Status);
                      end if;
@@ -4336,7 +4340,8 @@ package body Emit_Target is
                   Append_Code (Code, "func " & Func_Name & "(", Temp_Status);
                   for J in Parameter_Index range 1 .. Func.Parameters.Count loop
                      Append_Code (Code, Identifier_Strings.To_String (Func.Parameters.Params (J).Name) & " " &
-                                  Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Temp_Status);
+                                  Type_Map_Runtime.Map_Type
+                        (Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Target), Temp_Status);
                      if J < Func.Parameters.Count then
                         Append_Code (Code, ", ", Temp_Status);
                      end if;
@@ -4352,7 +4357,8 @@ package body Emit_Target is
                when Target_Java =>
                   Append_Code (Code, "public static " & Ret_Type & " " & Func_Name & "(", Temp_Status);
                   for J in Parameter_Index range 1 .. Func.Parameters.Count loop
-                     Append_Code (Code, Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type) & " " &
+                     Append_Code (Code, Type_Map_Runtime.Map_Type
+                        (Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Target) & " " &
                                   Identifier_Strings.To_String (Func.Parameters.Params (J).Name), Temp_Status);
                      if J < Func.Parameters.Count then
                         Append_Code (Code, ", ", Temp_Status);
@@ -4381,7 +4387,8 @@ package body Emit_Target is
                when Target_CSharp =>
                   Append_Code (Code, "public static " & Ret_Type & " " & Func_Name & "(", Temp_Status);
                   for J in Parameter_Index range 1 .. Func.Parameters.Count loop
-                     Append_Code (Code, Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type) & " " &
+                     Append_Code (Code, Type_Map_Runtime.Map_Type
+                        (Type_Name_Strings.To_String (Func.Parameters.Params (J).Param_Type), Target) & " " &
                                   Identifier_Strings.To_String (Func.Parameters.Params (J).Name), Temp_Status);
                      if J < Func.Parameters.Count then
                         Append_Code (Code, ", ", Temp_Status);

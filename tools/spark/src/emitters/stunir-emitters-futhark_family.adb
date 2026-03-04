@@ -4,6 +4,7 @@
 
 with IR.Types; use IR.Types;
 with STUNIR.Emitters.AST_Render;
+with Type_Map_Runtime;
 
 package body STUNIR.Emitters.Futhark_Family is
    pragma SPARK_Mode (On);
@@ -90,7 +91,8 @@ package body STUNIR.Emitters.Futhark_Family is
       Gen : STUNIR.Emitters.CodeGen.Code_Generator;
       Ok  : Boolean;
       Name_Str : constant String := IR.Types.Name_Strings.To_String (Func.Base.Decl_Name);
-      Ret_Type : constant String := IR.Types.Name_Strings.To_String (Func.Return_Type);
+      Raw_Ret_Type : constant String := IR.Types.Name_Strings.To_String (Func.Return_Type);
+      Ret_Type : constant String := Type_Map_Runtime.Map_Type (Raw_Ret_Type, STUNIR_Types.Target_Futhark);
    begin
       STUNIR.Emitters.CodeGen.Initialize (Gen, 2);
       --  Futhark function definition
