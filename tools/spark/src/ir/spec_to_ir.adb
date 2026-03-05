@@ -78,46 +78,143 @@ package body Spec_To_IR is
          IR.Dependencies.Dependencies (I).Version := Identifier_Strings.Null_Bounded_String;
       end loop;
       
-      --  Copy functions and generate placeholder steps
+      --  Copy functions and convert body statements to IR steps
       IR.Functions.Count := Spec.Functions.Count;
       for I in Function_Index range 1 .. Spec.Functions.Count loop
          IR.Functions.Functions (I).Name := Spec.Functions.Functions (I).Name;
          IR.Functions.Functions (I).Return_Type := Spec.Functions.Functions (I).Return_Type;
          IR.Functions.Functions (I).Parameters := Spec.Functions.Functions (I).Parameters;
          
-         --  Generate placeholder steps (assign + return)
-         if IR.Functions.Functions (I).Steps.Count < Max_Steps then
-            IR.Functions.Functions (I).Steps.Count := 1;
-            IR.Functions.Functions (I).Steps.Steps (1).Step_Type := Step_Assign;
-            IR.Functions.Functions (I).Steps.Steps (1).Target :=
-               Identifier_Strings.To_Bounded_String ("result");
-         end if;
-         
-         --  Set default return value based on return type
-         declare
-            Ret_Type : constant String := Type_Name_Strings.To_String (Spec.Functions.Functions (I).Return_Type);
-         begin
-            if Ret_Type = "void" then
-               IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.Null_Bounded_String;
-               IR.Functions.Functions (I).Steps.Count := 0;  --  No steps for void
-            elsif Ret_Type = "int" or Ret_Type = "i32" or Ret_Type = "i64" then
-               IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("0");
-            elsif Ret_Type = "float" or Ret_Type = "f32" or Ret_Type = "f64" then
-               IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("0.0");
-            elsif Ret_Type = "bool" or Ret_Type = "boolean" then
-               IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("false");
-            elsif Ret_Type = "string" then
-               IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("");
-            else
-               IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("null");
+         --  Convert body statements to IR steps
+         if Spec.Functions.Functions (I).Stmts.Count > 0 then
+            --  Convert parsed statements to IR steps
+            IR.Functions.Functions (I).Steps.Count := 0;
+            for J in 1 .. Spec.Functions.Functions (I).Stmts.Count loop
+               if IR.Functions.Functions (I).Steps.Count < Max_Steps then
+                  declare
+                     Stmt : constant Spec_Statement := 
+                        Spec.Functions.Functions (I).Stmts.Statements (J);
+                     Step_Idx : constant Step_Index := 
+                        IR.Functions.Functions (I).Steps.Count + 1;
+                  begin
+                     IR.Functions.Functions (I).Steps.Count := Step_Idx;
+                     
+                     --  Convert statement type to step type
+                     case Stmt.Stmt_Type is
+                        when Stmt_Assign =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Assign;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Target := Stmt.Target;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Value := Stmt.Value;
+                        when Stmt_Return =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Return;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Value := Stmt.Value;
+                        when Stmt_Call =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Call;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Target := Stmt.Target;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Value := Stmt.Value;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Args := Stmt.Args;
+                        when Stmt_If =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_If;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Condition := Stmt.Condition;
+                             --  If body counts were recorded during parsing, set Then/Else ranges
+                             if Stmt.Then_Count > 0 then
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Then_Start := Step_Idx + 1;
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Then_Count := Step_Index (Stmt.Then_Count);
+                             else
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Then_Start := 0;
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Then_Count := 0;
+                             end if;
+                             if Stmt.Else_Count > 0 then
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Else_Start := Step_Idx + 1 + Step_Index (Stmt.Then_Count);
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Else_Count := Step_Index (Stmt.Else_Count);
+                             else
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Else_Start := 0;
+                                IR.Functions.Functions (I).Steps.Steps (Step_Idx).Else_Count := 0;
+                             end if;
+                        when Stmt_While =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_While;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Condition := Stmt.Condition;
+                              IR.Functions.Functions (I).Steps.Steps (Step_Idx).Body_Start := Step_Idx + 1;
+                              IR.Functions.Functions (I).Steps.Steps (Step_Idx).Body_Count := Step_Index (Stmt.Body_Count);
+                        when Stmt_For =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_For;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Condition := Stmt.Condition;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Init := Stmt.Init;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Increment := Stmt.Increment;
+                              IR.Functions.Functions (I).Steps.Steps (Step_Idx).Body_Start := Step_Idx + 1;
+                              IR.Functions.Functions (I).Steps.Steps (Step_Idx).Body_Count := Step_Index (Stmt.Body_Count);
+                        when Stmt_Break =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Break;
+                        when Stmt_Continue =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Continue;
+                        when Stmt_Switch =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Switch;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Expr := Stmt.Expr;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Case_Count := Step_Index (Stmt.Case_Count);
+                           --  Cases' bodies are flattened into the function's statement list after this switch; compute starts
+                           declare
+                              Accum : Natural := 0;
+                           begin
+                              for C in 1 .. Stmt.Case_Count loop
+                                 IR.Functions.Functions (I).Steps.Steps (Step_Idx).Cases (C).Case_Value := Stmt.Cases (C).Case_Value;
+                                 IR.Functions.Functions (I).Steps.Steps (Step_Idx).Cases (C).Body_Start := Step_Idx + Step_Index (Accum) + 1;
+                                 IR.Functions.Functions (I).Steps.Steps (Step_Idx).Cases (C).Body_Count := Step_Index (Stmt.Cases (C).Body_Count);
+                                 Accum := Accum + Stmt.Cases (C).Body_Count;
+                              end loop;
+                              if Stmt.Has_Default then
+                                 IR.Functions.Functions (I).Steps.Steps (Step_Idx).Default_Start := Step_Idx + Step_Index (Accum) + 1;
+                                 IR.Functions.Functions (I).Steps.Steps (Step_Idx).Default_Count := Step_Index (0);
+                              end if;
+                           end;
+                        when Stmt_Try =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Try;
+                        when Stmt_Throw =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Throw;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Error_Msg := Stmt.Error_Msg;
+                        when Stmt_Error =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Error;
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Error_Msg := Stmt.Error_Msg;
+                        when Stmt_Nop =>
+                           IR.Functions.Functions (I).Steps.Steps (Step_Idx).Step_Type := Step_Nop;
+                     end case;
+                  end;
+               end if;
+            end loop;
+         else
+            --  Generate placeholder steps (assign + return)
+            if IR.Functions.Functions (I).Steps.Count < Max_Steps then
+               IR.Functions.Functions (I).Steps.Count := 1;
+               IR.Functions.Functions (I).Steps.Steps (1).Step_Type := Step_Assign;
+               IR.Functions.Functions (I).Steps.Steps (1).Target :=
+                  Identifier_Strings.To_Bounded_String ("result");
             end if;
-         end;
+            
+            --  Set default return value based on return type
+            declare
+               Ret_Type : constant String := Type_Name_Strings.To_String (Spec.Functions.Functions (I).Return_Type);
+            begin
+               if Ret_Type = "void" then
+                  IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.Null_Bounded_String;
+                  IR.Functions.Functions (I).Steps.Count := 0;  --  No steps for void
+               elsif Ret_Type = "int" or Ret_Type = "i32" or Ret_Type = "i64" then
+                  IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("0");
+               elsif Ret_Type = "float" or Ret_Type = "f32" or Ret_Type = "f64" then
+                  IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("0.0");
+               elsif Ret_Type = "bool" or Ret_Type = "boolean" then
+                  IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("false");
+               elsif Ret_Type = "string" then
+                  IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("");
+               else
+                  IR.Functions.Functions (I).Steps.Steps (1).Value := Identifier_Strings.To_Bounded_String ("null");
+               end if;
+            end;
 
-         if IR.Functions.Functions (I).Steps.Count > 0 and then IR.Functions.Functions (I).Steps.Count < Max_Steps then
-            IR.Functions.Functions (I).Steps.Count := IR.Functions.Functions (I).Steps.Count + 1;
-            IR.Functions.Functions (I).Steps.Steps (2).Step_Type := Step_Return;
-            IR.Functions.Functions (I).Steps.Steps (2).Value :=
-               IR.Functions.Functions (I).Steps.Steps (1).Target;
+            if IR.Functions.Functions (I).Steps.Count > 0 and then IR.Functions.Functions (I).Steps.Count < Max_Steps then
+               IR.Functions.Functions (I).Steps.Count := IR.Functions.Functions (I).Steps.Count + 1;
+               IR.Functions.Functions (I).Steps.Steps (2).Step_Type := Step_Return;
+               IR.Functions.Functions (I).Steps.Steps (2).Value :=
+                  IR.Functions.Functions (I).Steps.Steps (1).Target;
+            end if;
          end if;
       end loop;
       
@@ -215,6 +312,15 @@ package body Spec_To_IR is
                when Step_Return => Put (Output, "return");
                when Step_Assign => Put (Output, "assign");
                when Step_Call => Put (Output, "call");
+               when Step_If => Put (Output, "if");
+               when Step_While => Put (Output, "while");
+               when Step_For => Put (Output, "for");
+               when Step_Break => Put (Output, "break");
+               when Step_Continue => Put (Output, "continue");
+               when Step_Switch => Put (Output, "switch");
+               when Step_Try => Put (Output, "try");
+               when Step_Throw => Put (Output, "throw");
+               when Step_Error => Put (Output, "error");
                when Step_Nop => Put (Output, "nop");
                when others => Put (Output, "unknown");
             end case;

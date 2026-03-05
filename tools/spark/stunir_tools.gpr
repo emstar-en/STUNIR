@@ -120,6 +120,13 @@
 --              Target_Language (16 targets), Step_Type_Enum, IR_Step, IR_Function
 --    CRITICAL: All other packages depend on this. Change with extreme care.
 --
+--  src/limits/         Phase:X   Prefix:Pipeline_Limits  SPARK:On
+--    Configurable pipeline limits with receipt JSON support.
+--    Units: Pipeline_Limits (limits accessor package)
+--    Contains: Default limits (10x original), warning thresholds,
+--              JSON parsing/generation for limits, receipt loading
+--    Used by: All SPARK tools that need configurable limits
+--
 --  src/json/           Phase:X   Prefix:STUNIR_JSON*     SPARK:Mixed
 --    JSON parsing, manipulation, and file I/O utilities.
 --    Units: STUNIR_JSON, STUNIR_JSON_Parser, STUNIR_JSON_Utils,
@@ -233,6 +240,7 @@ project STUNIR_Tools is
       "src/core",       --  Phase 1-4: Pipeline orchestrators + root package
         "src/emitters",   --  Phase 3:   STUNIR.Emitters.* code generation backends
       "src/types",      --  Phase X:   STUNIR_Types master type definitions
+      "src/limits",     --  Phase X:   Pipeline_Limits configurable limits accessor
       "src/json",       --  Phase X:   JSON parsing and manipulation utilities
       "src/spec",       --  Phase 1:   Spec assembly and validation pipeline
       "src/ir",         --  Phase 2:   IR generation, validation, optimization (IR.* packages)

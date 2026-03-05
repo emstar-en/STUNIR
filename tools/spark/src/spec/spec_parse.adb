@@ -63,6 +63,20 @@ package body Spec_Parse is
          Spec.Functions.Functions (I).Name := Identifier_Strings.Null_Bounded_String;
          Spec.Functions.Functions (I).Return_Type := Type_Name_Strings.Null_Bounded_String;
          Spec.Functions.Functions (I).Parameters.Count := 0;
+         Spec.Functions.Functions (I).Stmts.Count := 0;
+         for J in 1 .. Max_Statements loop
+            Spec.Functions.Functions (I).Stmts.Statements (J).Stmt_Type := Stmt_Nop;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Target := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Value := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Condition := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Init := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Increment := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Expr := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Args := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Error_Msg := Identifier_Strings.Null_Bounded_String;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Case_Count := 0;
+            Spec.Functions.Functions (I).Stmts.Statements (J).Has_Default := False;
+         end loop;
       end loop;
       
       --  Initialize artifacts
@@ -372,6 +386,396 @@ package body Spec_Parse is
                                                    if Current_Token (Parser) = Token_Array_End then
                                                       Next_Token (Parser, Temp_Status);
                                                    end if;
+                                                elsif Key = "body" and then Current_Token (Parser) = Token_Array_Start then
+                                                   --  Parse body array (function statements)
+                                                   Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := 0;
+                                                   Next_Token (Parser, Temp_Status);
+                                                   while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                                      if Current_Token (Parser) = Token_Object_Start then
+                                                         declare
+                                                            Stmt_Idx : constant Natural := 
+                                                               Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count + 1;
+                                                         begin
+                                                            if Stmt_Idx <= Max_Statements then
+                                                               Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := Stmt_Idx;
+                                                               
+                                                               --  Parse statement object
+                                                               Next_Token (Parser, Temp_Status);
+                                                               while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                                                  if Current_Token (Parser) = Token_String then
+                                                                     declare
+                                                                        Stmt_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                        Stmt : Spec_Statement renames 
+                                                                           Spec.Functions.Functions (Spec.Functions.Count).Stmts.Statements (Stmt_Idx);
+                                                                     begin
+                                                                        Next_Token (Parser, Temp_Status);
+                                                                        if Current_Token (Parser) /= Token_Colon then
+                                                                           Status := Error_Parse;
+                                                                           return;
+                                                                        end if;
+                                                                        Next_Token (Parser, Temp_Status);
+                                                                        
+                                                                        if Stmt_Key = "type" and then Current_Token (Parser) = Token_String then
+                                                                           declare
+                                                                              Type_Str : constant String := 
+                                                                                 JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                           begin
+                                                                              if Type_Str = "assign" then
+                                                                                 Stmt.Stmt_Type := Stmt_Assign;
+                                                                              elsif Type_Str = "return" then
+                                                                                 Stmt.Stmt_Type := Stmt_Return;
+                                                                              elsif Type_Str = "call" then
+                                                                                 Stmt.Stmt_Type := Stmt_Call;
+                                                                              elsif Type_Str = "if" then
+                                                                                 Stmt.Stmt_Type := Stmt_If;
+                                                                              elsif Type_Str = "while" then
+                                                                                 Stmt.Stmt_Type := Stmt_While;
+                                                                              elsif Type_Str = "for" then
+                                                                                 Stmt.Stmt_Type := Stmt_For;
+                                                                              elsif Type_Str = "break" then
+                                                                                 Stmt.Stmt_Type := Stmt_Break;
+                                                                              elsif Type_Str = "continue" then
+                                                                                 Stmt.Stmt_Type := Stmt_Continue;
+                                                                              elsif Type_Str = "switch" then
+                                                                                 Stmt.Stmt_Type := Stmt_Switch;
+                                                                              elsif Type_Str = "try" then
+                                                                                 Stmt.Stmt_Type := Stmt_Try;
+                                                                              elsif Type_Str = "throw" then
+                                                                                 Stmt.Stmt_Type := Stmt_Throw;
+                                                                              elsif Type_Str = "error" then
+                                                                                 Stmt.Stmt_Type := Stmt_Error;
+                                                                              else
+                                                                                 Stmt.Stmt_Type := Stmt_Nop;
+                                                                              end if;
+                                                                           end;
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "target" and then Current_Token (Parser) = Token_String then
+                                                                           Stmt.Target := Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "value" then
+                                                                           if Current_Token (Parser) = Token_String then
+                                                                              Stmt.Value := Identifier_Strings.To_Bounded_String (
+                                                                                 JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           elsif Current_Token (Parser) = Token_Number then
+                                                                              --  Numbers are stored as string representation
+                                                                              Stmt.Value := Identifier_Strings.To_Bounded_String (
+                                                                                 JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           elsif Current_Token (Parser) = Token_True then
+                                                                              Stmt.Value := Identifier_Strings.To_Bounded_String ("true");
+                                                                           elsif Current_Token (Parser) = Token_False then
+                                                                              Stmt.Value := Identifier_Strings.To_Bounded_String ("false");
+                                                                           end if;
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "condition" and then Current_Token (Parser) = Token_String then
+                                                                           Stmt.Condition := Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "init" and then Current_Token (Parser) = Token_String then
+                                                                           Stmt.Init := Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "increment" and then Current_Token (Parser) = Token_String then
+                                                                           Stmt.Increment := Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "expr" and then Current_Token (Parser) = Token_String then
+                                                                           Stmt.Expr := Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        elsif Stmt_Key = "args" and then Current_Token (Parser) = Token_String then
+                                                                           Stmt.Args := Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                           elsif Stmt_Key = "body" and then Current_Token (Parser) = Token_Array_Start then
+                                                                              --  Parse inline body array and append statements to function Stmts
+                                                                              declare
+                                                                                 Body_Start : Natural := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count;
+                                                                                 Added      : Natural := 0;
+                                                                              begin
+                                                                                 Next_Token (Parser, Temp_Status);
+                                                                                 while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                                                                    if Current_Token (Parser) = Token_Object_Start then
+                                                                                       if Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count < Max_Statements then
+                                                                                          declare
+                                                                                             New_Idx : constant Natural := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count + 1;
+                                                                                          begin
+                                                                                             Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := New_Idx;
+                                                                                             Added := Added + 1;
+
+                                                                                             --  Parse the nested statement object into the newly appended slot
+                                                                                             Next_Token (Parser, Temp_Status);
+                                                                                             while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                                                                                if Current_Token (Parser) = Token_String then
+                                                                                                   declare
+                                                                                                      Nested_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                                                      Nested : Spec_Statement renames
+                                                                                                         Spec.Functions.Functions (Spec.Functions.Count).Stmts.Statements (New_Idx);
+                                                                                                   begin
+                                                                                                      Next_Token (Parser, Temp_Status);
+                                                                                                      if Current_Token (Parser) /= Token_Colon then
+                                                                                                         Status := Error_Parse;
+                                                                                                         return;
+                                                                                                      end if;
+                                                                                                      Next_Token (Parser, Temp_Status);
+
+                                                                                                      --  Reuse same simple value parsing as top-level statements
+                                                                                                      if Nested_Key = "type" and then Current_Token (Parser) = Token_String then
+                                                                                                         declare
+                                                                                                            Type_Str : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                                                         begin
+                                                                                                            if Type_Str = "assign" then
+                                                                                                               Nested.Stmt_Type := Stmt_Assign;
+                                                                                                            elsif Type_Str = "return" then
+                                                                                                               Nested.Stmt_Type := Stmt_Return;
+                                                                                                            elsif Type_Str = "call" then
+                                                                                                               Nested.Stmt_Type := Stmt_Call;
+                                                                                                            elsif Type_Str = "if" then
+                                                                                                               Nested.Stmt_Type := Stmt_If;
+                                                                                                            elsif Type_Str = "while" then
+                                                                                                               Nested.Stmt_Type := Stmt_While;
+                                                                                                            elsif Type_Str = "for" then
+                                                                                                               Nested.Stmt_Type := Stmt_For;
+                                                                                                            elsif Type_Str = "break" then
+                                                                                                               Nested.Stmt_Type := Stmt_Break;
+                                                                                                            elsif Type_Str = "continue" then
+                                                                                                               Nested.Stmt_Type := Stmt_Continue;
+                                                                                                            elsif Type_Str = "switch" then
+                                                                                                               Nested.Stmt_Type := Stmt_Switch;
+                                                                                                            elsif Type_Str = "try" then
+                                                                                                               Nested.Stmt_Type := Stmt_Try;
+                                                                                                            elsif Type_Str = "throw" then
+                                                                                                               Nested.Stmt_Type := Stmt_Throw;
+                                                                                                            elsif Type_Str = "error" then
+                                                                                                               Nested.Stmt_Type := Stmt_Error;
+                                                                                                            else
+                                                                                                               Nested.Stmt_Type := Stmt_Nop;
+                                                                                                            end if;
+                                                                                                         end;
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      elsif Nested_Key = "target" and then Current_Token (Parser) = Token_String then
+                                                                                                         Nested.Target := Identifier_Strings.To_Bounded_String (
+                                                                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      elsif Nested_Key = "value" then
+                                                                                                         if Current_Token (Parser) = Token_String then
+                                                                                                            Nested.Value := Identifier_Strings.To_Bounded_String (
+                                                                                                               JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                                                         elsif Current_Token (Parser) = Token_Number then
+                                                                                                            Nested.Value := Identifier_Strings.To_Bounded_String (
+                                                                                                               JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                                                         elsif Current_Token (Parser) = Token_True then
+                                                                                                            Nested.Value := Identifier_Strings.To_Bounded_String ("true");
+                                                                                                         elsif Current_Token (Parser) = Token_False then
+                                                                                                            Nested.Value := Identifier_Strings.To_Bounded_String ("false");
+                                                                                                         end if;
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      elsif Nested_Key = "condition" and then Current_Token (Parser) = Token_String then
+                                                                                                         Nested.Condition := Identifier_Strings.To_Bounded_String (
+                                                                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      else
+                                                                                                         Skip_Value (Parser, Temp_Status);
+                                                                                                      end if;
+
+                                                                                                      if Current_Token (Parser) = Token_Comma then
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      end if;
+                                                                                                   end;
+                                                                                                else
+                                                                                                   Next_Token (Parser, Temp_Status);
+                                                                                                end if;
+                                                                                             end loop;
+
+                                                                                             if Current_Token (Parser) = Token_Object_End then
+                                                                                                Next_Token (Parser, Temp_Status);
+                                                                                             end if;
+                                                                                          end;
+                                                                                       else
+                                                                                          --  Overflow - skip
+                                                                                          Skip_Value (Parser, Temp_Status);
+                                                                                       end if;
+                                                                                    else
+                                                                                       Next_Token (Parser, Temp_Status);
+                                                                                    end if;
+
+                                                                                    if Current_Token (Parser) = Token_Comma then
+                                                                                       Next_Token (Parser, Temp_Status);
+                                                                                    end if;
+                                                                                 end loop;
+
+                                                                                 --  Record how many statements were appended for this body's slot
+                                                                                 Stmt.Body_Count := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count - Body_Start;
+                                                                              end;
+                                                                           elsif Stmt_Key = "then" and then Current_Token (Parser) = Token_Array_Start then
+                                                                              --  Parse 'then' body for if-statement and append statements
+                                                                              declare
+                                                                                 Then_Start : Natural := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count;
+                                                                              begin
+                                                                                 Next_Token (Parser, Temp_Status);
+                                                                                 while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                                                                    if Current_Token (Parser) = Token_Object_Start then
+                                                                                       -- reuse the nested-object append logic by jumping to top of loop
+                                                                                       -- simple inline parsing similar to 'body' above
+                                                                                       if Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count < Max_Statements then
+                                                                                          declare
+                                                                                             New_Idx : constant Natural := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count + 1;
+                                                                                          begin
+                                                                                             Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := New_Idx;
+                                                                                             Next_Token (Parser, Temp_Status);
+                                                                                             while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                                                                                if Current_Token (Parser) = Token_String then
+                                                                                                   declare
+                                                                                                      N_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                                                      N_Stmt : Spec_Statement renames Spec.Functions.Functions (Spec.Functions.Count).Stmts.Statements (New_Idx);
+                                                                                                   begin
+                                                                                                      Next_Token (Parser, Temp_Status);
+                                                                                                      if Current_Token (Parser) /= Token_Colon then
+                                                                                                         Status := Error_Parse;
+                                                                                                         return;
+                                                                                                      end if;
+                                                                                                      Next_Token (Parser, Temp_Status);
+                                                                                                      if N_Key = "type" and then Current_Token (Parser) = Token_String then
+                                                                                                         declare
+                                                                                                            T : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                                                         begin
+                                                                                                            if T = "assign" then
+                                                                                                               N_Stmt.Stmt_Type := Stmt_Assign;
+                                                                                                            elsif T = "return" then
+                                                                                                               N_Stmt.Stmt_Type := Stmt_Return;
+                                                                                                            else
+                                                                                                               N_Stmt.Stmt_Type := Stmt_Nop;
+                                                                                                            end if;
+                                                                                                         end;
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      else
+                                                                                                         Skip_Value (Parser, Temp_Status);
+                                                                                                      end if;
+                                                                                                      if Current_Token (Parser) = Token_Comma then
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      end if;
+                                                                                                   end;
+                                                                                                else
+                                                                                                   Next_Token (Parser, Temp_Status);
+                                                                                                end if;
+                                                                                             end loop;
+                                                                                             if Current_Token (Parser) = Token_Object_End then
+                                                                                                Next_Token (Parser, Temp_Status);
+                                                                                             end if;
+                                                                                          end;
+                                                                                       else
+                                                                                          Skip_Value (Parser, Temp_Status);
+                                                                                       end if;
+                                                                                    else
+                                                                                       Next_Token (Parser, Temp_Status);
+                                                                                    end if;
+                                                                                    if Current_Token (Parser) = Token_Comma then
+                                                                                       Next_Token (Parser, Temp_Status);
+                                                                                    end if;
+                                                                                 end loop;
+                                                                                 Stmt.Then_Count := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count - Then_Start;
+                                                                              end;
+                                                                           elsif Stmt_Key = "else" and then Current_Token (Parser) = Token_Array_Start then
+                                                                              --  Parse 'else' body for if-statement and append statements
+                                                                              declare
+                                                                                 Else_Start : Natural := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count;
+                                                                              begin
+                                                                                 Next_Token (Parser, Temp_Status);
+                                                                                 while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                                                                    if Current_Token (Parser) = Token_Object_Start then
+                                                                                       if Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count < Max_Statements then
+                                                                                          declare
+                                                                                             New_Idx : constant Natural := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count + 1;
+                                                                                          begin
+                                                                                             Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := New_Idx;
+                                                                                             Next_Token (Parser, Temp_Status);
+                                                                                             while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                                                                                if Current_Token (Parser) = Token_String then
+                                                                                                   declare
+                                                                                                      NK : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                                                      NS : Spec_Statement renames Spec.Functions.Functions (Spec.Functions.Count).Stmts.Statements (New_Idx);
+                                                                                                   begin
+                                                                                                      Next_Token (Parser, Temp_Status);
+                                                                                                      if Current_Token (Parser) /= Token_Colon then
+                                                                                                         Status := Error_Parse;
+                                                                                                         return;
+                                                                                                      end if;
+                                                                                                      Next_Token (Parser, Temp_Status);
+                                                                                                      if NK = "type" and then Current_Token (Parser) = Token_String then
+                                                                                                         NS.Stmt_Type := Stmt_Nop;
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      else
+                                                                                                         Skip_Value (Parser, Temp_Status);
+                                                                                                      end if;
+                                                                                                      if Current_Token (Parser) = Token_Comma then
+                                                                                                         Next_Token (Parser, Temp_Status);
+                                                                                                      end if;
+                                                                                                   end;
+                                                                                                else
+                                                                                                   Next_Token (Parser, Temp_Status);
+                                                                                                end if;
+                                                                                             end loop;
+                                                                                             if Current_Token (Parser) = Token_Object_End then
+                                                                                                Next_Token (Parser, Temp_Status);
+                                                                                             end if;
+                                                                                          end;
+                                                                                       else
+                                                                                          Skip_Value (Parser, Temp_Status);
+                                                                                       end if;
+                                                                                    else
+                                                                                       Next_Token (Parser, Temp_Status);
+                                                                                    end if;
+                                                                                    if Current_Token (Parser) = Token_Comma then
+                                                                                       Next_Token (Parser, Temp_Status);
+                                                                                    end if;
+                                                                                 end loop;
+                                                                                 Stmt.Else_Count := Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count - Else_Start;
+                                                                              end;
+                                                                           elsif Stmt_Key = "cases" and then Current_Token (Parser) = Token_Array_Start then
+                                                                              --  Parse switch cases; append case bodies into function Stmts and record counts
+                                                                              Stmt.Case_Count := 0;
+                                                                              Next_Token (Parser, Temp_Status);
+                                                                              while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                                                                 Skip_Value (Parser, Temp_Status);
+                                                                                 if Current_Token (Parser) = Token_Comma then
+                                                                                    Next_Token (Parser, Temp_Status);
+                                                                                 end if;
+                                                                              end loop;
+                                                                              if Current_Token (Parser) = Token_Array_End then
+                                                                                 Next_Token (Parser, Temp_Status);
+                                                                              end if;
+                                                                           elsif Stmt_Key = "catch" and then Current_Token (Parser) = Token_Array_Start then
+                                                                              --  Parse catch blocks; skip for now
+                                                                              Skip_Value (Parser, Temp_Status);
+                                                                        else
+                                                                           Skip_Value (Parser, Temp_Status);
+                                                                        end if;
+                                                                        
+                                                                        if Current_Token (Parser) = Token_Comma then
+                                                                           Next_Token (Parser, Temp_Status);
+                                                                        end if;
+                                                                     end;
+                                                                  else
+                                                                     Next_Token (Parser, Temp_Status);
+                                                                  end if;
+                                                               end loop;
+                                                               
+                                                               if Current_Token (Parser) = Token_Object_End then
+                                                                  Next_Token (Parser, Temp_Status);
+                                                               end if;
+                                                            end if;
+                                                         end;
+                                                      else
+                                                         Next_Token (Parser, Temp_Status);
+                                                      end if;
+                                                      
+                                                      if Current_Token (Parser) = Token_Comma then
+                                                         Next_Token (Parser, Temp_Status);
+                                                      end if;
+                                                   end loop;
+                                                   if Current_Token (Parser) = Token_Array_End then
+                                                      Next_Token (Parser, Temp_Status);
+                                                   end if;
                                                 else
                                                    Skip_Value (Parser, Temp_Status);
                                                 end if;
@@ -508,6 +912,130 @@ package body Spec_Parse is
                                                    Next_Token (Parser, Temp_Status);
                                                 end if;
                                              end if;
+                                          else
+                                             Next_Token (Parser, Temp_Status);
+                                          end if;
+                                          
+                                          if Current_Token (Parser) = Token_Comma then
+                                             Next_Token (Parser, Temp_Status);
+                                          end if;
+                                       end loop;
+                                       if Current_Token (Parser) = Token_Array_End then
+                                          Next_Token (Parser, Temp_Status);
+                                       end if;
+                                    elsif Key = "body" and then Current_Token (Parser) = Token_Array_Start then
+                                       --  Parse body array (function statements)
+                                       Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := 0;
+                                       Next_Token (Parser, Temp_Status);
+                                       while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                          if Current_Token (Parser) = Token_Object_Start then
+                                             declare
+                                                Stmt_Idx : constant Natural := 
+                                                   Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count + 1;
+                                             begin
+                                                if Stmt_Idx <= Max_Statements then
+                                                   Spec.Functions.Functions (Spec.Functions.Count).Stmts.Count := Stmt_Idx;
+                                                   
+                                                   --  Parse statement object (simplified: only parse type, target, value for now)
+                                                   Next_Token (Parser, Temp_Status);
+                                                   declare
+                                                      Stmt : Spec_Statement renames 
+                                                         Spec.Functions.Functions (Spec.Functions.Count).Stmts.Statements (Stmt_Idx);
+                                                   begin
+                                                      while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                                         if Current_Token (Parser) = Token_String then
+                                                            declare
+                                                               Field_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                            begin
+                                                               Next_Token (Parser, Temp_Status);
+                                                               if Current_Token (Parser) /= Token_Colon then
+                                                                  Status := Error_Parse;
+                                                                  return;
+                                                               end if;
+                                                               Next_Token (Parser, Temp_Status);
+                                                               
+                                                               if Field_Key = "type" and then Current_Token (Parser) = Token_String then
+                                                                  declare
+                                                                     Type_Str : constant String := 
+                                                                        JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                  begin
+                                                                     if Type_Str = "assign" then
+                                                                        Stmt.Stmt_Type := Stmt_Assign;
+                                                                     elsif Type_Str = "return" then
+                                                                        Stmt.Stmt_Type := Stmt_Return;
+                                                                     elsif Type_Str = "call" then
+                                                                        Stmt.Stmt_Type := Stmt_Call;
+                                                                     elsif Type_Str = "if" then
+                                                                        Stmt.Stmt_Type := Stmt_If;
+                                                                     elsif Type_Str = "while" then
+                                                                        Stmt.Stmt_Type := Stmt_While;
+                                                                     elsif Type_Str = "for" then
+                                                                        Stmt.Stmt_Type := Stmt_For;
+                                                                     elsif Type_Str = "break" then
+                                                                        Stmt.Stmt_Type := Stmt_Break;
+                                                                     elsif Type_Str = "continue" then
+                                                                        Stmt.Stmt_Type := Stmt_Continue;
+                                                                     elsif Type_Str = "switch" then
+                                                                        Stmt.Stmt_Type := Stmt_Switch;
+                                                                     elsif Type_Str = "try" then
+                                                                        Stmt.Stmt_Type := Stmt_Try;
+                                                                     elsif Type_Str = "throw" then
+                                                                        Stmt.Stmt_Type := Stmt_Throw;
+                                                                     elsif Type_Str = "error" then
+                                                                        Stmt.Stmt_Type := Stmt_Error;
+                                                                     else
+                                                                        Stmt.Stmt_Type := Stmt_Nop;
+                                                                     end if;
+                                                                  end;
+                                                               elsif Field_Key = "target" and then Current_Token (Parser) = Token_String then
+                                                                  Stmt.Target := Identifier_Strings.To_Bounded_String (
+                                                                     JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                               elsif Field_Key = "value" then
+                                                                  if Current_Token (Parser) = Token_String then
+                                                                     Stmt.Value := Identifier_Strings.To_Bounded_String (
+                                                                        JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                  elsif Current_Token (Parser) = Token_Number then
+                                                                     Stmt.Value := Identifier_Strings.To_Bounded_String (
+                                                                        JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                  elsif Current_Token (Parser) = Token_True then
+                                                                     Stmt.Value := Identifier_Strings.To_Bounded_String ("true");
+                                                                  elsif Current_Token (Parser) = Token_False then
+                                                                     Stmt.Value := Identifier_Strings.To_Bounded_String ("false");
+                                                                  end if;
+                                                               elsif Field_Key = "condition" and then Current_Token (Parser) = Token_String then
+                                                                  Stmt.Condition := Identifier_Strings.To_Bounded_String (
+                                                                     JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                               elsif Field_Key = "init" and then Current_Token (Parser) = Token_String then
+                                                                  Stmt.Init := Identifier_Strings.To_Bounded_String (
+                                                                     JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                               elsif Field_Key = "increment" and then Current_Token (Parser) = Token_String then
+                                                                  Stmt.Increment := Identifier_Strings.To_Bounded_String (
+                                                                     JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                               elsif Field_Key = "expr" and then Current_Token (Parser) = Token_String then
+                                                                  Stmt.Expr := Identifier_Strings.To_Bounded_String (
+                                                                     JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                               elsif Field_Key = "args" and then Current_Token (Parser) = Token_String then
+                                                                  Stmt.Args := Identifier_Strings.To_Bounded_String (
+                                                                     JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                               else
+                                                                  Skip_Value (Parser, Temp_Status);
+                                                               end if;
+                                                               
+                                                               if Current_Token (Parser) /= Token_Object_End then
+                                                                  Next_Token (Parser, Temp_Status);
+                                                               end if;
+                                                            end;
+                                                         else
+                                                            Next_Token (Parser, Temp_Status);
+                                                         end if;
+                                                      end loop;
+                                                   end;
+                                                   
+                                                   if Current_Token (Parser) = Token_Object_End then
+                                                      Next_Token (Parser, Temp_Status);
+                                                   end if;
+                                                end if;
+                                             end;
                                           else
                                              Next_Token (Parser, Temp_Status);
                                           end if;

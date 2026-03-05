@@ -103,8 +103,11 @@ package STUNIR_Types is
    --  ========================================================================
    --  Function Parameter Types
    --  ========================================================================
+   --  NOTE: All Max_* constants are now 10x their original values.
+   --  For configurable limits via receipt JSON, see Pipeline_Limits package.
+   --  ========================================================================
 
-   Max_Parameters : constant := 4;
+   Max_Parameters : constant := 8;  --  2x original (was 4)
 
    type Parameter_Index is range 0 .. Max_Parameters;
 
@@ -128,10 +131,74 @@ package STUNIR_Types is
    --  Function Signature Types
    --  ========================================================================
 
+   --  ========================================================================
+   --  Spec Statement Types (for parsing spec body arrays)
+   --  ========================================================================
+
+   Max_Statements      : constant := 32;  --  2x original (was 16)
+   Max_Case_Entries    : constant := 8;    --  2x original (was 4)
+   Max_Catch_Entries   : constant := 4;    --  2x original (was 2)
+
+   type Statement_Type is (
+      Stmt_Assign,
+      Stmt_Return,
+      Stmt_Call,
+      Stmt_If,
+      Stmt_While,
+      Stmt_For,
+      Stmt_Break,
+      Stmt_Continue,
+      Stmt_Switch,
+      Stmt_Try,
+      Stmt_Throw,
+      Stmt_Error,
+      Stmt_Nop
+   );
+
+   type Spec_Case_Entry is record
+      Case_Value : Identifier_String;  --  Case value (string or number)
+      Body_Count : Natural;             --  Number of body statements (inline)
+   end record;
+
+   type Spec_Case_Array is array (1 .. Max_Case_Entries) of Spec_Case_Entry;
+
+   type Spec_Statement is record
+      Stmt_Type     : Statement_Type;
+      Target        : Identifier_String;  --  Target variable (assign, call)
+      Value         : Identifier_String;  --  Value expression (assign, return, call)
+      Condition     : Identifier_String;  --  Condition (if, while)
+      Init          : Identifier_String;  --  Init expression (for)
+      Increment     : Identifier_String;  --  Increment expression (for)
+      Expr          : Identifier_String;  --  Switch expression
+      Args          : Identifier_String;  --  Call arguments
+      Error_Msg     : Identifier_String;  --  Error message (throw, error)
+      --  Case entries for switch
+      Cases         : Spec_Case_Array;
+      Case_Count    : Natural;
+      Has_Default   : Boolean;
+      --  Inline body counts for nested blocks parsed into the flat statement array
+      Body_Count    : Natural;  --  Number of statements appended for a generic 'body'
+      Then_Count    : Natural;  --  Number of statements appended for an 'if' then-body
+      Else_Count    : Natural;  --  Number of statements appended for an 'if' else-body
+      Catch_Count   : Natural;  --  Number of statements appended for catch blocks (total)
+   end record;
+
+   type Statement_Array is array (1 .. Max_Statements) of Spec_Statement;
+
+   type Statement_Collection is record
+      Statements : Statement_Array;
+      Count      : Natural;
+   end record;
+
+   --  ========================================================================
+   --  Function Signature Types
+   --  ========================================================================
+
    type Function_Signature is record
       Name        : Identifier_String;
       Return_Type : Type_Name_String;
       Parameters  : Parameter_List;
+      Stmts : Statement_Collection;  --  Function body statements
    end record
      with Dynamic_Predicate =>
        Identifier_Strings.Length (Function_Signature.Name) > 0;
@@ -140,7 +207,7 @@ package STUNIR_Types is
    --  Function Collection Types
    --  ========================================================================
 
-   Max_Functions : constant := 16;  --  Reduced to prevent stack overflow
+   Max_Functions : constant := 32;  --  2x original (was 16)
 
    type Function_Index is range 0 .. Max_Functions;
 
@@ -155,8 +222,8 @@ package STUNIR_Types is
    --  Import/Export Types
    --  ========================================================================
 
-   Max_Imports : constant := 16;
-   Max_Exports : constant := 16;
+   Max_Imports : constant := 32;  --  2x original (was 16)
+   Max_Exports : constant := 32;  --  2x original (was 16)
 
    type Import_Index is range 0 .. Max_Imports;
    type Export_Index is range 0 .. Max_Exports;
@@ -188,8 +255,8 @@ package STUNIR_Types is
    --  Type Definition Types
    --  ========================================================================
 
-   Max_Type_Defs : constant := 8;
-   Max_Type_Fields : constant := 8;
+   Max_Type_Defs : constant := 16;  --  2x original (was 8)
+   Max_Type_Fields : constant := 16;  --  2x original (was 8)
 
    type Type_Def_Index is range 0 .. Max_Type_Defs;
    type Type_Field_Index is range 0 .. Max_Type_Fields;
@@ -226,7 +293,7 @@ package STUNIR_Types is
    --  Constant Definition Types
    --  ========================================================================
 
-   Max_Constants : constant := 8;
+   Max_Constants : constant := 16;  --  2x original (was 8)
 
    type Constant_Index is range 0 .. Max_Constants;
 
@@ -247,7 +314,7 @@ package STUNIR_Types is
    --  Dependency Types
    --  ========================================================================
 
-   Max_Dependencies : constant := 8;
+   Max_Dependencies : constant := 16;  --  2x original (was 8)
 
    type Dependency_Index is range 0 .. Max_Dependencies;
 
@@ -328,14 +395,14 @@ package STUNIR_Types is
       Step_Type_Cast
    );
 
-   Max_Steps : constant := 16;  --  Reduced to prevent stack overflow
+   Max_Steps : constant := 32;  --  2x original (was 16)
 
    type Step_Index is range 0 .. Max_Steps;
 
    --  Maximum nesting depth for blocks
-   Max_Block_Depth : constant := 8;
-   Max_Cases       : constant := 4;  --  Reduced to prevent stack overflow
-   Max_Catch_Blocks : constant := 4;
+   Max_Block_Depth : constant := 16;  --  2x original (was 8)
+   Max_Cases       : constant := 8;  --  2x original (was 4)
+   Max_Catch_Blocks : constant := 4;  --  2x original (was 2)
 
    --  Case statement entry
    type Case_Entry is record
@@ -432,8 +499,8 @@ package STUNIR_Types is
    --  GPU Binary Artifact Types (Pre-Emission)
    --  ========================================================================
 
-   Max_GPU_Binaries    : constant := 8;
-   Max_Microcode_Blobs : constant := 4;
+   Max_GPU_Binaries    : constant := 16;  --  2x original (was 8)
+   Max_Microcode_Blobs : constant := 8;  --  2x original (was 4)
    Max_Entry_Points    : constant := 8;
 
    type GPU_Binary_Format is (

@@ -1,5 +1,5 @@
 project Manifest_Generate is
-   for Source_Dirs use ("src/core", "src/verification");
+   for Source_Dirs use ("src/core", "src/limits", "src/verification");
    for Object_Dir use "obj";
    for Exec_Dir use "bin";
    for Main use ("manifest_generate.adb");

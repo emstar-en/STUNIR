@@ -4,6 +4,7 @@ with Ada.Strings.Unbounded;
 with Ada.IO_Exceptions;
 with Ada.Streams;
 with GNAT.SHA256;
+with Pipeline_Limits;
 
 procedure Receipt_Generate is
    use Ada.Command_Line;
@@ -141,11 +142,14 @@ begin
       declare
          Spec_Hash     : constant String := Hash_Content (Spec_Content);
          Manifest_Hash : constant String := Hash_Content (Manifest_Content);
-         Receipt : constant String :=
-           "{" &
-           """spec_hash"": """ & Spec_Hash & """," &
-           """source_index"": """ & Manifest_Hash & """," &
-           """links"":[]" &
+         Limits        : constant Pipeline_Limits.Limits_Record := Pipeline_Limits.Get_Default_Limits;
+         Limits_Json   : constant String := Pipeline_Limits.Generate_Limits_Json (Limits);
+         Receipt       : constant String :=
+           "{" & ASCII.LF &
+           "  ""spec_hash"": """ & Spec_Hash & """," & ASCII.LF &
+           "  ""source_index"": """ & Manifest_Hash & """," & ASCII.LF &
+           "  ""links"":[]," & ASCII.LF &
+           "  " & Limits_Json & ASCII.LF &
            "}";
       begin
          Write_All (To_String (Output_File), Receipt);
