@@ -192,6 +192,7 @@
 --    spec_assembler_main.adb       Phase:1  extraction JSON → spec JSON
 --    stunir_spec_assemble_main.adb Phase:1  AI extraction → spec JSON (alt)
 --    extraction_to_spec.adb        Phase:1  extraction JSON → spec JSON
+--    spec_modular_resolve_main.adb Phase:1  spec dir + registry → ordered manifest
 --    func_dedup.adb                Phase:1  functions JSON → deduped JSON
 --    type_normalize.adb            Phase:1  types JSON → normalized JSON
 --    DEPRECATED: spec_validate.adb → use spec_validate_schema.adb
@@ -205,7 +206,7 @@
 --
 --  PHASE 3 — Code Emission
 --    code_emitter_main.adb    Phase:3  IR JSON → target language code
---    pipeline_driver_main.adb Phase:3  config → full pipeline execution
+--    pipeline_driver_main.adb Phase:3  config/manifest → full pipeline execution
 --
 --  CROSS-CUTTING
 --    stunir_code_index_main.adb  Phase:X  source dir → code index JSON
@@ -268,6 +269,7 @@ project STUNIR_Tools is
       "stunir_spec_assemble_main.adb",
       "extraction_to_spec.adb",
       "assemble_spec_main.adb",
+      "spec_modular_resolve_main.adb",
       --  NOTE: spec_validate.adb moved to src/deprecated/ (stub, use spec_validate_schema.adb)
       "func_dedup.adb",
       "type_normalize.adb",
@@ -323,7 +325,7 @@ project STUNIR_Tools is
    package Binder is
       for Default_Switches ("Ada") use (
          "-E",     --  Exception traceback (symbolic)
-         "-d32m"   --  32MB primary stack (required for deep JSON recursion)
+         "-d64m"   --  64MB primary stack (required for deep JSON recursion + large types)
       );
    end Binder;
 
