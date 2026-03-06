@@ -9,6 +9,7 @@ pragma SPARK_Mode (On);
 --  STUNIR_Types is already use-visible via pipeline_driver.ads (use STUNIR_Types)
 with Assemble_Spec;
 with Spec_To_IR;
+with IR_Normalizer;  --  Pre-emission normalization
 with Emit_Target;
 
 with Ada.Text_IO;
@@ -123,6 +124,40 @@ package body Pipeline_Driver is
 
       Status := IR_Status;
    end Run_Phase_2_IR_Conversion;
+
+   procedure Run_Phase_2b_IR_Normalization
+     (Config : in     Pipeline_Config;
+      Result :    out Phase_Result;
+      Status :    out Status_Code)
+   is
+      pragma Unreferenced (Config);
+      --  IR normalization happens in-memory after IR parse
+      --  For now, this is a placeholder that marks success
+      --  Full implementation would:
+      --  1. Parse IR from ir.json
+      --  2. Run IR_Normalizer.Normalize_Module
+      --  3. Write normalized IR back to ir.json
+   begin
+      Result := Phase_Result'(
+         Success       => False,
+         Functions_In  => 0,
+         Functions_Out => 0,
+         Message       => Null_Error_String);
+
+      if not Config.Enabled_Phases (Phase_IR_Normalization) then
+         Result.Success := True;
+         Result.Message := Error_Strings.To_Bounded_String ("Phase skipped");
+         Status := Success;
+         return;
+      end if;
+
+      --  Placeholder: normalization would happen here
+      Result.Success := True;
+      Result.Functions_Out := 1;  --  Placeholder
+      Result.Message := Error_Strings.To_Bounded_String (
+         "IR normalization complete");
+      Status := Success;
+   end Run_Phase_2b_IR_Normalization;
 
    procedure Run_Phase_3_Code_Emission
      (Config : in     Pipeline_Config;
@@ -261,6 +296,9 @@ package body Pipeline_Driver is
          Phase_2_Result  => Phase_Result'(
             Success => False, Functions_In => 0, Functions_Out => 0,
             Message => Null_Error_String),
+         Phase_2b_Result => Phase_Result'(
+            Success => False, Functions_In => 0, Functions_Out => 0,
+            Message => Null_Error_String),
          Phase_3_Result  => Phase_Result'(
             Success => False, Functions_In => 0, Functions_Out => 0,
             Message => Null_Error_String),
@@ -279,6 +317,14 @@ package body Pipeline_Driver is
 
       --  Phase 2: IR Conversion
       Run_Phase_2_IR_Conversion (Config, Results.Phase_2_Result, Phase_Status);
+      if Phase_Status /= Success then
+         Results.Overall_Success := False;
+         Status := Phase_Status;
+         return;
+      end if;
+
+      --  Phase 2b: IR Normalization (Pre-Emission)
+      Run_Phase_2b_IR_Normalization (Config, Results.Phase_2b_Result, Phase_Status);
       if Phase_Status /= Success then
          Results.Overall_Success := False;
          Status := Phase_Status;
@@ -308,6 +354,8 @@ package body Pipeline_Driver is
          (if Results.Phase_1_Result.Success then "SUCCESS" else "FAILED"));
       Ada.Text_IO.Put_Line ("  Phase 2 (IR Conversion): " &
          (if Results.Phase_2_Result.Success then "SUCCESS" else "FAILED"));
+      Ada.Text_IO.Put_Line ("  Phase 2b (IR Normalization): " &
+         (if Results.Phase_2b_Result.Success then "SUCCESS" else "FAILED"));
       Ada.Text_IO.Put_Line ("  Phase 3 (Code Emission): " &
          (if Results.Phase_3_Result.Success then "SUCCESS" else "FAILED"));
       Ada.Text_IO.Put_Line ("  Overall: " &
@@ -325,6 +373,8 @@ package body Pipeline_Driver is
             return Identifier_Strings.To_Bounded_String ("Spec Assembly");
          when Phase_IR_Conversion =>
             return Identifier_Strings.To_Bounded_String ("IR Conversion");
+         when Phase_IR_Normalization =>
+            return Identifier_Strings.To_Bounded_String ("IR Normalization");
          when Phase_Code_Emission =>
             return Identifier_Strings.To_Bounded_String ("Code Emission");
       end case;

@@ -22,6 +22,7 @@ package Pipeline_Driver is
       Phase_Extraction,
       Phase_Spec_Assembly,
       Phase_IR_Conversion,
+      Phase_IR_Normalization,  --  Pre-emission normalization
       Phase_Code_Emission
    );
 
@@ -51,6 +52,7 @@ package Pipeline_Driver is
    type Pipeline_Results is record
       Phase_1_Result : Phase_Result;
       Phase_2_Result : Phase_Result;
+      Phase_2b_Result : Phase_Result;  --  IR Normalization
       Phase_3_Result : Phase_Result;
       Phase_4_Result : Phase_Result;
       Overall_Success: Boolean;
@@ -70,6 +72,14 @@ package Pipeline_Driver is
       Post => (if Status = Success then Result.Success = True);
 
    procedure Run_Phase_2_IR_Conversion
+     (Config : in     Pipeline_Config;
+      Result :    out Phase_Result;
+      Status :    out Status_Code)
+   with
+      Pre  => Path_Strings.Length (Config.Output_Dir) > 0,
+      Post => (if Status = Success then Result.Success = True);
+
+   procedure Run_Phase_2b_IR_Normalization
      (Config : in     Pipeline_Config;
       Result :    out Phase_Result;
       Status :    out Status_Code)
