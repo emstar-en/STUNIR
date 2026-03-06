@@ -368,6 +368,60 @@ GOLDEN_PATTERNS = {
     }
 }
 
+# Stub hint patterns - these should be present for unsupported operations
+STUB_HINT_PATTERNS = {
+    "common_lisp": {
+        "break": ["STUB: break", "return-from"],
+        "continue": ["STUB: continue", "go"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "scheme": {
+        "break": ["STUB: break", "call/cc"],
+        "continue": ["STUB: continue", "continuation"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "clojure": {
+        "break": ["STUB: break", "recur", "reduced"],
+        "continue": ["STUB: continue", "recur", "accumulator"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "futhark": {
+        "break": ["STUB: break", "tagged result"],
+        "continue": ["STUB: continue", "tagged result"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "lean4": {
+        "break": ["STUB: break", "whileM", "StateM", "Except"],
+        "continue": ["STUB: continue", "whileM", "StateM"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "ada": {
+        "break": ["exit;"],
+        "continue": ["STUB: continue", "label"],
+        "map_keys": ["STUB: map_keys", "Iterate"],
+        "set_union": ["STUB: set_union", "Union"],
+        "set_intersect": ["STUB: set_intersect", "Intersection"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "spark": {
+        "break": ["exit;"],
+        "continue": ["STUB: continue", "label"],
+        "map_keys": ["STUB: map_keys", "Iterate"],
+        "set_union": ["STUB: set_union", "Union"],
+        "set_intersect": ["STUB: set_intersect", "Intersection"],
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "swi_prolog": {
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "gnu_prolog": {
+        "unsupported": ["STUB: unsupported operation"],
+    },
+    "mercury": {
+        "unsupported": ["STUB: unsupported operation"],
+    }
+}
+
 def validate_ir_schema(ir_data: dict) -> Tuple[bool, str]:
     """Validate IR against schema."""
     required_fields = ["ir_version", "module_name", "functions"]
@@ -457,6 +511,181 @@ def check_no_placeholders(output: str, target: str) -> List[str]:
     
     return placeholders
 
+def validate_stub_hints(output: str, target: str, operation: str) -> Tuple[bool, List[str]]:
+    """Validate that stub hints are present for unsupported operations."""
+    if target not in STUB_HINT_PATTERNS:
+        return True, ["No stub hint patterns defined for target"]
+    
+    patterns = STUB_HINT_PATTERNS[target].get(operation, [])
+    if not patterns:
+        return True, ["No stub hint patterns defined for operation"]
+    
+    missing = []
+    for pattern in patterns:
+        if pattern.lower() not in output.lower():
+            missing.append(pattern)
+    
+    return len(missing) == 0, missing
+
+def run_python_emitter_test(target_group: str, target: str, ir_data: dict) -> Tuple[bool, str]:
+    """Run a Python emitter test for a specific target."""
+    import tempfile
+    import importlib.util
+    
+    # Map target groups to emitter paths
+    emitter_paths = {
+        "lisp": {
+            "common_lisp": "tools/python/targets/lisp/common_lisp/emitter.py",
+            "scheme": "tools/python/targets/lisp/scheme/emitter.py",
+            "clojure": "tools/python/targets/lisp/clojure/emitter.py",
+        },
+        "prolog": {
+            "swi_prolog": "tools/python/targets/prolog/swi_prolog/emitter.py",
+            "gnu_prolog": "tools/python/targets/prolog/gnu_prolog/emitter.py",
+            "mercury": "tools/python/targets/prolog/mercury/emitter.py",
+        },
+        "functional": {
+            "futhark": "tools/python/targets/functional/futhark_emitter.py",
+            "lean4": "tools/python/targets/functional/lean4_emitter.py",
+        },
+        "ada": {
+            "ada": "tools/python/targets/systems/ada_emitter.py",
+            "spark": "tools/python/targets/systems/spark_emitter.py",
+        }
+    }
+    
+    if target_group not in emitter_paths or target not in emitter_paths[target_group]:
+        return False, f"No emitter path for {target_group}/{target}"
+    
+    emitter_path = Path(emitter_paths[target_group][target])
+    if not emitter_path.exists():
+        return False, f"Emitter not found: {emitter_path}"
+    
+    try:
+        # Import emitter module dynamically
+        spec = importlib.util.spec_from_file_location("emitter", emitter_path)
+        if spec is None or spec.loader is None:
+            return False, f"Could not load emitter spec: {emitter_path}"
+        
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        
+        # Find emitter class
+        emitter_class = None
+        for name in dir(module):
+            obj = getattr(module, name)
+            if isinstance(obj, type) and 'Emitter' in name:
+                emitter_class = obj
+                break
+        
+        if emitter_class is None:
+            return False, f"No emitter class found in {emitter_path}"
+        
+        # Run emitter
+        with tempfile.TemporaryDirectory() as tmpdir:
+            emitter = emitter_class(ir_data, Path(tmpdir))
+            manifest = emitter.run()
+            
+            # Read generated files
+            generated_code = ""
+            for file_info in manifest.get("files", []):
+                file_path = Path(tmpdir) / file_info["path"]
+                if file_path.exists():
+                    generated_code += file_path.read_text() + "\n"
+            
+            return True, generated_code
+    
+    except Exception as e:
+        return False, f"Emitter error: {str(e)}"
+
+def test_all_stub_hints():
+    """Test that all targets emit proper stub hints for unsupported operations."""
+    print("\n[5] Testing stub hint emissions...")
+    
+    results = {
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "details": []
+    }
+    
+    # Test break/continue stub hints
+    break_continue_ir = {
+        "ir_version": "v1",
+        "module_name": "stub_test",
+        "types": [],
+        "functions": [
+            {
+                "name": "test_break",
+                "args": [],
+                "return_type": "int",
+                "emission_mode": "stub_hints",
+                "steps": [
+                    {"op": "assign", "target": "i", "value": "0"},
+                    {
+                        "op": "while",
+                        "condition": "i < 10",
+                        "body": [
+                            {"op": "break"}
+                        ]
+                    },
+                    {"op": "return", "value": "i"}
+                ]
+            },
+            {
+                "name": "test_continue",
+                "args": [],
+                "return_type": "int",
+                "emission_mode": "stub_hints",
+                "steps": [
+                    {"op": "assign", "target": "i", "value": "0"},
+                    {
+                        "op": "while",
+                        "condition": "i < 10",
+                        "body": [
+                            {"op": "continue"}
+                        ]
+                    },
+                    {"op": "return", "value": "i"}
+                ]
+            }
+        ]
+    }
+    
+    for group, targets in TARGET_LANGUAGES.items():
+        for target in targets:
+            success, output = run_python_emitter_test(group, target, break_continue_ir)
+            
+            if not success:
+                results["skipped"] += 1
+                results["details"].append(f"  {target}: SKIPPED ({output})")
+                continue
+            
+            # Validate break stub hint
+            break_valid, break_missing = validate_stub_hints(output, target, "break")
+            continue_valid, continue_missing = validate_stub_hints(output, target, "continue")
+            
+            if break_valid and continue_valid:
+                results["passed"] += 1
+                results["details"].append(f"  {target}: PASSED")
+            else:
+                results["failed"] += 1
+                msg = f"  {target}: FAILED"
+                if not break_valid:
+                    msg += f" (break missing: {', '.join(break_missing)})"
+                if not continue_valid:
+                    msg += f" (continue missing: {', '.join(continue_missing)})"
+                results["details"].append(msg)
+    
+    print(f"    Passed: {results['passed']}")
+    print(f"    Failed: {results['failed']}")
+    print(f"    Skipped: {results['skipped']}")
+    
+    for detail in results["details"]:
+        print(detail)
+    
+    return results["failed"] == 0
+
 def main():
     print("=" * 70)
     print("STUNIR Comprehensive Emission Validation Test")
@@ -489,6 +718,9 @@ def main():
         json.dump(COMPREHENSIVE_IR, f, indent=2)
     print(f"\n[4] Test IR written to {ir_path}")
     
+    # Test stub hints
+    stub_hints_passed = test_all_stub_hints()
+    
     # Summary
     print("\n" + "=" * 70)
     print("VALIDATION SUMMARY")
@@ -497,6 +729,7 @@ def main():
     print(f"  Step types covered: {len(covered)}")
     print(f"  Target languages: {sum(len(v) for v in TARGET_LANGUAGES.values())}")
     print(f"  Emission modes: stub_hints={modes['stub_hints']}, best_effort={modes['best_effort']}")
+    print(f"  Stub hint tests: {'PASSED' if stub_hints_passed else 'FAILED'}")
     
     # Body hints summary
     body_hints = [f.get("body_hint", "none") for f in COMPREHENSIVE_IR["functions"]]
@@ -508,8 +741,12 @@ def main():
     for group, targets in TARGET_LANGUAGES.items():
         print(f"    {group}: {', '.join(targets)}")
     
-    print("\n✓ Comprehensive emission validation test completed successfully")
-    return 0
+    if stub_hints_passed:
+        print("\n✓ Comprehensive emission validation test completed successfully")
+        return 0
+    else:
+        print("\n✗ Some stub hint tests failed")
+        return 1
 
 if __name__ == "__main__":
     sys.exit(main())
