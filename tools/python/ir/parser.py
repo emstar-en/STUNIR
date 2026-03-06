@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
 
-from .types import ParseError, ParserOptions, ErrorType
+from .ir_types import ParseError, ParserOptions, ErrorType
 from .ast_builder import ASTBuilder, AST
 from .semantic_analyzer import SemanticAnalyzer, AnnotatedAST
 from .ir_generator import IRGenerator, SemanticIR

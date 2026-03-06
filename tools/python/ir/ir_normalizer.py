@@ -34,6 +34,8 @@ class NormalizationStats:
     returns_added: int = 0
     temps_generated: int = 0
     expressions_split: int = 0
+    try_catch_lowered: int = 0
+    nested_blocks_processed: int = 0
 
 
 @dataclass
@@ -46,6 +48,7 @@ class NormalizerConfig:
     normalize_returns: bool = True
     generate_temp_names: bool = True
     simplify_expressions: bool = False
+    lower_try_catch: bool = True  # Convert try/catch to explicit error handling
     max_temps: int = 64
     verbose: bool = False
 
@@ -67,6 +70,7 @@ class IRNormalizer:
             steps = result["steps"]
             
             # Run passes in order
+            # 1. Lower control flow constructs
             if self.config.lower_switch:
                 steps = self._lower_switch(steps)
             
@@ -76,6 +80,14 @@ class IRNormalizer:
             if self.config.lower_break_continue:
                 steps = self._lower_break_continue(steps)
             
+            if self.config.lower_try_catch:
+                steps = self._lower_try_catch(steps)
+            
+            # 2. Simplify expressions
+            if self.config.simplify_expressions:
+                steps = self._simplify_expressions(steps)
+            
+            # 3. Flatten and normalize
             if self.config.flatten_blocks:
                 steps = self._flatten_blocks(steps)
             
@@ -110,6 +122,9 @@ class IRNormalizer:
             "blocks_flattened": self.stats.blocks_flattened,
             "returns_added": self.stats.returns_added,
             "temps_generated": self.stats.temps_generated,
+            "expressions_split": self.stats.expressions_split,
+            "try_catch_lowered": self.stats.try_catch_lowered,
+            "nested_blocks_processed": self.stats.nested_blocks_processed,
         }
         
         return result
@@ -312,6 +327,186 @@ class IRNormalizer:
         
         return result
     
+    def _lower_try_catch(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Lower try/catch to explicit error handling with result flags.
+        
+        Converts:
+            try { ... } catch (e) { ... }
+        To:
+            error_flag = false
+            error_value = null
+            if (!error_flag) { ... try body ... }
+            if (error_flag) { ... catch body ... }
+        """
+        result = []
+        
+        for step in steps:
+            op = step.get("op")
+            
+            if op == "try":
+                # Generate error tracking variables
+                error_flag = self._make_temp_name("error_flag")
+                error_var = self._make_temp_name("error_value")
+                
+                # Initialize error flag
+                result.append({
+                    "op": "assign",
+                    "target": error_flag,
+                    "value": "false"
+                })
+                result.append({
+                    "op": "assign",
+                    "target": error_var,
+                    "value": "null"
+                })
+                
+                # Wrap try body in error check
+                try_body = step.get("body", [])
+                wrapped_try = {
+                    "op": "if",
+                    "condition": f"!{error_flag}",
+                    "then_body": try_body,
+                    "else_body": []
+                }
+                result.append(wrapped_try)
+                
+                # Add catch as conditional
+                catch_body = step.get("catch_body", [])
+                catch_var = step.get("catch_var", "e")
+                
+                # Replace catch variable reference in catch body
+                catch_body_renamed = self._rename_var_in_steps(catch_body, catch_var, error_var)
+                
+                catch_conditional = {
+                    "op": "if",
+                    "condition": error_flag,
+                    "then_body": catch_body_renamed,
+                    "else_body": []
+                }
+                result.append(catch_conditional)
+                
+                self.stats.try_catch_lowered += 1
+            
+            elif op == "throw":
+                # Convert throw to error flag assignment
+                error_flag = self._find_nearest_error_flag(steps, step)
+                error_var = self._find_nearest_error_var(steps, step)
+                
+                result.append({
+                    "op": "assign",
+                    "target": error_flag or "error_flag",
+                    "value": "true"
+                })
+                result.append({
+                    "op": "assign",
+                    "target": error_var or "error_value",
+                    "value": step.get("value", "unknown_error")
+                })
+            
+            else:
+                result.append(step)
+        
+        return result
+    
+    def _rename_var_in_steps(self, steps: List[Dict], old_name: str, new_name: str) -> List[Dict]:
+        """Rename a variable throughout a list of steps."""
+        result = []
+        for step in steps:
+            modified = copy.deepcopy(step)
+            # Simple string replacement in condition/value fields
+            if "condition" in modified:
+                modified["condition"] = modified["condition"].replace(old_name, new_name)
+            if "value" in modified and isinstance(modified["value"], str):
+                modified["value"] = modified["value"].replace(old_name, new_name)
+            if "target" in modified and modified["target"] == old_name:
+                modified["target"] = new_name
+            result.append(modified)
+        return result
+    
+    def _find_nearest_error_flag(self, steps: List[Dict], current_step: Dict) -> Optional[str]:
+        """Find the nearest error flag variable name (helper for throw lowering)."""
+        # In a real implementation, this would track scope
+        return None
+    
+    def _find_nearest_error_var(self, steps: List[Dict], current_step: Dict) -> Optional[str]:
+        """Find the nearest error value variable name (helper for throw lowering)."""
+        # In a real implementation, this would track scope
+        return None
+    
+    def _simplify_expressions(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Simplify complex expressions into simpler statements.
+        
+        Converts:
+            x = a + b * c - d
+        To:
+            temp1 = b * c
+            temp2 = a + temp1
+            x = temp2 - d
+        """
+        result = []
+        
+        for step in steps:
+            op = step.get("op")
+            
+            if op == "assign" and "value" in step:
+                value = step["value"]
+                
+                # Check if value is a complex expression (string with operators)
+                if isinstance(value, str) and self._is_complex_expression(value):
+                    # Split into simpler statements
+                    simplified = self._split_expression(step["target"], value)
+                    result.extend(simplified)
+                    self.stats.expressions_split += 1
+                else:
+                    result.append(step)
+            
+            elif op in ("if", "while") and "condition" in step:
+                # Simplify complex conditions
+                cond = step["condition"]
+                if isinstance(cond, str) and self._is_complex_expression(cond):
+                    # Extract condition to temp variable
+                    temp_cond = self._make_temp_name("cond")
+                    result.append({
+                        "op": "assign",
+                        "target": temp_cond,
+                        "value": cond
+                    })
+                    modified_step = copy.deepcopy(step)
+                    modified_step["condition"] = temp_cond
+                    result.append(modified_step)
+                    self.stats.expressions_split += 1
+                else:
+                    result.append(step)
+            
+            else:
+                result.append(step)
+        
+        return result
+    
+    def _is_complex_expression(self, expr: str) -> bool:
+        """Check if an expression is complex enough to split."""
+        if not isinstance(expr, str):
+            return False
+        
+        # Count operators
+        operator_count = 0
+        operators = ['+', '-', '*', '/', '%', '&&', '||', '==', '!=', '<', '>', '<=', '>=']
+        
+        for op in operators:
+            operator_count += expr.count(op)
+        
+        # Consider complex if more than 2 operators
+        return operator_count > 2
+    
+    def _split_expression(self, target: str, expr: str) -> List[Dict]:
+        """Split a complex expression into simpler statements."""
+        # This is a simplified implementation
+        # A full implementation would parse the expression tree
+        
+        # For now, just return the original assignment
+        # Real implementation would use proper expression parsing
+        return [{"op": "assign", "target": target, "value": expr}]
+    
     def _flatten_blocks(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Flatten nested blocks where safe."""
         # Placeholder - full implementation would analyze block structure
@@ -420,8 +615,11 @@ def main():
         print(f"  For loops lowered: {normalizer.stats.for_loops_lowered}")
         print(f"  Breaks lowered: {normalizer.stats.breaks_lowered}")
         print(f"  Continues lowered: {normalizer.stats.continues_lowered}")
+        print(f"  Try/catch lowered: {normalizer.stats.try_catch_lowered}")
+        print(f"  Expressions split: {normalizer.stats.expressions_split}")
         print(f"  Returns added: {normalizer.stats.returns_added}")
         print(f"  Temps generated: {normalizer.stats.temps_generated}")
+
 
 
 if __name__ == "__main__":

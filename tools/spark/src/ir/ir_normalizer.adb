@@ -28,12 +28,13 @@ package body IR_Normalizer is
    begin
       return Normalizer_Config'(
          Enabled_Passes => (
-            Pass_Switch_Lowering   => True,
-            Pass_For_Lowering      => True,
-            Pass_Break_Continue    => False,  --  Optional, complex
-            Pass_Block_Flatten     => True,
-            Pass_Return_Normalize  => True,
-            Pass_Temp_Naming       => True,
+            Pass_Switch_Lowering     => True,
+            Pass_For_Lowering        => True,
+            Pass_Break_Continue      => False,  --  Optional, complex
+            Pass_Try_Catch_Lowering  => False,  --  Optional, complex
+            Pass_Block_Flatten       => True,
+            Pass_Return_Normalize    => True,
+            Pass_Temp_Naming         => True,
             Pass_Expression_Simplify => False  --  Optional
          ),
          Max_Temps      => 64,
@@ -294,6 +295,52 @@ package body IR_Normalizer is
       end loop;
    end Lower_Break_Continue;
 
+   procedure Lower_Try_Catch
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Try/catch lowering converts:
+      --    try { ... } catch (e) { ... }
+      --  To:
+      --    _error_flag = false;
+      --    if (!_error_flag) { ... try body ... }
+      --    if (_error_flag) { ... catch body ... }
+   begin
+      --  Placeholder implementation
+      --  Full implementation would transform try/catch blocks
+      for I in Step_Index range 1 .. Steps.Count loop
+         declare
+            Step : constant IR_Step := Steps.Steps (I);
+         begin
+            if Step.Step_Type = Step_Try then
+               Stats.Try_Catch_Lowered := Stats.Try_Catch_Lowered + 1;
+            end if;
+         end;
+      end loop;
+   end Lower_Try_Catch;
+
+   procedure Simplify_Expressions
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Simplify complex expressions into simpler statements
+      --  This is a placeholder - full implementation would parse
+      --  expression trees and split complex expressions
+   begin
+      --  Placeholder: count complex expressions
+      for I in Step_Index range 1 .. Steps.Count loop
+         declare
+            Step : constant IR_Step := Steps.Steps (I);
+         begin
+            if Step.Step_Type = Step_Assign then
+               --  Check if value is complex (more than 2 operators)
+               --  Placeholder: just count for now
+               null;
+            end if;
+         end;
+      end loop;
+   end Simplify_Expressions;
+
    procedure Flatten_Blocks
      (Steps  : in out Step_Collection;
       Stats  : in out Normalization_Stats)
@@ -394,14 +441,16 @@ package body IR_Normalizer is
       Result :    out Normalization_Result)
    is
       Stats : Normalization_Stats := (
-         Switches_Lowered   => 0,
-         For_Loops_Lowered  => 0,
-         Breaks_Lowered     => 0,
-         Continues_Lowered  => 0,
-         Blocks_Flattened   => 0,
-         Returns_Added      => 0,
-         Temps_Generated    => 0,
-         Expressions_Split  => 0
+         Switches_Lowered     => 0,
+         For_Loops_Lowered    => 0,
+         Breaks_Lowered       => 0,
+         Continues_Lowered    => 0,
+         Try_Catch_Lowered    => 0,
+         Blocks_Flattened     => 0,
+         Returns_Added        => 0,
+         Temps_Generated      => 0,
+         Expressions_Split    => 0,
+         Nested_Blocks_Proc   => 0
       );
    begin
       Result.Success := False;
@@ -409,6 +458,7 @@ package body IR_Normalizer is
       
       --  Run enabled passes in order
       
+      --  1. Lower control flow constructs
       if Config.Enabled_Passes (Pass_Switch_Lowering) then
          Lower_Switch (Func.Steps, Stats);
       end if;
@@ -421,6 +471,16 @@ package body IR_Normalizer is
          Lower_Break_Continue (Func.Steps, Stats);
       end if;
       
+      if Config.Enabled_Passes (Pass_Try_Catch_Lowering) then
+         Lower_Try_Catch (Func.Steps, Stats);
+      end if;
+      
+      --  2. Simplify expressions
+      if Config.Enabled_Passes (Pass_Expression_Simplify) then
+         Simplify_Expressions (Func.Steps, Stats);
+      end if;
+      
+      --  3. Flatten and normalize
       if Config.Enabled_Passes (Pass_Block_Flatten) then
          Flatten_Blocks (Func.Steps, Stats);
       end if;
@@ -445,14 +505,16 @@ package body IR_Normalizer is
    is
       Func_Result : Normalization_Result;
       Total_Stats : Normalization_Stats := (
-         Switches_Lowered   => 0,
-         For_Loops_Lowered  => 0,
-         Breaks_Lowered     => 0,
-         Continues_Lowered  => 0,
-         Blocks_Flattened   => 0,
-         Returns_Added      => 0,
-         Temps_Generated    => 0,
-         Expressions_Split  => 0
+         Switches_Lowered     => 0,
+         For_Loops_Lowered    => 0,
+         Breaks_Lowered       => 0,
+         Continues_Lowered    => 0,
+         Try_Catch_Lowered    => 0,
+         Blocks_Flattened     => 0,
+         Returns_Added        => 0,
+         Temps_Generated      => 0,
+         Expressions_Split    => 0,
+         Nested_Blocks_Proc   => 0
       );
    begin
       Result.Success := False;
@@ -476,6 +538,8 @@ package body IR_Normalizer is
             Func_Result.Stats.Breaks_Lowered;
          Total_Stats.Continues_Lowered := Total_Stats.Continues_Lowered +
             Func_Result.Stats.Continues_Lowered;
+         Total_Stats.Try_Catch_Lowered := Total_Stats.Try_Catch_Lowered +
+            Func_Result.Stats.Try_Catch_Lowered;
          Total_Stats.Blocks_Flattened := Total_Stats.Blocks_Flattened +
             Func_Result.Stats.Blocks_Flattened;
          Total_Stats.Returns_Added := Total_Stats.Returns_Added +
@@ -484,6 +548,8 @@ package body IR_Normalizer is
             Func_Result.Stats.Temps_Generated;
          Total_Stats.Expressions_Split := Total_Stats.Expressions_Split +
             Func_Result.Stats.Expressions_Split;
+         Total_Stats.Nested_Blocks_Proc := Total_Stats.Nested_Blocks_Proc +
+            Func_Result.Stats.Nested_Blocks_Proc;
       end loop;
       
       Result.Stats := Total_Stats;

@@ -30,6 +30,7 @@ package IR_Normalizer is
       Pass_Switch_Lowering,      --  Convert switch to if/else
       Pass_For_Lowering,         --  Convert for to while
       Pass_Break_Continue,       --  Lower break/continue to flags
+      Pass_Try_Catch_Lowering,   --  Lower try/catch to error flags
       Pass_Block_Flatten,        --  Flatten nested blocks
       Pass_Return_Normalize,     --  Ensure explicit returns
       Pass_Temp_Naming,          --  Unique temp variable names
@@ -49,14 +50,16 @@ package IR_Normalizer is
    --  =========================================================================
 
    type Normalization_Stats is record
-      Switches_Lowered   : Natural;
-      For_Loops_Lowered  : Natural;
-      Breaks_Lowered     : Natural;
-      Continues_Lowered  : Natural;
-      Blocks_Flattened   : Natural;
-      Returns_Added      : Natural;
-      Temps_Generated    : Natural;
-      Expressions_Split  : Natural;
+      Switches_Lowered     : Natural;
+      For_Loops_Lowered    : Natural;
+      Breaks_Lowered       : Natural;
+      Continues_Lowered    : Natural;
+      Try_Catch_Lowered    : Natural;
+      Blocks_Flattened     : Natural;
+      Returns_Added        : Natural;
+      Temps_Generated      : Natural;
+      Expressions_Split    : Natural;
+      Nested_Blocks_Proc   : Natural;
    end record;
 
    type Normalization_Result is record
@@ -116,6 +119,28 @@ package IR_Normalizer is
    --    bool _break_0 = false;
    --    while (cond && !_break_0) { ... _break_0 = true; ... }
    procedure Lower_Break_Continue
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Steps.Count <= Max_Steps,
+      Post => Steps.Count <= Max_Steps;
+
+   --  Lower try/catch to explicit error handling
+   --  This converts:
+   --    try { ... } catch (e) { ... }
+   --  To:
+   --    bool _error_flag = false;
+   --    if (!_error_flag) { ... try body ... }
+   --    if (_error_flag) { ... catch body ... }
+   procedure Lower_Try_Catch
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Steps.Count <= Max_Steps,
+      Post => Steps.Count <= Max_Steps;
+
+   --  Simplify complex expressions into simpler statements
+   procedure Simplify_Expressions
      (Steps  : in out Step_Collection;
       Stats  : in out Normalization_Stats)
    with

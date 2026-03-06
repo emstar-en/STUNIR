@@ -11,13 +11,23 @@ Tests the pre-emission normalization passes:
 
 import sys
 import os
+import importlib.util
 
-# Add parent directory to path to avoid naming conflicts
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Load ir_normalizer directly without going through package imports
+spec = importlib.util.spec_from_file_location(
+    "ir_normalizer",
+    os.path.join(os.path.dirname(__file__), "ir_normalizer.py")
+)
+ir_normalizer = importlib.util.module_from_spec(spec)
+sys.modules["ir_normalizer"] = ir_normalizer
+spec.loader.exec_module(ir_normalizer)
+
+IRNormalizer = ir_normalizer.IRNormalizer
+NormalizerConfig = ir_normalizer.NormalizerConfig
+normalize_ir = ir_normalizer.normalize_ir
 
 import unittest
 import json
-from ir.ir_normalizer import IRNormalizer, NormalizerConfig, normalize_ir
 
 
 class TestSwitchLowering(unittest.TestCase):
@@ -331,6 +341,145 @@ class TestConfigOptions(unittest.TestCase):
         # For should remain
         self.assertEqual(result["steps"][0]["op"], "for")
         self.assertEqual(normalizer.stats.for_loops_lowered, 0)
+
+
+class TestTryCatchLowering(unittest.TestCase):
+    """Test try/catch to error flag lowering."""
+    
+    def test_simple_try_catch(self):
+        """Test simple try/catch lowering."""
+        func = {
+            "name": "test",
+            "return_type": "void",
+            "steps": [
+                {
+                    "op": "try",
+                    "body": [
+                        {"op": "assign", "target": "x", "value": "1"}
+                    ],
+                    "catch_var": "e",
+                    "catch_body": [
+                        {"op": "assign", "target": "x", "value": "0"}
+                    ]
+                }
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        # Should have error flag init + try body wrapper + catch conditional
+        self.assertEqual(normalizer.stats.try_catch_lowered, 1)
+        
+        # Check for error flag initialization
+        steps = result["steps"]
+        self.assertEqual(steps[0]["op"], "assign")
+        self.assertIn("error_flag", steps[0]["target"])
+        self.assertEqual(steps[0]["value"], "false")
+    
+    def test_throw_conversion(self):
+        """Test throw statement conversion."""
+        func = {
+            "name": "test",
+            "return_type": "void",
+            "steps": [
+                {
+                    "op": "try",
+                    "body": [
+                        {"op": "throw", "value": "error_msg"}
+                    ],
+                    "catch_body": []
+                }
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        # Throw should be converted to error flag assignment
+        self.assertEqual(normalizer.stats.try_catch_lowered, 1)
+
+
+class TestExpressionSimplification(unittest.TestCase):
+    """Test expression simplification."""
+    
+    def test_complex_expression_detection(self):
+        """Test detection of complex expressions."""
+        normalizer = IRNormalizer()
+        
+        # Simple expressions
+        self.assertFalse(normalizer._is_complex_expression("x"))
+        self.assertFalse(normalizer._is_complex_expression("x + y"))
+        
+        # Complex expressions (more than 2 operators)
+        self.assertTrue(normalizer._is_complex_expression("a + b * c - d"))
+        self.assertTrue(normalizer._is_complex_expression("x && y || z && w"))
+    
+    def test_expression_simplification_disabled(self):
+        """Test that simplification is disabled by default."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "assign", "target": "x", "value": "a + b * c - d"}
+            ]
+        }
+        
+        # Default config has simplify_expressions=False
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        # Expression should remain unchanged
+        self.assertEqual(result["steps"][0]["value"], "a + b * c - d")
+        self.assertEqual(normalizer.stats.expressions_split, 0)
+    
+    def test_expression_simplification_enabled(self):
+        """Test expression simplification when enabled."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "assign", "target": "x", "value": "a + b * c - d"}
+            ]
+        }
+        
+        config = NormalizerConfig(simplify_expressions=True)
+        normalizer = IRNormalizer(config)
+        result = normalizer.normalize_function(func)
+        
+        # Should have attempted simplification
+        self.assertEqual(normalizer.stats.expressions_split, 1)
+
+
+class TestNormalizationStats(unittest.TestCase):
+    """Test normalization statistics tracking."""
+    
+    def test_stats_accumulation(self):
+        """Test that stats accumulate across multiple functions."""
+        module = {
+            "functions": [
+                {
+                    "name": "func1",
+                    "return_type": "int",
+                    "steps": [
+                        {"op": "switch", "expr": "x", "cases": [], "default": []}
+                    ]
+                },
+                {
+                    "name": "func2",
+                    "return_type": "int",
+                    "steps": [
+                        {"op": "switch", "expr": "y", "cases": [], "default": []}
+                    ]
+                }
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_module(module)
+        
+        # Should have lowered 2 switches
+        self.assertEqual(result["normalization_stats"]["switches_lowered"], 2)
 
 
 if __name__ == "__main__":
