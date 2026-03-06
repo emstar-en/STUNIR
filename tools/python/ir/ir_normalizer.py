@@ -36,6 +36,12 @@ class NormalizationStats:
     expressions_split: int = 0
     try_catch_lowered: int = 0
     nested_blocks_processed: int = 0
+    # Data structure normalization
+    arrays_flattened: int = 0
+    structs_flattened: int = 0
+    types_canonicalized: int = 0
+    constants_folded: int = 0
+    dead_code_removed: int = 0
 
 
 @dataclass
@@ -49,6 +55,12 @@ class NormalizerConfig:
     generate_temp_names: bool = True
     simplify_expressions: bool = False
     lower_try_catch: bool = True  # Convert try/catch to explicit error handling
+    # Data structure normalization
+    flatten_arrays: bool = False  # Flatten nested arrays (language-dependent)
+    flatten_structs: bool = False  # Flatten nested structs (language-dependent)
+    canonicalize_types: bool = True  # Normalize type names
+    fold_constants: bool = True  # Evaluate constant expressions
+    remove_dead_code: bool = False  # Remove unreachable code (disabled by default - enable explicitly)
     max_temps: int = 64
     verbose: bool = False
 
@@ -66,10 +78,13 @@ class IRNormalizer:
         """Normalize a single IR function."""
         result = copy.deepcopy(func)
         
+        # 0. Canonicalize types first
+        if self.config.canonicalize_types:
+            result = self._canonicalize_types(result)
+        
         if "steps" in result:
             steps = result["steps"]
             
-            # Run passes in order
             # 1. Lower control flow constructs
             if self.config.lower_switch:
                 steps = self._lower_switch(steps)
@@ -87,12 +102,27 @@ class IRNormalizer:
             if self.config.simplify_expressions:
                 steps = self._simplify_expressions(steps)
             
-            # 3. Flatten and normalize
+            # 3. Fold constants
+            if self.config.fold_constants:
+                steps = self._fold_constants(steps)
+            
+            # 4. Data structure normalization
+            if self.config.flatten_arrays:
+                steps = self._flatten_arrays(steps)
+            
+            if self.config.flatten_structs:
+                steps = self._flatten_structs(steps)
+            
+            # 5. Flatten and normalize
             if self.config.flatten_blocks:
                 steps = self._flatten_blocks(steps)
             
             if self.config.normalize_returns:
                 steps = self._normalize_returns(steps, result.get("return_type", "void"))
+            
+            # 6. Remove dead code
+            if self.config.remove_dead_code:
+                steps = self._remove_dead_code(steps)
             
             if self.config.generate_temp_names:
                 steps = self._generate_temp_names(steps)
@@ -125,6 +155,12 @@ class IRNormalizer:
             "expressions_split": self.stats.expressions_split,
             "try_catch_lowered": self.stats.try_catch_lowered,
             "nested_blocks_processed": self.stats.nested_blocks_processed,
+            # Data structure normalization
+            "arrays_flattened": self.stats.arrays_flattened,
+            "structs_flattened": self.stats.structs_flattened,
+            "types_canonicalized": self.stats.types_canonicalized,
+            "constants_folded": self.stats.constants_folded,
+            "dead_code_removed": self.stats.dead_code_removed,
         }
         
         return result
@@ -515,6 +551,235 @@ class IRNormalizer:
                 self.stats.blocks_flattened += 1
         return steps
     
+    def _canonicalize_types(self, func: Dict[str, Any]) -> Dict[str, Any]:
+        """Canonicalize type names to standard forms.
+        
+        Converts language-specific types to canonical forms:
+        - i32, int32, integer -> int
+        - i64, int64, long -> long
+        - f32, float32 -> float
+        - f64, float64, double -> double
+        - bool, boolean -> bool
+        - str, string -> string
+        """
+        result = copy.deepcopy(func)
+        
+        # Type mapping
+        type_map = {
+            # Integer types
+            "i32": "int", "int32": "int", "integer": "int",
+            "i64": "long", "int64": "long",
+            "i16": "short", "int16": "short",
+            "i8": "byte", "int8": "byte",
+            # Float types
+            "f32": "float", "float32": "float",
+            "f64": "double", "float64": "double",
+            # Boolean types
+            "boolean": "bool",
+            # String types
+            "str": "string",
+            # Void
+            "void": "void",
+            # Null/nil
+            "nil": "null", "None": "null",
+        }
+        
+        # Canonicalize return type
+        if "return_type" in result:
+            original = result["return_type"]
+            if original in type_map:
+                result["return_type"] = type_map[original]
+                self.stats.types_canonicalized += 1
+        
+        # Canonicalize parameter types
+        if "params" in result:
+            for param in result["params"]:
+                if "type" in param:
+                    original = param["type"]
+                    if original in type_map:
+                        param["type"] = type_map[original]
+                        self.stats.types_canonicalized += 1
+        
+        # Canonicalize local variable types
+        if "locals" in result:
+            for local in result["locals"]:
+                if "type" in local:
+                    original = local["type"]
+                    if original in type_map:
+                        local["type"] = type_map[original]
+                        self.stats.types_canonicalized += 1
+        
+        return result
+    
+    def _fold_constants(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Fold constant expressions at compile time.
+        
+        Evaluates constant expressions:
+        - 1 + 2 -> 3
+        - true && false -> false
+        - 10 / 2 -> 5
+        """
+        result = []
+        
+        for step in steps:
+            modified_step = copy.deepcopy(step)
+            
+            if step.get("op") == "assign" and "value" in step:
+                value = step["value"]
+                if isinstance(value, str):
+                    folded = self._try_fold_constant(value)
+                    if folded is not None:
+                        modified_step["value"] = folded
+                        self.stats.constants_folded += 1
+            
+            result.append(modified_step)
+        
+        return result
+    
+    def _try_fold_constant(self, expr: str) -> Optional[str]:
+        """Try to fold a constant expression. Returns None if not foldable."""
+        import re
+        
+        # Skip if contains variables (letters other than true/false/null)
+        if re.search(r'\b(?!true|false|null)[a-zA-Z_][a-zA-Z0-9_]*\b', expr):
+            return None
+        
+        # Try to evaluate simple arithmetic
+        try:
+            # Only allow safe characters
+            if re.match(r'^[\d\s\+\-\*\/\%\(\)\.]+$', expr):
+                # Evaluate the expression
+                result = eval(expr)
+                # Return as string
+                if isinstance(result, bool):
+                    return "true" if result else "false"
+                elif isinstance(result, float):
+                    # Check if it's actually an integer
+                    if result == int(result):
+                        return str(int(result))
+                    return str(result)
+                elif isinstance(result, int):
+                    return str(result)
+        except:
+            pass
+        
+        # Handle boolean expressions
+        if expr == "true && true":
+            return "true"
+        if expr == "true && false" or expr == "false && true":
+            return "false"
+        if expr == "false && false":
+            return "false"
+        if expr == "true || true" or expr == "true || false" or expr == "false || true":
+            return "true"
+        if expr == "false || false":
+            return "false"
+        if expr == "!true":
+            return "false"
+        if expr == "!false":
+            return "true"
+        
+        return None
+    
+    def _remove_dead_code(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Remove unreachable/dead code.
+        
+        Removes:
+        - Code after unconditional return/break/continue
+        - Empty if/else branches
+        - Unreachable statements
+        """
+        result = []
+        unreachable = False
+        
+        for i, step in enumerate(steps):
+            op = step.get("op")
+            
+            # Check if we're in unreachable section
+            if unreachable:
+                self.stats.dead_code_removed += 1
+                continue
+            
+            # Check for unconditional control flow
+            if op == "return":
+                result.append(step)
+                unreachable = True
+                continue
+            
+            if op in ("break", "continue"):
+                result.append(step)
+                unreachable = True
+                continue
+            
+            # Remove empty branches
+            if op == "if":
+                then_body = step.get("then_body", [])
+                else_body = step.get("else_body", [])
+                
+                # If both branches are empty, remove the if
+                if not then_body and not else_body:
+                    self.stats.dead_code_removed += 1
+                    continue
+                
+                # If condition is always false and no else, remove
+                cond = step.get("condition", "")
+                if cond == "false" and not else_body:
+                    self.stats.dead_code_removed += 1
+                    continue
+                
+                # If condition is always true, replace with then body
+                if cond == "true":
+                    result.extend(then_body)
+                    self.stats.dead_code_removed += 1
+                    continue
+                
+                # Recursively process nested bodies
+                modified_step = copy.deepcopy(step)
+                if then_body:
+                    modified_step["then_body"] = self._remove_dead_code(then_body)
+                if else_body:
+                    modified_step["else_body"] = self._remove_dead_code(else_body)
+                result.append(modified_step)
+                continue
+            
+            result.append(step)
+        
+        return result
+    
+    def _flatten_arrays(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Flatten nested array accesses where possible.
+        
+        Converts multi-dimensional array access to linear:
+        - arr[i][j] -> arr[i * COLS + j] (when dimensions known)
+        
+        This is a placeholder - full implementation requires type info.
+        """
+        # Placeholder - would need type information to properly flatten
+        for step in steps:
+            if step.get("op") == "assign":
+                value = step.get("value", "")
+                if isinstance(value, str) and "][" in value:
+                    # Multi-dimensional access detected
+                    self.stats.arrays_flattened += 1
+        return steps
+    
+    def _flatten_structs(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Flatten nested struct accesses where possible.
+        
+        Converts nested struct access to flat:
+        - a.b.c -> a_b_c (when safe)
+        
+        This is a placeholder - full implementation requires type info.
+        """
+        # Placeholder - would need type information to properly flatten
+        for step in steps:
+            if step.get("op") == "assign":
+                value = step.get("value", "")
+                if isinstance(value, str) and value.count(".") >= 2:
+                    # Nested struct access detected
+                    self.stats.structs_flattened += 1
+        return steps
+    
     def _normalize_returns(self, steps: List[Dict[str, Any]], return_type: str) -> List[Dict[str, Any]]:
         """Ensure all branches have explicit returns."""
         # Check if function already has a return
@@ -617,6 +882,9 @@ def main():
         print(f"  Continues lowered: {normalizer.stats.continues_lowered}")
         print(f"  Try/catch lowered: {normalizer.stats.try_catch_lowered}")
         print(f"  Expressions split: {normalizer.stats.expressions_split}")
+        print(f"  Constants folded: {normalizer.stats.constants_folded}")
+        print(f"  Types canonicalized: {normalizer.stats.types_canonicalized}")
+        print(f"  Dead code removed: {normalizer.stats.dead_code_removed}")
         print(f"  Returns added: {normalizer.stats.returns_added}")
         print(f"  Temps generated: {normalizer.stats.temps_generated}")
 

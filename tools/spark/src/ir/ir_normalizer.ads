@@ -34,7 +34,13 @@ package IR_Normalizer is
       Pass_Block_Flatten,        --  Flatten nested blocks
       Pass_Return_Normalize,     --  Ensure explicit returns
       Pass_Temp_Naming,          --  Unique temp variable names
-      Pass_Expression_Simplify   --  Simplify complex expressions
+      Pass_Expression_Simplify,  --  Simplify complex expressions
+      --  Data structure normalization
+      Pass_Array_Flatten,        --  Flatten nested arrays
+      Pass_Struct_Flatten,       --  Flatten nested structs
+      Pass_Type_Canonicalize,    --  Normalize type names
+      Pass_Constant_Fold,        --  Evaluate constant expressions
+      Pass_Dead_Code_Remove      --  Remove unreachable code
    );
 
    type Pass_Enabled is array (Normalization_Pass) of Boolean;
@@ -60,6 +66,12 @@ package IR_Normalizer is
       Temps_Generated      : Natural;
       Expressions_Split    : Natural;
       Nested_Blocks_Proc   : Natural;
+      --  Data structure normalization
+      Arrays_Flattened     : Natural;
+      Structs_Flattened    : Natural;
+      Types_Canonicalized  : Natural;
+      Constants_Folded     : Natural;
+      Dead_Code_Removed    : Natural;
    end record;
 
    type Normalization_Result is record
@@ -141,6 +153,46 @@ package IR_Normalizer is
 
    --  Simplify complex expressions into simpler statements
    procedure Simplify_Expressions
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Steps.Count <= Max_Steps,
+      Post => Steps.Count <= Max_Steps;
+
+   --  Canonicalize type names to standard forms
+   procedure Canonicalize_Types
+     (Func   : in out IR_Function;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Identifier_Strings.Length (Func.Name) > 0,
+      Post => Func.Steps.Count <= Max_Steps;
+
+   --  Fold constant expressions at compile time
+   procedure Fold_Constants
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Steps.Count <= Max_Steps,
+      Post => Steps.Count <= Max_Steps;
+
+   --  Remove unreachable/dead code
+   procedure Remove_Dead_Code
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Steps.Count <= Max_Steps,
+      Post => Steps.Count <= Max_Steps;
+
+   --  Flatten nested arrays where possible
+   procedure Flatten_Arrays
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Steps.Count <= Max_Steps,
+      Post => Steps.Count <= Max_Steps;
+
+   --  Flatten nested structs where possible
+   procedure Flatten_Structs
      (Steps  : in out Step_Collection;
       Stats  : in out Normalization_Stats)
    with

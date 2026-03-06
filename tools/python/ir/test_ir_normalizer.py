@@ -482,5 +482,198 @@ class TestNormalizationStats(unittest.TestCase):
         self.assertEqual(result["normalization_stats"]["switches_lowered"], 2)
 
 
+class TestTypeCanonicalization(unittest.TestCase):
+    """Test type canonicalization."""
+    
+    def test_int_type_canonicalization(self):
+        """Test integer type canonicalization."""
+        func = {
+            "name": "test",
+            "return_type": "i32",
+            "params": [{"name": "x", "type": "int64"}],
+            "locals": [{"name": "y", "type": "integer"}],
+            "steps": []
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        # Types should be canonicalized
+        self.assertEqual(result["return_type"], "int")
+        self.assertEqual(result["params"][0]["type"], "long")
+        self.assertEqual(result["locals"][0]["type"], "int")
+        self.assertEqual(normalizer.stats.types_canonicalized, 3)
+    
+    def test_float_type_canonicalization(self):
+        """Test float type canonicalization."""
+        func = {
+            "name": "test",
+            "return_type": "f64",
+            "params": [{"name": "x", "type": "float32"}],
+            "steps": []
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        self.assertEqual(result["return_type"], "double")
+        self.assertEqual(result["params"][0]["type"], "float")
+    
+    def test_bool_type_canonicalization(self):
+        """Test boolean type canonicalization."""
+        func = {
+            "name": "test",
+            "return_type": "boolean",
+            "steps": []
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        self.assertEqual(result["return_type"], "bool")
+
+
+class TestConstantFolding(unittest.TestCase):
+    """Test constant folding."""
+    
+    def test_arithmetic_folding(self):
+        """Test arithmetic constant folding."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "assign", "target": "x", "value": "1 + 2"},
+                {"op": "assign", "target": "y", "value": "10 / 2"},
+                {"op": "assign", "target": "z", "value": "3 * 4"}
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        # Constants should be folded
+        self.assertEqual(result["steps"][0]["value"], "3")
+        self.assertEqual(result["steps"][1]["value"], "5")
+        self.assertEqual(result["steps"][2]["value"], "12")
+        self.assertEqual(normalizer.stats.constants_folded, 3)
+    
+    def test_boolean_folding(self):
+        """Test boolean constant folding."""
+        func = {
+            "name": "test",
+            "return_type": "bool",
+            "steps": [
+                {"op": "assign", "target": "a", "value": "true && false"},
+                {"op": "assign", "target": "b", "value": "true || false"},
+                {"op": "assign", "target": "c", "value": "!true"}
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        self.assertEqual(result["steps"][0]["value"], "false")
+        self.assertEqual(result["steps"][1]["value"], "true")
+        self.assertEqual(result["steps"][2]["value"], "false")
+    
+    def test_no_variable_folding(self):
+        """Test that expressions with variables are not folded."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "assign", "target": "x", "value": "a + 2"}
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.normalize_function(func)
+        
+        # Should not fold expressions with variables
+        self.assertEqual(result["steps"][0]["value"], "a + 2")
+
+
+class TestDeadCodeRemoval(unittest.TestCase):
+    """Test dead code removal."""
+    
+    def test_code_after_return(self):
+        """Test removal of code after return."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "assign", "target": "x", "value": "1"},
+                {"op": "return", "value": "x"},
+                {"op": "assign", "target": "y", "value": "2"}  # Dead code
+            ]
+        }
+        
+        config = NormalizerConfig(remove_dead_code=True, normalize_returns=False)
+        normalizer = IRNormalizer(config)
+        result = normalizer.normalize_function(func)
+        
+        # Dead code should be removed
+        self.assertEqual(len(result["steps"]), 2)  # assign + return
+        self.assertEqual(normalizer.stats.dead_code_removed, 1)
+    
+    def test_empty_if_removal(self):
+        """Test removal of empty if statements."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "if", "condition": "x", "then_body": [], "else_body": []}
+            ]
+        }
+        
+        config = NormalizerConfig(remove_dead_code=True, normalize_returns=False)
+        normalizer = IRNormalizer(config)
+        result = normalizer.normalize_function(func)
+        
+        # Empty if should be removed
+        self.assertEqual(len(result["steps"]), 0)
+    
+    def test_false_condition_removal(self):
+        """Test removal of if with false condition and no else."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "if", "condition": "false", "then_body": [
+                    {"op": "assign", "target": "x", "value": "1"}
+                ], "else_body": []}
+            ]
+        }
+        
+        config = NormalizerConfig(remove_dead_code=True, normalize_returns=False)
+        normalizer = IRNormalizer(config)
+        result = normalizer.normalize_function(func)
+        
+        # False condition with no else should be removed
+        self.assertEqual(len(result["steps"]), 0)
+    
+    def test_true_condition_simplification(self):
+        """Test simplification of if with true condition."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "if", "condition": "true", "then_body": [
+                    {"op": "assign", "target": "x", "value": "1"}
+                ], "else_body": [
+                    {"op": "assign", "target": "y", "value": "2"}
+                ]}
+            ]
+        }
+        
+        config = NormalizerConfig(remove_dead_code=True, normalize_returns=False)
+        normalizer = IRNormalizer(config)
+        result = normalizer.normalize_function(func)
+        
+        # True condition should be replaced with then body
+        self.assertEqual(len(result["steps"]), 1)
+        self.assertEqual(result["steps"][0]["op"], "assign")
+
+
 if __name__ == "__main__":
     unittest.main()

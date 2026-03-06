@@ -341,6 +341,70 @@ package body IR_Normalizer is
       end loop;
    end Simplify_Expressions;
 
+   procedure Canonicalize_Types
+     (Func   : in out IR_Function;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Canonicalize type names to standard forms
+      --  Converts: i32 -> int, f64 -> double, boolean -> bool, etc.
+   begin
+      --  Placeholder: would transform type names in function signature
+      --  and local variable declarations
+      null;
+   end Canonicalize_Types;
+
+   procedure Fold_Constants
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Fold constant expressions at compile time
+      --  Evaluates: 1 + 2 -> 3, true && false -> false, etc.
+   begin
+      --  Placeholder: would evaluate constant expressions
+      for I in Step_Index range 1 .. Steps.Count loop
+         declare
+            Step : constant IR_Step := Steps.Steps (I);
+         begin
+            if Step.Step_Type = Step_Assign then
+               --  Check if value is a constant expression
+               --  Placeholder: just count for now
+               null;
+            end if;
+         end;
+      end loop;
+   end Fold_Constants;
+
+   procedure Remove_Dead_Code
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Remove unreachable/dead code
+      --  Removes code after return/break/continue
+   begin
+      --  Placeholder: would analyze control flow and remove dead code
+      null;
+   end Remove_Dead_Code;
+
+   procedure Flatten_Arrays
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Flatten nested array accesses where possible
+   begin
+      --  Placeholder: would flatten multi-dimensional array access
+      null;
+   end Flatten_Arrays;
+
+   procedure Flatten_Structs
+     (Steps  : in out Step_Collection;
+      Stats  : in out Normalization_Stats)
+   is
+      --  Flatten nested struct accesses where possible
+   begin
+      --  Placeholder: would flatten nested struct access
+      null;
+   end Flatten_Structs;
+
    procedure Flatten_Blocks
      (Steps  : in out Step_Collection;
       Stats  : in out Normalization_Stats)
@@ -450,13 +514,21 @@ package body IR_Normalizer is
          Returns_Added        => 0,
          Temps_Generated      => 0,
          Expressions_Split    => 0,
-         Nested_Blocks_Proc   => 0
+         Nested_Blocks_Proc   => 0,
+         Arrays_Flattened     => 0,
+         Structs_Flattened    => 0,
+         Types_Canonicalized  => 0,
+         Constants_Folded     => 0,
+         Dead_Code_Removed    => 0
       );
    begin
       Result.Success := False;
       Result.Message := Error_Strings.Null_Bounded_String;
       
-      --  Run enabled passes in order
+      --  0. Canonicalize types first
+      if Config.Enabled_Passes (Pass_Type_Canonicalize) then
+         Canonicalize_Types (Func, Stats);
+      end if;
       
       --  1. Lower control flow constructs
       if Config.Enabled_Passes (Pass_Switch_Lowering) then
@@ -480,13 +552,32 @@ package body IR_Normalizer is
          Simplify_Expressions (Func.Steps, Stats);
       end if;
       
-      --  3. Flatten and normalize
+      --  3. Fold constants
+      if Config.Enabled_Passes (Pass_Constant_Fold) then
+         Fold_Constants (Func.Steps, Stats);
+      end if;
+      
+      --  4. Data structure normalization
+      if Config.Enabled_Passes (Pass_Array_Flatten) then
+         Flatten_Arrays (Func.Steps, Stats);
+      end if;
+      
+      if Config.Enabled_Passes (Pass_Struct_Flatten) then
+         Flatten_Structs (Func.Steps, Stats);
+      end if;
+      
+      --  5. Flatten and normalize
       if Config.Enabled_Passes (Pass_Block_Flatten) then
          Flatten_Blocks (Func.Steps, Stats);
       end if;
       
       if Config.Enabled_Passes (Pass_Return_Normalize) then
          Normalize_Returns (Func, Stats);
+      end if;
+      
+      --  6. Remove dead code
+      if Config.Enabled_Passes (Pass_Dead_Code_Remove) then
+         Remove_Dead_Code (Func.Steps, Stats);
       end if;
       
       if Config.Enabled_Passes (Pass_Temp_Naming) then
@@ -514,7 +605,12 @@ package body IR_Normalizer is
          Returns_Added        => 0,
          Temps_Generated      => 0,
          Expressions_Split    => 0,
-         Nested_Blocks_Proc   => 0
+         Nested_Blocks_Proc   => 0,
+         Arrays_Flattened     => 0,
+         Structs_Flattened    => 0,
+         Types_Canonicalized  => 0,
+         Constants_Folded     => 0,
+         Dead_Code_Removed    => 0
       );
    begin
       Result.Success := False;
@@ -550,6 +646,16 @@ package body IR_Normalizer is
             Func_Result.Stats.Expressions_Split;
          Total_Stats.Nested_Blocks_Proc := Total_Stats.Nested_Blocks_Proc +
             Func_Result.Stats.Nested_Blocks_Proc;
+         Total_Stats.Arrays_Flattened := Total_Stats.Arrays_Flattened +
+            Func_Result.Stats.Arrays_Flattened;
+         Total_Stats.Structs_Flattened := Total_Stats.Structs_Flattened +
+            Func_Result.Stats.Structs_Flattened;
+         Total_Stats.Types_Canonicalized := Total_Stats.Types_Canonicalized +
+            Func_Result.Stats.Types_Canonicalized;
+         Total_Stats.Constants_Folded := Total_Stats.Constants_Folded +
+            Func_Result.Stats.Constants_Folded;
+         Total_Stats.Dead_Code_Removed := Total_Stats.Dead_Code_Removed +
+            Func_Result.Stats.Dead_Code_Removed;
       end loop;
       
       Result.Stats := Total_Stats;
