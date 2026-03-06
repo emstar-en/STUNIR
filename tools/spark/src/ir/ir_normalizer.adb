@@ -519,7 +519,9 @@ package body IR_Normalizer is
          Structs_Flattened    => 0,
          Types_Canonicalized  => 0,
          Constants_Folded     => 0,
-         Dead_Code_Removed    => 0
+         Dead_Code_Removed    => 0,
+         Validation_Errors    => 0,
+         Validation_Warnings  => 0
       );
    begin
       Result.Success := False;
@@ -610,7 +612,9 @@ package body IR_Normalizer is
          Structs_Flattened    => 0,
          Types_Canonicalized  => 0,
          Constants_Folded     => 0,
-         Dead_Code_Removed    => 0
+         Dead_Code_Removed    => 0,
+         Validation_Errors    => 0,
+         Validation_Warnings  => 0
       );
    begin
       Result.Success := False;
@@ -656,11 +660,107 @@ package body IR_Normalizer is
             Func_Result.Stats.Constants_Folded;
          Total_Stats.Dead_Code_Removed := Total_Stats.Dead_Code_Removed +
             Func_Result.Stats.Dead_Code_Removed;
+         Total_Stats.Validation_Errors := Total_Stats.Validation_Errors +
+            Func_Result.Stats.Validation_Errors;
+         Total_Stats.Validation_Warnings := Total_Stats.Validation_Warnings +
+            Func_Result.Stats.Validation_Warnings;
       end loop;
       
       Result.Stats := Total_Stats;
       Result.Success := True;
       Result.Message := Error_Strings.To_Bounded_String ("Module normalization complete");
    end Normalize_Module;
+
+   --  =========================================================================
+   --  Pre-Emission Validation (Phase D)
+   --  =========================================================================
+
+   procedure Validate_For_Emission
+     (Func   : in     IR_Function;
+      Result :    out Validation_Result;
+      Stats  : in out Normalization_Stats)
+   is
+   begin
+      Result.Valid := True;
+      Result.Error_Count := 0;
+      Result.Warning_Count := 0;
+      
+      --  Check control flow
+      Check_Control_Flow (Func.Steps, Result);
+      
+      --  Check type consistency
+      Check_Type_Consistency (Func, Result);
+      
+      --  Update stats
+      Stats.Validation_Errors := Result.Error_Count;
+      Stats.Validation_Warnings := Result.Warning_Count;
+   end Validate_For_Emission;
+
+   procedure Check_Control_Flow
+     (Steps  : in     Step_Collection;
+      Result : in out Validation_Result)
+   is
+      Loop_Depth : Natural := 0;
+   begin
+      for I in Step_Index range 1 .. Steps.Count loop
+         declare
+            Step : constant IR_Step := Steps.Steps (I);
+         begin
+            case Step.Step_Type is
+               when Step_While | Step_For =>
+                  Loop_Depth := Loop_Depth + 1;
+                  
+                  --  Check for empty loop body
+                  if Step.Body_Count = 0 then
+                     Result.Warning_Count := Result.Warning_Count + 1;
+                  end if;
+                  
+               when Step_Break =>
+                  if Loop_Depth = 0 then
+                     Result.Valid := False;
+                     Result.Error_Count := Result.Error_Count + 1;
+                  end if;
+                  
+               when Step_Continue =>
+                  if Loop_Depth = 0 then
+                     Result.Valid := False;
+                     Result.Error_Count := Result.Error_Count + 1;
+                  end if;
+                  
+               when others =>
+                  null;
+            end case;
+         end;
+      end loop;
+   end Check_Control_Flow;
+
+   procedure Check_Type_Consistency
+     (Func   : in     IR_Function;
+      Result : in out Validation_Result)
+   is
+      --  Check that return statements match return type
+      Ret_Type : constant String := Identifier_Strings.To_String (Func.Return_Type);
+   begin
+      for I in Step_Index range 1 .. Func.Steps.Count loop
+         declare
+            Step : constant IR_Step := Func.Steps.Steps (I);
+         begin
+            if Step.Step_Type = Step_Return then
+               --  Check void function returning value
+               if Ret_Type = "void" then
+                  if Identifier_Strings.Length (Step.Value) > 0 then
+                     Result.Warning_Count := Result.Warning_Count + 1;
+                  end if;
+               else
+                  --  Non-void function should have return value
+                  if Identifier_Strings.Length (Step.Value) = 0 then
+                     Result.Valid := False;
+                     Result.Error_Count := Result.Error_Count + 1;
+                  end if;
+               end if;
+            end if;
+         end;
+      end loop;
+   end Check_Type_Consistency;
 
 end IR_Normalizer;

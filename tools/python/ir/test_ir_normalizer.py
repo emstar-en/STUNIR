@@ -25,6 +25,7 @@ spec.loader.exec_module(ir_normalizer)
 IRNormalizer = ir_normalizer.IRNormalizer
 NormalizerConfig = ir_normalizer.NormalizerConfig
 normalize_ir = ir_normalizer.normalize_ir
+ValidationResult = ir_normalizer.ValidationResult
 
 import unittest
 import json
@@ -673,6 +674,125 @@ class TestDeadCodeRemoval(unittest.TestCase):
         # True condition should be replaced with then body
         self.assertEqual(len(result["steps"]), 1)
         self.assertEqual(result["steps"][0]["op"], "assign")
+
+
+class TestPreEmissionValidation(unittest.TestCase):
+    """Test pre-emission validation guardrails."""
+    
+    def test_break_outside_loop(self):
+        """Test detection of break outside loop."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "assign", "target": "x", "value": "1"},
+                {"op": "break"}  # Error: break outside loop
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertFalse(result.valid)
+        self.assertTrue(any("break" in e for e in result.errors))
+    
+    def test_continue_outside_loop(self):
+        """Test detection of continue outside loop."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "continue"}  # Error: continue outside loop
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertFalse(result.valid)
+        self.assertTrue(any("continue" in e for e in result.errors))
+    
+    def test_void_function_returns_value(self):
+        """Test warning for void function returning value."""
+        func = {
+            "name": "test",
+            "return_type": "void",
+            "steps": [
+                {"op": "return", "value": "42"}  # Warning: void returns value
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertTrue(result.valid)  # Warning, not error
+        self.assertTrue(any("void" in w.lower() for w in result.warnings))
+    
+    def test_non_void_missing_return_value(self):
+        """Test error for non-void function missing return value."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "return"}  # Error: missing return value
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertFalse(result.valid)
+        self.assertTrue(any("return value" in e.lower() for e in result.errors))
+    
+    def test_empty_loop_body(self):
+        """Test warning for empty loop body."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "while", "condition": "true", "body": []}  # Warning: empty body
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertTrue(result.valid)  # Warning, not error
+        self.assertTrue(any("empty" in w.lower() for w in result.warnings))
+    
+    def test_valid_function(self):
+        """Test that valid function passes validation."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "params": [{"name": "x", "type": "int"}],
+            "steps": [
+                {"op": "assign", "target": "y", "value": "x + 1"},
+                {"op": "return", "value": "y"}
+            ]
+        }
+        
+        normalizer = IRNormalizer()
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertTrue(result.valid)
+        self.assertEqual(len(result.errors), 0)
+    
+    def test_validation_disabled(self):
+        """Test that validation can be disabled."""
+        func = {
+            "name": "test",
+            "return_type": "int",
+            "steps": [
+                {"op": "break"}  # Would normally be error
+            ]
+        }
+        
+        config = NormalizerConfig(validate_before_emit=False)
+        normalizer = IRNormalizer(config)
+        result = normalizer.validate_for_emission(func)
+        
+        self.assertTrue(result.valid)  # No validation run
 
 
 if __name__ == "__main__":

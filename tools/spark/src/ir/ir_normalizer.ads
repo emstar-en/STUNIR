@@ -72,6 +72,9 @@ package IR_Normalizer is
       Types_Canonicalized  : Natural;
       Constants_Folded     : Natural;
       Dead_Code_Removed    : Natural;
+      --  Pre-emission guardrails
+      Validation_Errors    : Natural;
+      Validation_Warnings  : Natural;
    end record;
 
    type Normalization_Result is record
@@ -235,6 +238,43 @@ package IR_Normalizer is
 
    --  Count steps that need normalization
    function Count_Needing_Normalization
+     (Steps  : Step_Collection;
+      Config : Normalizer_Config) return Natural
+   with Global => null;
+
+   --  =========================================================================
+   --  Pre-Emission Validation (Phase D)
+   --  =========================================================================
+
+   --  Validation result type
+   type Validation_Result is record
+      Valid      : Boolean;
+      Error_Count   : Natural;
+      Warning_Count : Natural;
+   end record;
+
+   --  Validate function for emission
+   procedure Validate_For_Emission
+     (Func   : in     IR_Function;
+      Result :    out Validation_Result;
+      Stats  : in out Normalization_Stats)
+   with
+      Pre  => Identifier_Strings.Length (Func.Name) > 0,
+      Post => Result.Error_Count <= Max_Steps;
+
+   --  Check control flow integrity
+   procedure Check_Control_Flow
+     (Steps  : in     Step_Collection;
+      Result : in out Validation_Result)
+   with
+      Pre  => Steps.Count <= Max_Steps;
+
+   --  Check type consistency
+   procedure Check_Type_Consistency
+     (Func   : in     IR_Function;
+      Result : in out Validation_Result)
+   with
+      Pre  => Identifier_Strings.Length (Func.Name) > 0;
      (Steps  : Step_Collection;
       Config : Normalizer_Config) return Natural
    with Global => null;

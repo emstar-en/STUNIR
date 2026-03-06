@@ -42,6 +42,24 @@ class NormalizationStats:
     types_canonicalized: int = 0
     constants_folded: int = 0
     dead_code_removed: int = 0
+    # Guardrails
+    validation_errors: int = 0
+    validation_warnings: int = 0
+
+
+@dataclass
+class ValidationResult:
+    """Result of pre-emission validation."""
+    valid: bool = True
+    errors: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+    
+    def add_error(self, msg: str):
+        self.errors.append(msg)
+        self.valid = False
+    
+    def add_warning(self, msg: str):
+        self.warnings.append(msg)
 
 
 @dataclass
@@ -61,6 +79,11 @@ class NormalizerConfig:
     canonicalize_types: bool = True  # Normalize type names
     fold_constants: bool = True  # Evaluate constant expressions
     remove_dead_code: bool = False  # Remove unreachable code (disabled by default - enable explicitly)
+    # Pre-emission guardrails
+    validate_before_emit: bool = True  # Run validation checks before emission
+    check_undefined_vars: bool = True  # Check for undefined variable references
+    check_type_consistency: bool = True  # Check type consistency
+    check_control_flow: bool = True  # Check control flow integrity
     max_temps: int = 64
     verbose: bool = False
 
@@ -820,6 +843,155 @@ class IRNormalizer:
             result.append(modified_step)
         
         return result
+    
+    # =========================================================================
+    # Pre-Emission Guardrails (Phase D)
+    # =========================================================================
+    
+    def validate_for_emission(self, func: Dict[str, Any]) -> ValidationResult:
+        """Run all pre-emission validation checks.
+        
+        This should be called after normalization to catch any issues
+        that would cause emission to fail or produce incorrect code.
+        """
+        result = ValidationResult()
+        
+        if not self.config.validate_before_emit:
+            return result
+        
+        # Collect defined variables
+        defined_vars = self._collect_defined_vars(func)
+        
+        # Run validation checks
+        if self.config.check_undefined_vars:
+            self._check_undefined_vars(func.get("steps", []), defined_vars, result)
+        
+        if self.config.check_type_consistency:
+            self._check_type_consistency(func, result)
+        
+        if self.config.check_control_flow:
+            self._check_control_flow(func.get("steps", []), result)
+        
+        # Update stats
+        self.stats.validation_errors = len(result.errors)
+        self.stats.validation_warnings = len(result.warnings)
+        
+        return result
+    
+    def _collect_defined_vars(self, func: Dict[str, Any]) -> set:
+        """Collect all defined variables in a function."""
+        defined = set()
+        
+        # Add parameters
+        for param in func.get("params", []):
+            if "name" in param:
+                defined.add(param["name"])
+        
+        # Add local variables
+        for local in func.get("locals", []):
+            if "name" in local:
+                defined.add(local["name"])
+        
+        # Add assigned variables from steps
+        for step in func.get("steps", []):
+            if step.get("op") == "assign" and "target" in step:
+                defined.add(step["target"])
+            elif step.get("op") == "for" and "loop_var" in step:
+                defined.add(step["loop_var"])
+        
+        return defined
+    
+    def _check_undefined_vars(self, steps: List[Dict], defined_vars: set, result: ValidationResult):
+        """Check for references to undefined variables."""
+        import re
+        
+        for i, step in enumerate(steps):
+            op = step.get("op")
+            
+            # Check condition expressions
+            if "condition" in step:
+                self._check_expr_vars(step["condition"], defined_vars, result, i, "condition")
+            
+            # Check value expressions
+            if "value" in step and isinstance(step["value"], str):
+                self._check_expr_vars(step["value"], defined_vars, result, i, "value")
+            
+            # Recursively check nested bodies
+            if "body" in step:
+                self._check_undefined_vars(step["body"], defined_vars, result)
+            if "then_body" in step:
+                self._check_undefined_vars(step["then_body"], defined_vars, result)
+            if "else_body" in step:
+                self._check_undefined_vars(step["else_body"], defined_vars, result)
+    
+    def _check_expr_vars(self, expr: str, defined_vars: set, result: ValidationResult, step_idx: int, field: str):
+        """Check variable references in an expression."""
+        import re
+        
+        # Extract potential variable names (identifiers)
+        # Skip keywords and built-ins
+        keywords = {"true", "false", "null", "void", "if", "else", "while", "for", "return", "break", "continue"}
+        
+        # Find all identifiers
+        identifiers = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', str(expr))
+        
+        for ident in identifiers:
+            if ident not in keywords and ident not in defined_vars:
+                # Check if it's a built-in function
+                if ident not in {"print", "println", "len", "abs", "min", "max", "sqrt"}:
+                    result.add_warning(f"Step {step_idx}: Potentially undefined variable '{ident}' in {field}")
+    
+    def _check_type_consistency(self, func: Dict[str, Any], result: ValidationResult):
+        """Check type consistency in function."""
+        return_type = func.get("return_type", "void")
+        
+        # Check that return statements match return type
+        for i, step in enumerate(func.get("steps", [])):
+            if step.get("op") == "return":
+                value = step.get("value")
+                
+                # Void functions shouldn't return values
+                if return_type == "void" and value is not None:
+                    result.add_warning(f"Step {i}: Void function returns a value")
+                
+                # Non-void functions should return values
+                if return_type != "void" and value is None:
+                    result.add_error(f"Step {i}: Non-void function missing return value")
+    
+    def _check_control_flow(self, steps: List[Dict], result: ValidationResult):
+        """Check control flow integrity."""
+        loop_depth = 0
+        
+        for i, step in enumerate(steps):
+            op = step.get("op")
+            
+            # Track loop depth
+            if op in ("while", "for"):
+                loop_depth += 1
+                
+                # Check for empty loop body
+                body = step.get("body", [])
+                if not body:
+                    result.add_warning(f"Step {i}: Empty loop body")
+            
+            # Check break/continue outside loops
+            if op == "break" and loop_depth == 0:
+                result.add_error(f"Step {i}: 'break' outside of loop")
+            
+            if op == "continue" and loop_depth == 0:
+                result.add_error(f"Step {i}: 'continue' outside of loop")
+            
+            # Recursively check nested bodies
+            if "body" in step:
+                self._check_control_flow(step["body"], result)
+            if "then_body" in step:
+                self._check_control_flow(step["then_body"], result)
+            if "else_body" in step:
+                self._check_control_flow(step["else_body"], result)
+            
+            # Track loop exit
+            if op in ("while", "for"):
+                loop_depth -= 1
 
 
 def normalize_ir(ir_data: Dict[str, Any], config: Optional[NormalizerConfig] = None) -> Dict[str, Any]:
