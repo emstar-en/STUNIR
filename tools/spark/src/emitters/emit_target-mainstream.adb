@@ -2333,9 +2333,19 @@ package body Emit_Target.Mainstream is
    end Emit_Steps_Kotlin;
 
    procedure Emit_Steps_SPARK (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
+      Ret_Type : constant String := IStr.To_String (Func.Return_Type);
    begin
       if Func.Steps.Count = 0 then
-         Append_Line ("   return Integer'First;");
+         --  Use type-aware default for empty body
+         if Ret_Type'Length = 0 or else Ret_Type = "void" or else Ret_Type = "Void" then
+            Append_Line ("   return;");
+         elsif Ret_Type = "Boolean" or else Ret_Type = "bool" then
+            Append_Line ("   return False;");
+         elsif Ret_Type = "Float" or else Ret_Type = "Long_Float" then
+            Append_Line ("   return 0.0;");
+         else
+            Append_Line ("   return " & Ret_Type & "'First;");
+         end if;
          return;
       end if;
 
@@ -2619,11 +2629,21 @@ package body Emit_Target.Mainstream is
    end Emit_Steps_SPARK;
 
    procedure Emit_Steps_Ada (Func : IR_Function; Append_Line : not null access procedure (Text : String)) is
+      Ret_Type : constant String := IStr.To_String (Func.Return_Type);
    begin
       --  Ada emitter is identical to SPARK for now
       --  Future: SPARK may add pragma SPARK_Mode, contracts, etc.
       if Func.Steps.Count = 0 then
-         Append_Line ("   return Integer'First;");
+         --  Use type-aware default for empty body
+         if Ret_Type'Length = 0 or else Ret_Type = "void" or else Ret_Type = "Void" then
+            Append_Line ("   return;");
+         elsif Ret_Type = "Boolean" or else Ret_Type = "bool" then
+            Append_Line ("   return False;");
+         elsif Ret_Type = "Float" or else Ret_Type = "Long_Float" then
+            Append_Line ("   return 0.0;");
+         else
+            Append_Line ("   return " & Ret_Type & "'First;");
+         end if;
          return;
       end if;
 

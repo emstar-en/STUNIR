@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "module_name": "test_module",
+  "functions": [
+    {
+      "name": "test_assign",
+      "return_type": "int",
+      "params": [
+        {"name": "x", "type": "int"},
+        {"name": "y", "type": "int"}
+      ],
+      "body": [
+        {"type": "assign", "target": "result", "value": "x"},
+        {"type": "assign", "target": "result", "value": "y"},
+        {"type": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "test_if",
+      "return_type": "int",
+      "params": [
+        {"name": "a", "type": "int"}
+      ],
+      "body": [
+        {
+          "type": "if",
+          "condition": "a > 0",
+          "then": [
+            {"type": "assign", "target": "result", "value": "1"}
+          ],
+          "else": [
+            {"type": "assign", "target": "result", "value": "0"}
+          ]
+        },
+        {"type": "return", "value": "result"}
+      ]
+    },
+    {
+      "name": "test_loop",
+      "return_type": "int",
+      "params": [
+        {"name": "n", "type": "int"}
+      ],
+      "body": [
+        {
+          "type": "for",
+          "init": "i=0",
+          "condition": "i<n",
+          "increment": "i++",
+          "body": [
+            {"type": "assign", "target": "sum", "value": "i"}
+          ]
+        },
+        {"type": "return", "value": "sum"}
+      ]
+    }
+  ]
+}

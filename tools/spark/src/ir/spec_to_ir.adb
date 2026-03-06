@@ -84,6 +84,8 @@ package body Spec_To_IR is
          IR.Functions.Functions (I).Name := Spec.Functions.Functions (I).Name;
          IR.Functions.Functions (I).Return_Type := Spec.Functions.Functions (I).Return_Type;
          IR.Functions.Functions (I).Parameters := Spec.Functions.Functions (I).Parameters;
+         IR.Functions.Functions (I).Body_Hint := Spec.Functions.Functions (I).Body_Hint;
+         IR.Functions.Functions (I).Hint_Detail := Spec.Functions.Functions (I).Hint_Detail;
          
          --  Convert body statements to IR steps
          if Spec.Functions.Functions (I).Stmts.Count > 0 then
@@ -283,9 +285,75 @@ package body Spec_To_IR is
       Put_Line (Output, "  ""schema"": ""stunir_ir_v1"",");
       Put_Line (Output, "  ""ir_version"": ""v1"",");
       Put_Line (Output, "  ""module_name"": """ & Identifier_Strings.To_String (IR.Module_Name) & """,");
-      Put_Line (Output, "  ""types"": [],");
-      Put_Line (Output, "  ""functions"": [");
       
+      --  Emit types array
+      Put (Output, "  ""types"": [");
+      for I in Type_Def_Index range 1 .. IR.Types.Count loop
+         Put (Output, "{");
+         Put (Output, """name"": """ & Identifier_Strings.To_String (IR.Types.Type_Defs (I).Name) & """");
+         
+         --  Emit kind
+         Put (Output, ", ""kind"": """);
+         case IR.Types.Type_Defs (I).Kind is
+            when Type_Struct => Put (Output, "struct");
+            when Type_Enum => Put (Output, "enum");
+            when Type_Alias => Put (Output, "alias");
+            when Type_Generic => Put (Output, "generic");
+         end case;
+         Put (Output, """");
+         
+         --  Emit base_type if present
+         if Type_Name_Strings.Length (IR.Types.Type_Defs (I).Base_Type) > 0 then
+            Put (Output, ", ""base_type"": """ & 
+               Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Base_Type) & """");
+         end if;
+         
+         --  Emit fields for struct types
+         if IR.Types.Type_Defs (I).Kind = Type_Struct and then IR.Types.Type_Defs (I).Fields.Count > 0 then
+            Put (Output, ", ""fields"": [");
+            for J in Type_Field_Index range 1 .. IR.Types.Type_Defs (I).Fields.Count loop
+               Put (Output, "{");
+               Put (Output, """name"": """ & 
+                  Identifier_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Name) & """");
+               Put (Output, ", ""type"": """ & 
+                  Type_Name_Strings.To_String (IR.Types.Type_Defs (I).Fields.Fields (J).Field_Type) & """");
+               Put (Output, "}");
+               if J < IR.Types.Type_Defs (I).Fields.Count then
+                  Put (Output, ", ");
+               end if;
+            end loop;
+            Put (Output, "]");
+         end if;
+         
+         Put (Output, "}");
+         if I < IR.Types.Count then
+            Put (Output, ", ");
+         end if;
+      end loop;
+      Put_Line (Output, "],");
+      
+      --  Emit constants array
+      Put (Output, "  ""constants"": [");
+      for I in Constant_Index range 1 .. IR.Constants.Count loop
+         Put (Output, "{");
+         Put (Output, """name"": """ & Identifier_Strings.To_String (IR.Constants.Constants (I).Name) & """");
+         if Type_Name_Strings.Length (IR.Constants.Constants (I).Const_Type) > 0 then
+            Put (Output, ", ""type"": """ & 
+               Type_Name_Strings.To_String (IR.Constants.Constants (I).Const_Type) & """");
+         end if;
+         if Identifier_Strings.Length (IR.Constants.Constants (I).Value_Str) > 0 then
+            Put (Output, ", ""value"": """ & 
+               Identifier_Strings.To_String (IR.Constants.Constants (I).Value_Str) & """");
+         end if;
+         Put (Output, "}");
+         if I < IR.Constants.Count then
+            Put (Output, ", ");
+         end if;
+      end loop;
+      Put_Line (Output, "],");
+      
+      --  Emit functions array
+      Put_Line (Output, "  ""functions"": [");
       for I in Function_Index range 1 .. IR.Functions.Count loop
          Put_Line (Output, "    {");
          Put_Line (Output, "      ""name"": """ & Identifier_Strings.To_String (IR.Functions.Functions (I).Name) & """,");
@@ -351,7 +419,31 @@ package body Spec_To_IR is
                Put (Output, ", ");
             end if;
          end loop;
-         Put_Line (Output, "]");
+         Put_Line (Output, "],");
+         
+         --  Emit body_hint field
+         Put (Output, "      ""body_hint"": """);
+         case IR.Functions.Functions (I).Body_Hint is
+            when Hint_None => Put (Output, "none");
+            when Hint_Simple_Return => Put (Output, "simple_return");
+            when Hint_Getter => Put (Output, "getter");
+            when Hint_Setter => Put (Output, "setter");
+            when Hint_Loop_Accum => Put (Output, "loop_accum");
+            when Hint_Conditional => Put (Output, "conditional");
+            when Hint_Switch => Put (Output, "switch");
+            when Hint_Try_Catch => Put (Output, "try_catch");
+            when Hint_Recursive => Put (Output, "recursive");
+            when Hint_Callback => Put (Output, "callback");
+            when Hint_Complex => Put (Output, "complex");
+         end case;
+         Put (Output, """");
+         
+         --  Emit hint_detail if present
+         if Hint_Strings.Length (IR.Functions.Functions (I).Hint_Detail) > 0 then
+            Put (Output, ", ""hint_detail"": """ & 
+               Hint_Strings.To_String (IR.Functions.Functions (I).Hint_Detail) & """");
+         end if;
+         Put_Line (Output, "");
          
          if I < IR.Functions.Count then
             Put_Line (Output, "    },");

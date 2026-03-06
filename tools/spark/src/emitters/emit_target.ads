@@ -19,6 +19,66 @@ package Emit_Target is
       Emit_Hybrid      --  Source with binary fallback
    );
 
+   --  ========================================================================
+   --  Emission Policy (Stub Hints vs Best Effort)
+   --  ========================================================================
+
+   --  Check if function requests stub hints (default) or best-effort code
+   function Should_Emit_Stub_Hints (Func : IR_Function) return Boolean;
+
+   --  Check if function requests best-effort code generation
+   function Should_Emit_Best_Effort (Func : IR_Function) return Boolean;
+
+   --  ========================================================================
+   --  Shared Emitter Helpers (v0.9.1+)
+   --  ========================================================================
+
+   --  Get zero-value default for a type (for empty body placeholders)
+   function Get_Zero_Value (Type_Name : String) return String;
+
+   --  Escape string literal for target language
+   function Escape_String_Literal
+     (Text   : String;
+      Target : Target_Language) return String;
+
+   --  Generate JSONPath pointer for a step
+   function Make_Step_Pointer
+     (Func_Idx : Natural;
+      Step_Idx : Natural) return String;
+
+   --  Generate stub hint comment for a step
+   function Make_Stub_Hint
+     (Func_Idx  : Natural;
+      Step_Idx  : Natural;
+      Op_Name   : String;
+      Key_Fields : String;
+      Target    : Target_Language) return String;
+
+   --  Generate conditional stub hint (only if emission mode is stub_hints)
+   function Make_Conditional_Stub_Hint
+     (Func      : IR_Function;
+      Func_Idx  : Natural;
+      Step_Idx  : Natural;
+      Op_Name   : String;
+      Key_Fields : String;
+      Target    : Target_Language) return String;
+
+   --  Check if a type is a primitive numeric type
+   function Is_Numeric_Type (Type_Name : String) return Boolean;
+
+   --  Check if a type is a boolean type
+   function Is_Boolean_Type (Type_Name : String) return Boolean;
+
+   --  Check if a type is void
+   function Is_Void_Type (Type_Name : String) return Boolean;
+
+   --  Get comment prefix for target language
+   function Get_Comment_Prefix (Target : Target_Language) return String;
+
+   --  Get block start/end delimiters for target language
+   function Get_Block_Start (Target : Target_Language) return String;
+   function Get_Block_End (Target : Target_Language) return String;
+
    --  Emit code for a single target language
    procedure Emit_Single_Target
      (IR       : in     IR_Data;

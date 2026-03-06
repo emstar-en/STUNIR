@@ -1,0 +1,171 @@
+{
+  "version": "1.0",
+  "module": "test_module",
+  "functions": [
+    {
+      "name": "simple_return",
+      "return_type": "int",
+      "params": [],
+      "steps": [
+        {
+          "step_type": "return",
+          "value": "42"
+        }
+      ],
+      "body_hint": "simple_return"
+    },
+    {
+      "name": "add_numbers",
+      "return_type": "int",
+      "params": [
+        {
+          "name": "a",
+          "type": "int"
+        },
+        {
+          "name": "b",
+          "type": "int"
+        }
+      ],
+      "steps": [
+        {
+          "step_type": "assign",
+          "target": "result",
+          "value": "a + b"
+        },
+        {
+          "step_type": "return",
+          "value": "result"
+        }
+      ],
+      "body_hint": "simple_return"
+    },
+    {
+      "name": "factorial",
+      "return_type": "int",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "steps": [
+        {
+          "step_type": "assign",
+          "target": "result",
+          "value": "1"
+        },
+        {
+          "step_type": "assign",
+          "target": "i",
+          "value": "1"
+        },
+        {
+          "step_type": "for",
+          "init": "1",
+          "condition": "n + 1",
+          "increment": "i + 1",
+          "body_start": 3,
+          "body_count": 1
+        },
+        {
+          "step_type": "assign",
+          "target": "result",
+          "value": "result * i"
+        },
+        {
+          "step_type": "return",
+          "value": "result"
+        }
+      ],
+      "body_hint": "loop_accum",
+      "hint_detail": "accumulates product"
+    },
+    {
+      "name": "is_even",
+      "return_type": "bool",
+      "params": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "steps": [
+        {
+          "step_type": "if",
+          "condition": "n % 2 == 0",
+          "then_start": 1,
+          "then_count": 1,
+          "else_start": 2,
+          "else_count": 1
+        },
+        {
+          "step_type": "return",
+          "value": "true"
+        },
+        {
+          "step_type": "return",
+          "value": "false"
+        }
+      ],
+      "body_hint": "conditional"
+    },
+    {
+      "name": "empty_func",
+      "return_type": "void",
+      "params": [],
+      "steps": [],
+      "body_hint": "none"
+    },
+    {
+      "name": "array_sum",
+      "return_type": "int",
+      "params": [
+        {
+          "name": "arr",
+          "type": "int[]"
+        }
+      ],
+      "steps": [
+        {
+          "step_type": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "step_type": "array_len",
+          "target": "len",
+          "value": "arr"
+        },
+        {
+          "step_type": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "step_type": "while",
+          "condition": "i < len",
+          "body_start": 4,
+          "body_count": 2
+        },
+        {
+          "step_type": "array_get",
+          "target": "val",
+          "value": "arr",
+          "args": "i"
+        },
+        {
+          "step_type": "assign",
+          "target": "sum",
+          "value": "sum + val"
+        },
+        {
+          "step_type": "return",
+          "value": "sum"
+        }
+      ],
+      "body_hint": "loop_accum",
+      "hint_detail": "accumulates sum"
+    }
+  ]
+}

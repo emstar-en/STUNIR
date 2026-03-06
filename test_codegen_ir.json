@@ -1,0 +1,30 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "codegen_test",
+  "types": [],
+  "functions": [
+    {
+      "name": "add_points",
+      "return_type": "Point",
+      "args": [{"name": "a", "type": "Point"}, {"name": "b", "type": "Point"}],
+      "steps": [{"op": "assign", "value": "null", "target": "result"}, {"op": "return", "value": "result"}]
+    },
+    {
+      "name": "sum_array",
+      "return_type": "i32",
+      "args": [{"name": "arr", "type": "i32[]"}, {"name": "len", "type": "i32"}],
+      "steps": [{"op": "assign", "value": "0", "target": "result"}, {"op": "return", "value": "result"}]
+    },
+    {
+      "name": "factorial",
+      "return_type": "i64",
+      "args": [{"name": "n", "type": "i64"}],
+      "steps": [{"op": "assign", "value": "0", "target": "result"}, {"op": "return", "value": "result"}]
+    }
+  ],
+  "artifacts": {
+    "gpu_binaries": [],
+    "microcode_blobs": []
+  }
+}

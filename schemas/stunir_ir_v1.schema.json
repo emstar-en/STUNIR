@@ -277,6 +277,35 @@
             "type": "string",
             "minLength": 1
           },
+          "body_hint": {
+            "type": "string",
+            "enum": [
+              "none",
+              "simple_return",
+              "getter",
+              "setter",
+              "loop_accum",
+              "conditional",
+              "switch",
+              "try_catch",
+              "recursive",
+              "callback",
+              "complex"
+            ],
+            "default": "none",
+            "description": "Token-saving hint indicating the function body pattern for manual completion"
+          },
+          "hint_detail": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Additional detail about the body hint (e.g., 'accumulates sum')"
+          },
+          "emission_mode": {
+            "type": "string",
+            "enum": ["stub_hints", "best_effort"],
+            "default": "stub_hints",
+            "description": "Emission mode: 'stub_hints' emits structured stub hints with JSONPath pointers for unsupported constructs; 'best_effort' attempts real code generation even if imperfect"
+          },
           "steps": {
             "type": "array",
             "description": "Simplified v1 operation list (mini-AST).",

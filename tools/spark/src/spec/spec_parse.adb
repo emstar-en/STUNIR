@@ -64,6 +64,8 @@ package body Spec_Parse is
          Spec.Functions.Functions (I).Return_Type := Type_Name_Strings.Null_Bounded_String;
          Spec.Functions.Functions (I).Parameters.Count := 0;
          Spec.Functions.Functions (I).Stmts.Count := 0;
+         Spec.Functions.Functions (I).Body_Hint := Hint_None;
+         Spec.Functions.Functions (I).Hint_Detail := Hint_Strings.Null_Bounded_String;
          for J in 1 .. Max_Statements loop
             Spec.Functions.Functions (I).Stmts.Statements (J).Stmt_Type := Stmt_Nop;
             Spec.Functions.Functions (I).Stmts.Statements (J).Target := Identifier_Strings.Null_Bounded_String;
@@ -280,11 +282,243 @@ package body Spec_Parse is
                                  Next_Token (Parser, Temp_Status);
                               end if;
                            elsif Mod_Key = "types" and then Current_Token (Parser) = Token_Array_Start then
-                              --  Skip types array for now (complex parsing)
-                              Skip_Value (Parser, Temp_Status);
+                              --  Parse types array
+                              Spec.Types.Count := 0;
+                              Next_Token (Parser, Temp_Status);
+                              while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                 if Current_Token (Parser) = Token_Object_Start then
+                                    if Spec.Types.Count < Max_Type_Defs then
+                                       Spec.Types.Count := Spec.Types.Count + 1;
+                                       
+                                       --  Initialize type definition
+                                       Spec.Types.Type_Defs (Spec.Types.Count).Kind := Type_Struct;
+                                       Spec.Types.Type_Defs (Spec.Types.Count).Fields.Count := 0;
+                                       Spec.Types.Type_Defs (Spec.Types.Count).Base_Type := 
+                                          Type_Name_Strings.Null_Bounded_String;
+                                       
+                                       --  Parse type object members
+                                       Next_Token (Parser, Temp_Status);
+                                       while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                          if Current_Token (Parser) = Token_String then
+                                             declare
+                                                Type_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                Type_Idx : constant Type_Def_Index := Spec.Types.Count;
+                                             begin
+                                                Next_Token (Parser, Temp_Status);
+                                                if Current_Token (Parser) /= Token_Colon then
+                                                   Status := Error_Parse;
+                                                   return;
+                                                end if;
+                                                Next_Token (Parser, Temp_Status);
+                                                
+                                                if Type_Key = "name" and then Current_Token (Parser) = Token_String then
+                                                   Spec.Types.Type_Defs (Type_Idx).Name := 
+                                                      Identifier_Strings.To_Bounded_String (
+                                                         JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   Next_Token (Parser, Temp_Status);
+                                                elsif Type_Key = "kind" and then Current_Token (Parser) = Token_String then
+                                                   declare
+                                                      Kind_Str : constant String := 
+                                                         JSON_Strings.To_String (Token_String_Value (Parser));
+                                                   begin
+                                                      if Kind_Str = "struct" then
+                                                         Spec.Types.Type_Defs (Type_Idx).Kind := Type_Struct;
+                                                      elsif Kind_Str = "enum" then
+                                                         Spec.Types.Type_Defs (Type_Idx).Kind := Type_Enum;
+                                                      elsif Kind_Str = "alias" then
+                                                         Spec.Types.Type_Defs (Type_Idx).Kind := Type_Alias;
+                                                      elsif Kind_Str = "generic" then
+                                                         Spec.Types.Type_Defs (Type_Idx).Kind := Type_Generic;
+                                                      end if;
+                                                   end;
+                                                   Next_Token (Parser, Temp_Status);
+                                                elsif Type_Key = "base_type" and then Current_Token (Parser) = Token_String then
+                                                   Spec.Types.Type_Defs (Type_Idx).Base_Type := 
+                                                      Type_Name_Strings.To_Bounded_String (
+                                                         JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   Next_Token (Parser, Temp_Status);
+                                                elsif Type_Key = "fields" and then Current_Token (Parser) = Token_Array_Start then
+                                                   --  Parse fields array for struct types
+                                                   Spec.Types.Type_Defs (Type_Idx).Fields.Count := 0;
+                                                   Next_Token (Parser, Temp_Status);
+                                                   while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                                      if Current_Token (Parser) = Token_Object_Start then
+                                                         if Spec.Types.Type_Defs (Type_Idx).Fields.Count < Max_Type_Fields then
+                                                            Spec.Types.Type_Defs (Type_Idx).Fields.Count := 
+                                                               Spec.Types.Type_Defs (Type_Idx).Fields.Count + 1;
+                                                            
+                                                            --  Parse field object
+                                                            Next_Token (Parser, Temp_Status);
+                                                            while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                                               if Current_Token (Parser) = Token_String then
+                                                                  declare
+                                                                     Field_Key : constant String := 
+                                                                        JSON_Strings.To_String (Token_String_Value (Parser));
+                                                                     Field_Idx : constant Type_Field_Index := 
+                                                                        Spec.Types.Type_Defs (Type_Idx).Fields.Count;
+                                                                  begin
+                                                                     Next_Token (Parser, Temp_Status);
+                                                                     if Current_Token (Parser) /= Token_Colon then
+                                                                        Status := Error_Parse;
+                                                                        return;
+                                                                     end if;
+                                                                     Next_Token (Parser, Temp_Status);
+                                                                     
+                                                                     if Field_Key = "name" and then Current_Token (Parser) = Token_String then
+                                                                        Spec.Types.Type_Defs (Type_Idx).Fields.Fields (Field_Idx).Name :=
+                                                                           Identifier_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                        Next_Token (Parser, Temp_Status);
+                                                                     elsif Field_Key = "type" and then Current_Token (Parser) = Token_String then
+                                                                        Spec.Types.Type_Defs (Type_Idx).Fields.Fields (Field_Idx).Field_Type :=
+                                                                           Type_Name_Strings.To_Bounded_String (
+                                                                              JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                                        Next_Token (Parser, Temp_Status);
+                                                                     else
+                                                                        Skip_Value (Parser, Temp_Status);
+                                                                     end if;
+                                                                     
+                                                                     if Current_Token (Parser) = Token_Comma then
+                                                                        Next_Token (Parser, Temp_Status);
+                                                                     end if;
+                                                                  end;
+                                                               else
+                                                                  Next_Token (Parser, Temp_Status);
+                                                               end if;
+                                                            end loop;
+                                                            
+                                                            if Current_Token (Parser) = Token_Object_End then
+                                                               Next_Token (Parser, Temp_Status);
+                                                            end if;
+                                                         end if;
+                                                      else
+                                                         Next_Token (Parser, Temp_Status);
+                                                      end if;
+                                                      
+                                                      if Current_Token (Parser) = Token_Comma then
+                                                         Next_Token (Parser, Temp_Status);
+                                                      end if;
+                                                   end loop;
+                                                   if Current_Token (Parser) = Token_Array_End then
+                                                      Next_Token (Parser, Temp_Status);
+                                                   end if;
+                                                else
+                                                   Skip_Value (Parser, Temp_Status);
+                                                end if;
+                                                
+                                                if Current_Token (Parser) = Token_Comma then
+                                                   Next_Token (Parser, Temp_Status);
+                                                end if;
+                                             end;
+                                          else
+                                             Next_Token (Parser, Temp_Status);
+                                          end if;
+                                       end loop;
+                                       
+                                       if Current_Token (Parser) = Token_Object_End then
+                                          Next_Token (Parser, Temp_Status);
+                                       end if;
+                                    end if;
+                                 else
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                                 
+                                 if Current_Token (Parser) = Token_Comma then
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                              end loop;
+                              if Current_Token (Parser) = Token_Array_End then
+                                 Next_Token (Parser, Temp_Status);
+                              end if;
                            elsif Mod_Key = "constants" and then Current_Token (Parser) = Token_Array_Start then
-                              --  Skip constants array for now (complex parsing)
-                              Skip_Value (Parser, Temp_Status);
+                              --  Parse constants array
+                              Spec.Constants.Count := 0;
+                              Next_Token (Parser, Temp_Status);
+                              while Temp_Status = Success and then Current_Token (Parser) /= Token_Array_End loop
+                                 if Current_Token (Parser) = Token_Object_Start then
+                                    if Spec.Constants.Count < Max_Constants then
+                                       Spec.Constants.Count := Spec.Constants.Count + 1;
+                                       
+                                       --  Parse constant object members
+                                       Next_Token (Parser, Temp_Status);
+                                       while Temp_Status = Success and then Current_Token (Parser) /= Token_Object_End loop
+                                          if Current_Token (Parser) = Token_String then
+                                             declare
+                                                Const_Key : constant String := JSON_Strings.To_String (Token_String_Value (Parser));
+                                                Const_Idx : constant Constant_Index := Spec.Constants.Count;
+                                             begin
+                                                Next_Token (Parser, Temp_Status);
+                                                if Current_Token (Parser) /= Token_Colon then
+                                                   Status := Error_Parse;
+                                                   return;
+                                                end if;
+                                                Next_Token (Parser, Temp_Status);
+                                                
+                                                if Const_Key = "name" and then Current_Token (Parser) = Token_String then
+                                                   Spec.Constants.Constants (Const_Idx).Name := 
+                                                      Identifier_Strings.To_Bounded_String (
+                                                         JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   Next_Token (Parser, Temp_Status);
+                                                elsif Const_Key = "type" and then Current_Token (Parser) = Token_String then
+                                                   Spec.Constants.Constants (Const_Idx).Const_Type := 
+                                                      Type_Name_Strings.To_Bounded_String (
+                                                         JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                   Next_Token (Parser, Temp_Status);
+                                                elsif Const_Key = "value" then
+                                                   --  Parse value (can be string, number, boolean, etc.)
+                                                   if Current_Token (Parser) = Token_String then
+                                                      Spec.Constants.Constants (Const_Idx).Value_Str := 
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                      Next_Token (Parser, Temp_Status);
+                                                   elsif Current_Token (Parser) = Token_Number then
+                                                      Spec.Constants.Constants (Const_Idx).Value_Str := 
+                                                         Identifier_Strings.To_Bounded_String (
+                                                            JSON_Strings.To_String (Token_String_Value (Parser)));
+                                                      Next_Token (Parser, Temp_Status);
+                                                   elsif Current_Token (Parser) = Token_True then
+                                                      Spec.Constants.Constants (Const_Idx).Value_Str := 
+                                                         Identifier_Strings.To_Bounded_String ("true");
+                                                      Next_Token (Parser, Temp_Status);
+                                                   elsif Current_Token (Parser) = Token_False then
+                                                      Spec.Constants.Constants (Const_Idx).Value_Str := 
+                                                         Identifier_Strings.To_Bounded_String ("false");
+                                                      Next_Token (Parser, Temp_Status);
+                                                   elsif Current_Token (Parser) = Token_Null then
+                                                      Spec.Constants.Constants (Const_Idx).Value_Str := 
+                                                         Identifier_Strings.To_Bounded_String ("null");
+                                                      Next_Token (Parser, Temp_Status);
+                                                   else
+                                                      Skip_Value (Parser, Temp_Status);
+                                                   end if;
+                                                else
+                                                   Skip_Value (Parser, Temp_Status);
+                                                end if;
+                                                
+                                                if Current_Token (Parser) = Token_Comma then
+                                                   Next_Token (Parser, Temp_Status);
+                                                end if;
+                                             end;
+                                          else
+                                             Next_Token (Parser, Temp_Status);
+                                          end if;
+                                       end loop;
+                                       
+                                       if Current_Token (Parser) = Token_Object_End then
+                                          Next_Token (Parser, Temp_Status);
+                                       end if;
+                                    end if;
+                                 else
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                                 
+                                 if Current_Token (Parser) = Token_Comma then
+                                    Next_Token (Parser, Temp_Status);
+                                 end if;
+                              end loop;
+                              if Current_Token (Parser) = Token_Array_End then
+                                 Next_Token (Parser, Temp_Status);
+                              end if;
                            elsif Mod_Key = "functions" and then Current_Token (Parser) = Token_Array_Start then
                               --  Parse functions array (same logic as top-level functions)
                               Spec.Functions.Count := 0;
@@ -1063,6 +1297,89 @@ package body Spec_Parse is
                            if Current_Token (Parser) = Token_Object_End then
                               Next_Token (Parser, Temp_Status);
                            end if;
+                           
+                           --  Compute body hint based on parsed statements
+                           declare
+                              Func_Idx : constant Function_Index := Spec.Functions.Count;
+                              Stmt_Count : constant Natural := Spec.Functions.Functions (Func_Idx).Stmts.Count;
+                           begin
+                              if Stmt_Count = 0 then
+                                 --  No body - no hint
+                                 Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_None;
+                              elsif Stmt_Count = 1 then
+                                 --  Single statement - check if it's a simple return
+                                 if Spec.Functions.Functions (Func_Idx).Stmts.Statements (1).Stmt_Type = Stmt_Return then
+                                    Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Simple_Return;
+                                    Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                       Hint_Strings.To_Bounded_String ("single return");
+                                 else
+                                    Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Simple_Return;
+                                 end if;
+                              elsif Stmt_Count = 2 then
+                                 --  Two statements - likely assign + return
+                                 declare
+                                    S1 : constant Spec_Statement := 
+                                       Spec.Functions.Functions (Func_Idx).Stmts.Statements (1);
+                                    S2 : constant Spec_Statement := 
+                                       Spec.Functions.Functions (Func_Idx).Stmts.Statements (2);
+                                 begin
+                                    if S1.Stmt_Type = Stmt_Assign and S2.Stmt_Type = Stmt_Return then
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Simple_Return;
+                                       Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                          Hint_Strings.To_Bounded_String ("assign and return");
+                                    elsif S1.Stmt_Type = Stmt_If then
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Conditional;
+                                       Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                          Hint_Strings.To_Bounded_String ("simple conditional");
+                                    else
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Complex;
+                                    end if;
+                                 end;
+                              else
+                                 --  Multiple statements - analyze pattern
+                                 declare
+                                    Has_Loop : Boolean := False;
+                                    Has_If : Boolean := False;
+                                    Has_Switch : Boolean := False;
+                                    Has_Try : Boolean := False;
+                                 begin
+                                    for J in 1 .. Stmt_Count loop
+                                       case Spec.Functions.Functions (Func_Idx).Stmts.Statements (J).Stmt_Type is
+                                          when Stmt_For | Stmt_While =>
+                                             Has_Loop := True;
+                                          when Stmt_If =>
+                                             Has_If := True;
+                                          when Stmt_Switch =>
+                                             Has_Switch := True;
+                                          when Stmt_Try =>
+                                             Has_Try := True;
+                                          when others =>
+                                             null;
+                                       end case;
+                                    end loop;
+                                    
+                                    if Has_Loop then
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Loop_Accum;
+                                       Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                          Hint_Strings.To_Bounded_String ("loop with accumulation");
+                                    elsif Has_Switch then
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Switch;
+                                       Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                          Hint_Strings.To_Bounded_String ("switch/match pattern");
+                                    elsif Has_Try then
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Try_Catch;
+                                       Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                          Hint_Strings.To_Bounded_String ("exception handling");
+                                    elsif Has_If then
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Conditional;
+                                       Spec.Functions.Functions (Func_Idx).Hint_Detail := 
+                                          Hint_Strings.To_Bounded_String ("conditional logic");
+                                    else
+                                       Spec.Functions.Functions (Func_Idx).Body_Hint := Hint_Complex;
+                                    end if;
+                                 end;
+                              end if;
+                           end;
                         else
                            Status := Error_Too_Large;
                            return;

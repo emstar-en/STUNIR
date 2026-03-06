@@ -126,7 +126,7 @@ package body Emit_Target.Functional_Formal is
                   end;
                when Step_While =>
                   --  Futhark uses loop expressions
-                  Append_Line ("  -- while " & Cond & " (use loop expression)");
+                  Append_Line ("  let " & Tgt & " = loop " & Tgt & " = " & Val & " while " & Cond & " do");
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                      if B <= Func.Steps.Count then
                         declare
@@ -137,7 +137,7 @@ package body Emit_Target.Functional_Formal is
                            case Body_Step.Step_Type is
                               when Step_Assign =>
                                  if B_Tgt'Length > 0 then
-                                    Append_Line ("  --   let " & B_Tgt & " = " & B_Val);
+                                    Append_Line ("    let " & B_Tgt & " = " & B_Val);
                                  end if;
                               when others =>
                                  null;
@@ -146,8 +146,8 @@ package body Emit_Target.Functional_Formal is
                      end if;
                   end loop;
                when Step_For =>
-                  --  Futhark uses loop expressions
-                  Append_Line ("  -- for " & Init & "; " & Cond & "; " & Incr);
+                  --  Futhark uses loop expressions with range
+                  Append_Line ("  let " & Tgt & " = loop " & Tgt & " = " & Val & " for i < " & Cond & " do");
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                      if B <= Func.Steps.Count then
                         declare
@@ -158,7 +158,7 @@ package body Emit_Target.Functional_Formal is
                            case Body_Step.Step_Type is
                               when Step_Assign =>
                                  if B_Tgt'Length > 0 then
-                                    Append_Line ("  --   let " & B_Tgt & " = " & B_Val);
+                                    Append_Line ("    let " & B_Tgt & " = " & B_Val);
                                  end if;
                               when others =>
                                  null;
@@ -377,19 +377,26 @@ package body Emit_Target.Functional_Formal is
                      end if;
                   end;
                when Step_While =>
-                  --  Lean4 uses recursion or forM
-                  Append_Line ("  -- while " & Cond & " (use forM or recursion)");
+                  --  Lean4 uses forM or recursion
+                  Append_Line ("  let " & Tgt & " ← whileM (pure " & Cond & ") (do");
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                      if B <= Func.Steps.Count then
                         declare
                            Body_Step : constant IR_Step := Func.Steps.Steps (B);
                            B_Val : constant String := To_String (Body_Step.Value);
                            B_Tgt : constant String := To_String (Body_Step.Target);
+                           B_Args : constant String := To_String (Body_Step.Args);
                         begin
                            case Body_Step.Step_Type is
                               when Step_Assign =>
                                  if B_Tgt'Length > 0 then
-                                    Append_Line ("  --   let " & B_Tgt & " := " & B_Val);
+                                    Append_Line ("    let " & B_Tgt & " := " & B_Val);
+                                 end if;
+                              when Step_Call =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    let " & B_Tgt & " ← " & B_Val & " " & B_Args);
+                                 else
+                                    Append_Line ("    " & B_Val & " " & B_Args);
                                  end if;
                               when others =>
                                  null;
@@ -397,7 +404,35 @@ package body Emit_Target.Functional_Formal is
                         end;
                      end if;
                   end loop;
+                  Append_Line ("    pure ())");
                when Step_For =>
+                  --  Lean4 uses forM
+                  Append_Line ("  for i in [" & Init & ":" & Cond & "] do");
+                  for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
+                     if B <= Func.Steps.Count then
+                        declare
+                           Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                           B_Val : constant String := To_String (Body_Step.Value);
+                           B_Tgt : constant String := To_String (Body_Step.Target);
+                           B_Args : constant String := To_String (Body_Step.Args);
+                        begin
+                           case Body_Step.Step_Type is
+                              when Step_Assign =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    let " & B_Tgt & " := " & B_Val);
+                                 end if;
+                              when Step_Call =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    let " & B_Tgt & " ← " & B_Val & " " & B_Args);
+                                 else
+                                    Append_Line ("    " & B_Val & " " & B_Args);
+                                 end if;
+                              when others =>
+                                 null;
+                           end case;
+                        end;
+                     end if;
+                  end loop;
                   --  Lean4 uses forM
                   Append_Line ("  -- for " & Init & "; " & Cond & "; " & Incr);
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop

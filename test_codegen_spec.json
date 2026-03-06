@@ -1,0 +1,53 @@
+{
+  "schema": "stunir_spec_v1",
+  "module_name": "codegen_test",
+  "dependencies": [],
+  "types": [
+    {
+      "name": "Point",
+      "kind": "struct",
+      "fields": [
+        {"name": "x", "type": "f32"},
+        {"name": "y", "type": "f32"}
+      ]
+    },
+    {
+      "name": "Color",
+      "kind": "enum",
+      "base_type": "i32"
+    },
+    {
+      "name": "Handle",
+      "kind": "alias",
+      "base_type": "i64"
+    }
+  ],
+  "constants": [
+    {"name": "MAX_SIZE", "type": "i32", "value": "1024"}
+  ],
+  "functions": [
+    {
+      "name": "add_points",
+      "return_type": "Point",
+      "args": [
+        {"name": "a", "type": "Point"},
+        {"name": "b", "type": "Point"}
+      ]
+    },
+    {
+      "name": "sum_array",
+      "return_type": "i32",
+      "args": [
+        {"name": "arr", "type": "i32[]"},
+        {"name": "len", "type": "i32"}
+      ]
+    },
+    {
+      "name": "factorial",
+      "return_type": "i64",
+      "args": [
+        {"name": "n", "type": "i64"}
+      ]
+    }
+  ]
+}

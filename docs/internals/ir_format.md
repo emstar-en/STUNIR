@@ -22,6 +22,8 @@ The STUNIR Intermediate Representation (IR) is a JSON-based format that captures
         {"name": "<param>", "type": "<type>"}
       ],
       "return_type": "<type>",
+      "body_hint": "<hint_kind>",
+      "hint_detail": "<hint_description>",
       "body": [...]
     }
   ],
@@ -54,7 +56,47 @@ The STUNIR Intermediate Representation (IR) is a JSON-based format that captures
 | `name` | string | Function identifier |
 | `params` | array | Parameter list |
 | `return_type` | string | Return type identifier |
+| `body_hint` | string | Token-saving hint for body pattern |
+| `hint_detail` | string | Additional hint description |
+| `emission_mode` | string | `stub_hints` or `best_effort` (default: `stub_hints`) |
 | `body` | array | IR statements |
+
+### Emission Mode
+
+The `emission_mode` field controls how emitters handle unsupported constructs:
+
+| Mode | Behavior |
+|------|----------|
+| `stub_hints` | Emit structured stub hints with JSONPath pointers for unsupported constructs (default) |
+| `best_effort` | Attempt real code generation even if imperfect |
+
+When `emission_mode` is `stub_hints` (default), emitters will:
+- Generate real code for all supported constructs
+- Emit structured stub comments with JSONPath pointers for unsupported constructs
+- Include key fields in stub hints for manual completion
+
+When `emission_mode` is `best_effort`, emitters will:
+- Attempt to generate real code for all constructs
+- May produce syntactically correct but semantically incomplete code
+- Useful for rapid prototyping or when manual completion is not needed
+
+### Body Hints
+
+Body hints provide token-saving guidance for manual completion of function bodies:
+
+| Hint | Description |
+|------|-------------|
+| `none` | No hint available |
+| `simple_return` | Function just returns a value |
+| `getter` | Simple getter/accessor |
+| `setter` | Simple setter/mutator |
+| `loop_accum` | Loop with accumulation pattern |
+| `conditional` | Conditional logic (if/else) |
+| `switch` | Switch/match pattern |
+| `try_catch` | Exception handling |
+| `recursive` | Recursive function |
+| `callback` | Callback/async pattern |
+| `complex` | Complex body, no simplification |
 
 ### Types
 
@@ -63,6 +105,72 @@ The STUNIR Intermediate Representation (IR) is a JSON-based format that captures
 | `name` | string | Type identifier |
 | `kind` | string | `struct`, `enum`, or `alias` |
 | `fields` | array | Field definitions (for structs) |
+
+## Stub Hint Convention
+
+When emitters cannot fully generate code for an IR construct, they emit stub comments with spec-mapped hints to aid manual completion.
+
+### JSONPath Pointer Format
+
+Stub comments include a JSONPath pointer to the IR location and key fields:
+
+```
+/* STUB: $.functions[2].steps[4] op=switch expr=status */
+/* TODO: Implement switch on 'status' */
+```
+
+### Required Hint Fields by Step Type
+
+| Step Type | Required Fields |
+|-----------|-----------------|
+| `assign` | `target`, `value` |
+| `return` | `value` |
+| `call` | `value` (func name), `args` |
+| `if` | `condition` |
+| `while` | `condition` |
+| `for` | `init`, `condition`, `increment` |
+| `switch` | `expr` |
+| `try` | `value` |
+| `throw` | `exception_type`, `exception_message` |
+| `error` | `error_msg` |
+
+### Example Stub Comments
+
+**C/C++:**
+```c
+/* STUB: $.functions[0].steps[3] op=call func=process_data args=data,len */
+/* TODO: Implement call to 'process_data' */
+```
+
+**SPARK/Ada:**
+```ada
+--  STUB: $.functions[1].steps[2] op=for init=i=0 condition=i<n increment=i++
+--  TODO: Implement for loop
+```
+
+**Lisp:**
+```lisp
+;; STUB: $.functions[0].steps[1] op=if condition=x>0
+;; TODO: Implement conditional
+```
+
+**Futhark:**
+```futhark
+-- STUB: $.functions[0].steps[2] op=loop condition=i<n
+-- TODO: Implement loop
+```
+
+**Lean4:**
+```lean
+-- STUB: $.functions[0].steps[1] op=if condition=x>0
+-- TODO: Implement conditional
+```
+
+**Prolog:**
+```prolog
+% STUB: $.functions[0].steps[1] op=if condition=X>0
+% TODO: Implement conditional
+```
 
 ## IR Statements
 

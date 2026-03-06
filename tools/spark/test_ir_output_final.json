@@ -1,0 +1,30 @@
+{
+  "schema": "stunir_ir_v1",
+  "ir_version": "v1",
+  "module_name": "test_module",
+  "types": [],
+  "functions": [
+    {
+      "name": "test_assign",
+      "return_type": "int",
+      "args": [{"name": "x", "type": "int"}, {"name": "y", "type": "int"}],
+      "steps": [{"op": "assign", "value": "x", "target": "result"}, {"op": "assign", "value": "y", "target": "result"}, {"op": "return", "value": "result"}]
+    },
+    {
+      "name": "test_if",
+      "return_type": "int",
+      "args": [{"name": "a", "type": "int"}],
+      "steps": [{"op": "if", "value": "", "condition": "a > 0"}, {"op": "return", "value": "result"}]
+    },
+    {
+      "name": "test_loop",
+      "return_type": "int",
+      "args": [{"name": "n", "type": "int"}],
+      "steps": [{"op": "for", "value": "", "condition": "i<n", "init": "i=0", "increment": "i++"}, {"op": "return", "value": "sum"}]
+    }
+  ],
+  "artifacts": {
+    "gpu_binaries": [],
+    "microcode_blobs": []
+  }
+}

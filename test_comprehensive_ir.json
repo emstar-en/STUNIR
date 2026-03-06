@@ -1,0 +1,571 @@
+{
+  "ir_version": "v1",
+  "module_name": "emission_test",
+  "types": [],
+  "functions": [
+    {
+      "name": "simple_return",
+      "args": [],
+      "return_type": "int",
+      "body_hint": "simple_return",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "return",
+          "value": "42"
+        }
+      ]
+    },
+    {
+      "name": "add",
+      "args": [
+        {
+          "name": "a",
+          "type": "int"
+        },
+        {
+          "name": "b",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "simple_return",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "a + b"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "name": "conditional",
+      "args": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ],
+      "return_type": "bool",
+      "body_hint": "conditional",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "if",
+          "condition": "x > 0",
+          "then_block": [
+            {
+              "op": "return",
+              "value": "true"
+            }
+          ],
+          "else_block": [
+            {
+              "op": "return",
+              "value": "false"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "while_loop",
+      "args": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "loop_accum",
+      "hint_detail": "accumulates sum",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "op": "while",
+          "condition": "i < n",
+          "body": [
+            {
+              "op": "assign",
+              "target": "sum",
+              "value": "sum + i"
+            },
+            {
+              "op": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "name": "for_loop",
+      "args": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "loop_accum",
+      "hint_detail": "factorial",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "1"
+        },
+        {
+          "op": "for",
+          "init": "1",
+          "condition": "n + 1",
+          "increment": "i + 1",
+          "body": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "result * i"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "name": "switch_example",
+      "args": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ],
+      "return_type": "string",
+      "body_hint": "switch",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "switch",
+          "expr": "x",
+          "cases": [
+            {
+              "value": 1,
+              "body": [
+                {
+                  "op": "return",
+                  "value": "\"one\""
+                }
+              ]
+            },
+            {
+              "value": 2,
+              "body": [
+                {
+                  "op": "return",
+                  "value": "\"two\""
+                }
+              ]
+            },
+            {
+              "value": 3,
+              "body": [
+                {
+                  "op": "return",
+                  "value": "\"three\""
+                }
+              ]
+            }
+          ],
+          "default": [
+            {
+              "op": "return",
+              "value": "\"other\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "try_catch_example",
+      "args": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "try_catch",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "try",
+          "try_block": [
+            {
+              "op": "assign",
+              "target": "result",
+              "value": "x * 2"
+            }
+          ],
+          "catch_blocks": [
+            {
+              "exception_type": "ValueError",
+              "exception_var": "e",
+              "body": [
+                {
+                  "op": "assign",
+                  "target": "result",
+                  "value": "0"
+                }
+              ]
+            }
+          ],
+          "finally_block": [
+            {
+              "op": "call",
+              "value": "cleanup",
+              "args": ""
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    },
+    {
+      "name": "array_operations",
+      "args": [],
+      "return_type": "int",
+      "body_hint": "complex",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "array_new",
+          "target": "arr",
+          "element_type": "int",
+          "size": 5
+        },
+        {
+          "op": "array_push",
+          "target": "arr",
+          "value": "1"
+        },
+        {
+          "op": "array_push",
+          "target": "arr",
+          "value": "2"
+        },
+        {
+          "op": "array_push",
+          "target": "arr",
+          "value": "3"
+        },
+        {
+          "op": "array_len",
+          "target": "len",
+          "value": "arr"
+        },
+        {
+          "op": "array_get",
+          "target": "first",
+          "value": "arr",
+          "index": "0"
+        },
+        {
+          "op": "array_set",
+          "target": "arr",
+          "index": "1",
+          "value": "42"
+        },
+        {
+          "op": "array_pop",
+          "target": "last",
+          "value": "arr"
+        },
+        {
+          "op": "return",
+          "value": "len"
+        }
+      ]
+    },
+    {
+      "name": "map_operations",
+      "args": [],
+      "return_type": "int",
+      "body_hint": "complex",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "map_new",
+          "target": "m",
+          "key_type": "string",
+          "value_type": "int"
+        },
+        {
+          "op": "map_set",
+          "target": "m",
+          "key": "\"a\"",
+          "value": "1"
+        },
+        {
+          "op": "map_set",
+          "target": "m",
+          "key": "\"b\"",
+          "value": "2"
+        },
+        {
+          "op": "map_get",
+          "target": "val",
+          "value": "m",
+          "key": "\"a\""
+        },
+        {
+          "op": "map_has",
+          "target": "has_b",
+          "value": "m",
+          "key": "\"b\""
+        },
+        {
+          "op": "map_delete",
+          "target": "m",
+          "key": "\"a\""
+        },
+        {
+          "op": "map_keys",
+          "target": "keys",
+          "value": "m"
+        },
+        {
+          "op": "return",
+          "value": "val"
+        }
+      ]
+    },
+    {
+      "name": "set_operations",
+      "args": [],
+      "return_type": "bool",
+      "body_hint": "complex",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "set_new",
+          "target": "s",
+          "element_type": "int"
+        },
+        {
+          "op": "set_add",
+          "target": "s",
+          "value": "1"
+        },
+        {
+          "op": "set_add",
+          "target": "s",
+          "value": "2"
+        },
+        {
+          "op": "set_has",
+          "target": "has_one",
+          "value": "s",
+          "key": "1"
+        },
+        {
+          "op": "set_remove",
+          "target": "s",
+          "value": "1"
+        },
+        {
+          "op": "return",
+          "value": "has_one"
+        }
+      ]
+    },
+    {
+      "name": "struct_operations",
+      "args": [],
+      "return_type": "int",
+      "body_hint": "complex",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "struct_new",
+          "target": "p",
+          "struct_type": "Point",
+          "fields": {
+            "x": 1,
+            "y": 2
+          }
+        },
+        {
+          "op": "struct_get",
+          "target": "x_val",
+          "value": "p",
+          "field": "x"
+        },
+        {
+          "op": "struct_set",
+          "target": "p",
+          "field": "y",
+          "value": "3"
+        },
+        {
+          "op": "return",
+          "value": "x_val"
+        }
+      ]
+    },
+    {
+      "name": "break_continue",
+      "args": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "complex",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "sum",
+          "value": "0"
+        },
+        {
+          "op": "assign",
+          "target": "i",
+          "value": "0"
+        },
+        {
+          "op": "while",
+          "condition": "i < n",
+          "body": [
+            {
+              "op": "if",
+              "condition": "i == 5",
+              "then_block": [
+                {
+                  "op": "break"
+                }
+              ],
+              "else_block": []
+            },
+            {
+              "op": "if",
+              "condition": "i % 2 == 0",
+              "then_block": [
+                {
+                  "op": "assign",
+                  "target": "i",
+                  "value": "i + 1"
+                },
+                {
+                  "op": "continue"
+                }
+              ],
+              "else_block": []
+            },
+            {
+              "op": "assign",
+              "target": "sum",
+              "value": "sum + i"
+            },
+            {
+              "op": "assign",
+              "target": "i",
+              "value": "i + 1"
+            }
+          ]
+        },
+        {
+          "op": "return",
+          "value": "sum"
+        }
+      ]
+    },
+    {
+      "name": "error_example",
+      "args": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "complex",
+      "emission_mode": "stub_hints",
+      "steps": [
+        {
+          "op": "if",
+          "condition": "x < 0",
+          "then_block": [
+            {
+              "op": "error",
+              "value": "\"x must be non-negative\""
+            }
+          ],
+          "else_block": []
+        },
+        {
+          "op": "return",
+          "value": "x * 2"
+        }
+      ]
+    },
+    {
+      "name": "empty_func",
+      "args": [],
+      "return_type": "void",
+      "body_hint": "none",
+      "emission_mode": "stub_hints",
+      "steps": []
+    },
+    {
+      "name": "best_effort_test",
+      "args": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ],
+      "return_type": "int",
+      "body_hint": "complex",
+      "emission_mode": "best_effort",
+      "steps": [
+        {
+          "op": "assign",
+          "target": "result",
+          "value": "x * 2"
+        },
+        {
+          "op": "return",
+          "value": "result"
+        }
+      ]
+    }
+  ]
+}

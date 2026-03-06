@@ -17,6 +17,18 @@ package body Emit_Target is
 
    LF : constant Character := Ada.Characters.Latin_1.LF;
 
+   --  Simple lowercase conversion (SPARK-compatible)
+   function To_Lower (S : String) return String is
+      Result : String := S;
+   begin
+      for I in Result'Range loop
+         if Result (I) >= 'A' and then Result (I) <= 'Z' then
+            Result (I) := Character'Val (Character'Pos (Result (I)) + 32);
+         end if;
+      end loop;
+      return Result;
+   end To_Lower;
+
    --  Internal helper to append to code string
    procedure Append_Code
      (Code   : in out Code_String;
@@ -31,6 +43,255 @@ package body Emit_Target is
       Code_Strings.Append (Code, Text);
       Status := Success;
    end Append_Code;
+
+   --  ========================================================================
+   --  Shared Emitter Helpers (v0.9.1+)
+   --  ========================================================================
+
+   function Is_Numeric_Type (Type_Name : String) return Boolean is
+      Lower_Name : constant String := To_Lower (Type_Name);
+   begin
+      return Lower_Name = "int" or else
+             Lower_Name = "integer" or else
+             Lower_Name = "i32" or else Lower_Name = "i64" or else
+             Lower_Name = "u32" or else Lower_Name = "u64" or else
+             Lower_Name = "f32" or else Lower_Name = "f64" or else
+             Lower_Name = "float" or else Lower_Name = "double" or else
+             Lower_Name = "long" or else Lower_Name = "short" or else
+             Lower_Name = "byte" or else Lower_Name = "sbyte" or else
+             Lower_Name = "uint" or else Lower_Name = "ulong" or else
+             Lower_Name = "ushort" or else Lower_Name = "usize" or else
+             Lower_Name = "isize" or else Lower_Name = "bigint" or else
+             Lower_Name = "number" or else Lower_Name = "real" or else
+             Lower_Name = "nat" or else Lower_Name = "int64" or else
+             Lower_Name = "int32" or else Lower_Name = "word" or else
+             Lower_Name = "long_long" or else Lower_Name = "longlong";
+   end Is_Numeric_Type;
+
+   function Is_Boolean_Type (Type_Name : String) return Boolean is
+      Lower_Name : constant String := To_Lower (Type_Name);
+   begin
+      return Lower_Name = "bool" or else
+             Lower_Name = "boolean" or else
+             Lower_Name = "_Bool" or else
+             Lower_Name = "bit";
+   end Is_Boolean_Type;
+
+   function Is_Void_Type (Type_Name : String) return Boolean is
+      Lower_Name : constant String := To_Lower (Type_Name);
+   begin
+      return Lower_Name = "void" or else
+             Lower_Name = "unit" or else
+             Lower_Name = "nil" or else
+             Lower_Name = "null" or else
+             Lower_Name = "none" or else
+             Lower_Name = "";
+   end Is_Void_Type;
+
+   function Get_Zero_Value (Type_Name : String) return String is
+      Lower_Name : constant String := To_Lower (Type_Name);
+   begin
+      if Is_Void_Type (Type_Name) then
+         return "";
+      elsif Is_Boolean_Type (Type_Name) then
+         return "false";
+      elsif Is_Numeric_Type (Type_Name) then
+         --  Check for float types
+         if Lower_Name = "f32" or else Lower_Name = "f64" or else
+            Lower_Name = "float" or else Lower_Name = "double" or else
+            Lower_Name = "real"
+         then
+            return "0.0";
+         else
+            return "0";
+         end if;
+      elsif Lower_Name = "string" or else Lower_Name = "str" or else
+            Lower_Name = "char*" or else Lower_Name = "const char*" then
+         return """""";
+      else
+         --  Default to null/None for complex types
+         return "null";
+      end if;
+   end Get_Zero_Value;
+
+   function Escape_String_Literal
+     (Text   : String;
+      Target : Target_Language) return String
+   is
+      Result : String (1 .. Text'Length * 2);
+      Len    : Natural := 0;
+   begin
+      for C of Text loop
+         case C is
+            when '"' =>
+               Len := Len + 1;
+               Result (Len) := '\';
+               Len := Len + 1;
+               Result (Len) := '"';
+            when '\' =>
+               Len := Len + 1;
+               Result (Len) := '\';
+               Len := Len + 1;
+               Result (Len) := '\';
+            when Ada.Characters.Latin_1.LF =>
+               Len := Len + 1;
+               Result (Len) := '\';
+               Len := Len + 1;
+               Result (Len) := 'n';
+            when Ada.Characters.Latin_1.HT =>
+               Len := Len + 1;
+               Result (Len) := '\';
+               Len := Len + 1;
+               Result (Len) := 't';
+            when others =>
+               Len := Len + 1;
+               Result (Len) := C;
+         end case;
+      end loop;
+      return Result (1 .. Len);
+   end Escape_String_Literal;
+
+   function Make_Step_Pointer
+     (Func_Idx : Natural;
+      Step_Idx : Natural) return String
+   is
+      --  Convert Natural to String (simple implementation)
+      function Img (N : Natural) return String is
+         S : constant String := Natural'Image (N);
+      begin
+         return S (S'First + 1 .. S'Last);  --  Strip leading space
+      end Img;
+   begin
+      return "$.functions[" & Img (Func_Idx) & "].steps[" & Img (Step_Idx) & "]";
+   end Make_Step_Pointer;
+
+   function Get_Comment_Prefix (Target : Target_Language) return String is
+   begin
+      case Target is
+         when Target_CPP | Target_C | Target_Swift | Target_Kotlin |
+              Target_Java | Target_Go | Target_Rust | Target_CSharp |
+              Target_SPARK | Target_Ada =>
+            return "//";
+         when Target_Python | Target_Ruby | Target_Perl =>
+            return "#";
+         when Target_Common_Lisp | Target_Scheme | Target_Racket |
+              Target_Emacs_Lisp | Target_Guile | Target_Hy |
+              Target_Janet | Target_Clojure | Target_ClojureScript =>
+            return ";";
+         when Target_SWI_Prolog | Target_GNU_Prolog | Target_Prolog =>
+            return "%";
+         when Target_Mercury =>
+            return "%";
+         when Target_Futhark =>
+            return "--";
+         when Target_Lean4 =>
+            return "--";
+         when Target_Haskell =>
+            return "--";
+         when Target_JavaScript =>
+            return "//";
+      end case;
+   end Get_Comment_Prefix;
+
+   function Get_Block_Start (Target : Target_Language) return String is
+   begin
+      case Target is
+         when Target_CPP | Target_C | Target_Java | Target_JavaScript |
+              Target_CSharp | Target_Swift | Target_Kotlin | Target_Go |
+              Target_Rust =>
+            return "{";
+         when Target_SPARK | Target_Ada =>
+            return "begin";
+         when Target_Python =>
+            return ":";
+         when Target_Common_Lisp | Target_Scheme | Target_Racket |
+              Target_Emacs_Lisp | Target_Guile | Target_Hy |
+              Target_Janet | Target_Clojure | Target_ClojureScript =>
+            return "(";
+         when Target_SWI_Prolog | Target_GNU_Prolog | Target_Prolog =>
+            return ":-";
+         when Target_Mercury =>
+            return ":-";
+         when Target_Futhark =>
+            return "let";
+         when Target_Lean4 =>
+            return "do";
+         when Target_Haskell =>
+            return "do";
+      end case;
+   end Get_Block_Start;
+
+   function Get_Block_End (Target : Target_Language) return String is
+   begin
+      case Target is
+         when Target_CPP | Target_C | Target_Java | Target_JavaScript |
+              Target_CSharp | Target_Swift | Target_Kotlin | Target_Go |
+              Target_Rust =>
+            return "}";
+         when Target_SPARK | Target_Ada =>
+            return "end;";
+         when Target_Python =>
+            return "";
+         when Target_Common_Lisp | Target_Scheme | Target_Racket |
+              Target_Emacs_Lisp | Target_Guile | Target_Hy |
+              Target_Janet | Target_Clojure | Target_ClojureScript =>
+            return ")";
+         when Target_SWI_Prolog | Target_GNU_Prolog | Target_Prolog =>
+            return ".";
+         when Target_Mercury =>
+            return ".";
+         when Target_Futhark =>
+            return "";
+         when Target_Lean4 =>
+            return "";
+         when Target_Haskell =>
+            return "";
+      end case;
+   end Get_Block_End;
+
+   --  ========================================================================
+   --  Emission Policy Functions
+   --  ========================================================================
+
+   function Should_Emit_Stub_Hints (Func : IR_Function) return Boolean is
+   begin
+      return Func.Emission_Mode = Emit_Stub_Hints;
+   end Should_Emit_Stub_Hints;
+
+   function Should_Emit_Best_Effort (Func : IR_Function) return Boolean is
+   begin
+      return Func.Emission_Mode = Emit_Best_Effort;
+   end Should_Emit_Best_Effort;
+
+   function Make_Conditional_Stub_Hint
+     (Func       : IR_Function;
+      Func_Idx   : Natural;
+      Step_Idx   : Natural;
+      Op_Name    : String;
+      Key_Fields : String;
+      Target     : Target_Language) return String
+   is
+   begin
+      if Should_Emit_Stub_Hints (Func) then
+         return Make_Stub_Hint (Func_Idx, Step_Idx, Op_Name, Key_Fields, Target);
+      else
+         return "";  --  Best-effort mode: no stub hint
+      end if;
+   end Make_Conditional_Stub_Hint;
+
+   function Make_Stub_Hint
+     (Func_Idx  : Natural;
+      Step_Idx  : Natural;
+      Op_Name   : String;
+      Key_Fields : String;
+      Target    : Target_Language) return String
+   is
+      Comment : constant String := Get_Comment_Prefix (Target);
+      Pointer : constant String := Make_Step_Pointer (Func_Idx, Step_Idx);
+   begin
+      return Comment & " STUB: " & Op_Name & " @ " & Pointer &
+             " [" & Key_Fields & "]";
+   end Make_Stub_Hint;
 
    function Get_Target_Extension (Target : Target_Language) return String is
    begin

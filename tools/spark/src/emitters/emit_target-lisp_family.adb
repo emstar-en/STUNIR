@@ -171,7 +171,8 @@ package body Emit_Target.Lisp_Family is
                      Append_Line ("  )");
                   end if;
                when Step_While =>
-                  Append_Line ("  (while " & Cond & " (do");
+                  Append_Line ("  (loop []");
+                  Append_Line ("    (when " & Cond);
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                      if B <= Func.Steps.Count then
                         declare
@@ -183,34 +184,13 @@ package body Emit_Target.Lisp_Family is
                            case Body_Step.Step_Type is
                               when Step_Assign =>
                                  if B_Tgt'Length > 0 then
-                                    Append_Line ("    (set! " & B_Tgt & " " & B_Val & ")");
+                                    Append_Line ("      (set! " & B_Tgt & " " & B_Val & ")");
                                  end if;
                               when Step_Call =>
                                  if B_Tgt'Length > 0 then
-                                    Append_Line ("    (set! " & B_Tgt & " (" & B_Val & " " & B_Args & "))");
+                                    Append_Line ("      (set! " & B_Tgt & " (" & B_Val & " " & B_Args & "))");
                                  else
-                                    Append_Line ("    (" & B_Val & " " & B_Args & ")");
-                                 end if;
-                              when others =>
-                                 Append_Line ("    nil");
-                           end case;
-                        end;
-                     end if;
-                  end loop;
-                  Append_Line ("  ))");
-               when Step_For =>
-                  Append_Line ("  ;; for loop: use loop/recur");
-                  for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
-                     if B <= Func.Steps.Count then
-                        declare
-                           Body_Step : constant IR_Step := Func.Steps.Steps (B);
-                           B_Val : constant String := To_String (Body_Step.Value);
-                           B_Tgt : constant String := To_String (Body_Step.Target);
-                        begin
-                           case Body_Step.Step_Type is
-                              when Step_Assign =>
-                                 if B_Tgt'Length > 0 then
-                                    Append_Line ("  ;;   " & B_Tgt & " = " & B_Val);
+                                    Append_Line ("      (" & B_Val & " " & B_Args & ")");
                                  end if;
                               when others =>
                                  null;
@@ -218,6 +198,37 @@ package body Emit_Target.Lisp_Family is
                         end;
                      end if;
                   end loop;
+                  Append_Line ("      (recur))");
+                  Append_Line ("    ))");
+               when Step_For =>
+                  Append_Line ("  (loop [i " & Init "]");
+                  Append_Line ("    (when (< i " & Cond & ")");
+                  for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
+                     if B <= Func.Steps.Count then
+                        declare
+                           Body_Step : constant IR_Step := Func.Steps.Steps (B);
+                           B_Val : constant String := To_String (Body_Step.Value);
+                           B_Tgt : constant String := To_String (Body_Step.Target);
+                           B_Args : constant String := To_String (Body_Step.Args);
+                        begin
+                           case Body_Step.Step_Type is
+                              when Step_Assign =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("      (set! " & B_Tgt & " " & B_Val & ")");
+                                 end if;
+                              when Step_Call =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("      (set! " & B_Tgt & " (" & B_Val & " " & B_Args & "))");
+                                 else
+                                    Append_Line ("      (" & B_Val & " " & B_Args & ")");
+                                 end if;
+                              when others =>
+                                 null;
+                           end case;
+                        end;
+                     end if;
+                  end loop;
+                  Append_Line ("      (recur (inc i))))");
                when Step_Error =>
                   if Val'Length > 0 then
                      Append_Line ("  (throw (Exception. " & Val & "))");
@@ -537,25 +548,33 @@ package body Emit_Target.Lisp_Family is
                   end loop;
                   Append_Line ("  )");
                when Step_For =>
-                  Append_Line ("  ;; for loop: use loop macro");
+                  Append_Line ("  (loop for i from " & Init & " below " & Cond & " do");
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                      if B <= Func.Steps.Count then
                         declare
                            Body_Step : constant IR_Step := Func.Steps.Steps (B);
                            B_Val : constant String := To_String (Body_Step.Value);
                            B_Tgt : constant String := To_String (Body_Step.Target);
+                           B_Args : constant String := To_String (Body_Step.Args);
                         begin
                            case Body_Step.Step_Type is
                               when Step_Assign =>
                                  if B_Tgt'Length > 0 then
-                                    Append_Line ("  ;;   " & B_Tgt & " = " & B_Val);
+                                    Append_Line ("    (setf " & B_Tgt & " " & B_Val & ")");
+                                 end if;
+                              when Step_Call =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    (setf " & B_Tgt & " (" & B_Val & " " & B_Args & "))");
+                                 else
+                                    Append_Line ("    (" & B_Val & " " & B_Args & ")");
                                  end if;
                               when others =>
-                                 null;
+                                 Append_Line ("    nil");
                            end case;
                         end;
                      end if;
                   end loop;
+                  Append_Line ("  )");
                when Step_Error =>
                   if Val'Length > 0 then
                      Append_Line ("  (error " & Val & ")");
@@ -871,14 +890,33 @@ package body Emit_Target.Lisp_Family is
                   Append_Line ("    )");
                   Append_Line ("  )");
                when Step_For =>
-                  Append_Line ("  ;; for loop: use named let or do");
+                  Append_Line ("  (do ((i " & Init & " (+ i 1))) ((>= i " & Cond & "))");
                   for B in Step_Index range Step.Body_Start .. Step.Body_Start + Step.Body_Count - 1 loop
                      if B <= Func.Steps.Count then
                         declare
                            Body_Step : constant IR_Step := Func.Steps.Steps (B);
                            B_Val : constant String := To_String (Body_Step.Value);
                            B_Tgt : constant String := To_String (Body_Step.Target);
+                           B_Args : constant String := To_String (Body_Step.Args);
                         begin
+                           case Body_Step.Step_Type is
+                              when Step_Assign =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    (set! " & B_Tgt & " " & B_Val & ")");
+                                 end if;
+                              when Step_Call =>
+                                 if B_Tgt'Length > 0 then
+                                    Append_Line ("    (set! " & B_Tgt & " (" & B_Val & " " & B_Args & "))");
+                                 else
+                                    Append_Line ("    (" & B_Val & " " & B_Args & ")");
+                                 end if;
+                              when others =>
+                                 Append_Line ("    #f");
+                           end case;
+                        end;
+                     end if;
+                  end loop;
+                  Append_Line ("  )");
                            case Body_Step.Step_Type is
                               when Step_Assign =>
                                  if B_Tgt'Length > 0 then

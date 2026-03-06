@@ -24,6 +24,7 @@ package STUNIR_Types is
    Max_Path_Length       : constant := 4096;       --  File paths
    Max_Error_Length      : constant := 512;        --  Error messages
    Max_Code_Length       : constant := 100_000;    --  100KB for code output
+   Max_Hint_Length       : constant := 256;        --  Body hints
 
    --  Bounded string packages
    package JSON_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
@@ -49,6 +50,37 @@ package STUNIR_Types is
    package Code_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
      (Max => Max_Code_Length);
    subtype Code_String is Code_Strings.Bounded_String;
+
+   package Hint_Strings is new Ada.Strings.Bounded.Generic_Bounded_Length
+     (Max => Max_Hint_Length);
+   subtype Hint_String is Hint_Strings.Bounded_String;
+
+   --  ========================================================================
+   --  Body Hint Types (Token-saving hints for function bodies)
+   --  ========================================================================
+
+   type Body_Hint_Kind is (
+      Hint_None,           --  No hint available
+      Hint_Simple_Return,  --  Function just returns a value
+      Hint_Getter,         --  Simple getter/accessor
+      Hint_Setter,         --  Simple setter/mutator
+      Hint_Loop_Accum,     --  Loop with accumulation pattern
+      Hint_Conditional,    --  Conditional logic (if/else)
+      Hint_Switch,         --  Switch/match pattern
+      Hint_Try_Catch,      --  Exception handling
+      Hint_Recursive,      --  Recursive function
+      Hint_Callback,       --  Callback/async pattern
+      Hint_Complex         --  Complex body, no simplification
+   );
+
+   --  ========================================================================
+   --  Emission Mode Types (Stub hints vs best-effort code generation)
+   --  ========================================================================
+
+   type Emission_Mode is (
+      Emit_Stub_Hints,     --  Emit structured stub hints with JSONPath pointers
+      Emit_Best_Effort     --  Attempt real code generation even if imperfect
+   );
 
    --  ========================================================================
    --  Status and Error Types
@@ -198,7 +230,9 @@ package STUNIR_Types is
       Name        : Identifier_String;
       Return_Type : Type_Name_String;
       Parameters  : Parameter_List;
-      Stmts : Statement_Collection;  --  Function body statements
+      Stmts       : Statement_Collection;  --  Function body statements
+      Body_Hint   : Body_Hint_Kind := Hint_None;  --  Token-saving hint for body
+      Hint_Detail : Hint_String;  --  Additional hint details (e.g., "accumulates sum")
    end record
      with Dynamic_Predicate =>
        Identifier_Strings.Length (Function_Signature.Name) > 0;
@@ -482,10 +516,13 @@ package STUNIR_Types is
    --  ========================================================================
 
    type IR_Function is record
-      Name        : Identifier_String;
-      Return_Type : Type_Name_String;
-      Parameters  : Parameter_List;
-      Steps       : Step_Collection;
+      Name          : Identifier_String;
+      Return_Type   : Type_Name_String;
+      Parameters    : Parameter_List;
+      Steps         : Step_Collection;
+      Body_Hint     : Body_Hint_Kind := Hint_None;  --  Token-saving hint for body
+      Hint_Detail   : Hint_String;  --  Additional hint details
+      Emission_Mode : Emission_Mode := Emit_Stub_Hints;  --  Stub hints vs best-effort
    end record;
 
    type IR_Function_Array is array (Function_Index range <>) of IR_Function;
