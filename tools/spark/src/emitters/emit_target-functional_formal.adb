@@ -173,9 +173,9 @@ package body Emit_Target.Functional_Formal is
                      Append_Line ("  let _ = assert false \"error\"");
                   end if;
                when Step_Break =>
-                  Append_Line ("  -- break not directly supported");
+                  Append_Line ("  -- STUB: break - use loop with tagged result (e.g., type result = Break | Continue | Done)");
                when Step_Continue =>
-                  Append_Line ("  -- continue not directly supported");
+                  Append_Line ("  -- STUB: continue - use loop with tagged result to skip iteration");
                when Step_Switch =>
                   Append_Line ("  match " & Val & " with");
                   for C in Case_Index range 1 .. Step.Case_Count loop
@@ -280,7 +280,7 @@ package body Emit_Target.Functional_Formal is
                when Step_Type_Cast =>
                   Append_Line ("  let " & Tgt & " = " & Val & " :> " & Args);
                when others =>
-                  Append_Line ("  -- unsupported step");
+                  Append_Line ("  -- STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Futhark>>
@@ -460,9 +460,9 @@ package body Emit_Target.Functional_Formal is
                      Append_Line ("  panic! \"error\"");
                   end if;
                when Step_Break =>
-                  Append_Line ("  -- break not directly supported");
+                  Append_Line ("  -- STUB: break - use whileM with StateM monad and early return via Except");
                when Step_Continue =>
-                  Append_Line ("  -- continue not directly supported");
+                  Append_Line ("  -- STUB: continue - use whileM with StateM monad to skip iteration");
                when Step_Switch =>
                   Append_Line ("  match " & Val & " with");
                   for C in Case_Index range 1 .. Step.Case_Count loop
@@ -567,7 +567,7 @@ package body Emit_Target.Functional_Formal is
                when Step_Type_Cast =>
                   Append_Line ("  let " & Tgt & " := (" & Val & " : " & Args & ")");
                when others =>
-                  Append_Line ("  -- unsupported step");
+                  Append_Line ("  -- STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Lean4>>
@@ -712,9 +712,9 @@ package body Emit_Target.Functional_Formal is
                      Append_Line ("  error \"runtime error\"");
                   end if;
                when Step_Break =>
-                  Append_Line ("  -- break not directly supported");
+                  Append_Line ("  -- STUB: break - use Either monad with Left for early exit in recursive loops");
                when Step_Continue =>
-                  Append_Line ("  -- continue not directly supported");
+                  Append_Line ("  -- STUB: continue - use Either monad with Right to continue in recursive loops");
                when Step_Switch =>
                   Append_Line ("  case " & Val & " of");
                   for C in Case_Index range 1 .. Step.Case_Count loop
@@ -819,7 +819,7 @@ package body Emit_Target.Functional_Formal is
                when Step_Type_Cast =>
                   Append_Line ("  let " & Tgt & " = " & Val & " :: " & Args);
                when others =>
-                  Append_Line ("  -- unsupported step");
+                  Append_Line ("  -- STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Haskell>>

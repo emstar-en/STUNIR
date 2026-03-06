@@ -264,7 +264,7 @@ package body Emit_Target.Prolog_Family is
                when Step_Set_Has =>
                   Append_Line ("    member(" & Args & ", " & Val & "),"),
                when others =>
-                  Append_Line ("    % unsupported step");
+                  Append_Line ("    % STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_SWI>>
@@ -433,7 +433,7 @@ package body Emit_Target.Prolog_Family is
                      end if;
                   end loop;
                when others =>
-                  Append_Line ("    % unsupported step");
+                  Append_Line ("    % STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_GNU>>
@@ -601,7 +601,7 @@ package body Emit_Target.Prolog_Family is
                   end loop;
                   Append_Line ("    ),");
                when others =>
-                  Append_Line ("    % unsupported step");
+                  Append_Line ("    % STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Mercury>>

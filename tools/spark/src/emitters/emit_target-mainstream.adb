@@ -2501,7 +2501,7 @@ package body Emit_Target.Mainstream is
                when Step_Break =>
                   Append_Line ("   exit;");
                when Step_Continue =>
-                  Append_Line ("   goto Continue;");
+                  Append_Line ("   --  STUB: continue - use label at end of loop body: <<Continue>> null;");
                when Step_Error =>
                   Append_Line ("   raise Program_Error with """ & Val & """;");
                when Step_Switch =>
@@ -2595,7 +2595,8 @@ package body Emit_Target.Mainstream is
                when Step_Map_Has =>
                   Append_Line ("   " & Tgt & " := " & Val & ".Contains (" & Args & ");");
                when Step_Map_Keys =>
-                  Append_Line ("   --  map keys iteration for " & Val);
+                  Append_Line ("   --  STUB: map_keys - iterate with Iterate or Get_First/Get_Next cursors");
+                  Append_Line ("   --  for C in " & Val & ".Iterate loop " & Tgt & ".Append (Key (C)); end loop;");
                when Step_Set_New =>
                   Append_Line ("   " & Tgt & " := " & Args & "_Sets.Empty_Set;");
                when Step_Set_Add =>
@@ -2605,9 +2606,11 @@ package body Emit_Target.Mainstream is
                when Step_Set_Has =>
                   Append_Line ("   " & Tgt & " := " & Val & ".Contains (" & Args & ");");
                when Step_Set_Union =>
-                  Append_Line ("   --  set union: " & Tgt & " := " & Val & " union " & Args);
+                  Append_Line ("   --  STUB: set_union - use Union procedure from Ada.Containers");
+                  Append_Line ("   --  " & Tgt & ".Union (" & Val & ", " & Args & ");");
                when Step_Set_Intersect =>
-                  Append_Line ("   --  set intersect: " & Tgt & " := " & Val & " intersect " & Args);
+                  Append_Line ("   --  STUB: set_intersect - use Intersection procedure from Ada.Containers");
+                  Append_Line ("   --  " & Tgt & ".Intersection (" & Val & ", " & Args & ");");
                when Step_Struct_New =>
                   Append_Line ("   " & Tgt & " := (" & Val & ");");
                when Step_Struct_Get =>
@@ -2621,7 +2624,7 @@ package body Emit_Target.Mainstream is
                when Step_Nop =>
                   null;  --  No operation
                when others =>
-                  Append_Line ("   --  unsupported step");
+                  Append_Line ("   --  STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_SPARK>>
@@ -2799,7 +2802,7 @@ package body Emit_Target.Mainstream is
                when Step_Break =>
                   Append_Line ("   exit;");
                when Step_Continue =>
-                  Append_Line ("   goto Continue;");
+                  Append_Line ("   --  STUB: continue - use label at end of loop body: <<Continue>> null;");
                when Step_Error =>
                   Append_Line ("   raise Program_Error with """ & Val & """;");
                when Step_Switch =>
@@ -2893,7 +2896,8 @@ package body Emit_Target.Mainstream is
                when Step_Map_Has =>
                   Append_Line ("   " & Tgt & " := " & Val & ".Contains (" & Args & ");");
                when Step_Map_Keys =>
-                  Append_Line ("   --  map keys iteration for " & Val);
+                  Append_Line ("   --  STUB: map_keys - iterate with Iterate or Get_First/Get_Next cursors");
+                  Append_Line ("   --  for C in " & Val & ".Iterate loop " & Tgt & ".Append (Key (C)); end loop;");
                when Step_Set_New =>
                   Append_Line ("   " & Tgt & " := " & Args & "_Sets.Empty_Set;");
                when Step_Set_Add =>
@@ -2903,9 +2907,11 @@ package body Emit_Target.Mainstream is
                when Step_Set_Has =>
                   Append_Line ("   " & Tgt & " := " & Val & ".Contains (" & Args & ");");
                when Step_Set_Union =>
-                  Append_Line ("   --  set union: " & Tgt & " := " & Val & " union " & Args);
+                  Append_Line ("   --  STUB: set_union - use Union procedure from Ada.Containers");
+                  Append_Line ("   --  " & Tgt & ".Union (" & Val & ", " & Args & ");");
                when Step_Set_Intersect =>
-                  Append_Line ("   --  set intersect: " & Tgt & " := " & Val & " intersect " & Args);
+                  Append_Line ("   --  STUB: set_intersect - use Intersection procedure from Ada.Containers");
+                  Append_Line ("   --  " & Tgt & ".Intersection (" & Val & ", " & Args & ");");
                when Step_Struct_New =>
                   Append_Line ("   " & Tgt & " := (" & Val & ");");
                when Step_Struct_Get =>
@@ -2919,7 +2925,7 @@ package body Emit_Target.Mainstream is
                when Step_Nop =>
                   null;  --  No operation
                when others =>
-                  Append_Line ("   --  unsupported step");
+                  Append_Line ("   --  STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Ada>>

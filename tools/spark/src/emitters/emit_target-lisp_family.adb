@@ -236,9 +236,9 @@ package body Emit_Target.Lisp_Family is
                      Append_Line ("  (throw (Exception. \"runtime error\"))");
                   end if;
                when Step_Break =>
-                  Append_Line ("  (break)");
+                  Append_Line ("  ;; STUB: break - use (recur) with accumulator or reduced in loop/recur");
                when Step_Continue =>
-                  Append_Line ("  (continue)");
+                  Append_Line ("  ;; STUB: continue - use (recur) with updated accumulator in loop/recur");
                when Step_Switch =>
                   Append_Line ("  (case " & Val);
                   for C in Case_Index range 1 .. Step.Case_Count loop
@@ -383,7 +383,8 @@ package body Emit_Target.Lisp_Family is
                when Step_Type_Cast =>
                   Append_Line ("  (set! " & Tgt & " (" & Args & " " & Val & "))");
                when others =>
-                    Append_Line ("  ;; unsupported step");
+                  --  Emit structured stub hint for unsupported operations
+                  Append_Line ("  ;; STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Clojure>>
@@ -582,9 +583,11 @@ package body Emit_Target.Lisp_Family is
                      Append_Line ("  (error \"runtime error\")");
                   end if;
                when Step_Break =>
-                  Append_Line ("  (break)");
+                  --  Common Lisp: use (return-from block-name) or (go tag)
+                  Append_Line ("  ;; STUB: break - use (return-from) or (go) in Common Lisp");
                when Step_Continue =>
-                  Append_Line ("  (continue)");
+                  --  Common Lisp: use (go) to continue loop iteration
+                  Append_Line ("  ;; STUB: continue - use (go) to continue in Common Lisp");
                when Step_Switch =>
                   Append_Line ("  (case " & Val);
                   for C in Case_Index range 1 .. Step.Case_Count loop
@@ -722,7 +725,8 @@ package body Emit_Target.Lisp_Family is
                when Step_Type_Cast =>
                   Append_Line ("  (setf " & Tgt & " (coerce " & Val & " '" & Args & "))");
                when others =>
-                  Append_Line ("  ;; unsupported step");
+                  --  Emit structured stub hint for unsupported operations
+                  Append_Line ("  ;; STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Common_Lisp>>
@@ -935,9 +939,11 @@ package body Emit_Target.Lisp_Family is
                      Append_Line ("  (error \"runtime error\")");
                   end if;
                when Step_Break =>
-                  Append_Line ("  (break)");
+                  --  Scheme: use (call/cc) or escape continuation
+                  Append_Line ("  ;; STUB: break - use (call/cc) escape continuation in Scheme");
                when Step_Continue =>
-                  Append_Line ("  (continue)");
+                  --  Scheme: use continuation or restructure loop
+                  Append_Line ("  ;; STUB: continue - use continuation or restructure loop in Scheme");
                when Step_Switch =>
                   Append_Line ("  (case " & Val);
                   for C in Case_Index range 1 .. Step.Case_Count loop
@@ -1076,7 +1082,7 @@ package body Emit_Target.Lisp_Family is
                when Step_Type_Cast =>
                   Append_Line ("  (set! " & Tgt & " (coerce " & Val & " '" & Args & "))");
                when others =>
-                  Append_Line ("  ; unsupported step");
+                  Append_Line ("  ;; STUB: unsupported operation - requires manual implementation");
             end case;
          end;
          <<Continue_Scheme>>
