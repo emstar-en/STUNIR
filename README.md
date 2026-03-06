@@ -3,6 +3,12 @@
 > **⚠️ PRE-ALPHA (v0.1.0-alpha)** — Experimental prototype. SPARK-only pipeline functional. Not production-ready.
 > See [VERSION_STATUS.md](./VERSION_STATUS.md) for current capabilities and limitations.
 
+## Security & Compliance (Non-Python Pipelines)
+- **Python is explicitly banned** from non-Python pipelines (e.g., SPARK/Ada DO-173C).
+- **Do not introduce Python scripts, helpers, or tests** into non-Python pipeline stages.
+- Tools may **interact with user-provided Python artifacts**, but STUNIR must **not create** Python components for non-Python pipelines.
+
+
 ##  Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
 **[⬇️ Download STUNIR Pack (ZIP)](https://github.com/emstar-en/STUNIR/archive/refs/heads/main.zip)** ← Click this. One click. That's it.
