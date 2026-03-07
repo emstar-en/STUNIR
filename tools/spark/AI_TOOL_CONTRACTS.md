@@ -12,15 +12,15 @@
 
 ---
 
-## Tool: stunir_spec_to_ir
+## Tool: spec_to_ir
 
 **Binary Location**:
-- Precompiled: `precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main`
-- Source build: `tools/spark/bin/stunir_spec_to_ir_main`
+- Precompiled: `precompiled/linux-x86_64/spark/bin/spec_to_ir_main`
+- Source build: `tools/spark/bin/spec_to_ir_main`
 
 **Purpose**: Converts specification JSON files to canonical Intermediate Reference (IR) format.
 
-**Implementation**: `tools/spark/src/stunir_spec_to_ir.adb` (lines 1-475)
+**Implementation**: `tools/spark/src/core/spec_to_ir.adb` (lines 1-475)
 
 **Development Status**:
 - 🔨 PARTIALLY FUNCTIONAL - basic pipeline works
@@ -31,7 +31,7 @@
 ### Command Line Interface
 
 ```bash
-stunir_spec_to_ir_main --spec-root <directory> --out <file> [--lockfile <file>]
+spec_to_ir_main --spec-root <directory> --out <file> [--lockfile <file>]
 ```
 
 **Arguments**:
@@ -125,12 +125,12 @@ Defined in `stunir_spec_to_ir.ads`:
 
 ```bash
 # Basic usage
-./tools/spark/bin/stunir_spec_to_ir_main \
+./tools/spark/bin/spec_to_ir_main \
   --spec-root ./spec/examples \
   --out ./ir/example.json
 
 # With custom lockfile
-./tools/spark/bin/stunir_spec_to_ir_main \
+./tools/spark/bin/spec_to_ir_main \
   --spec-root ./spec/examples \
   --out ./ir/example.json \
   --lockfile ./custom_toolchain.lock.json
@@ -276,7 +276,7 @@ code_emitter -i <file> -o <output_dir> -t <target>
 
 ```bash
 # Step 1: Spec → IR
-./tools/spark/bin/stunir_spec_to_ir_main \
+./tools/spark/bin/spec_to_ir_main \
   --spec-root ./spec \
   --out ./build/ir.json
 
@@ -334,13 +334,13 @@ Future: Each tool will support `--emit-receipt` flag to generate:
 
 ```bash
 # Verbose logging (future)
-STUNIR_LOG_LEVEL=debug ./tools/spark/bin/stunir_spec_to_ir_main ...
+STUNIR_LOG_LEVEL=debug ./tools/spark/bin/spec_to_ir_main ...
 
 # Dry run (future)
-./tools/spark/bin/stunir_spec_to_ir_main --dry-run ...
+./tools/spark/bin/spec_to_ir_main --dry-run ...
 
 # Schema validation (future)
-./tools/spark/bin/stunir_spec_to_ir_main --validate-only ...
+./tools/spark/bin/spec_to_ir_main --validate-only ...
 ```
 
 ---
@@ -351,7 +351,7 @@ STUNIR_LOG_LEVEL=debug ./tools/spark/bin/stunir_spec_to_ir_main ...
 
 Each tool will support:
 ```bash
-./tools/spark/bin/stunir_spec_to_ir_main --describe
+./tools/spark/bin/spec_to_ir_main --describe
 ```
 
 Output JSON:

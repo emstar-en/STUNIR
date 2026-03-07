@@ -126,37 +126,26 @@
     "deprecation_window": "At least one minor version before removal"
   },
   "legacy_compatibility": {
-    "description": "Original monolithic tools and their powertools equivalents",
-    "migration_status": "in_progress",
-    "original_tools": [
+    "description": "Original monolithic tools have been archived",
+    "migration_status": "completed",
+    "archived_tools": [
       {
         "name": "stunir_spec_to_ir_main",
-        "status": "legacy",
-        "replacement": "spec_to_ir (internal, being decomposed)",
-        "powertools_equivalent": [
-          "extraction_to_spec",
-          "spec_validate",
-          "func_dedup",
-          "type_normalize"
-        ],
-        "deprecation_date": "2026-03-01",
-        "removal_date": "2026-06-01"
+        "status": "archived",
+        "replacement": "spec_to_ir_main, ir_converter_main",
+        "archived_date": "2026-03-07",
+        "archive_location": "work_artifacts/archive/deprecated_pipeline_2026-03-07/"
       },
       {
         "name": "stunir_ir_to_code_main",
-        "status": "legacy",
-        "replacement": "sig_gen_cpp, sig_gen_rust, type_map",
-        "powertools_equivalent": [
-          "sig_gen_cpp",
-          "sig_gen_rust",
-          "type_map"
-        ],
-        "deprecation_date": "2026-03-01",
-        "removal_date": "2026-06-01"
+        "status": "archived",
+        "replacement": "code_emitter_main",
+        "archived_date": "2026-03-07",
+        "archive_location": "work_artifacts/archive/deprecated_pipeline_2026-03-07/"
       },
       {
         "name": "stunir_code_index_main",
-        "status": "legacy",
+        "status": "archived",
         "replacement": "file_indexer, hash_compute",
         "powertools_equivalent": [
           "file_indexer",

@@ -11,6 +11,24 @@
     "types",
     "functions"
   ],
+  "normalization": {
+    "_comment": "IR normalization rules are defined in the SPARK SSoT file. Models MUST NOT invent their own formats.",
+    "ssot_location": "tools/spark/schema/stunir_ir_v1.dcbor.json",
+    "ssot_section": "normal_form",
+    "key_rules": {
+      "field_ordering": "All object keys MUST be sorted lexicographically (UTF-8 byte order)",
+      "array_ordering": {
+        "types": "Sorted alphabetically by name field",
+        "functions": "Sorted alphabetically by name field",
+        "fields": "Sorted alphabetically by name field",
+        "args": "Preserve source order (semantic significance)"
+      },
+      "alpha_renaming": "Bound variables use canonical names _t0, _t1, ... (top-level names preserved)",
+      "literal_normalization": "Integers use shortest CBOR encoding; strings MUST be NFC-normalized UTF-8",
+      "semantic_normalization": "Identity operations eliminated; commutative ops use canonical operand ordering",
+      "confluence_guarantee": "Two semantically equivalent programs MUST produce identical canonical IR bytes"
+    }
+  },
   "definitions": {
     "type_param": {
       "description": "Generic type parameter definition (v0.8.9+)",

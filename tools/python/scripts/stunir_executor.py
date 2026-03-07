@@ -138,9 +138,9 @@ class STUNIRExecutor:
         """Check which STUNIR tools are available"""
         tools = {}
         tool_names = [
-            "stunir_spec_assemble_main.exe",
-            "stunir_spec_to_ir_main.exe", 
-            "stunir_ir_to_code_main.exe"
+            "spec_assembler_main.exe",
+            "spec_to_ir_main.exe", 
+            "code_emitter_main.exe"
         ]
         
         for tool in tool_names:

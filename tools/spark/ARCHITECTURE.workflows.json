@@ -12,7 +12,7 @@
         "steps": [
           "file_indexer --recursive src/ > manifest.json",
           "extraction_to_spec < extraction.json | spec_validate | func_dedup | type_normalize > spec.json",
-          "stunir_spec_to_ir_main --input=spec.json --output=ir.json",
+          "spec_to_ir_main --input=spec.json --output=ir.json",
           "sig_gen_cpp < ir.json > output/generated.cpp"
         ]
       },
@@ -104,9 +104,9 @@
         "pattern": "extraction_to_spec --pretty < extraction.json"
       },
       {
-        "name": "fallback_to_legacy",
-        "description": "Use legacy monolith if powertool pipeline fails",
-        "pattern": "stunir_spec_to_ir_main --input=spec.json --output=ir.json"
+        "name": "use_pipeline_driver",
+        "description": "Use pipeline_driver_main for full pipeline orchestration",
+        "pattern": "pipeline_driver_main --config pipeline.json"
       }
     ]
   }

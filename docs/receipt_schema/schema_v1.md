@@ -76,6 +76,15 @@ This document specifies the Receipt Bundle Schema v1 (`stunir.receipt.v1`) used 
 | `receipt_type` | string | One of: `build`, `ir`, `target`, `manifest`, `verification` |
 | `artifact` | object | Primary artifact being receipted |
 | `receipt_hash` | string | SHA-256 hash of receipt content (excluding this field) |
+| `cir_sha256` | string | **Canonical IR hash anchor** - binds this receipt to the canonical IR |
+
+### Output Confluence Fields (for target receipts)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `output_artifacts` | array | List of output artifacts (for target receipts) |
+| `semantic_equivalence` | boolean | If true, outputs may differ but are semantically equivalent to same `cir_sha256` |
+| `target_platform` | string | Target platform identifier (e.g., `linux-x86_64`, `wasm`, `embedded-arm`) |
 
 ### Optional Fields
 

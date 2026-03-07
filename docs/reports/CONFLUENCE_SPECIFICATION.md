@@ -33,6 +33,26 @@ Confluence is achieved when:
 3. All four pipelines can emit **bitwise-identical** code outputs for all 24 target categories
 4. All four pipelines pass the same deterministic verification tests
 
+### 1.2 Output Confluence (Receipt-Bound Semantic Equivalence)
+
+**Output confluence** extends confluence to generated outputs via receipts and attestations:
+
+- **Target source outputs** may differ by platform/toolchain, but MUST be provably bound to the same `cir_sha256` (Canonical IR hash) via receipts.
+- **Receipts/manifests** MUST include explicit output artifact hashes anchored to `cir_sha256`.
+- **Root attestation** MUST bind receipt bundles and output artifacts to the same `cir_sha256`.
+
+**Key principle:** Two builds are confluent if their receipts prove they derive from the same canonical IR, even if emitted outputs differ due to platform-specific variations.
+
+**Confluence guarantee:**
+```
+same cir_sha256 ⟹ semantically equivalent outputs (proven via receipts)
+```
+
+This enables:
+- Cross-environment reproducibility (same IR → same semantic output)
+- Attested provenance (receipts bind outputs to IR)
+- Auditability (root attestation provides single source of truth)
+
 ### 1.2 Why Confluence Matters
 
 1. **Organizational Acceptance**: Different organizations only accept specific languages for audit
@@ -191,11 +211,28 @@ Test Cases: 48
 Confluence Score: 95.8% (46/48 tests passing)
 ```
 
-### 4.4 Success Criteria
+### 4.5 Output Confluence Tests
+
+For output confluence (receipt-bound semantic equivalence):
+```bash
+# Test that outputs are bound to same cir_sha256
+spark_ir_to_code ir.json --target=X --emit-receipt > spark_output_X.txt
+python_ir_to_code ir.json --target=X --emit-receipt > python_output_X.txt
+
+# Extract cir_sha256 from receipts
+spark_cir=$(jq -r '.cir_sha256' spark_receipt.json)
+python_cir=$(jq -r '.cir_sha256' python_receipt.json)
+
+# Verify same canonical IR
+[ "$spark_cir" = "$python_cir" ] && echo "Output confluence: PASS"
+```
+
+### 4.6 Success Criteria
 
 Confluence is achieved when:
 - **100%** of spec_to_ir tests pass (all 4 pipelines produce identical IR)
 - **100%** of ir_to_code tests pass for all 24 categories (all 4 pipelines produce identical code)
+- **100%** of output confluence tests pass (all outputs bound to same `cir_sha256` via receipts)
 - Automated test suite shows **100%** confluence score
 
 ---

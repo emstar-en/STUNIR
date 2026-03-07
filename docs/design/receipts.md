@@ -12,6 +12,7 @@ Receipts serve three key functions:
 1. **Integrity**: Prove artifact content via SHA-256 hashes
 2. **Provenance**: Track artifact origin and dependencies
 3. **Reproducibility**: Enable deterministic rebuild verification
+4. **Output Confluence**: Bind outputs to canonical IR via `cir_sha256` anchor
 
 ## Receipt Schema
 
@@ -71,22 +72,31 @@ Generated for IR emission.
 }
 ```
 
-### Target Receipt
-Generated for target code emission.
+### Target Receipt (with Output Confluence)
+Generated for target code emission. **MUST include `cir_sha256` anchor for output confluence.**
 
 ```json
 {
   "receipt_type": "target",
   "artifact": {
     "name": "module.rs",
-    "path": "targets/polyglot/rust/src/module.rs"
+    "path": "targets/polyglot/rust/src/module.rs",
+    "hash": "sha256:..."
   },
   "target_type": "rust",
+  "target_platform": "linux-x86_64",
+  "cir_sha256": "sha256:...",
+  "semantic_equivalence": true,
+  "output_artifacts": [
+    {"name": "module.rs", "hash": "sha256:...", "kind": "source"}
+  ],
   "inputs": [
     {"name": "module.json", "hash": "sha256:..."}
   ]
 }
 ```
+
+**Output Confluence:** Two target receipts with the same `cir_sha256` prove semantically equivalent outputs, even if artifact hashes differ due to platform-specific variations.
 
 ### Manifest Receipt
 Generated for manifest creation.
@@ -148,6 +158,30 @@ spec_hash ────▶ ir_receipt.hash
                    │
                    ▼
            manifest_receipt.hash
+```
+
+## Output Confluence
+
+**Key principle:** Outputs are confluent if their receipts share the same `cir_sha256`.
+
+```
+same cir_sha256 ⟹ semantically equivalent outputs (proven via receipts)
+```
+
+This enables:
+- Cross-environment reproducibility (same IR → same semantic output)
+- Attested provenance (receipts bind outputs to IR)
+- Auditability (root attestation provides single source of truth)
+
+**Verification:**
+```bash
+# Extract cir_sha256 from two target receipts
+cir1=$(jq -r '.cir_sha256' receipts/target_rust.json)
+cir2=$(jq -r '.cir_sha256' receipts/target_python.json)
+
+# If same, outputs are semantically equivalent
+[ "$cir1" = "$cir2" ] && echo "Output confluence: PASS"
+```
                    │
                    ▼
            receipts_manifest.hash

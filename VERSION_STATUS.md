@@ -143,7 +143,7 @@ Most emitters in `tools/python/targets/` report version `1.0.0` but are **not te
 1. **Ada SPARK Spec→IR→Code Pipeline**
    - Input: Spec JSON files
    - Output: IR JSON + function stubs (C/Rust/Python)
-   - Tools: `stunir_spec_to_ir_main.exe` + `stunir_ir_to_code_main.exe`
+   - Tools: `spec_to_ir_main.exe` + `code_emitter_main.exe`
 
 2. **Supported Languages (stub generation only)**
    - C (C99)
@@ -153,8 +153,8 @@ Most emitters in `tools/python/targets/` report version `1.0.0` but are **not te
 3. **Example Workflow**
    ```powershell
    # Tested and working
-   .\tools\spark\bin\stunir_spec_to_ir_main.exe --spec-root spec\examples --out test_ir.json
-   .\tools\spark\bin\stunir_ir_to_code_main.exe --input test_ir.json --output output.c --target c
+   .\tools\spark\bin\spec_to_ir_main.exe --spec-root spec\examples --out test_ir.json
+   .\tools\spark\bin\code_emitter_main.exe --input test_ir.json --output output.c --target c
    ```
 
 ### ❌ Not Implemented
@@ -230,7 +230,7 @@ grep "version" pyproject.toml
 
 **Ada SPARK Tools**:
 ```bash
-.\tools\spark\bin\stunir_ir_to_code_main.exe --version
+.\tools\spark\bin\code_emitter_main.exe --version
 ```
 
 **Toolchain Lock**:

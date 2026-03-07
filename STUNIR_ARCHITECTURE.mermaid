@@ -19,5 +19,11 @@ graph TD
 
     Logic -->|Reads| Spec[Spec (JSON)]
     Logic -->|Reads| Lock[Toolchain Lock]
-    Logic -->|Produces| Code[Source Code]
+    Logic -->|Phase 2b| IRNorm[IR Normalization
+normal_form rules]
+    IRNorm -->|Produces| Code[Source Code]
     Logic -->|Produces| Receipt[Receipt (JSON)]
+
+    %% Normal Form SSoT Reference
+    IRNorm -.->|SSoT| SSoT[tools/spark/schema/
+stunir_ir_v1.dcbor.json]

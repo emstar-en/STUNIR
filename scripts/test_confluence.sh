@@ -1,6 +1,13 @@
 #!/bin/bash
 # STUNIR Confluence Test
 # Verifies that SPARK, Python, and Rust implementations produce identical outputs.
+#
+# OUTPUT CONFLUENCE (Receipt-Bound Semantic Equivalence):
+# - Target outputs may differ by platform/toolchain, but MUST be bound to same cir_sha256
+# - Receipts MUST include output artifact hashes anchored to cir_sha256
+# - Two builds are confluent if receipts prove same canonical IR derivation
+#
+# SSoT: docs/reports/CONFLUENCE_SPECIFICATION.md → Output Confluence section
 
 set -euo pipefail
 
@@ -36,7 +43,7 @@ echo ""
 
 # Test SPARK spec_to_ir
 echo "1️⃣  SPARK spec_to_ir:"
-SPARK_SPEC_TO_IR="$REPO_ROOT/tools/spark/bin/stunir_spec_to_ir_main"
+SPARK_SPEC_TO_IR="$REPO_ROOT/tools/spark/bin/spec_to_ir_main"
 if [ -x "$SPARK_SPEC_TO_IR" ]; then
     $SPARK_SPEC_TO_IR --spec-root "$SPEC_DIR" --out "$TEST_DIR/ir_spark.json"
     echo "   ✅ Generated: $TEST_DIR/ir_spark.json"
@@ -97,7 +104,7 @@ echo ""
 
 # Test SPARK ir_to_code
 echo "1️⃣  SPARK ir_to_code:"
-SPARK_IR_TO_CODE="$REPO_ROOT/tools/spark/bin/stunir_ir_to_code_main"
+SPARK_IR_TO_CODE="$REPO_ROOT/tools/spark/bin/code_emitter_main"
 if [ -x "$SPARK_IR_TO_CODE" ]; then
     $SPARK_IR_TO_CODE --input "$IR_FILE" --output "$TEST_DIR/output_spark.c" --target c
     echo "   ✅ Generated: $TEST_DIR/output_spark.c"
@@ -185,6 +192,149 @@ fi
 echo ""
 echo "=== Summary ==="
 echo "Passed: $PASS_COUNT / $TOTAL_COUNT"
+
+# ============================================================================
+# Phase 4: Output Confluence Verification (Receipt-Bound)
+# ============================================================================
+echo ""
+echo "=== Phase 4: Output Confluence (Receipt-Bound) ==="
+echo ""
+
+# Check if receipts exist and verify cir_sha256 binding
+RECEIPT_DIR="$REPO_ROOT/receipts"
+if [ -d "$RECEIPT_DIR" ]; then
+    echo "📋 Checking receipt bindings..."
+    
+    # Extract cir_sha256 from all target receipts
+    CIR_HASHES=""
+    for receipt in "$RECEIPT_DIR"/target_*.json; do
+        if [ -f "$receipt" ]; then
+            cir=$(jq -r '.cir_sha256 // empty' "$receipt" 2>/dev/null || echo "")
+            if [ -n "$cir" ]; then
+                CIR_HASHES="$CIR_HASHES $cir"
+                echo "   Found cir_sha256 in $(basename $receipt): $cir"
+            fi
+        done
+    done
+    
+    # Check if all cir_sha256 values match
+    if [ -n "$CIR_HASHES" ]; then
+        UNIQUE_CIRS=$(echo $CIR_HASHES | tr ' ' '\n' | sort -u | wc -l)
+        if [ "$UNIQUE_CIRS" -eq 1 ]; then
+            echo "✅ Output Confluence: All receipts bound to same cir_sha256"
+        else
+            echo "⚠️  Output Confluence: Receipts have different cir_sha256 values"
+            echo "   This indicates different canonical IRs were used"
+        fi
+    else
+        echo "⚠️  No cir_sha256 found in receipts (legacy format)"
+    fi
+else
+    echo "⚠️  No receipts directory found"
+fi
+
+# ============================================================================
+# Phase 5: Semantic IR Confluence Verification
+# ============================================================================
+echo ""
+echo "=== Phase 5: Semantic IR Confluence ==="
+echo ""
+
+# Test Semantic IR generation and normalization
+SEMANTIC_IR_DIR="$TEST_DIR/semantic_ir"
+mkdir -p "$SEMANTIC_IR_DIR"
+
+# Test SPARK Semantic IR generation
+echo "1️⃣  SPARK Semantic IR:"
+SPARK_SEMANTIC_IR="$REPO_ROOT/tools/spark/bin/semantic_ir_main"
+if [ -x "$SPARK_SEMANTIC_IR" ]; then
+    $SPARK_SEMANTIC_IR "$IR_FILE" "$SEMANTIC_IR_DIR/semantic_ir_spark.json"
+    echo "   ✅ Generated: $SEMANTIC_IR_DIR/semantic_ir_spark.json"
+    
+    # Verify normal form
+    if [ -f "$SEMANTIC_IR_DIR/semantic_ir_spark.json" ]; then
+        # Check that imports are sorted
+        IMPORTS_SORTED=$(jq -e '.imports | if length > 1 then all(.[] as $item | .[1:] | all(.module_name >= $item.module_name)) else true end' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" 2>/dev/null && echo "true" || echo "false")
+        if [ "$IMPORTS_SORTED" = "true" ]; then
+            echo "   ✅ Imports sorted (normal form)"
+        else
+            echo "   ⚠️  Imports not sorted (normal form violation)"
+        fi
+        
+        # Check that exports are sorted
+        EXPORTS_SORTED=$(jq -e '.exports | if length > 1 then all(.[] as $item | .[1:] | all(. >= $item)) else true end' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" 2>/dev/null && echo "true" || echo "false")
+        if [ "$EXPORTS_SORTED" = "true" ]; then
+            echo "   ✅ Exports sorted (normal form)"
+        else
+            echo "   ⚠️  Exports not sorted (normal form violation)"
+        fi
+        
+        # Check for content hash
+        HAS_HASH=$(jq -e '.module_hash != null' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" 2>/dev/null && echo "true" || echo "false")
+        if [ "$HAS_HASH" = "true" ]; then
+            echo "   ✅ Content hash present (confluence guarantee)"
+        else
+            echo "   ⚠️  Content hash missing (confluence not guaranteed)"
+        fi
+    fi
+else
+    echo "   ⚠️  SPARK Semantic IR binary not found, skipping"
+fi
+echo ""
+
+#  Python Semantic IR is NOT part of the SPARK pipeline.
+#  Only SPARK Semantic IR is tested for confluence.
+#  Python tools are excluded per project requirements.
+
+# Verify SPARK Semantic IR conformance
+echo "📋 Semantic IR Confluence Verification (SPARK-only):"
+SEMANTIC_IR_PASS=0
+SEMANTIC_IR_TOTAL=1
+
+if [ -f "$SEMANTIC_IR_DIR/semantic_ir_spark.json" ]; then
+    # Check for valid JSON structure
+    if jq -e '.module_name' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" >/dev/null 2>&1; then
+        echo "   ✅ Valid Semantic IR JSON structure"
+        SEMANTIC_IR_PASS=$((SEMANTIC_IR_PASS + 1))
+    else
+        echo "   ⚠️  Invalid Semantic IR JSON structure"
+    fi
+    
+    # Check for content hash (confluence guarantee)
+    HAS_HASH=$(jq -e '.module_hash != null' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" 2>/dev/null && echo "true" || echo "false")
+    if [ "$HAS_HASH" = "true" ]; then
+        echo "   ✅ Content hash present (confluence guarantee)"
+    else
+        echo "   ⚠️  Content hash missing (confluence not guaranteed)"
+    fi
+    
+    # Check normal form properties
+    IMPORTS_SORTED=$(jq -e '.imports | if length > 1 then all(.[] as $item | .[1:] | all(.module_name >= $item.module_name)) else true end' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" 2>/dev/null && echo "true" || echo "false")
+    if [ "$IMPORTS_SORTED" = "true" ]; then
+        echo "   ✅ Imports sorted (normal form)"
+    else
+        echo "   ⚠️  Imports not sorted (normal form violation)"
+    fi
+    
+    EXPORTS_SORTED=$(jq -e '.exports | if length > 1 then all(.[] as $item | .[1:] | all(. >= $item)) else true end' "$SEMANTIC_IR_DIR/semantic_ir_spark.json" 2>/dev/null && echo "true" || echo "false")
+    if [ "$EXPORTS_SORTED" = "true" ]; then
+        echo "   ✅ Exports sorted (normal form)"
+    else
+        echo "   ⚠️  Exports not sorted (normal form violation)"
+    fi
+else
+    echo "   ⚠️  SPARK Semantic IR output not found"
+fi
+
+echo ""
+echo "=== Semantic IR Summary ==="
+echo "Passed: $SEMANTIC_IR_PASS / $SEMANTIC_IR_TOTAL"
+
+if [ $SEMANTIC_IR_PASS -eq $SEMANTIC_IR_TOTAL ]; then
+    echo "✅ Semantic IR Confluence: SPARK implementation produces valid output"
+else
+    echo "⚠️  Semantic IR Confluence: SPARK implementation has issues"
+fi
 
 if [ $TOTAL_COUNT -eq 0 ]; then
     echo "⚠️  WARNING: No implementations could be compared"

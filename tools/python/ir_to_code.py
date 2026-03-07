@@ -6,7 +6,7 @@ Integrates with semantic IR emitters from tools/semantic_ir/emitters/
 Supports both general-purpose languages and specialized emitters.
 
 PRIMARY IMPLEMENTATION: Ada SPARK
-    Location: tools/spark/bin/stunir_ir_to_code_main
+    Location: tools/spark/bin/code_emitter_main
     Build:    cd tools/spark && gprbuild -P stunir_tools.gpr
 
 This Python version provides:

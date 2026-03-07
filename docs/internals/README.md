@@ -23,13 +23,18 @@ STUNIR uses a JSON-based IR format that:
 - Can be serialized to dCBOR for compact binary storage
 - Includes cryptographic hashes for verification
 
+**IR Normal Form (SSoT):** `tools/spark/schema/stunir_ir_v1.dcbor.json` → `normal_form` section
+
+**Models MUST NOT invent their own IR formats.** The normal form rules are enforced by Phase 2b normalization.
+
 ### Pipeline Stages
 
 1. **Parsing**: Spec files → AST
 2. **IR Emission**: AST → Canonical IR
-3. **Target Emission**: IR → Platform code
-4. **Receipt Generation**: Artifacts → Verification receipts
-5. **Manifest Generation**: Receipts → Deterministic manifests
+3. **IR Normalization (Phase 2b)**: Enforce normal_form rules (auto-normalize with warnings)
+4. **Target Emission**: IR → Platform code
+5. **Receipt Generation**: Artifacts → Verification receipts
+6. **Manifest Generation**: Receipts → Deterministic manifests
 
 ### Hash Chain
 

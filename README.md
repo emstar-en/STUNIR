@@ -8,6 +8,44 @@
 - **Do not introduce Python scripts, helpers, or tests** into non-Python pipeline stages.
 - Tools may **interact with user-provided Python artifacts**, but STUNIR must **not create** Python components for non-Python pipelines.
 
+## IR Normal Form (SSoT)
+
+**Models MUST NOT invent their own IR formats.** The canonical normal form rules are codified in:
+
+```
+tools/spark/schema/stunir_ir_v1.dcbor.json → normal_form section
+```
+
+Key rules:
+- **Field ordering**: All object keys sorted lexicographically (UTF-8 byte order)
+- **Array ordering**: Types/functions sorted alphabetically by name; args preserve source order
+- **Alpha renaming**: Bound variables use `_t0`, `_t1`, ...; top-level names preserved
+- **Literal normalization**: Shortest CBOR encoding; NFC-normalized UTF-8 strings
+- **Floats**: Forbidden in IR payloads (hard reject)
+- **Confluence**: Two semantically equivalent programs produce identical canonical IR bytes
+
+The SPARK pipeline enforces these rules in **Phase 2b (IR Normalization)** before code emission.
+
+## Output Confluence (Receipt-Bound Semantic Equivalence)
+
+**Output confluence** extends confluence to generated outputs via receipts and attestations:
+
+- **Target source outputs** may differ by platform/toolchain, but MUST be provably bound to the same `cir_sha256` (Canonical IR hash) via receipts.
+- **Receipts/manifests** MUST include explicit output artifact hashes anchored to `cir_sha256`.
+- **Root attestation** MUST bind receipt bundles and output artifacts to the same `cir_sha256`.
+
+**Key principle:**
+```
+same cir_sha256 ⟹ semantically equivalent outputs (proven via receipts)
+```
+
+This enables:
+- Cross-environment reproducibility (same IR → same semantic output)
+- Attested provenance (receipts bind outputs to IR)
+- Auditability (root attestation provides single source of truth)
+
+**SSoT:** `docs/reports/CONFLUENCE_SPECIFICATION.md` → Output Confluence section
+
 
 ##  Quick Start (For Humans Who Just Want This To Work)
 ### **Step 1: Get STUNIR**
@@ -104,8 +142,7 @@ precompiled/linux-x86_64/spark/bin/code_emitter_main
 precompiled/linux-x86_64/spark/bin/pipeline_driver_main
 ```
 
-> **Note:** The old tool names (`stunir_spec_to_ir_main`, `stunir_ir_to_code_main`) are deprecated.
-> See `docs/archive/spark_deprecated/README.md` for the deprecation schedule.
+> **Note:** Use the current tool names: `spec_to_ir_main`, `ir_converter_main`, `code_emitter_main`, `pipeline_driver_main`.
 
 **Benefits of Precompiled Binaries:**
 - ✅ No GNAT compiler required
@@ -185,12 +222,12 @@ If you're a developer who wants to directly use STUNIR's Ada SPARK tools:
 
 ```bash
 # 1. Convert spec to IR
-precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main \
+precompiled/linux-x86_64/spark/bin/spec_to_ir_main \
   --spec-dir spec/ \
   --output asm/spec_ir.txt
 
 # 2. Generate code from IR
-precompiled/linux-x86_64/spark/bin/stunir_ir_to_code_main \
+precompiled/linux-x86_64/spark/bin/code_emitter_main \
   --ir-file asm/spec_ir.txt \
   --target c99 \
   --output build/generated/
@@ -492,8 +529,8 @@ This section is intentionally concrete. If you want to understand "how STUNIR wo
 STUNIR's deterministic pipeline is built around **Ada SPARK** as the primary implementation:
 
 1. **Precompiled SPARK Binaries** (recommended): `precompiled/linux-x86_64/spark/bin/`
-   - `stunir_spec_to_ir_main` — Spec to IR conversion
-   - `stunir_ir_to_code_main` — IR to code emission
+   - `spec_to_ir_main` — Spec to IR conversion
+   - `code_emitter_main` — IR to code emission
    - `embedded_emitter_main` — Embedded target code generation
    
 2. **Source SPARK Tools** (if building from source): `tools/spark/bin/`
@@ -529,9 +566,9 @@ In strict mode, `scripts/build.sh` can forbid non-deterministic epochs; by defau
 This repo currently emits IR using **Ada SPARK** as the primary implementation:
 
 1. **Primary SPARK Implementation**: 
-   - Tool: `precompiled/linux-x86_64/spark/bin/stunir_spec_to_ir_main` (or `tools/spark/bin/stunir_spec_to_ir_main`)
+   - Tool: `precompiled/linux-x86_64/spark/bin/spec_to_ir_main` (or `tools/spark/bin/spec_to_ir_main`)
    - Output: `asm/spec_ir.txt` — deterministic manifest-style summary of spec JSON files (file + sha256 + optional id/name)
-   - Source: `tools/spark/src/stunir_spec_to_ir.adb` (DO-178C Level A verified)
+   - Source: `tools/spark/src/core/spec_to_ir.adb` (DO-178C Level A verified)
 
 2. **Normalized IR files** (Ada SPARK):
    - Each `spec/**.json` is normalized into deterministic CBOR bytes (dCBOR-style map ordering)

@@ -104,13 +104,13 @@
 --           STUNIR.Emitters.Visitor
 --    NOTE: stunir.ads is NOT here. It lives in src/core/ only.
 --
---  src/semantic_ir/    Phase:2   Prefix:Semantic_IR      SPARK:On
---    Typed AST intermediate representation hierarchy.
+--  src/semantic_ir/    Phase:2c  Prefix:Semantic_IR      SPARK:On
+--    Semantic IR with explicit type bindings, CFG edges, and normal form.
 --    Units: Semantic_IR (root), Semantic_IR.Types, Semantic_IR.Nodes,
 --           Semantic_IR.Modules, Semantic_IR.Declarations,
 --           Semantic_IR.Expressions, Semantic_IR.Statements,
---           Semantic_IR.Validation, Semantic_IR.JSON
---    This is the canonical IR AST used by all emitters.
+--           Semantic_IR.Parse, Semantic_IR.Normalizer, Semantic_IR.Emitter
+--    Converts flat IR to semantically enriched IR for multi-target emission.
 --
 --  src/types/          Phase:X   Prefix:STUNIR_Types     SPARK:On
 --    Master type definitions shared across all phases.
@@ -244,6 +244,7 @@ project STUNIR_Tools is
       "src/json",       --  Phase X:   JSON parsing and manipulation utilities
       "src/spec",       --  Phase 1:   Spec assembly and validation pipeline
       "src/ir",         --  Phase 2:   IR generation, validation, optimization (IR.* packages)
+      "src/semantic_ir",--  Phase 2c:  Semantic IR with type bindings and CFG (Semantic_IR.* packages)
       "src/utils",      --  Phase X:   String, path, CLI, toolchain utilities
       "src/files",      --  Phase 0:   Filesystem find/hash/index/read/write
       "src/functions",  --  Phase 1:   Function dedup, parsing, IR conversion
@@ -252,7 +253,6 @@ project STUNIR_Tools is
       "src/verification" --  Phase X:  Hashing, manifests, receipts
       --  NOTE: src/deprecated/ is intentionally ABSENT. See RULE 3 above.
       --  NOTE: src/micro/ removed - emit_target_main.adb moved to src/emitters/
-      --  NOTE: src/semantic_ir/ removed - IR.* packages now in src/ir/
    );
 
    for Object_Dir use "obj";  --  All .ali and .o files go here. Never in src/.
@@ -296,6 +296,9 @@ project STUNIR_Tools is
       "spec_to_ir_main.adb",
       "module_to_ir.adb",
       --  NOTE: type_resolve.adb moved to src/deprecated/ (use type_resolver.adb instead)
+
+      --  Phase 2c — Semantic IR Conversion
+      "semantic_ir_main.adb",
 
       --  Phase 3 — Code Emission
       "code_emitter_main.adb",

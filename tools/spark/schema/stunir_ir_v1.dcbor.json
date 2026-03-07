@@ -38,6 +38,183 @@
     "required_root_fields": ["ir_version", "module_name", "types", "functions"],
     "field_order": "lexicographic"
   },
+  "normal_form": {
+    "_comment": "AST-level normalization rules for mathematical confluence. Models MUST NOT invent their own formats.",
+    "principle": "Two semantically equivalent programs MUST produce identical canonical IR bytes.",
+    "field_ordering": {
+      "rule": "All object keys MUST be sorted lexicographically (UTF-8 byte order).",
+      "rationale": "Ensures deterministic serialization independent of source order.",
+      "example": {
+        "invalid": {"z": 1, "a": 2},
+        "valid": {"a": 2, "z": 1}
+      }
+    },
+    "array_ordering": {
+      "root_level": {
+        "rule": "Root arrays follow declaration order: types before functions.",
+        "order": ["types", "generic_instantiations", "functions"],
+        "rationale": "Dependency resolution requires types before functions."
+      },
+      "types_array": {
+        "rule": "Types sorted alphabetically by name field.",
+        "example": ["ArrayWrapper", "Buffer", "Config", "Point"]
+      },
+      "functions_array": {
+        "rule": "Functions sorted alphabetically by name field.",
+        "example": ["calculate_total", "get_config", "init_buffer"]
+      },
+      "fields_array": {
+        "rule": "Struct fields sorted alphabetically by name field.",
+        "rationale": "Memory layout is target-dependent; canonical form uses logical ordering."
+      },
+      "args_array": {
+        "rule": "Function arguments preserve source order (semantic significance).",
+        "rationale": "Argument order affects calling convention; cannot be reordered."
+      }
+    },
+    "alpha_renaming": {
+      "scope": "Bound variables within function bodies (not top-level names).",
+      "rule": "Bound variables MUST use canonical names: _t0, _t1, _t2, ...",
+      "algorithm": [
+        "1. Traverse AST in depth-first, left-to-right order.",
+        "2. For each binding site (let, lambda, for-loop var), assign next _tN.",
+        "3. Replace all references to the original name with the canonical name.",
+        "4. Scopes are independent: same _tN may appear in sibling scopes."
+      ],
+      "example": {
+        "input": "let x = 1; let y = x + 2; return y",
+        "normalized": "let _t0 = 1; let _t1 = _t0 + 2; return _t1"
+      },
+      "preserved_names": {
+        "rule": "Top-level names (module, function names, type names, field names) are NOT alpha-renamed.",
+        "rationale": "These names are part of the public API and must be preserved for linking."
+      }
+    },
+    "literal_normalization": {
+      "integers": {
+        "rule": "Encode as shortest CBOR integer representation.",
+        "range_encoding": {
+          "0..23": "inline (1 byte)",
+          "-24..-1": "inline negative (1 byte)",
+          "24..255": "uint8_t prefix (2 bytes)",
+          "-256..-25": "int8_t prefix (2 bytes)",
+          "256..65535": "uint16_t prefix (3 bytes)",
+          "-65536..-257": "int16_t prefix (3 bytes)"
+        }
+      },
+      "strings": {
+        "rule": "MUST be NFC-normalized UTF-8 with no surrogates.",
+        "forbidden": ["non-NFC unicode", "lone surrogates", "null bytes in text strings"]
+      },
+      "booleans": {
+        "rule": "Use CBOR simple values true (0xF5) and false (0xF4)."
+      },
+      "null": {
+        "rule": "Use CBOR simple value null (0xF6)."
+      }
+    },
+    "structural_canonicalization": {
+      "deduplication": {
+        "rule": "Duplicate type definitions with identical structure MUST be merged.",
+        "detection": "Structural equality, not name equality.",
+        "example": {
+          "input": [{"name": "Point", "fields": [{"name": "x", "type": "f32"}, {"name": "y", "type": "f32"}]}, {"name": "Vec2", "fields": [{"name": "x", "type": "f32"}, {"name": "y", "type": "f32"}]}],
+          "normalized": [{"name": "Point", "fields": [{"name": "x", "type": "f32"}, {"name": "y", "type": "f32"}]}],
+          "note": "References to Vec2 rewritten to Point; first definition wins."
+        }
+      },
+      "dead_code_elimination": {
+        "rule": "Unreachable functions MAY be removed (optional optimization).",
+        "detection": "Functions not referenced by exported functions or entry points.",
+        "preserved": ["exported functions", "functions with external linkage attribute"]
+      },
+      "constant_folding": {
+        "rule": "Constant expressions MUST be evaluated at IR construction time.",
+        "examples": {
+          "arithmetic": {"input": "2 + 3", "output": "5"},
+          "string_concat": {"input": "\"hello\" + \" world\"", "output": "\"hello world\""},
+          "comparison": {"input": "5 > 3", "output": "true"}
+        }
+      }
+    },
+    "semantic_normalization": {
+      "_comment": "Transformations that preserve semantics but change structure.",
+      "identity_operations": {
+        "rule": "Identity operations MUST be eliminated.",
+        "examples": [
+          {"input": "x + 0", "output": "x"},
+          {"input": "x * 1", "output": "x"},
+          {"input": "x || false", "output": "x"},
+          {"input": "x && true", "output": "x"},
+          {"input": "!!x", "output": "x"}
+        ]
+      },
+      "commutative_canonicalization": {
+        "rule": "Commutative operations MUST use canonical operand ordering.",
+        "ordering": "Sort operands by their serialized CBOR bytes (lexicographic).",
+        "operators": ["+", "*", "&&", "||", "==", "!=", "&", "|", "^"],
+        "example": {
+          "input": "b + a",
+          "normalized": "a + b",
+          "rationale": "a serializes before b lexicographically"
+        }
+      },
+      "associative_flattening": {
+        "rule": "Associative chains MUST be flattened to left-associative form.",
+        "operators": ["+", "*", "&&", "||"],
+        "example": {
+          "input": "(a + b) + c",
+          "normalized": "a + (b + c)",
+          "note": "Left-associative nesting for deterministic tree shape."
+        }
+      }
+    },
+    "type_normalization": {
+      "alias_resolution": {
+        "rule": "Type aliases MUST be resolved to their underlying type.",
+        "example": {
+          "input": {"alias": "UserId", "target": "u64"},
+          "usage": "UserId",
+          "normalized": "u64"
+        }
+      },
+      "platform_independence": {
+        "rule": "Platform-dependent types MUST normalize to explicit sizes.",
+        "mappings": {
+          "size_t": "u64",
+          "ptrdiff_t": "i64",
+          "intptr_t": "i64",
+          "uintptr_t": "u64",
+          "long": "i64",
+          "unsigned long": "u64"
+        }
+      }
+    },
+    "control_flow_normalization": {
+      "rule": "Control flow structures normalize to canonical forms.",
+      "for_loop": {
+        "normalized_form": "while_loop with explicit init, condition, increment",
+        "example": {
+          "input": "for (i = 0; i < n; i++) { body }",
+          "output": "{ let i = 0; while (i < n) { body; i = i + 1; } }"
+        }
+      },
+      "switch_statement": {
+        "normalized_form": "chain of if-else with explicit fallthrough handling",
+        "note": "Case values sorted by serialized CBOR bytes."
+      }
+    },
+    "confluence_guarantee": {
+      "theorem": "The normal form rules are confluent: any sequence of valid transformations produces the same final IR.",
+      "proof_sketch": [
+        "1. All ordering rules are total orders (lexicographic).",
+        "2. Alpha-renaming uses deterministic traversal order.",
+        "3. Semantic transformations are terminating (size-reducing).",
+        "4. No rule depends on external state or random choices."
+      ],
+      "implication": "Two implementations of these rules MUST produce identical canonical IR bytes for semantically equivalent programs."
+    }
+  },
   "hashes": {
     "cir_sha256": "sha256(dcbor_canonical_encode(canonical_ir_object_model))",
     "ir_dcbor_sha256": "sha256(ir_dcbor_bytes)"

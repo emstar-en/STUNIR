@@ -13,6 +13,7 @@ STUNIR (Structured Universal Native Intermediate Representation) is a determinis
 - SHA-256 hashes verify artifact integrity
 - Canonical JSON encoding (RFC 8785/JCS subset)
 - Epoch-based timestamps for reproducibility
+- **IR Normal Form**: Enforced by Phase 2b normalization (see `tools/spark/schema/stunir_ir_v1.dcbor.json`)
 
 ### 2. Multi-Target Support
 - Native: Haskell, Rust
@@ -32,6 +33,7 @@ Spec → IR → Targets → Receipts → Verification
 |-------|-------------|-------|
 | Spec Parsing | Parse input specifications | `tools/parsers/` |
 | IR Emission | Generate intermediate representation | `tools/ir_emitter/` |
+| **IR Normalization** | **Enforce normal_form rules (Phase 2b)** | **`tools/spark/src/ir/ir_normalizer.adb`** |
 | Target Emission | Generate platform-specific code | `tools/emitters/`, `targets/` |
 | Manifest Generation | Create deterministic manifests | `manifests/` |
 | Receipt Generation | Produce verification receipts | `tools/receipt_emitter/` |

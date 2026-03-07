@@ -7,7 +7,7 @@ WARNING: This is a REFERENCE IMPLEMENTATION for readability purposes only.
          applications.
 
 PRIMARY IMPLEMENTATION: Ada SPARK
-    Location: tools/spark/bin/stunir_spec_to_ir_main
+    Location: tools/spark/bin/spec_to_ir_main
     Build:    cd tools/spark && gprbuild -P stunir_tools.gpr
 
 This Python version exists to:

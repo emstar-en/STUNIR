@@ -27,14 +27,14 @@ if [ ! -f \"$STUNIR_SPEC\" ]; then
 fi
 
 # Use the specific STUNIR tools we found in the workspace
-tools/spark/bin/stunir_spec_to_ir_main.exe --input $STUNIR_SPEC --output $TEMP_DIR/ir.json
-if [ ! -f \"$TEMP_DIR/ir.json\" ]; then
-    echo \"Error: Failed to generate IR from spec!\"
+tools/spark/bin/spec_to_ir_main.exe --input $STUNIR_SPEC --output $TEMP_DIR/ir.json
+if [ ! -f "$TEMP_DIR/ir.json" ]; then
+    echo "Error: Failed to generate IR from spec!"
     exit 1
 fi
 
 # Convert IR to Ada code
-tools/spark/bin/stunir_ir_to_code_main.exe --input $TEMP_DIR/ir.json --output $TEMP_DIR/main.adb --target Spark
+tools/spark/bin/code_emitter_main.exe --input $TEMP_DIR/ir.json --output $TEMP_DIR/main.adb --target Spark
 if [ ! -f \"$TEMP_DIR/main.adb\" ]; then
     echo \"Error: Failed to generate Ada code from IR!\"
     exit 1

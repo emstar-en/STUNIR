@@ -8,6 +8,9 @@
 > - Build manifest: `stunir_tools.gpr`
 > - Regex patterns: `schema/stunir_regex_ir_v1.dcbor.json`
 > - Type definitions: `src/types/stunir_types.ads`
+> - **IR Normal Form Rules: `schema/stunir_ir_v1.dcbor.json` → `normal_form` section**
+>
+> **Models MUST NOT invent their own IR formats.** All normalization rules are codified in the SSoT file.
 
 ---
 
@@ -198,6 +201,27 @@ The SSoT for all regular expressions. See `schema/stunir_regex_ir_v1.dcbor.json`
 - `extraction.whitespace` (3) — Whitespace normalization
 - `asm.x86_registers` (1) / `asm.arm_registers` (1) / `asm.wasm_instructions` (2)
 - `asm.x86_instructions` (1) / `asm.arm_instructions` (1)
+
+### 3.4 IR Normal Form Rules (SSoT)
+
+The canonical IR normal form rules are codified in `schema/stunir_ir_v1.dcbor.json`
+under the `normal_form` section. **Models MUST NOT invent their own formats.**
+
+**Key normalization rules:**
+
+| Rule | Description |
+|------|-------------|
+| Field Ordering | All object keys sorted lexicographically (UTF-8 byte order) |
+| Array Ordering | Types/functions sorted alphabetically by name; args preserve source order |
+| Alpha Renaming | Bound variables use `_t0`, `_t1`, ...; top-level names preserved |
+| Literal Normalization | Integers use shortest CBOR encoding; strings are NFC-normalized UTF-8 |
+| Identity Elimination | `x + 0` → `x`, `x * 1` → `x`, etc. |
+| Commutative Ordering | Operands sorted by serialized CBOR bytes |
+| Confluence | Two semantically equivalent programs produce identical canonical IR bytes |
+
+**Confluence guarantee:** The normal form rules are confluent—any sequence of valid
+transformations produces the same final IR. This enables deterministic cross-implementation
+verification.
 - `asm.unsafe_syscall` (1) / `asm.directives` (3)
 - `logging.filter` (3) — Runtime-supplied log filter patterns
 - `sanitization.identifier` (2) / `sanitization.tool_name` (1)
@@ -296,14 +320,14 @@ All tools use these exit codes (per `ARCHITECTURE.core.json`):
 
 ## 7. Deprecation Schedule
 
-| Tool | Deprecated | Removal | Replacement |
+| Tool | Deprecated | Removed | Replacement |
 |------|-----------|---------|-------------|
-| `stunir_spec_to_ir_main` | 2026-01-15 | 2026-06-01 | `ir_converter_main` |
-| `stunir_ir_to_code_main` | 2026-01-20 | 2026-06-01 | `code_emitter_main` |
-| `stunir_code_index_main` | 2026-01-20 | 2026-06-01 | (integrated into pipeline) |
+| `stunir_spec_to_ir_main` | 2026-01-15 | 2026-03-07 | `spec_to_ir_main`, `ir_converter_main` |
+| `stunir_ir_to_code_main` | 2026-01-20 | 2026-03-07 | `code_emitter_main` |
+| `stunir_code_index_main` | 2026-01-20 | 2026-03-07 | (integrated into pipeline) |
 
-Deprecated files are in `src/deprecated/` (excluded from `stunir_tools.gpr`).
-See `src/deprecated/DEPRECATED.md` for the full tombstone.
+Deprecated files have been moved to `work_artifacts/archive/deprecated_pipeline_2026-03-07/`.
+See that directory for historical reference.
 
 ---
 

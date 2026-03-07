@@ -31,7 +31,7 @@ Technical architecture documentation for the STUNIR (Structured Toolchain for Un
 │  ├──────────────┤   ├──────────────┤   ├──────────────┤                │
 │  │ • Specs      │──▶│ • Parser     │──▶│ • Targets    │                │
 │  │ • Configs    │   │ • IR Emitter │   │ • Manifests  │                │
-│  │ • Validation │   │ • Transform  │   │ • Receipts   │                │
+│  │ • Validation │   │ • IR Norm    │   │ • Receipts   │                │
 │  └──────────────┘   └──────────────┘   └──────────────┘                │
 │          │                  │                  │                        │
 │          └──────────────────┼──────────────────┘                        │
@@ -62,6 +62,7 @@ Technical architecture documentation for the STUNIR (Structured Toolchain for Un
 3. **Polyglot**: Support for multiple programming languages
 4. **Security**: Input validation and protection against common attacks
 5. **Modularity**: Components can be used independently or together
+6. **IR Normal Form**: Phase 2b enforces normal_form rules from `tools/spark/schema/stunir_ir_v1.dcbor.json`
 
 ---
 

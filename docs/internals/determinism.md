@@ -31,6 +31,23 @@ def canonical_json(data):
 - Minimal separators
 - UTF-8 encoding
 
+**IR Normal Form:** The IR normal form rules are codified in `tools/spark/schema/stunir_ir_v1.dcbor.json` → `normal_form` section. Phase 2b normalization enforces these rules before code emission.
+
+### 1.1 Output Confluence
+
+**Output confluence** extends determinism to generated outputs via receipts:
+
+- Target source outputs may differ by platform/toolchain, but MUST be provably bound to the same `cir_sha256` (Canonical IR hash) via receipts.
+- Receipts/manifests MUST include explicit output artifact hashes anchored to `cir_sha256`.
+- Root attestation MUST bind receipt bundles and output artifacts to the same `cir_sha256`.
+
+**Key principle:**
+```
+same cir_sha256 ⟹ semantically equivalent outputs (proven via receipts)
+```
+
+This enables cross-environment reproducibility and attested provenance.
+
 ### 2. SHA-256 Hash Verification
 
 Every artifact includes its SHA-256 hash:
@@ -80,6 +97,12 @@ Binary artifacts use Deterministic CBOR:
 - Same canonical ordering as JSON
 - Minimal encoding (shortest form)
 - No floating-point special values
+
+**IR dCBOR Profile:** See `tools/spark/schema/stunir_ir_v1.dcbor.json` for the full dCBOR profile specification, including:
+- Float policy: `forbid_floats`
+- String normalization: NFC UTF-8
+- Map key order: canonical (lexicographic)
+- Integer encoding: shortest
 
 ## Verification
 

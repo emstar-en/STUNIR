@@ -2,6 +2,19 @@
 
 This directory contains the Rust implementation of the STUNIR Native Core, capable of emitting code for multiple targets from a canonical Intermediate Reference (IR).
 
+## IR Normal Form
+
+**Emitters expect normalized IR input.** The IR normal form rules are enforced by Phase 2b normalization:
+
+```
+tools/spark/schema/stunir_ir_v1.dcbor.json → normal_form section
+```
+
+Key rules:
+- Field ordering: lexicographic (UTF-8 byte order)
+- Array ordering: types/functions alphabetically by name
+- Floats: forbidden in IR payloads
+
 ## Supported Targets
 
 | Target       | Flag          | Description                                      |

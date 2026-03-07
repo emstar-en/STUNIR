@@ -6,6 +6,22 @@
 
 The STUNIR Intermediate Representation (IR) is a JSON-based format that captures the structure and semantics of compiled modules.
 
+## IR Normal Form (SSoT)
+
+**Models MUST NOT invent their own IR formats.** The canonical normal form rules are codified in:
+
+```
+tools/spark/schema/stunir_ir_v1.dcbor.json → normal_form section
+```
+
+Key rules enforced by Phase 2b normalization:
+- **Field ordering**: All object keys sorted lexicographically (UTF-8 byte order)
+- **Array ordering**: Types/functions sorted alphabetically by name; args preserve source order
+- **Alpha renaming**: Bound variables use `_t0`, `_t1`, ...; top-level names preserved
+- **Literal normalization**: Shortest CBOR encoding; NFC-normalized UTF-8 strings
+- **Floats**: Forbidden in IR payloads (hard reject)
+- **Confluence**: Two semantically equivalent programs produce identical canonical IR bytes
+
 ## IR Schema
 
 ### Version: `stunir.ir.v1`

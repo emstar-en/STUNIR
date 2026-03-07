@@ -9,14 +9,16 @@ The STUNIR build pipeline transforms specifications into deterministic, verifiab
 ## Pipeline Stages
 
 ```
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│  PARSE   │───▶│   IR     │───▶│  TARGET  │───▶│ MANIFEST │───▶│  VERIFY  │
-└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
-    │               │               │               │               │
-    ▼               ▼               ▼               ▼               ▼
-spec.json      ir.json      targets/*    manifests/*   PASS/FAIL
-               ir.dcbor     receipts/*
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│  PARSE   │───▶│   IR     │───▶│IR NORM   │───▶│  TARGET  │───▶│ MANIFEST │───▶│  VERIFY  │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+    │               │               │               │               │               │
+    ▼               ▼               ▼               ▼               ▼               ▼
+spec.json      ir.json      normalized    targets/*    manifests/*   PASS/FAIL
+               ir.dcbor       ir.json       receipts/*
 ```
+
+**IR Normal Form:** Phase 2b enforces normal_form rules from `tools/spark/schema/stunir_ir_v1.dcbor.json`. Models MUST NOT invent their own IR formats.
 
 ## Stage Details
 
@@ -49,6 +51,24 @@ spec.json      ir.json      targets/*    manifests/*   PASS/FAIL
 **Tools:**
 - `tools/ir_emitter/emit_ir.py`
 - `scripts/lib/emit_dcbor.sh`
+
+### Stage 2b: IR Normalization
+
+**Purpose:** Enforce IR normal_form rules before emission.
+
+**Input:**
+- IR artifacts from Stage 2
+
+**Output:**
+- Normalized IR (auto-normalized with warnings)
+
+**Tools:**
+- `tools/spark/src/ir/ir_normalizer.adb`
+- `tools/spark/src/ir/ir_canonicalize_dcbor.adb`
+
+**Normal Form SSoT:** `tools/spark/schema/stunir_ir_v1.dcbor.json` → `normal_form` section
+
+**Enforcement:** Auto-normalize with warnings; reject floats in IR payloads.
 
 ### Stage 3: Target Emission
 

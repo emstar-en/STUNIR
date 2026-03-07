@@ -16,9 +16,7 @@ precompiled/
             └── embedded_emitter_main     # Embedded target emitter
 ```
 
-> **Note:** The old tool names (`stunir_spec_to_ir_main`, `stunir_ir_to_code_main`) are deprecated.
-> They may still exist for backward compatibility but should not be used for new work.
-> See `docs/archive/spark_deprecated/README.md` for the deprecation schedule.
+> **Note:** Use the current tool names: `ir_converter_main`, `code_emitter_main`, `pipeline_driver_main`.
 
 ## Supported Platforms
 

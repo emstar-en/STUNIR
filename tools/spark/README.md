@@ -341,9 +341,9 @@ These are the canonical tools from the GPR Main list:
 | **Phase 3** | `code_emitter_main`, `pipeline_driver_main`, `emit_target_main` |
 | **Cross-cutting** | `stunir_code_index_main`, `stunir_receipt_link_main`, `json_validate`, `json_extract`, `json_merge`, `receipt_generate` |
 
-### Deprecated Tools (54)
+### Deprecated Tools (52)
 
-These tools are in `bin/deprecated/` and will be removed on **2026-06-01**:
+These tools are in `work_artifacts/archive/deprecated_pipeline_2026-03-07/` and have been removed from active use:
 
 - Code generation helpers: `code_add_comments`, `code_format_target`, `code_gen_func_body`, `code_gen_func_sig`, `code_gen_preamble`, `code_write`
 - CPP utilities: `cpp_header_gen`, `cpp_impl_gen`, `cpp_sig_normalize`
@@ -351,7 +351,9 @@ These tools are in `bin/deprecated/` and will be removed on **2026-06-01**:
 - Function analysis: `func_parse_body`, `func_parse_sig`, `func_to_ir`
 - IR utilities: `ir_add_metadata`, `ir_check_functions`, `ir_check_required`, `ir_check_types`, `ir_extract_funcs`, `ir_extract_module`, `ir_gen_functions`, `ir_merge_funcs`
 - JSON utilities: `json_formatter`, `json_merge_arrays`, `json_merge_objects`, `json_path_eval`, `json_path_parser`, `json_validator`, `json_value_format`
-- Other: `manifest_generate`, `module_to_ir`, `schema_check_format`, `schema_check_required`, `schema_check_types`, `sig_gen_cpp`, `sig_gen_python`, `sig_gen_rust`, `spec_extract_funcs`, `spec_extract_module`, `spec_extract_types`, `spec_to_python`, `spec_validate`, `spec_validate_schema`, `stunir_ir_to_code_main`, `stunir_spec_to_ir_main`, `type_dependency`, `type_expand`, `type_lookup`, `type_map_cpp`, `type_map_target`, `type_resolve`, `type_resolver`, `validation_reporter`
+- Other: `manifest_generate`, `module_to_ir`, `schema_check_format`, `schema_check_required`, `schema_check_types`, `sig_gen_cpp`, `sig_gen_python`, `sig_gen_rust`, `spec_extract_funcs`, `spec_extract_module`, `spec_extract_types`, `spec_to_python`, `spec_validate`, `spec_validate_schema`, `type_dependency`, `type_expand`, `type_lookup`, `type_map_cpp`, `type_map_target`, `type_resolve`, `type_resolver`, `validation_reporter`
+
+**Note:** `stunir_spec_to_ir_main` and `stunir_ir_to_code_main` have been replaced by `spec_to_ir_main`/`ir_converter_main` and `code_emitter_main` respectively.
 
 ### Running Deprecation
 
